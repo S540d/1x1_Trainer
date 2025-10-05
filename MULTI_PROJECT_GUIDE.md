@@ -19,9 +19,9 @@ https://s540d.github.io/[repository-name]/
    - URL: `https://s540d.github.io/1x1_Trainer/`
    - Status: ✅ Konfiguriert & bereit
 
-2. **Kleines langweiliges Testprojekt**
-   - Repository: `https://github.com/S540d/kleines-langweiliges-Testprojekt`
-   - URL: `https://s540d.github.io/kleines-langweiliges-Testprojekt/`
+2. **Eisenhauer**
+   - Repository: `https://github.com/S540d/Eisenhauer`
+   - URL: `https://s540d.github.io/Eisenhauer/`
    - Status: ✅ Bereits deployed
 
 3. **Energy Price Germany**

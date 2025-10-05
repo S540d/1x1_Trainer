@@ -36,7 +36,7 @@ https://s540d.github.io/1x1_Trainer/
 **Multi-Projekt GitHub Pages:**
 GitHub Pages kann mehrere Projekte gleichzeitig hosten - jedes Repository bekommt einen eigenen Subpath:
 - ✅ `https://s540d.github.io/1x1_Trainer/`
-- ✅ `https://s540d.github.io/kleines-langweiliges-Testprojekt/`
+- ✅ `https://s540d.github.io/Eisenhauer/`
 - ✅ `https://s540d.github.io/Energy_Price_Germany/` (wenn Pages aktiviert)
 - ✅ Weitere Projekte können jederzeit hinzugefügt werden
 
