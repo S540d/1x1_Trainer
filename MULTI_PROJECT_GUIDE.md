@@ -27,7 +27,7 @@ https://s540d.github.io/[repository-name]/
 3. **Energy Price Germany**
    - Repository: `https://github.com/S540d/Energy_Price_Germany`
    - URL: `https://s540d.github.io/Energy_Price_Germany/`
-   - Status: ⏳ Noch nicht konfiguriert
+   - Status: ✅ Konfiguriert & bereit
 
 ## 🚀 Weiteres Projekt hinzufügen
 
