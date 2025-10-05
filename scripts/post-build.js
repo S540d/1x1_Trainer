@@ -21,4 +21,20 @@ filesToCopy.forEach(({ src, dest }) => {
   }
 });
 
+// Fix paths in index.html for GitHub Pages subpath deployment
+const indexPath = path.join(__dirname, '..', 'dist', 'index.html');
+if (fs.existsSync(indexPath)) {
+  let html = fs.readFileSync(indexPath, 'utf8');
+
+  // Replace absolute paths with relative paths
+  html = html.replace(/href="\//g, 'href="./');
+  html = html.replace(/src="\//g, 'src="./');
+
+  // Fix service worker registration path
+  html = html.replace(/\.register\('\/service-worker\.js'\)/, ".register('./service-worker.js')");
+
+  fs.writeFileSync(indexPath, html);
+  console.log('✓ Fixed paths in index.html for subpath deployment');
+}
+
 console.log('✓ PWA files copied successfully!');
