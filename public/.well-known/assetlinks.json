@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.sven4321.trainer1x1",
+    "sha256_cert_fingerprints": [
+      "1C:34:91:A8:8A:76:18:82:E3:80:68:19:FA:7C:59:9C:AF:F7:B2:35:5E:8E:DA:31:B8:1F:49:0F:EB:B7:17:FC"
+    ]
+  }
+}]
