@@ -45,7 +45,7 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('/service-worker.js', { scope: '/' })
+            .register('/1x1_Trainer/service-worker.js', { scope: '/1x1_Trainer/' })
             .then((registration) => {
               console.log('SW registered: ', registration);
             })
