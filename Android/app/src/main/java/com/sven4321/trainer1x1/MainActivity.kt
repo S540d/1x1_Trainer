@@ -34,13 +34,6 @@ class MainActivity : AppCompatActivity() {
         try {
             // Create CustomTabs intent for TWA
             val builder = CustomTabsIntent.Builder()
-                .setDefaultColorSchemeParams(
-                    CustomTabsIntent.ColorSchemeParams.Builder()
-                        .setToolbarColor(getColor(android.R.color.white))
-                        .setSecondaryToolbarColor(getColor(android.R.color.darker_gray))
-                        .setNavigationBarColor(getColor(android.R.color.white))
-                        .build()
-                )
                 .setShowTitle(false)
                 .setInstantAppsEnabled(true)
                 .setUrlBarHidingEnabled(true)
