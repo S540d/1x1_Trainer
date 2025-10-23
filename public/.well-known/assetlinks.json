@@ -1,10 +1,15 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.sven4321.trainer1x1",
-    "sha256_cert_fingerprints": [
-      "A8:A4:28:53:89:4F:40:05:B5:78:89:5E:9E:C8:74:E9:03:E4:C9:31:F5:B3:20:32:CF:08:A2:98:C9:08:0B:88"
-    ]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.sven4321.trainer1x1",
+      "sha256_cert_fingerprints": [
+        "C9:B7:5C:A8:F4:23:48:5D:D6:E3:87:EB:9A:13:5B:4F:B8:24:A4:AE:E5:56:9C:58:56:E6:E6:AE:73:C4:BB:78"
+      ]
+    }
   }
-}]
+]
