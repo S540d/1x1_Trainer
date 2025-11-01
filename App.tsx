@@ -19,8 +19,40 @@ enum GameMode {
 }
 
 type ThemeMode = 'light' | 'dark' | 'system';
+type Language = 'en' | 'de';
 
 const APP_VERSION = '1.0.1';
+
+const translations = {
+  en: {
+    appearance: 'APPEARANCE',
+    dark: 'Dark',
+    system: 'System',
+    language: 'LANGUAGE',
+    english: 'English',
+    german: 'Deutsch',
+    feedback: 'Send Feedback',
+    support: 'Buy Me a Coffee',
+    about: 'ABOUT',
+    version: 'Version',
+    copyright: '© 2025 Sven Strohkark',
+    license: 'License: MIT',
+  },
+  de: {
+    appearance: 'ERSCHEINUNGSBILD',
+    dark: 'Dunkel',
+    system: 'System',
+    language: 'SPRACHE',
+    english: 'English',
+    german: 'Deutsch',
+    feedback: 'Feedback senden',
+    support: 'Buy Me a Coffee',
+    about: 'ÜBER',
+    version: 'Version',
+    copyright: '© 2025 Sven Strohkark',
+    license: 'Lizenz: MIT',
+  },
+};
 
 interface GameState {
   num1: number;
@@ -54,6 +86,8 @@ export default function App() {
   });
   const [menuVisible, setMenuVisible] = useState(false);
   const [themeMode, setThemeMode] = useState<ThemeMode>('system');
+  const [language, setLanguage] = useState<Language>('en');
+  const t = translations[language];
 
   useEffect(() => {
     generateQuestion();
@@ -214,65 +248,118 @@ export default function App() {
               <Text style={styles.settingsMenuCloseButtonText}>✕</Text>
             </TouchableOpacity>
 
-            {/* Dark Mode Toggle */}
+            {/* Appearance Settings - Dark/System Only */}
             <View style={styles.settingsSection}>
-              <Text style={styles.settingsSectionTitle}>Erscheinungsbild</Text>
+              <Text style={styles.settingsSectionTitle}>{t.appearance}</Text>
               <View style={styles.themeToggle}>
-                {(['light', 'system', 'dark'] as ThemeMode[]).map((mode) => (
-                  <TouchableOpacity
-                    key={mode}
+                <TouchableOpacity
+                  style={[
+                    styles.themeButton,
+                    themeMode === 'dark' && styles.themeButtonActive,
+                  ]}
+                  onPress={() => setThemeMode('dark')}
+                >
+                  <Text
                     style={[
-                      styles.themeButton,
-                      themeMode === mode && styles.themeButtonActive,
+                      styles.themeButtonText,
+                      themeMode === 'dark' && styles.themeButtonTextActive,
                     ]}
-                    onPress={() => setThemeMode(mode)}
                   >
-                    <Text
-                      style={[
-                        styles.themeButtonText,
-                        themeMode === mode && styles.themeButtonTextActive,
-                      ]}
-                    >
-                      {mode === 'light' ? 'Hell' : mode === 'dark' ? 'Dunkel' : 'System'}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                    {t.dark}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.themeButton,
+                    themeMode === 'system' && styles.themeButtonActive,
+                  ]}
+                  onPress={() => setThemeMode('system')}
+                >
+                  <Text
+                    style={[
+                      styles.themeButtonText,
+                      themeMode === 'system' && styles.themeButtonTextActive,
+                    ]}
+                  >
+                    {t.system}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
 
             <View style={styles.settingsDivider} />
 
-            {/* Feedback */}
-            <TouchableOpacity
-              style={styles.settingsMenuLink}
-              onPress={() => {
-                Linking.openURL('mailto:feedback@example.com?subject=1x1 Trainer Feedback');
-                setMenuVisible(false);
-              }}
-            >
-              <Text style={styles.settingsMenuLinkText}>Feedback</Text>
-            </TouchableOpacity>
+            {/* Language Settings */}
+            <View style={styles.settingsSection}>
+              <Text style={styles.settingsSectionTitle}>{t.language}</Text>
+              <View style={styles.themeToggle}>
+                <TouchableOpacity
+                  style={[
+                    styles.themeButton,
+                    language === 'en' && styles.themeButtonActive,
+                  ]}
+                  onPress={() => setLanguage('en')}
+                >
+                  <Text
+                    style={[
+                      styles.themeButtonText,
+                      language === 'en' && styles.themeButtonTextActive,
+                    ]}
+                  >
+                    {t.english}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.themeButton,
+                    language === 'de' && styles.themeButtonActive,
+                  ]}
+                  onPress={() => setLanguage('de')}
+                >
+                  <Text
+                    style={[
+                      styles.themeButtonText,
+                      language === 'de' && styles.themeButtonTextActive,
+                    ]}
+                  >
+                    {t.german}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.settingsDivider} />
+
+            {/* Feedback and Support in One Row */}
+            <View style={[styles.settingsSection, styles.settingsSectionRow]}>
+              <TouchableOpacity
+                style={styles.settingsMenuLinkFlex}
+                onPress={() => {
+                  Linking.openURL('mailto:feedback@example.com?subject=1x1 Trainer Feedback');
+                  setMenuVisible(false);
+                }}
+              >
+                <Text style={styles.settingsMenuLinkText}>{t.feedback}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.settingsMenuLinkFlex}
+                onPress={() => {
+                  Linking.openURL('https://buymeacoffee.com/sven4321');
+                  setMenuVisible(false);
+                }}
+              >
+                <Text style={styles.settingsMenuLinkText}>{t.support}</Text>
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.settingsDivider} />
 
             {/* About */}
             <View style={styles.settingsSection}>
-              <Text style={styles.settingsAboutText}>Version {APP_VERSION}</Text>
-              <Text style={styles.settingsAboutText}>© 2025 Sven Strohkark</Text>
+              <Text style={styles.settingsSectionTitle}>{t.about}</Text>
+              <Text style={styles.settingsAboutText}>{t.version} {APP_VERSION}</Text>
+              <Text style={styles.settingsAboutText}>{t.license}</Text>
             </View>
-
-            <View style={styles.settingsDivider} />
-
-            {/* Support */}
-            <TouchableOpacity
-              style={styles.settingsMenuLink}
-              onPress={() => {
-                Linking.openURL('https://buymeacoffee.com/sven4321');
-                setMenuVisible(false);
-              }}
-            >
-              <Text style={styles.settingsMenuLinkText}>Buy Me a Coffee</Text>
-            </TouchableOpacity>
           </View>
         </>
       )}
@@ -508,6 +595,14 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.1)',
   },
+  settingsMenuLinkFlex: {
+    flex: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+  },
   settingsMenuLinkText: {
     fontSize: 14,
     fontWeight: '600',
@@ -516,6 +611,10 @@ const styles = StyleSheet.create({
   settingsSection: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+  },
+  settingsSectionRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 0,
   },
   settingsSectionTitle: {
     fontSize: 12,
