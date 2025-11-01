@@ -1,7 +1,7 @@
 {
   "short_name": "1x1 Trainer",
-  "name": "1x1 Trainer - Lerne das Einmaleins",
-  "description": "Übe das kleine Einmaleins mit verschiedenen Spielmodi",
+  "name": "1x1 Trainer - Learn Multiplication",
+  "description": "Practice multiplication tables with different game modes",
   "icons": [
     {
       "src": "/icon-96.png",
@@ -74,9 +74,9 @@
   "categories": ["education", "productivity"],
   "shortcuts": [
     {
-      "name": "Starte Training",
+      "name": "Start Training",
       "short_name": "Training",
-      "description": "Starte ein neues 1x1 Training",
+      "description": "Start a new 1x1 training session",
       "url": "/1x1_Trainer/?mode=normal",
       "icons": [
         {

@@ -25,6 +25,7 @@ const APP_VERSION = '1.0.1';
 
 const translations = {
   en: {
+    // Settings Menu
     appearance: 'APPEARANCE',
     dark: 'Dark',
     system: 'System',
@@ -37,8 +38,26 @@ const translations = {
     version: 'Version',
     copyright: '© 2025 Sven Strohkark',
     license: 'License: MIT',
+    // Game UI
+    task: 'Task',
+    points: 'Points',
+    of: 'of',
+    // Game Modes
+    normalMode: 'Normal Tasks',
+    firstMissing: 'First Number Missing',
+    secondMissing: 'Second Number Missing',
+    mixedMode: 'Mixed',
+    // Buttons
+    check: 'Check',
+    nextQuestion: 'Next Question',
+    playAgain: 'Play Again',
+    // Results Modal
+    great: 'Great!',
+    youSolved: 'You solved',
+    tasksCorrectly: 'tasks correctly',
   },
   de: {
+    // Settings Menu
     appearance: 'ERSCHEINUNGSBILD',
     dark: 'Dunkel',
     system: 'System',
@@ -51,6 +70,23 @@ const translations = {
     version: 'Version',
     copyright: '© 2025 Sven Strohkark',
     license: 'Lizenz: MIT',
+    // Game UI
+    task: 'Aufgabe',
+    points: 'Punkte',
+    of: 'von',
+    // Game Modes
+    normalMode: 'Normale Aufgaben',
+    firstMissing: 'Erste Zahl fehlt',
+    secondMissing: 'Zweite Zahl fehlt',
+    mixedMode: 'Gemischt',
+    // Buttons
+    check: 'Prüfen',
+    nextQuestion: 'Nächste Frage',
+    playAgain: 'Nochmal spielen',
+    // Results Modal
+    great: 'Super!',
+    youSolved: 'Du hast',
+    tasksCorrectly: 'Aufgaben richtig gelöst',
   },
 };
 
@@ -89,9 +125,36 @@ export default function App() {
   const [language, setLanguage] = useState<Language>('en');
   const t = translations[language];
 
+  // Load language preference on mount
   useEffect(() => {
+    const loadLanguage = async () => {
+      try {
+        // Try to load from localStorage
+        const savedLanguage = localStorage.getItem('app-language');
+        if (savedLanguage === 'en' || savedLanguage === 'de') {
+          setLanguage(savedLanguage);
+        } else {
+          // Auto-detect browser language
+          const browserLang = navigator.language.split('-')[0];
+          setLanguage(browserLang === 'de' ? 'de' : 'en');
+        }
+      } catch (error) {
+        // Fallback to English if localStorage is not available
+        setLanguage('en');
+      }
+    };
+    loadLanguage();
     generateQuestion();
   }, []);
+
+  // Save language preference when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('app-language', language);
+    } catch (error) {
+      // Ignore localStorage errors
+    }
+  }, [language]);
 
   const generateQuestion = (mode: GameMode = gameState.gameMode) => {
     const newNum1 = Math.floor(Math.random() * 10) + 1;
@@ -368,32 +431,34 @@ export default function App() {
 
         <View style={styles.scoreContainer}>
           <Text style={styles.scoreText}>
-            Aufgabe: {gameState.currentTask} / {gameState.totalTasks}
+            {t.task}: {gameState.currentTask} / {gameState.totalTasks}
           </Text>
-          <Text style={[styles.scoreText, styles.scoreValue]}>Punkte: {gameState.score}</Text>
+          <Text style={[styles.scoreText, styles.scoreValue]}>
+            {t.points}: {gameState.score}
+          </Text>
         </View>
 
         <View style={styles.gameModeContainer}>
           <View style={styles.gameModeRow}>
             <GameModeButton
-              text="Normale Aufgaben"
+              text={t.normalMode}
               isSelected={gameState.gameMode === GameMode.NORMAL}
               onPress={() => changeGameMode(GameMode.NORMAL)}
             />
             <GameModeButton
-              text="Erste Zahl fehlt"
+              text={t.firstMissing}
               isSelected={gameState.gameMode === GameMode.FIRST_MISSING}
               onPress={() => changeGameMode(GameMode.FIRST_MISSING)}
             />
           </View>
           <View style={styles.gameModeRow}>
             <GameModeButton
-              text="Zweite Zahl fehlt"
+              text={t.secondMissing}
               isSelected={gameState.gameMode === GameMode.SECOND_MISSING}
               onPress={() => changeGameMode(GameMode.SECOND_MISSING)}
             />
             <GameModeButton
-              text="Gemischt"
+              text={t.mixedMode}
               isSelected={gameState.gameMode === GameMode.MIXED}
               onPress={() => changeGameMode(GameMode.MIXED)}
             />
@@ -424,7 +489,7 @@ export default function App() {
             disabled={gameState.userAnswer === ''}
           >
             <Text style={styles.checkButtonText}>
-              {gameState.isAnswerChecked ? 'Nächste Frage' : 'Prüfen'}
+              {gameState.isAnswerChecked ? t.nextQuestion : t.check}
             </Text>
           </TouchableOpacity>
         </View>
@@ -433,12 +498,12 @@ export default function App() {
       <Modal visible={gameState.showResult} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Super!</Text>
+            <Text style={styles.modalTitle}>{t.great}</Text>
             <Text style={styles.modalText}>
-              Du hast {gameState.score} von {gameState.totalTasks} Aufgaben richtig gelöst.
+              {t.youSolved} {gameState.score} {t.of} {gameState.totalTasks} {t.tasksCorrectly}.
             </Text>
             <TouchableOpacity style={styles.restartButton} onPress={restartGame}>
-              <Text style={styles.restartButtonText}>Nochmal spielen</Text>
+              <Text style={styles.restartButtonText}>{t.playAgain}</Text>
             </TouchableOpacity>
           </View>
         </View>
