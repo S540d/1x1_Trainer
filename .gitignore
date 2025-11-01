@@ -56,3 +56,6 @@ Android/*.keystore
 # Only track via submodule, ignore local copies
 .github/ISSUE_TEMPLATE/
 .github/PULL_REQUEST_TEMPLATE/
+Android/app/release/
+Android/playstore-screenshots/
+Android/release/
