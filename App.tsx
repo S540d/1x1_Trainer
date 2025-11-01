@@ -48,6 +48,7 @@ export default function App() {
     lastAnswerCorrect: null,
     isAnswerChecked: false,
   });
+  const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
     generateQuestion();
@@ -179,8 +180,48 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>1x1 Trainer</Text>
+        <TouchableOpacity
+          onPress={() => setMenuVisible(true)}
+          style={styles.settingsButton}
+          aria-label="Settings"
+        >
+          <Text style={styles.settingsButtonText}>⋮</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Settings Menu */}
+      {menuVisible && (
+        <>
+          <TouchableOpacity
+            style={styles.settingsOverlay}
+            activeOpacity={1}
+            onPress={() => setMenuVisible(false)}
+          />
+          <View style={styles.settingsMenu}>
+            <TouchableOpacity
+              style={styles.settingsMenuCloseButton}
+              onPress={() => setMenuVisible(false)}
+            >
+              <Text style={styles.settingsMenuCloseButtonText}>✕</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.settingsMenuLink}
+              onPress={() => {
+                Linking.openURL('https://buymeacoffee.com/sven4321');
+                setMenuVisible(false);
+              }}
+            >
+              <Text style={styles.settingsMenuLinkText}>Buy Me a Coffee</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>1x1 Trainer</Text>
 
         <View style={styles.scoreContainer}>
           <Text style={styles.scoreText}>
@@ -244,12 +285,6 @@ export default function App() {
             </Text>
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
-          onPress={() => Linking.openURL('https://www.buymeacoffee.com/sven4321')}
-        >
-          <Text style={styles.supportText}>Unterstütze die Entwicklung</Text>
-        </TouchableOpacity>
       </ScrollView>
 
       <Modal visible={gameState.showResult} transparent animationType="fade">
@@ -351,6 +386,76 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 24,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  settingsButton: {
+    padding: 8,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingsButtonText: {
+    fontSize: 24,
+    fontWeight: '500',
+    color: '#6200EE',
+  },
+  settingsOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 999,
+  },
+  settingsMenu: {
+    position: 'absolute',
+    top: 60,
+    right: 16,
+    minWidth: 200,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    zIndex: 1000,
+    overflow: 'hidden',
+  },
+  settingsMenuCloseButton: {
+    padding: 12,
+    alignItems: 'flex-end',
+  },
+  settingsMenuCloseButtonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  settingsMenuLink: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+  },
+  settingsMenuLinkText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6200EE',
   },
   scoreContainer: {
     flexDirection: 'row',
@@ -463,11 +568,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#000',
     fontWeight: 'bold',
-  },
-  supportText: {
-    color: '#6200EE',
-    textAlign: 'center',
-    textDecorationLine: 'underline',
   },
   modalOverlay: {
     flex: 1,
