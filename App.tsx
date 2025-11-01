@@ -18,6 +18,10 @@ enum GameMode {
   MIXED = 'MIXED',
 }
 
+type ThemeMode = 'light' | 'dark' | 'system';
+
+const APP_VERSION = '1.0.1';
+
 interface GameState {
   num1: number;
   num2: number;
@@ -49,6 +53,7 @@ export default function App() {
     isAnswerChecked: false,
   });
   const [menuVisible, setMenuVisible] = useState(false);
+  const [themeMode, setThemeMode] = useState<ThemeMode>('system');
 
   useEffect(() => {
     generateQuestion();
@@ -208,6 +213,57 @@ export default function App() {
             >
               <Text style={styles.settingsMenuCloseButtonText}>✕</Text>
             </TouchableOpacity>
+
+            {/* Dark Mode Toggle */}
+            <View style={styles.settingsSection}>
+              <Text style={styles.settingsSectionTitle}>Erscheinungsbild</Text>
+              <View style={styles.themeToggle}>
+                {(['light', 'system', 'dark'] as ThemeMode[]).map((mode) => (
+                  <TouchableOpacity
+                    key={mode}
+                    style={[
+                      styles.themeButton,
+                      themeMode === mode && styles.themeButtonActive,
+                    ]}
+                    onPress={() => setThemeMode(mode)}
+                  >
+                    <Text
+                      style={[
+                        styles.themeButtonText,
+                        themeMode === mode && styles.themeButtonTextActive,
+                      ]}
+                    >
+                      {mode === 'light' ? 'Hell' : mode === 'dark' ? 'Dunkel' : 'System'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.settingsDivider} />
+
+            {/* Feedback */}
+            <TouchableOpacity
+              style={styles.settingsMenuLink}
+              onPress={() => {
+                Linking.openURL('mailto:feedback@example.com?subject=1x1 Trainer Feedback');
+                setMenuVisible(false);
+              }}
+            >
+              <Text style={styles.settingsMenuLinkText}>Feedback</Text>
+            </TouchableOpacity>
+
+            <View style={styles.settingsDivider} />
+
+            {/* About */}
+            <View style={styles.settingsSection}>
+              <Text style={styles.settingsAboutText}>Version {APP_VERSION}</Text>
+              <Text style={styles.settingsAboutText}>© 2025 Sven Strohkark</Text>
+            </View>
+
+            <View style={styles.settingsDivider} />
+
+            {/* Support */}
             <TouchableOpacity
               style={styles.settingsMenuLink}
               onPress={() => {
@@ -456,6 +512,51 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#6200EE',
+  },
+  settingsSection: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  settingsSectionTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#999',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+  },
+  themeToggle: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  themeButton: {
+    flex: 1,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    backgroundColor: '#f5f5f5',
+    alignItems: 'center',
+  },
+  themeButtonActive: {
+    backgroundColor: '#6200EE',
+  },
+  themeButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+  },
+  themeButtonTextActive: {
+    color: '#fff',
+  },
+  settingsDivider: {
+    height: 1,
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    marginVertical: 8,
+  },
+  settingsAboutText: {
+    fontSize: 12,
+    color: '#999',
+    textAlign: 'center',
+    paddingVertical: 4,
   },
   scoreContainer: {
     flexDirection: 'row',
