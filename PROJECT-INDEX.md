@@ -4,8 +4,8 @@
 
 ```
 Phase 1: PWA Development          ✅ 100% COMPLETE
-Phase 2: TWA Development (STEP 1) ✅ 100% COMPLETE  
-Phase 2: TWA Development (STEPS 2-7) ⏳ READY TO START
+Phase 2: TWA Development          ✅ 100% COMPLETE
+Android App v1.0.4               ✅ VERÖFFENTLICHT IM PLAY STORE
 ```
 
 ---
@@ -18,6 +18,7 @@ Phase 2: TWA Development (STEPS 2-7) ⏳ READY TO START
 | **README.md** | Projekt-Übersicht | Alle |
 | **INDEX.md** | PWA Phase 1 Index | Alle |
 | **ROADMAP.md** | Visueller Überblick (PWA + TWA) | Alle |
+| **ANDROID-UX-GUIDELINES.md** | Android Edge-to-Edge Best Practices | Entwickler |
 
 ---
 
@@ -31,19 +32,24 @@ Phase 2: TWA Development (STEPS 2-7) ⏳ READY TO START
 
 ---
 
-### 🤖 Phase 2: TWA Development (Android)
+### 🤖 Phase 2: TWA Development (Android) - ✅ COMPLETE
 
-#### STEP 1: Digital Asset Links (✅ DONE)
+#### Aktuelle Version: v1.0.4 (Veröffentlicht)
+
 | Datei | Inhalt |
 |-------|--------|
-| **PHASE2-STEP1-COMPLETE.md** | STEP 1 Summary & Results |
-| **TWA-STEP1-HANDSON.md** | Detaillierte Anleitung STEP 1 |
-| **scripts/setup-twa-step1.sh** | Automatisiertes Setup-Script |
+| **Android/RELEASE-NOTES-v1.0.4.md** | Aktuelle Release Notes |
+| **ANDROID-UX-GUIDELINES.md** | Edge-to-Edge Best Practices für Android 15+ |
+| **Android/ICON-FIX-v1.0.3.md** | Icon-Fix Dokumentation |
+| **Keystore/README.md** | Keystore & Signing Informationen |
 
-#### STEPS 2-7: (⏳ READY)
+#### Historische Dokumentation
+
 | Datei | Inhalt |
 |-------|--------|
-| **TWA-DEVELOPMENT.md** | Kompletter Roadmap ALLE STEPS |
+| **TWA-DEVELOPMENT.md** | TWA Development Guide |
+| **PHASE2-STEP1-COMPLETE.md** | Digital Asset Links Setup |
+| **TWA-STEP1-HANDSON.md** | Detaillierte Anleitung Digital Asset Links |
 
 ---
 
@@ -111,14 +117,15 @@ scripts/
 ### Ich teste PWA
 → Nutze **scripts/test-pwa.sh**
 
-### Ich möchte TWA bauen (Android App)
-→ Start mit **PHASE2-STEP1-COMPLETE.md** (Overview)
-→ Dann **TWA-DEVELOPMENT.md** (STEPS 2-7)
+### Ich möchte die Android-App aktualisieren
+→ Start mit **Android/RELEASE-NOTES-v1.0.4.md**
+→ Siehe **ANDROID-UX-GUIDELINES.md** für Edge-to-Edge Implementation
+→ Keystore Info: **Keystore/README.md**
 
-### Ich bin auf STEP 1 (Digital Asset Links)
-→ **PHASE2-STEP1-COMPLETE.md** (Results)
-→ **TWA-STEP1-HANDSON.md** (Detailed Guide)
-→ **scripts/setup-twa-step1.sh** (Automation)
+### Ich entwickle eine neue TWA App
+→ Start mit **TWA-DEVELOPMENT.md**
+→ Edge-to-Edge Guidelines: **ANDROID-UX-GUIDELINES.md**
+→ Icon-Generator: **Android/scripts/generate-android-icons.py**
 
 ---
 
@@ -134,55 +141,67 @@ scripts/
 - ✅ Umfassende Dokumentation
 - ✅ Testing Scripts
 
-### Phase 2: TWA - STEP 1 ✅ (100%)
-- ✅ Keystore generiert
+### Phase 2: Android TWA App ✅ (100%)
+- ✅ Keystore generiert und gesichert
 - ✅ SHA-256 Fingerprint extrahiert
-- ✅ assetlinks.json erstellt
-- ✅ assetlinks.json deployed
-- ✅ Digital Asset Links working
+- ✅ Digital Asset Links konfiguriert
+- ✅ Android Project Setup
+- ✅ AndroidManifest konfiguriert
+- ✅ Android Icons generiert (automatisch)
+- ✅ Edge-to-Edge Display implementiert
+- ✅ Build & Signing (AAB)
+- ✅ Google Play Store Upload
+- ✅ **v1.0.4 VERÖFFENTLICHT**
 
-### Phase 2: TWA - STEPS 2-7 ⏳ (Ready to Go)
-- ⏳ Android Project Setup
-- ⏳ AndroidManifest konfigurieren
-- ⏳ Android Icons generieren
-- ⏳ Build & Signing
-- ⏳ Google Play Setup
-- ⏳ Submission & Release
+### Aktuelle Android App: v1.0.4
+- ✅ Edge-to-Edge mit `androidx.activity.enableEdgeToEdge()`
+- ✅ Korrekte App-Icons (Play Store + AAB)
+- ✅ Material Components 1.13.0
+- ✅ Keystore gesichert in `Keystore/`
+- ✅ Signiert mit SHA1: `3F:1F:1E:16:56:BB:01:36:40:50:76:E8:44:73:9D:01:A3:B8:D4:78`
 
 ---
 
 ## 💾 Wichtige Dateien (NICHT LÖSCHEN!)
 
 ```
-🔐 /Users/svenstrohkark/1x1-trainer-key.keystore
-   └─ Einmalig! Backup notwendig!
-   └─ Password: 1x1trainer2025!
-   
+🔐 Keystore/1x1-trainer-key.keystore
+   └─ KRITISCH! Ohne diesen Keystore keine App-Updates möglich!
+   └─ Password: 1x1Trainer2025Secure!
+   └─ Alias: 1x1-trainer-key
+   └─ Backup: Keystore/1x1-trainer-key.keystore.backup-20251107
+
 📄 public/.well-known/assetlinks.json
    └─ Für TWA Authentication
    └─ Deployed auf GitHub Pages
-   
-🔑 SHA-256 Fingerprint:
-   1C:34:91:A8:8A:76:18:82:E3:80:68:19:FA:7C:59:9C:AF:F7:B2:35:5E:8E:DA:31:B8:1F:49:0F:EB:B7:17:FC
-   └─ Für Google Play Console
-   └─ Für Android Projekt
+
+🔑 SHA1 Fingerprint (aktuell):
+   3F:1F:1E:16:56:BB:01:36:40:50:76:E8:44:73:9D:01:A3:B8:D4:78
+
+🔑 SHA256 Fingerprint (aktuell):
+   A8:A4:28:53:89:4F:40:05:B5:78:89:5E:9E:C8:74:E9:03:E4:C9:31:F5:B3:20:32:CF:08:A2:98:C9:08:0B:88
 ```
 
 ---
 
-## 🚀 Next Steps
+## 🚀 Nächste Schritte für Updates
 
-### Sofort:
-1. Keystore-Datei **BACKUP** machen
-2. SHA-256 Fingerprint speichern
-3. assetlinks.json Verifikation (~30 Sekunden)
+### Bei App-Updates:
+1. Version in `Android/app/build.gradle.kts` erhöhen
+2. Änderungen testen
+3. AAB bauen: `./gradlew clean bundleRelease`
+4. Upload zu Play Store Console
+5. Release Notes aktualisieren
 
-### STEP 2 beginnen:
-1. Android Studio installieren (falls nicht vorhanden)
-2. **TWA-DEVELOPMENT.md** STEP 2 lesen
-3. Neues Android-Projekt erstellen
+### Bei Icon-Änderungen:
+1. PWA Icon aktualisieren (`public/icon-1024x1024.png`)
+2. Android Icons neu generieren: `python3 Android/scripts/generate-android-icons.py`
+3. Play Store Icon aktualisieren: `Android/playstore-assets/play-store-icon-512x512.png`
 
-**Geschätzter Zeitaufwand:** ~2.5 Stunden + Google Review (1-3 Tage)
+### Bei Edge-to-Edge Problemen:
+1. Siehe **ANDROID-UX-GUIDELINES.md**
+2. Verwende `androidx.activity.enableEdgeToEdge()`
+3. Theme transparent bars konfigurieren
 
 ---
 

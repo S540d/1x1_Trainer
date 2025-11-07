@@ -51,6 +51,10 @@ Android/.DS_Store
 Android/local.properties
 Android/*.jks
 Android/*.keystore
+Android/.backup/
+
+# Keystore directory with signing keys
+Keystore/
 
 # Local GitHub templates (from .templates submodule)
 # Only track via submodule, ignore local copies
