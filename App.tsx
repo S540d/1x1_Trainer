@@ -33,7 +33,7 @@ const translations = {
     english: 'English',
     german: 'Deutsch',
     feedback: 'Send Feedback',
-    support: 'Buy Me a Coffee',
+    support: 'support me',
     about: 'ABOUT',
     version: 'Version',
     copyright: '© 2025 Sven Strohkark',
@@ -65,7 +65,7 @@ const translations = {
     english: 'English',
     german: 'Deutsch',
     feedback: 'Feedback senden',
-    support: 'Buy Me a Coffee',
+    support: 'support me',
     about: 'ÜBER',
     version: 'Version',
     copyright: '© 2025 Sven Strohkark',
@@ -407,7 +407,7 @@ export default function App() {
               <TouchableOpacity
                 style={styles.settingsMenuLinkFlex}
                 onPress={() => {
-                  Linking.openURL('https://buymeacoffee.com/sven4321');
+                  Linking.openURL('https://ko-fi.com/devsven');
                   setMenuVisible(false);
                 }}
               >
