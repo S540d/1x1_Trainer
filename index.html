@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -7,13 +7,19 @@
       name="viewport"
       content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1.00001, viewport-fit=cover"
     />
-    <title>1x1 Trainer</title>
-    <meta name="description" content="Übe das kleine Einmaleins mit verschiedenen Spielmodi" />
+    <title>1x1 Trainer - Learn Multiplication</title>
+    <meta name="description" content="Practice multiplication tables with different game modes" />
+    <meta name="keywords" content="1x1, multiplication, trainer, math, learning, PWA, education" />
+    <meta name="author" content="S540d" />
     <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" type="image/png" href="./icon-192.png" />
+    <link rel="apple-touch-icon" href="./icon-180.png" />
     <meta name="theme-color" content="#6200EE" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="1x1 Trainer" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-touch-fullscreen" content="yes" />
     <style>
       #root,
       body,
@@ -34,11 +40,12 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <script src="./pwa-update.js"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./service-worker.js')
+            .register('/1x1_Trainer/service-worker.js', { scope: '/1x1_Trainer/' })
             .then((registration) => {
               console.log('SW registered: ', registration);
             })
@@ -48,6 +55,6 @@
         });
       }
     </script>
-  <script src="./_expo/static/js/web/index-0b5e93e3a4ac8fcb827a1b6d75cebf45.js" defer></script>
+  <script src="./_expo/static/js/web/index-8e9660708deafd14b3ea2de35e62adcd.js" defer></script>
 </body>
 </html>

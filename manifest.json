@@ -1,22 +1,89 @@
 {
   "short_name": "1x1 Trainer",
-  "name": "1x1 Trainer - Lerne das Einmaleins",
-  "description": "Übe das kleine Einmaleins mit verschiedenen Spielmodi",
+  "name": "1x1 Trainer - Learn Multiplication",
+  "description": "Practice multiplication tables with different game modes",
   "icons": [
+    {
+      "src": "/icon-96.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "/icon-128.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    },
+    {
+      "src": "/icon-144.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    },
+    {
+      "src": "/icon-152.png",
+      "type": "image/png",
+      "sizes": "152x152"
+    },
+    {
+      "src": "/icon-180.png",
+      "type": "image/png",
+      "sizes": "180x180"
+    },
     {
       "src": "/icon-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-256.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    },
+    {
+      "src": "/icon-384.png",
+      "type": "image/png",
+      "sizes": "384x384"
     },
     {
       "src": "/icon-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any"
     }
   ],
-  "start_url": "/",
+  "screenshots": [
+    {
+      "src": "/screenshot-540x720.png",
+      "type": "image/png",
+      "sizes": "540x720",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshot-1280x720.png",
+      "type": "image/png",
+      "sizes": "1280x720",
+      "form_factor": "wide"
+    }
+  ],
+  "start_url": "/1x1_Trainer/",
+  "scope": "/1x1_Trainer/",
   "display": "standalone",
   "theme_color": "#6200EE",
   "background_color": "#ffffff",
-  "orientation": "portrait"
+  "orientation": "portrait-primary",
+  "categories": ["education", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Start Training",
+      "short_name": "Training",
+      "description": "Start a new 1x1 training session",
+      "url": "/1x1_Trainer/?mode=normal",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
 }
