@@ -36,7 +36,10 @@
               "pathPrefix": "/1x1_Trainer"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -44,6 +47,12 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro",
       "baseUrl": "/1x1_Trainer"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "91fd28a6-8da1-4b9b-a8bc-a2b48b70cc33"
+      }
+    },
+    "owner": "devsven"
   }
 }
