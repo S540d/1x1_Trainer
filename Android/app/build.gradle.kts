@@ -11,8 +11,8 @@ android {
         applicationId = "com.sven4321.trainer1x1"
         minSdk = 21
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.0.4"
+        versionCode = 6
+        versionName = "1.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
