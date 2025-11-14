@@ -1,14 +1,11 @@
 [
   {
-    "relation": [
-      "delegate_permission/common.handle_all_urls",
-      "delegate_permission/common.get_login_creds"
-    ],
+    "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
       "package_name": "com.sven4321.trainer1x1",
       "sha256_cert_fingerprints": [
-        "A8:A4:28:53:89:4F:40:05:B5:78:89:5E:9E:C8:74:E9:03:E4:C9:31:F5:B3:20:32:CF:08:A2:98:C9:08:0B:88"
+        "C9B75CA8F423485DD6E387EB9A135B4FB824A4AEE5569C5856E6E6AE73C4BB78"
       ]
     }
   }

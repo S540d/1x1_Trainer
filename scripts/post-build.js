@@ -3,10 +3,12 @@ const path = require('path');
 
 // Copy PWA files to dist folder
 const filesToCopy = [
+  { src: 'public/.nojekyll', dest: 'dist/.nojekyll' },
   { src: 'public/manifest.json', dest: 'dist/manifest.json' },
   { src: 'public/service-worker.js', dest: 'dist/service-worker.js' },
   { src: 'public/icon-192.png', dest: 'dist/icon-192.png' },
-  { src: 'public/icon-512.png', dest: 'dist/icon-512.png' }
+  { src: 'public/icon-512.png', dest: 'dist/icon-512.png' },
+  { src: 'public/.well-known/assetlinks.json', dest: 'dist/.well-known/assetlinks.json' }
 ];
 
 filesToCopy.forEach(({ src, dest }) => {
@@ -14,6 +16,11 @@ filesToCopy.forEach(({ src, dest }) => {
   const destPath = path.join(__dirname, '..', dest);
 
   if (fs.existsSync(srcPath)) {
+    // Create destination directory if it doesn't exist
+    const destDir = path.dirname(destPath);
+    if (!fs.existsSync(destDir)) {
+      fs.mkdirSync(destDir, { recursive: true });
+    }
     fs.copyFileSync(srcPath, destPath);
     console.log(`✓ Copied ${src} to ${dest}`);
   } else {
