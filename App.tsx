@@ -18,6 +18,11 @@ enum GameMode {
   MIXED = 'MIXED',
 }
 
+enum Operation {
+  ADDITION = 'ADDITION',
+  MULTIPLICATION = 'MULTIPLICATION',
+}
+
 type ThemeMode = 'light' | 'dark' | 'system';
 type Language = 'en' | 'de';
 
@@ -98,6 +103,7 @@ interface GameState {
   currentTask: number;
   totalTasks: number;
   gameMode: GameMode;
+  operation: Operation;
   questionPart: number; // 0: num1, 1: num2, 2: result
   showResult: boolean;
   lastAnswerCorrect: boolean | null;
@@ -115,6 +121,7 @@ export default function App() {
     currentTask: 1,
     totalTasks: TOTAL_TASKS,
     gameMode: GameMode.NORMAL,
+    operation: Operation.ADDITION,
     questionPart: 2,
     showResult: false,
     lastAnswerCorrect: null,
@@ -208,10 +215,25 @@ export default function App() {
     setTimeout(() => generateQuestion(newMode), 0);
   };
 
+  const changeOperation = (newOperation: Operation) => {
+    setGameState((prev) => ({
+      ...prev,
+      operation: newOperation,
+      currentTask: 1,
+      score: 0,
+      showResult: false,
+    }));
+    setTimeout(() => generateQuestion(), 0);
+  };
+
   const checkAnswer = () => {
     if (gameState.userAnswer === '') return;
 
     let correctAnswer = 0;
+    const result = gameState.operation === Operation.ADDITION
+      ? gameState.num1 + gameState.num2
+      : gameState.num1 * gameState.num2;
+
     switch (gameState.questionPart) {
       case 0:
         correctAnswer = gameState.num1;
@@ -220,7 +242,7 @@ export default function App() {
         correctAnswer = gameState.num2;
         break;
       default:
-        correctAnswer = gameState.num1 * gameState.num2;
+        correctAnswer = result;
     }
 
     const isCorrect = parseInt(gameState.userAnswer) === correctAnswer;
@@ -276,8 +298,16 @@ export default function App() {
 
   const firstNumText = gameState.questionPart === 0 ? '?' : gameState.num1.toString();
   const secondNumText = gameState.questionPart === 1 ? '?' : gameState.num2.toString();
-  const resultText =
-    gameState.questionPart === 2 ? '?' : (gameState.num1 * gameState.num2).toString();
+  const operatorSymbol = gameState.operation === Operation.ADDITION ? '+' : '×';
+  const result = gameState.operation === Operation.ADDITION
+    ? gameState.num1 + gameState.num2
+    : gameState.num1 * gameState.num2;
+  const resultText = gameState.questionPart === 2 ? '?' : result.toString();
+
+  // Dynamic icons based on operation
+  const normalIcon = operatorSymbol;
+  const firstMissingIcon = `?${operatorSymbol}`;
+  const secondMissingIcon = `${operatorSymbol}?`;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -286,6 +316,40 @@ export default function App() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>1x1 Trainer</Text>
+        <View style={styles.operationToggle}>
+          <TouchableOpacity
+            style={[
+              styles.operationButton,
+              gameState.operation === Operation.ADDITION && styles.operationButtonActive,
+            ]}
+            onPress={() => changeOperation(Operation.ADDITION)}
+          >
+            <Text
+              style={[
+                styles.operationButtonText,
+                gameState.operation === Operation.ADDITION && styles.operationButtonTextActive,
+              ]}
+            >
+              +
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.operationButton,
+              gameState.operation === Operation.MULTIPLICATION && styles.operationButtonActive,
+            ]}
+            onPress={() => changeOperation(Operation.MULTIPLICATION)}
+          >
+            <Text
+              style={[
+                styles.operationButtonText,
+                gameState.operation === Operation.MULTIPLICATION && styles.operationButtonTextActive,
+              ]}
+            >
+              ×
+            </Text>
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity
           onPress={() => setMenuVisible(true)}
           style={styles.settingsButton}
@@ -429,31 +493,22 @@ export default function App() {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
-        <View style={styles.scoreContainer}>
-          <Text style={styles.scoreText}>
-            {t.task}: {gameState.currentTask} / {gameState.totalTasks}
-          </Text>
-          <Text style={[styles.scoreText, styles.scoreValue]}>
-            {t.points}: {gameState.score}
-          </Text>
-        </View>
-
         <View style={styles.gameModeContainer}>
           <View style={styles.gameModeRow}>
             <GameModeButton
-              icon="×"
+              icon={normalIcon}
               label={t.normalMode}
               isSelected={gameState.gameMode === GameMode.NORMAL}
               onPress={() => changeGameMode(GameMode.NORMAL)}
             />
             <GameModeButton
-              icon="?×"
+              icon={firstMissingIcon}
               label={t.firstMissing}
               isSelected={gameState.gameMode === GameMode.FIRST_MISSING}
               onPress={() => changeGameMode(GameMode.FIRST_MISSING)}
             />
             <GameModeButton
-              icon="×?"
+              icon={secondMissingIcon}
               label={t.secondMissing}
               isSelected={gameState.gameMode === GameMode.SECOND_MISSING}
               onPress={() => changeGameMode(GameMode.SECOND_MISSING)}
@@ -467,11 +522,20 @@ export default function App() {
           </View>
         </View>
 
+        <View style={styles.scoreContainer}>
+          <Text style={styles.scoreText}>
+            {t.task}: {gameState.currentTask} / {gameState.totalTasks}
+          </Text>
+          <Text style={[styles.scoreText, styles.scoreValue]}>
+            {t.points}: {gameState.score}
+          </Text>
+        </View>
+
         <View style={[styles.questionCard, { backgroundColor: getCardColor() }]}>
           <Text style={styles.questionText}>
             {gameState.questionPart === 2
-              ? `${firstNumText} × ${secondNumText} = ?`
-              : `${firstNumText} × ${secondNumText} = ${resultText}`}
+              ? `${firstNumText} ${operatorSymbol} ${secondNumText} = ?`
+              : `${firstNumText} ${operatorSymbol} ${secondNumText} = ${resultText}`}
           </Text>
 
           <View style={styles.answerBox}>
@@ -636,6 +700,29 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
+  },
+  operationToggle: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  operationButton: {
+    width: 36,
+    height: 36,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  operationButtonActive: {
+    backgroundColor: '#6200EE',
+  },
+  operationButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  operationButtonTextActive: {
+    color: '#fff',
   },
   settingsButton: {
     padding: 8,
