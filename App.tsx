@@ -441,24 +441,26 @@ export default function App() {
         <View style={styles.gameModeContainer}>
           <View style={styles.gameModeRow}>
             <GameModeButton
-              text={t.normalMode}
+              icon="×"
+              label={t.normalMode}
               isSelected={gameState.gameMode === GameMode.NORMAL}
               onPress={() => changeGameMode(GameMode.NORMAL)}
             />
             <GameModeButton
-              text={t.firstMissing}
+              icon="?×"
+              label={t.firstMissing}
               isSelected={gameState.gameMode === GameMode.FIRST_MISSING}
               onPress={() => changeGameMode(GameMode.FIRST_MISSING)}
             />
-          </View>
-          <View style={styles.gameModeRow}>
             <GameModeButton
-              text={t.secondMissing}
+              icon="×?"
+              label={t.secondMissing}
               isSelected={gameState.gameMode === GameMode.SECOND_MISSING}
               onPress={() => changeGameMode(GameMode.SECOND_MISSING)}
             />
             <GameModeButton
-              text={t.mixedMode}
+              icon="⚡"
+              label={t.mixedMode}
               isSelected={gameState.gameMode === GameMode.MIXED}
               onPress={() => changeGameMode(GameMode.MIXED)}
             />
@@ -478,20 +480,22 @@ export default function App() {
             </Text>
           </View>
 
-          <Numpad onNumberClick={handleNumberClick} />
+          <Numpad
+            onNumberClick={handleNumberClick}
+            onCheck={gameState.isAnswerChecked ? nextQuestion : checkAnswer}
+            userAnswer={gameState.userAnswer}
+          />
 
-          <TouchableOpacity
-            style={[
-              styles.checkButton,
-              gameState.userAnswer === '' && styles.checkButtonDisabled,
-            ]}
-            onPress={gameState.isAnswerChecked ? nextQuestion : checkAnswer}
-            disabled={gameState.userAnswer === ''}
-          >
-            <Text style={styles.checkButtonText}>
-              {gameState.isAnswerChecked ? t.nextQuestion : t.check}
-            </Text>
-          </TouchableOpacity>
+          {gameState.isAnswerChecked && (
+            <TouchableOpacity
+              style={styles.nextButton}
+              onPress={nextQuestion}
+            >
+              <Text style={styles.nextButtonText}>
+                {t.nextQuestion}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
 
@@ -513,11 +517,13 @@ export default function App() {
 }
 
 function GameModeButton({
-  text,
+  icon,
+  label,
   isSelected,
   onPress,
 }: {
-  text: string;
+  icon: string;
+  label: string;
   isSelected: boolean;
   onPress: () => void;
 }) {
@@ -527,15 +533,28 @@ function GameModeButton({
       onPress={onPress}
     >
       <Text
+        style={[styles.gameModeButtonIcon, isSelected && styles.gameModeButtonIconSelected]}
+      >
+        {icon}
+      </Text>
+      <Text
         style={[styles.gameModeButtonText, isSelected && styles.gameModeButtonTextSelected]}
       >
-        {text}
+        {label}
       </Text>
     </TouchableOpacity>
   );
 }
 
-function Numpad({ onNumberClick }: { onNumberClick: (num: number) => void }) {
+function Numpad({
+  onNumberClick,
+  onCheck,
+  userAnswer
+}: {
+  onNumberClick: (num: number) => void;
+  onCheck: () => void;
+  userAnswer: string;
+}) {
   return (
     <View style={styles.numpad}>
       <View style={styles.numpadRow}>
@@ -556,7 +575,16 @@ function Numpad({ onNumberClick }: { onNumberClick: (num: number) => void }) {
       <View style={styles.numpadRow}>
         <NumpadButton text="←" onPress={() => onNumberClick(-1)} isSpecial />
         <NumpadButton text="0" onPress={() => onNumberClick(0)} />
-        <NumpadButton text="C" onPress={() => onNumberClick(-2)} isSpecial />
+        <TouchableOpacity
+          style={[
+            styles.numpadButtonCheck,
+            userAnswer === '' && styles.numpadButtonCheckDisabled,
+          ]}
+          onPress={onCheck}
+          disabled={userAnswer === ''}
+        >
+          <Text style={styles.numpadButtonCheckText}>✓</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -737,16 +765,15 @@ const styles = StyleSheet.create({
   },
   gameModeContainer: {
     width: '100%',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   gameModeRow: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 8,
   },
   gameModeButton: {
     flex: 1,
-    height: 60,
+    height: 70,
     backgroundColor: '#E0E0E0',
     borderRadius: 8,
     justifyContent: 'center',
@@ -756,9 +783,18 @@ const styles = StyleSheet.create({
   gameModeButtonSelected: {
     backgroundColor: '#6200EE',
   },
-  gameModeButtonText: {
-    fontSize: 12,
+  gameModeButtonIcon: {
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 4,
+  },
+  gameModeButtonIconSelected: {
+    color: '#fff',
+  },
+  gameModeButtonText: {
+    fontSize: 9,
+    fontWeight: '600',
     color: '#000',
     textAlign: 'center',
   },
@@ -818,20 +854,37 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  checkButton: {
-    width: '100%',
+  numpadButtonCheck: {
+    flex: 1,
     height: 50,
     backgroundColor: '#03DAC6',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#00BFA5',
+  },
+  numpadButtonCheckDisabled: {
+    backgroundColor: '#B0BEC5',
+    borderColor: '#90A4AE',
+  },
+  numpadButtonCheckText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  nextButton: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#6200EE',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 16,
   },
-  checkButtonDisabled: {
-    backgroundColor: '#B0BEC5',
-  },
-  checkButtonText: {
+  nextButtonText: {
     fontSize: 18,
-    color: '#000',
+    color: '#fff',
     fontWeight: 'bold',
   },
   modalOverlay: {
