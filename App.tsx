@@ -459,7 +459,7 @@ export default function App() {
               onPress={() => changeGameMode(GameMode.SECOND_MISSING)}
             />
             <GameModeButton
-              icon="⚡"
+              icon="🎲"
               label={t.mixedMode}
               isSelected={gameState.gameMode === GameMode.MIXED}
               onPress={() => changeGameMode(GameMode.MIXED)}
