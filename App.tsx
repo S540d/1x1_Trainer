@@ -129,14 +129,33 @@ export default function App() {
   });
   const [menuVisible, setMenuVisible] = useState(false);
   const [themeMode, setThemeMode] = useState<ThemeMode>('system');
+  const [systemDarkMode, setSystemDarkMode] = useState(false);
   const [language, setLanguage] = useState<Language>('en');
   const t = translations[language];
 
-  // Load language preference on mount
+  // Calculate effective dark mode
+  const isDarkMode = themeMode === 'dark' || (themeMode === 'system' && systemDarkMode);
+
+  // Dynamic colors based on theme
+  const colors = {
+    background: isDarkMode ? '#121212' : '#fff',
+    text: isDarkMode ? '#E0E0E0' : '#000',
+    textSecondary: isDarkMode ? '#B0B0B0' : '#666',
+    border: isDarkMode ? '#333' : '#E0E0E0',
+    card: isDarkMode ? '#1E1E1E' : '#f5f5f5',
+    cardCorrect: isDarkMode ? '#1B5E20' : '#C8E6C9',
+    cardIncorrect: isDarkMode ? '#B71C1C' : '#FFCDD2',
+    buttonInactive: isDarkMode ? '#2C2C2C' : '#E0E0E0',
+    buttonInactiveText: isDarkMode ? '#B0B0B0' : '#000',
+    settingsOverlay: 'rgba(0,0,0,0.7)',
+    settingsMenu: isDarkMode ? '#1E1E1E' : '#fff',
+  };
+
+  // Load preferences and detect system theme on mount
   useEffect(() => {
-    const loadLanguage = async () => {
+    const loadPreferences = async () => {
       try {
-        // Try to load from localStorage
+        // Load language
         const savedLanguage = localStorage.getItem('app-language');
         if (savedLanguage === 'en' || savedLanguage === 'de') {
           setLanguage(savedLanguage);
@@ -145,12 +164,29 @@ export default function App() {
           const browserLang = navigator.language.split('-')[0];
           setLanguage(browserLang === 'de' ? 'de' : 'en');
         }
+
+        // Load theme preference
+        const savedTheme = localStorage.getItem('app-theme');
+        if (savedTheme === 'dark' || savedTheme === 'system') {
+          setThemeMode(savedTheme as ThemeMode);
+        }
+
+        // Detect system dark mode
+        if (typeof window !== 'undefined' && window.matchMedia) {
+          const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+          setSystemDarkMode(darkModeQuery.matches);
+
+          // Listen for changes
+          const handler = (e: MediaQueryListEvent) => setSystemDarkMode(e.matches);
+          darkModeQuery.addEventListener('change', handler);
+          return () => darkModeQuery.removeEventListener('change', handler);
+        }
       } catch (error) {
-        // Fallback to English if localStorage is not available
+        // Fallback to defaults
         setLanguage('en');
       }
     };
-    loadLanguage();
+    loadPreferences();
     generateQuestion();
   }, []);
 
@@ -162,6 +198,15 @@ export default function App() {
       // Ignore localStorage errors
     }
   }, [language]);
+
+  // Save theme preference when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('app-theme', themeMode);
+    } catch (error) {
+      // Ignore localStorage errors
+    }
+  }, [themeMode]);
 
   const generateQuestion = (mode: GameMode = gameState.gameMode) => {
     const newNum1 = Math.floor(Math.random() * 10) + 1;
@@ -291,9 +336,9 @@ export default function App() {
   };
 
   const getCardColor = () => {
-    if (gameState.lastAnswerCorrect === true) return '#C8E6C9';
-    if (gameState.lastAnswerCorrect === false) return '#FFCDD2';
-    return '#f5f5f5';
+    if (gameState.lastAnswerCorrect === true) return colors.cardCorrect;
+    if (gameState.lastAnswerCorrect === false) return colors.cardIncorrect;
+    return colors.card;
   };
 
   const firstNumText = gameState.questionPart === 0 ? '?' : gameState.num1.toString();
@@ -310,16 +355,17 @@ export default function App() {
   const secondMissingIcon = `${operatorSymbol}?`;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="auto" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
 
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>1x1 Trainer</Text>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>1x1 Trainer</Text>
         <View style={styles.operationToggle}>
           <TouchableOpacity
             style={[
               styles.operationButton,
+              { backgroundColor: colors.buttonInactive },
               gameState.operation === Operation.ADDITION && styles.operationButtonActive,
             ]}
             onPress={() => changeOperation(Operation.ADDITION)}
@@ -327,6 +373,7 @@ export default function App() {
             <Text
               style={[
                 styles.operationButtonText,
+                { color: colors.buttonInactiveText },
                 gameState.operation === Operation.ADDITION && styles.operationButtonTextActive,
               ]}
             >
@@ -336,6 +383,7 @@ export default function App() {
           <TouchableOpacity
             style={[
               styles.operationButton,
+              { backgroundColor: colors.buttonInactive },
               gameState.operation === Operation.MULTIPLICATION && styles.operationButtonActive,
             ]}
             onPress={() => changeOperation(Operation.MULTIPLICATION)}
@@ -343,6 +391,7 @@ export default function App() {
             <Text
               style={[
                 styles.operationButtonText,
+                { color: colors.buttonInactiveText },
                 gameState.operation === Operation.MULTIPLICATION && styles.operationButtonTextActive,
               ]}
             >
@@ -363,21 +412,21 @@ export default function App() {
       {menuVisible && (
         <>
           <TouchableOpacity
-            style={styles.settingsOverlay}
+            style={[styles.settingsOverlay, { backgroundColor: colors.settingsOverlay }]}
             activeOpacity={1}
             onPress={() => setMenuVisible(false)}
           />
-          <View style={styles.settingsMenu}>
+          <View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu }]}>
             <TouchableOpacity
               style={styles.settingsMenuCloseButton}
               onPress={() => setMenuVisible(false)}
             >
-              <Text style={styles.settingsMenuCloseButtonText}>✕</Text>
+              <Text style={[styles.settingsMenuCloseButtonText, { color: colors.text }]}>✕</Text>
             </TouchableOpacity>
 
             {/* Appearance Settings - Dark/System Only */}
             <View style={styles.settingsSection}>
-              <Text style={styles.settingsSectionTitle}>{t.appearance}</Text>
+              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.appearance}</Text>
               <View style={styles.themeToggle}>
                 <TouchableOpacity
                   style={[
@@ -418,7 +467,7 @@ export default function App() {
 
             {/* Language Settings */}
             <View style={styles.settingsSection}>
-              <Text style={styles.settingsSectionTitle}>{t.language}</Text>
+              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.language}</Text>
               <View style={styles.themeToggle}>
                 <TouchableOpacity
                   style={[
@@ -483,9 +532,9 @@ export default function App() {
 
             {/* About */}
             <View style={styles.settingsSection}>
-              <Text style={styles.settingsSectionTitle}>{t.about}</Text>
-              <Text style={styles.settingsAboutText}>{t.version} {APP_VERSION}</Text>
-              <Text style={styles.settingsAboutText}>{t.license}</Text>
+              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.about}</Text>
+              <Text style={[styles.settingsAboutText, { color: colors.textSecondary }]}>{t.version} {APP_VERSION}</Text>
+              <Text style={[styles.settingsAboutText, { color: colors.textSecondary }]}>{t.license}</Text>
             </View>
           </View>
         </>
@@ -500,30 +549,34 @@ export default function App() {
               label={t.normalMode}
               isSelected={gameState.gameMode === GameMode.NORMAL}
               onPress={() => changeGameMode(GameMode.NORMAL)}
+              colors={colors}
             />
             <GameModeButton
               icon={firstMissingIcon}
               label={t.firstMissing}
               isSelected={gameState.gameMode === GameMode.FIRST_MISSING}
               onPress={() => changeGameMode(GameMode.FIRST_MISSING)}
+              colors={colors}
             />
             <GameModeButton
               icon={secondMissingIcon}
               label={t.secondMissing}
               isSelected={gameState.gameMode === GameMode.SECOND_MISSING}
               onPress={() => changeGameMode(GameMode.SECOND_MISSING)}
+              colors={colors}
             />
             <GameModeButton
               icon="🎲"
               label={t.mixedMode}
               isSelected={gameState.gameMode === GameMode.MIXED}
               onPress={() => changeGameMode(GameMode.MIXED)}
+              colors={colors}
             />
           </View>
         </View>
 
         <View style={styles.scoreContainer}>
-          <Text style={styles.scoreText}>
+          <Text style={[styles.scoreText, { color: colors.text }]}>
             {t.task}: {gameState.currentTask} / {gameState.totalTasks}
           </Text>
           <Text style={[styles.scoreText, styles.scoreValue]}>
@@ -532,14 +585,14 @@ export default function App() {
         </View>
 
         <View style={[styles.questionCard, { backgroundColor: getCardColor() }]}>
-          <Text style={styles.questionText}>
+          <Text style={[styles.questionText, { color: colors.text }]}>
             {gameState.questionPart === 2
               ? `${firstNumText} ${operatorSymbol} ${secondNumText} = ?`
               : `${firstNumText} ${operatorSymbol} ${secondNumText} = ${resultText}`}
           </Text>
 
-          <View style={styles.answerBox}>
-            <Text style={[styles.answerText, gameState.userAnswer === '' && styles.answerPlaceholder]}>
+          <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
+            <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
               {gameState.userAnswer || '?'}
             </Text>
           </View>
@@ -565,9 +618,9 @@ export default function App() {
 
       <Modal visible={gameState.showResult} transparent animationType="fade">
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{t.great}</Text>
-            <Text style={styles.modalText}>
+          <View style={[styles.modalContent, { backgroundColor: colors.settingsMenu }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{t.great}</Text>
+            <Text style={[styles.modalText, { color: colors.text }]}>
               {t.youSolved} {gameState.score} {t.of} {gameState.totalTasks} {t.tasksCorrectly}.
             </Text>
             <TouchableOpacity style={styles.restartButton} onPress={restartGame}>
@@ -585,24 +638,50 @@ function GameModeButton({
   label,
   isSelected,
   onPress,
+  colors,
 }: {
   icon: string;
   label: string;
   isSelected: boolean;
   onPress: () => void;
+  colors: {
+    background: string;
+    text: string;
+    textSecondary: string;
+    border: string;
+    card: string;
+    cardCorrect: string;
+    cardIncorrect: string;
+    buttonInactive: string;
+    buttonInactiveText: string;
+    settingsOverlay: string;
+    settingsMenu: string;
+  };
 }) {
   return (
     <TouchableOpacity
-      style={[styles.gameModeButton, isSelected && styles.gameModeButtonSelected]}
+      style={[
+        styles.gameModeButton,
+        { backgroundColor: colors.buttonInactive },
+        isSelected && styles.gameModeButtonSelected,
+      ]}
       onPress={onPress}
     >
       <Text
-        style={[styles.gameModeButtonIcon, isSelected && styles.gameModeButtonIconSelected]}
+        style={[
+          styles.gameModeButtonIcon,
+          { color: colors.buttonInactiveText },
+          isSelected && styles.gameModeButtonIconSelected,
+        ]}
       >
         {icon}
       </Text>
       <Text
-        style={[styles.gameModeButtonText, isSelected && styles.gameModeButtonTextSelected]}
+        style={[
+          styles.gameModeButtonText,
+          { color: colors.buttonInactiveText },
+          isSelected && styles.gameModeButtonTextSelected,
+        ]}
       >
         {label}
       </Text>
