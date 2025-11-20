@@ -10,6 +10,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import * as Updates from 'expo-updates';
 
 enum GameMode {
   NORMAL = 'NORMAL',
@@ -150,6 +151,24 @@ export default function App() {
     settingsOverlay: 'rgba(0,0,0,0.7)',
     settingsMenu: isDarkMode ? '#1E1E1E' : '#fff',
   };
+
+  // Check for OTA updates on mount
+  useEffect(() => {
+    async function checkAndApplyUpdates() {
+      if (!__DEV__) {
+        try {
+          const update = await Updates.checkForUpdateAsync();
+          if (update.isAvailable) {
+            await Updates.fetchUpdateAsync();
+            await Updates.reloadAsync();
+          }
+        } catch (error) {
+          console.error('Error checking for updates:', error);
+        }
+      }
+    }
+    checkAndApplyUpdates();
+  }, []);
 
   // Load preferences and detect system theme on mount
   useEffect(() => {
