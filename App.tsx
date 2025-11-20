@@ -171,7 +171,7 @@ export default function App() {
             await Updates.reloadAsync();
           }
         } catch (error) {
-          console.error('Error checking for updates:', error);
+          // Silently ignore update errors
         }
       }
     }
@@ -376,7 +376,12 @@ export default function App() {
 
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>1x1 Trainer</Text>
+        <Text style={[styles.headerScore, { color: colors.text }]}>
+          {t.task}: {gameState.currentTask}/{gameState.totalTasks}
+        </Text>
+        <Text style={[styles.headerScore, { color: colors.text }]}>
+          {t.points}: <Text style={{ color: '#6200EE', fontWeight: 'bold' }}>{gameState.score}</Text>
+        </Text>
         <TouchableOpacity
           onPress={() => setMenuVisible(true)}
           style={styles.settingsButton}
@@ -401,6 +406,9 @@ export default function App() {
             >
               <Text style={[styles.settingsMenuCloseButtonText, { color: colors.text }]}>✕</Text>
             </TouchableOpacity>
+
+            {/* App Name */}
+            <Text style={[styles.appName, { color: colors.text }]}>1x1 Trainer</Text>
 
             {/* Appearance Settings - Dark/System Only */}
             <View style={styles.settingsSection}>
@@ -603,7 +611,7 @@ export default function App() {
               <TouchableOpacity
                 style={styles.settingsMenuLinkFlex}
                 onPress={() => {
-                  Linking.openURL('mailto:feedback@example.com?subject=1x1 Trainer Feedback');
+                  Linking.openURL('mailto:devsven@posteo.de?subject=1x1 Trainer Feedback');
                   setMenuVisible(false);
                 }}
               >
@@ -633,15 +641,6 @@ export default function App() {
       )}
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.scoreContainer}>
-          <Text style={[styles.scoreText, { color: colors.text }]}>
-            {t.task}: {gameState.currentTask} / {gameState.totalTasks}
-          </Text>
-          <Text style={[styles.scoreText, styles.scoreValue]}>
-            {t.points}: {gameState.score}
-          </Text>
-        </View>
-
         <View style={[styles.questionCard, { backgroundColor: getCardColor() }]}>
           <View style={styles.questionRow}>
             {/* First number or answer box */}
@@ -813,6 +812,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
   },
+  headerScore: {
+    fontSize: 14,
+    color: '#000',
+  },
   settingsButton: {
     padding: 8,
     minWidth: 44,
@@ -857,6 +860,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
+  },
+  appName: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 24,
+    textAlign: 'center',
+    paddingHorizontal: 16,
   },
   settingsMenuLink: {
     paddingHorizontal: 16,
@@ -951,19 +961,6 @@ const styles = StyleSheet.create({
   },
   gameModeSettingsButtonTextActive: {
     color: '#fff',
-  },
-  scoreContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 16,
-  },
-  scoreText: {
-    fontSize: 16,
-  },
-  scoreValue: {
-    color: '#6200EE',
-    fontWeight: 'bold',
   },
   questionCard: {
     width: '100%',
