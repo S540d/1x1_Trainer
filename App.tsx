@@ -363,10 +363,6 @@ export default function App() {
   const firstNumText = gameState.questionPart === 0 ? '?' : gameState.num1.toString();
   const secondNumText = gameState.questionPart === 1 ? '?' : gameState.num2.toString();
   const operatorSymbol = gameState.operation === Operation.ADDITION ? '+' : '×';
-  const result = gameState.operation === Operation.ADDITION
-    ? gameState.num1 + gameState.num2
-    : gameState.num1 * gameState.num2;
-  const resultText = gameState.questionPart === 2 ? '?' : result.toString();
 
   // Dynamic icons based on operation
   const normalIcon = operatorSymbol;
@@ -604,16 +600,15 @@ export default function App() {
         </View>
 
         <View style={[styles.questionCard, { backgroundColor: getCardColor() }]}>
-          <Text style={[styles.questionText, { color: colors.text }]}>
-            {gameState.questionPart === 2
-              ? `${firstNumText} ${operatorSymbol} ${secondNumText} = ?`
-              : `${firstNumText} ${operatorSymbol} ${secondNumText} = ${resultText}`}
-          </Text>
-
-          <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
-            <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
-              {gameState.userAnswer || '?'}
+          <View style={styles.questionRow}>
+            <Text style={[styles.questionText, { color: colors.text }]}>
+              {`${firstNumText} ${operatorSymbol} ${secondNumText} = `}
             </Text>
+            <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
+              <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
+                {gameState.userAnswer || '?'}
+              </Text>
+            </View>
           </View>
 
           <Numpad
@@ -993,10 +988,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
+  questionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
   questionText: {
     fontSize: 36,
     fontWeight: 'bold',
-    marginBottom: 16,
   },
   answerBox: {
     width: 120,
@@ -1005,7 +1004,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
   },
   answerText: {
     fontSize: 24,
