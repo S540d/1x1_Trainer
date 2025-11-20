@@ -615,18 +615,8 @@ export default function App() {
             onNumberClick={handleNumberClick}
             onCheck={gameState.isAnswerChecked ? nextQuestion : checkAnswer}
             userAnswer={gameState.userAnswer}
+            isAnswerChecked={gameState.isAnswerChecked}
           />
-
-          {gameState.isAnswerChecked && (
-            <TouchableOpacity
-              style={styles.nextButton}
-              onPress={nextQuestion}
-            >
-              <Text style={styles.nextButtonText}>
-                {t.nextQuestion}
-              </Text>
-            </TouchableOpacity>
-          )}
         </View>
       </ScrollView>
 
@@ -706,11 +696,13 @@ function GameModeButton({
 function Numpad({
   onNumberClick,
   onCheck,
-  userAnswer
+  userAnswer,
+  isAnswerChecked
 }: {
   onNumberClick: (num: number) => void;
   onCheck: () => void;
   userAnswer: string;
+  isAnswerChecked: boolean;
 }) {
   return (
     <View style={styles.numpad}>
@@ -735,12 +727,14 @@ function Numpad({
         <TouchableOpacity
           style={[
             styles.numpadButtonCheck,
-            userAnswer === '' && styles.numpadButtonCheckDisabled,
+            userAnswer === '' && !isAnswerChecked && styles.numpadButtonCheckDisabled,
           ]}
           onPress={onCheck}
-          disabled={userAnswer === ''}
+          disabled={userAnswer === '' && !isAnswerChecked}
         >
-          <Text style={styles.numpadButtonCheckText}>✓</Text>
+          <Text style={styles.numpadButtonCheckText}>
+            {isAnswerChecked ? '→' : '✓'}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -1055,20 +1049,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
-  },
-  nextButton: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#6200EE',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  nextButtonText: {
-    fontSize: 18,
-    color: '#fff',
-    fontWeight: 'bold',
   },
   modalOverlay: {
     flex: 1,
