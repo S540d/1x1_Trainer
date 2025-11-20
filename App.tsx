@@ -38,6 +38,10 @@ const translations = {
     language: 'LANGUAGE',
     english: 'English',
     german: 'Deutsch',
+    gameMode: 'GAME MODE',
+    operation: 'OPERATION',
+    addition: 'Addition',
+    multiplication: 'Multiplication',
     feedback: 'Send Feedback',
     support: 'support me',
     about: 'ABOUT',
@@ -70,6 +74,10 @@ const translations = {
     language: 'SPRACHE',
     english: 'English',
     german: 'Deutsch',
+    gameMode: 'SPIELMODUS',
+    operation: 'RECHENART',
+    addition: 'Addition',
+    multiplication: 'Multiplikation',
     feedback: 'Feedback senden',
     support: 'support me',
     about: 'ÜBER',
@@ -360,14 +368,7 @@ export default function App() {
     return colors.card;
   };
 
-  const firstNumText = gameState.questionPart === 0 ? '?' : gameState.num1.toString();
-  const secondNumText = gameState.questionPart === 1 ? '?' : gameState.num2.toString();
   const operatorSymbol = gameState.operation === Operation.ADDITION ? '+' : '×';
-
-  // Dynamic icons based on operation
-  const normalIcon = operatorSymbol;
-  const firstMissingIcon = `?${operatorSymbol}`;
-  const secondMissingIcon = `${operatorSymbol}?`;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -376,44 +377,6 @@ export default function App() {
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <Text style={[styles.headerTitle, { color: colors.text }]}>1x1 Trainer</Text>
-        <View style={styles.operationToggle}>
-          <TouchableOpacity
-            style={[
-              styles.operationButton,
-              { backgroundColor: colors.buttonInactive },
-              gameState.operation === Operation.ADDITION && styles.operationButtonActive,
-            ]}
-            onPress={() => changeOperation(Operation.ADDITION)}
-          >
-            <Text
-              style={[
-                styles.operationButtonText,
-                { color: colors.buttonInactiveText },
-                gameState.operation === Operation.ADDITION && styles.operationButtonTextActive,
-              ]}
-            >
-              +
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.operationButton,
-              { backgroundColor: colors.buttonInactive },
-              gameState.operation === Operation.MULTIPLICATION && styles.operationButtonActive,
-            ]}
-            onPress={() => changeOperation(Operation.MULTIPLICATION)}
-          >
-            <Text
-              style={[
-                styles.operationButtonText,
-                { color: colors.buttonInactiveText },
-                gameState.operation === Operation.MULTIPLICATION && styles.operationButtonTextActive,
-              ]}
-            >
-              ×
-            </Text>
-          </TouchableOpacity>
-        </View>
         <TouchableOpacity
           onPress={() => setMenuVisible(true)}
           style={styles.settingsButton}
@@ -521,6 +484,120 @@ export default function App() {
 
             <View style={styles.settingsDivider} />
 
+            {/* Operation Settings */}
+            <View style={styles.settingsSection}>
+              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.operation}</Text>
+              <View style={styles.themeToggle}>
+                <TouchableOpacity
+                  style={[
+                    styles.themeButton,
+                    gameState.operation === Operation.ADDITION && styles.themeButtonActive,
+                  ]}
+                  onPress={() => changeOperation(Operation.ADDITION)}
+                >
+                  <Text
+                    style={[
+                      styles.themeButtonText,
+                      gameState.operation === Operation.ADDITION && styles.themeButtonTextActive,
+                    ]}
+                  >
+                    {t.addition}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.themeButton,
+                    gameState.operation === Operation.MULTIPLICATION && styles.themeButtonActive,
+                  ]}
+                  onPress={() => changeOperation(Operation.MULTIPLICATION)}
+                >
+                  <Text
+                    style={[
+                      styles.themeButtonText,
+                      gameState.operation === Operation.MULTIPLICATION && styles.themeButtonTextActive,
+                    ]}
+                  >
+                    {t.multiplication}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.settingsDivider} />
+
+            {/* Game Mode Settings */}
+            <View style={styles.settingsSection}>
+              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.gameMode}</Text>
+              <View style={styles.gameModeGrid}>
+                <TouchableOpacity
+                  style={[
+                    styles.gameModeSettingsButton,
+                    gameState.gameMode === GameMode.NORMAL && styles.gameModeSettingsButtonActive,
+                  ]}
+                  onPress={() => changeGameMode(GameMode.NORMAL)}
+                >
+                  <Text
+                    style={[
+                      styles.gameModeSettingsButtonText,
+                      gameState.gameMode === GameMode.NORMAL && styles.gameModeSettingsButtonTextActive,
+                    ]}
+                  >
+                    {t.normalMode}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.gameModeSettingsButton,
+                    gameState.gameMode === GameMode.FIRST_MISSING && styles.gameModeSettingsButtonActive,
+                  ]}
+                  onPress={() => changeGameMode(GameMode.FIRST_MISSING)}
+                >
+                  <Text
+                    style={[
+                      styles.gameModeSettingsButtonText,
+                      gameState.gameMode === GameMode.FIRST_MISSING && styles.gameModeSettingsButtonTextActive,
+                    ]}
+                  >
+                    {t.firstMissing}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.gameModeSettingsButton,
+                    gameState.gameMode === GameMode.SECOND_MISSING && styles.gameModeSettingsButtonActive,
+                  ]}
+                  onPress={() => changeGameMode(GameMode.SECOND_MISSING)}
+                >
+                  <Text
+                    style={[
+                      styles.gameModeSettingsButtonText,
+                      gameState.gameMode === GameMode.SECOND_MISSING && styles.gameModeSettingsButtonTextActive,
+                    ]}
+                  >
+                    {t.secondMissing}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.gameModeSettingsButton,
+                    gameState.gameMode === GameMode.MIXED && styles.gameModeSettingsButtonActive,
+                  ]}
+                  onPress={() => changeGameMode(GameMode.MIXED)}
+                >
+                  <Text
+                    style={[
+                      styles.gameModeSettingsButtonText,
+                      gameState.gameMode === GameMode.MIXED && styles.gameModeSettingsButtonTextActive,
+                    ]}
+                  >
+                    {t.mixedMode}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.settingsDivider} />
+
             {/* Feedback and Support in One Row */}
             <View style={[styles.settingsSection, styles.settingsSectionRow]}>
               <TouchableOpacity
@@ -556,40 +633,6 @@ export default function App() {
       )}
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-
-        <View style={styles.gameModeContainer}>
-          <View style={styles.gameModeRow}>
-            <GameModeButton
-              icon={normalIcon}
-              label={t.normalMode}
-              isSelected={gameState.gameMode === GameMode.NORMAL}
-              onPress={() => changeGameMode(GameMode.NORMAL)}
-              colors={colors}
-            />
-            <GameModeButton
-              icon={firstMissingIcon}
-              label={t.firstMissing}
-              isSelected={gameState.gameMode === GameMode.FIRST_MISSING}
-              onPress={() => changeGameMode(GameMode.FIRST_MISSING)}
-              colors={colors}
-            />
-            <GameModeButton
-              icon={secondMissingIcon}
-              label={t.secondMissing}
-              isSelected={gameState.gameMode === GameMode.SECOND_MISSING}
-              onPress={() => changeGameMode(GameMode.SECOND_MISSING)}
-              colors={colors}
-            />
-            <GameModeButton
-              icon="🎲"
-              label={t.mixedMode}
-              isSelected={gameState.gameMode === GameMode.MIXED}
-              onPress={() => changeGameMode(GameMode.MIXED)}
-              colors={colors}
-            />
-          </View>
-        </View>
-
         <View style={styles.scoreContainer}>
           <Text style={[styles.scoreText, { color: colors.text }]}>
             {t.task}: {gameState.currentTask} / {gameState.totalTasks}
@@ -601,14 +644,52 @@ export default function App() {
 
         <View style={[styles.questionCard, { backgroundColor: getCardColor() }]}>
           <View style={styles.questionRow}>
-            <Text style={[styles.questionText, { color: colors.text }]}>
-              {`${firstNumText} ${operatorSymbol} ${secondNumText} = `}
-            </Text>
-            <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
-              <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
-                {gameState.userAnswer || '?'}
+            {/* First number or answer box */}
+            {gameState.questionPart === 0 ? (
+              <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
+                <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
+                  {gameState.userAnswer || '?'}
+                </Text>
+              </View>
+            ) : (
+              <Text style={[styles.questionText, { color: colors.text }]}>
+                {gameState.num1}
               </Text>
-            </View>
+            )}
+
+            {/* Operator */}
+            <Text style={[styles.questionText, { color: colors.text }]}> {operatorSymbol} </Text>
+
+            {/* Second number or answer box */}
+            {gameState.questionPart === 1 ? (
+              <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
+                <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
+                  {gameState.userAnswer || '?'}
+                </Text>
+              </View>
+            ) : (
+              <Text style={[styles.questionText, { color: colors.text }]}>
+                {gameState.num2}
+              </Text>
+            )}
+
+            {/* Equals sign */}
+            <Text style={[styles.questionText, { color: colors.text }]}> = </Text>
+
+            {/* Result or answer box */}
+            {gameState.questionPart === 2 ? (
+              <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
+                <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
+                  {gameState.userAnswer || '?'}
+                </Text>
+              </View>
+            ) : (
+              <Text style={[styles.questionText, { color: colors.text }]}>
+                {gameState.operation === Operation.ADDITION
+                  ? gameState.num1 + gameState.num2
+                  : gameState.num1 * gameState.num2}
+              </Text>
+            )}
           </View>
 
           <Numpad
@@ -634,62 +715,6 @@ export default function App() {
         </View>
       </Modal>
     </SafeAreaView>
-  );
-}
-
-function GameModeButton({
-  icon,
-  label,
-  isSelected,
-  onPress,
-  colors,
-}: {
-  icon: string;
-  label: string;
-  isSelected: boolean;
-  onPress: () => void;
-  colors: {
-    background: string;
-    text: string;
-    textSecondary: string;
-    border: string;
-    card: string;
-    cardCorrect: string;
-    cardIncorrect: string;
-    buttonInactive: string;
-    buttonInactiveText: string;
-    settingsOverlay: string;
-    settingsMenu: string;
-  };
-}) {
-  return (
-    <TouchableOpacity
-      style={[
-        styles.gameModeButton,
-        { backgroundColor: colors.buttonInactive },
-        isSelected && styles.gameModeButtonSelected,
-      ]}
-      onPress={onPress}
-    >
-      <Text
-        style={[
-          styles.gameModeButtonIcon,
-          { color: colors.buttonInactiveText },
-          isSelected && styles.gameModeButtonIconSelected,
-        ]}
-      >
-        {icon}
-      </Text>
-      <Text
-        style={[
-          styles.gameModeButtonText,
-          { color: colors.buttonInactiveText },
-          isSelected && styles.gameModeButtonTextSelected,
-        ]}
-      >
-        {label}
-      </Text>
-    </TouchableOpacity>
   );
 }
 
@@ -787,29 +812,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
-  },
-  operationToggle: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  operationButton: {
-    width: 36,
-    height: 36,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  operationButtonActive: {
-    backgroundColor: '#6200EE',
-  },
-  operationButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  operationButtonTextActive: {
-    color: '#fff',
   },
   settingsButton: {
     padding: 8,
@@ -924,6 +926,32 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 4,
   },
+  gameModeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  gameModeSettingsButton: {
+    flex: 1,
+    minWidth: '45%',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    backgroundColor: '#f5f5f5',
+    alignItems: 'center',
+  },
+  gameModeSettingsButtonActive: {
+    backgroundColor: '#6200EE',
+  },
+  gameModeSettingsButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+  },
+  gameModeSettingsButtonTextActive: {
+    color: '#fff',
+  },
   scoreContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -936,44 +964,6 @@ const styles = StyleSheet.create({
   scoreValue: {
     color: '#6200EE',
     fontWeight: 'bold',
-  },
-  gameModeContainer: {
-    width: '100%',
-    marginBottom: 24,
-  },
-  gameModeRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  gameModeButton: {
-    flex: 1,
-    height: 70,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 8,
-  },
-  gameModeButtonSelected: {
-    backgroundColor: '#6200EE',
-  },
-  gameModeButtonIcon: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 4,
-  },
-  gameModeButtonIconSelected: {
-    color: '#fff',
-  },
-  gameModeButtonText: {
-    fontSize: 9,
-    fontWeight: '600',
-    color: '#000',
-    textAlign: 'center',
-  },
-  gameModeButtonTextSelected: {
-    color: '#fff',
   },
   questionCard: {
     width: '100%',
