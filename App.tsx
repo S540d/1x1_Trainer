@@ -130,7 +130,7 @@ export default function App() {
     currentTask: 1,
     totalTasks: TOTAL_TASKS,
     gameMode: GameMode.NORMAL,
-    operation: Operation.ADDITION,
+    operation: Operation.MULTIPLICATION,
     questionPart: 2,
     showResult: false,
     lastAnswerCorrect: null,
