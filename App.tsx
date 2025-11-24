@@ -8,9 +8,12 @@ import {
   Linking,
   ScrollView,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Updates from 'expo-updates';
+import * as Localization from 'expo-localization';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 enum GameMode {
   NORMAL = 'NORMAL',
@@ -27,7 +30,7 @@ enum Operation {
 type ThemeMode = 'light' | 'dark' | 'system';
 type Language = 'en' | 'de';
 
-const APP_VERSION = '1.0.1';
+const APP_VERSION = '1.0.6';
 
 const translations = {
   en: {
@@ -182,18 +185,31 @@ export default function App() {
   useEffect(() => {
     const loadPreferences = async () => {
       try {
-        // Load language
-        const savedLanguage = localStorage.getItem('app-language');
+        // Load language from storage
+        let savedLanguage: string | null = null;
+        if (Platform.OS === 'web') {
+          savedLanguage = localStorage.getItem('app-language');
+        } else {
+          savedLanguage = await AsyncStorage.getItem('app-language');
+        }
+
         if (savedLanguage === 'en' || savedLanguage === 'de') {
           setLanguage(savedLanguage);
         } else {
-          // Auto-detect browser language
-          const browserLang = navigator.language.split('-')[0];
-          setLanguage(browserLang === 'de' ? 'de' : 'en');
+          // Auto-detect device language
+          const locales = Localization.getLocales();
+          const deviceLang = locales[0]?.languageCode || 'en';
+          setLanguage(deviceLang === 'de' ? 'de' : 'en');
         }
 
         // Load theme preference
-        const savedTheme = localStorage.getItem('app-theme');
+        let savedTheme: string | null = null;
+        if (Platform.OS === 'web') {
+          savedTheme = localStorage.getItem('app-theme');
+        } else {
+          savedTheme = await AsyncStorage.getItem('app-theme');
+        }
+
         if (savedTheme === 'dark' || savedTheme === 'system') {
           setThemeMode(savedTheme as ThemeMode);
         }
@@ -209,7 +225,7 @@ export default function App() {
           return () => darkModeQuery.removeEventListener('change', handler);
         }
       } catch (error) {
-        // Fallback to defaults
+        // Fallback to English
         setLanguage('en');
       }
     };
@@ -219,20 +235,34 @@ export default function App() {
 
   // Save language preference when it changes
   useEffect(() => {
-    try {
-      localStorage.setItem('app-language', language);
-    } catch (error) {
-      // Ignore localStorage errors
-    }
+    const saveLanguage = async () => {
+      try {
+        if (Platform.OS === 'web') {
+          localStorage.setItem('app-language', language);
+        } else {
+          await AsyncStorage.setItem('app-language', language);
+        }
+      } catch (error) {
+        // Ignore storage errors
+      }
+    };
+    saveLanguage();
   }, [language]);
 
   // Save theme preference when it changes
   useEffect(() => {
-    try {
-      localStorage.setItem('app-theme', themeMode);
-    } catch (error) {
-      // Ignore localStorage errors
-    }
+    const saveTheme = async () => {
+      try {
+        if (Platform.OS === 'web') {
+          localStorage.setItem('app-theme', themeMode);
+        } else {
+          await AsyncStorage.setItem('app-theme', themeMode);
+        }
+      } catch (error) {
+        // Ignore storage errors
+      }
+    };
+    saveTheme();
   }, [themeMode]);
 
   const generateQuestion = (mode: GameMode = gameState.gameMode) => {

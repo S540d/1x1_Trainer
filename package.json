@@ -1,6 +1,6 @@
 {
   "name": "1x1_trainer",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Cross-platform 1x1 multiplication trainer with multiple game modes",
   "main": "index.ts",
   "homepage": "https://s540d.github.io/1x1_Trainer/",
@@ -24,7 +24,9 @@
     "deploy:gh-pages": "gh-pages -d dist -t --dotfiles"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
     "expo": "~54.0.12",
+    "expo-localization": "^17.0.7",
     "expo-status-bar": "~3.0.8",
     "expo-updates": "^29.0.12",
     "react": "19.1.0",
