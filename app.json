@@ -14,7 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sven4321.trainer1x1"
+      "bundleIdentifier": "com.sven4321.trainer1x1",
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -40,8 +43,24 @@
             "BROWSABLE",
             "DEFAULT"
           ]
+        },
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "s540d.github.io",
+              "pathPrefix": "/1x1_Trainer"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
-      ]
+      ],
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -53,6 +72,9 @@
         "projectId": "91fd28a6-8da1-4b9b-a8bc-a2b48b70cc33"
       }
     },
-    "owner": "devsven"
+    "owner": "devsven",
+    "updates": {
+      "url": "https://u.expo.dev/91fd28a6-8da1-4b9b-a8bc-a2b48b70cc33"
+    }
   }
 }
