@@ -30,12 +30,13 @@ enum Operation {
 type ThemeMode = 'light' | 'dark' | 'system';
 type Language = 'en' | 'de';
 
-const APP_VERSION = '1.0.6';
+const APP_VERSION = '1.0.7';
 
 const translations = {
   en: {
     // Settings Menu
     appearance: 'APPEARANCE',
+    light: 'Light',
     dark: 'Dark',
     system: 'System',
     language: 'LANGUAGE',
@@ -68,10 +69,15 @@ const translations = {
     great: 'Great!',
     youSolved: 'You solved',
     tasksCorrectly: 'tasks correctly',
+    // Motivation Message
+    motivationTitle: 'Great Progress!',
+    motivationMessage: 'You have already solved 10 tasks. Let\'s try another round!',
+    motivationButton: 'Continue',
   },
   de: {
     // Settings Menu
     appearance: 'ERSCHEINUNGSBILD',
+    light: 'Hell',
     dark: 'Dunkel',
     system: 'System',
     language: 'SPRACHE',
@@ -104,6 +110,10 @@ const translations = {
     great: 'Super!',
     youSolved: 'Du hast',
     tasksCorrectly: 'Aufgaben richtig gelöst',
+    // Motivation Message
+    motivationTitle: 'Toll gemacht!',
+    motivationMessage: 'Du hast schon 10 Aufgaben gerechnet. Lass uns noch eine Runde versuchen!',
+    motivationButton: 'Weiter',
   },
 };
 
@@ -120,6 +130,7 @@ interface GameState {
   showResult: boolean;
   lastAnswerCorrect: boolean | null;
   isAnswerChecked: boolean;
+  totalSolvedTasks: number; // Track total tasks solved for motivation message
 }
 
 const TOTAL_TASKS = 10;
@@ -133,16 +144,18 @@ export default function App() {
     currentTask: 1,
     totalTasks: TOTAL_TASKS,
     gameMode: GameMode.NORMAL,
-    operation: Operation.MULTIPLICATION,
+    operation: Operation.ADDITION,
     questionPart: 2,
     showResult: false,
     lastAnswerCorrect: null,
     isAnswerChecked: false,
+    totalSolvedTasks: 0,
   });
   const [menuVisible, setMenuVisible] = useState(false);
-  const [themeMode, setThemeMode] = useState<ThemeMode>('system');
+  const [themeMode, setThemeMode] = useState<ThemeMode>('light');
   const [systemDarkMode, setSystemDarkMode] = useState(false);
   const [language, setLanguage] = useState<Language>('en');
+  const [showMotivation, setShowMotivation] = useState(false);
   const t = translations[language];
 
   // Calculate effective dark mode
@@ -210,8 +223,35 @@ export default function App() {
           savedTheme = await AsyncStorage.getItem('app-theme');
         }
 
-        if (savedTheme === 'dark' || savedTheme === 'system') {
+        if (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'system') {
           setThemeMode(savedTheme as ThemeMode);
+        }
+
+        // Load operation preference
+        let savedOperation: string | null = null;
+        if (Platform.OS === 'web') {
+          savedOperation = localStorage.getItem('app-operation');
+        } else {
+          savedOperation = await AsyncStorage.getItem('app-operation');
+        }
+
+        if (savedOperation === 'ADDITION' || savedOperation === 'MULTIPLICATION') {
+          setGameState((prev) => ({ ...prev, operation: savedOperation as Operation }));
+        }
+
+        // Load total solved tasks
+        let savedTotalTasks: string | null = null;
+        if (Platform.OS === 'web') {
+          savedTotalTasks = localStorage.getItem('app-total-tasks');
+        } else {
+          savedTotalTasks = await AsyncStorage.getItem('app-total-tasks');
+        }
+
+        if (savedTotalTasks) {
+          const totalTasks = parseInt(savedTotalTasks, 10);
+          if (!isNaN(totalTasks)) {
+            setGameState((prev) => ({ ...prev, totalSolvedTasks: totalTasks }));
+          }
         }
 
         // Detect system dark mode
@@ -264,6 +304,38 @@ export default function App() {
     };
     saveTheme();
   }, [themeMode]);
+
+  // Save operation preference when it changes
+  useEffect(() => {
+    const saveOperation = async () => {
+      try {
+        if (Platform.OS === 'web') {
+          localStorage.setItem('app-operation', gameState.operation);
+        } else {
+          await AsyncStorage.setItem('app-operation', gameState.operation);
+        }
+      } catch (error) {
+        // Ignore storage errors
+      }
+    };
+    saveOperation();
+  }, [gameState.operation]);
+
+  // Save total solved tasks when it changes
+  useEffect(() => {
+    const saveTotalTasks = async () => {
+      try {
+        if (Platform.OS === 'web') {
+          localStorage.setItem('app-total-tasks', gameState.totalSolvedTasks.toString());
+        } else {
+          await AsyncStorage.setItem('app-total-tasks', gameState.totalSolvedTasks.toString());
+        }
+      } catch (error) {
+        // Ignore storage errors
+      }
+    };
+    saveTotalTasks();
+  }, [gameState.totalSolvedTasks]);
 
   const generateQuestion = (mode: GameMode = gameState.gameMode) => {
     const newNum1 = Math.floor(Math.random() * 10) + 1;
@@ -360,10 +432,18 @@ export default function App() {
 
   const nextQuestion = () => {
     if (gameState.currentTask < gameState.totalTasks) {
+      const newTotalSolvedTasks = gameState.totalSolvedTasks + 1;
       setGameState((prev) => ({
         ...prev,
         currentTask: prev.currentTask + 1,
+        totalSolvedTasks: newTotalSolvedTasks,
       }));
+
+      // Show motivation message after every 10 tasks
+      if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
+        setShowMotivation(true);
+      }
+
       setTimeout(() => generateQuestion(), 0);
     } else {
       setGameState((prev) => ({ ...prev, showResult: true }));
@@ -410,7 +490,7 @@ export default function App() {
           {t.task}: {gameState.currentTask}/{gameState.totalTasks}
         </Text>
         <Text style={[styles.headerScore, { color: colors.text }]}>
-          {t.points}: <Text style={{ color: '#6200EE', fontWeight: 'bold' }}>{gameState.score}</Text>
+          {t.points}: <Text style={{ color: colors.text, fontWeight: 'bold' }}>{gameState.score}</Text>
         </Text>
         <TouchableOpacity
           onPress={() => setMenuVisible(true)}
@@ -440,10 +520,26 @@ export default function App() {
             {/* App Name */}
             <Text style={[styles.appName, { color: colors.text }]}>1x1 Trainer</Text>
 
-            {/* Appearance Settings - Dark/System Only */}
+            {/* Appearance Settings - Light/Dark/System */}
             <View style={styles.settingsSection}>
               <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.appearance}</Text>
               <View style={styles.themeToggle}>
+                <TouchableOpacity
+                  style={[
+                    styles.themeButton,
+                    themeMode === 'light' && styles.themeButtonActive,
+                  ]}
+                  onPress={() => setThemeMode('light')}
+                >
+                  <Text
+                    style={[
+                      styles.themeButtonText,
+                      themeMode === 'light' && styles.themeButtonTextActive,
+                    ]}
+                  >
+                    {t.light}
+                  </Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
@@ -670,7 +766,10 @@ export default function App() {
         </>
       )}
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        style={{ backgroundColor: colors.background }}
+      >
         <View style={[styles.questionCard, { backgroundColor: getCardColor() }]}>
           <View style={styles.questionRow}>
             {/* First number or answer box */}
@@ -739,6 +838,24 @@ export default function App() {
             </Text>
             <TouchableOpacity style={styles.restartButton} onPress={restartGame}>
               <Text style={styles.restartButtonText}>{t.playAgain}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Motivation Modal */}
+      <Modal visible={showMotivation} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.settingsMenu }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{t.motivationTitle}</Text>
+            <Text style={[styles.modalText, { color: colors.text }]}>
+              {t.motivationMessage}
+            </Text>
+            <TouchableOpacity
+              style={styles.restartButton}
+              onPress={() => setShowMotivation(false)}
+            >
+              <Text style={styles.restartButtonText}>{t.motivationButton}</Text>
             </TouchableOpacity>
           </View>
         </View>
