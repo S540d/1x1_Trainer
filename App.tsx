@@ -149,6 +149,8 @@ interface GameState {
 }
 
 const TOTAL_TASKS = 10;
+const MAX_CHOICE_GENERATION_ATTEMPTS = 100;
+const MAX_RANDOM_ANSWER = 100;
 
 export default function App() {
   const [gameState, setGameState] = useState<GameState>({
@@ -527,19 +529,18 @@ export default function App() {
     
     // Generate two wrong answers
     let attempts = 0;
-    const maxAttempts = 100;
-    while (choices.length < 3 && attempts < maxAttempts) {
+    while (choices.length < 3 && attempts < MAX_CHOICE_GENERATION_ATTEMPTS) {
       attempts++;
       let wrongAnswer;
       if (Math.random() < 0.5) {
         // Nearby wrong answer (but not the correct answer)
-        // Generate offset from -4 to 4, excluding 0
-        const offset = Math.floor(Math.random() * 8) - 4; // Generates -4 to 3
+        // Generate offset range: -4 to 3 (inclusive), then adjust to exclude 0
+        const offset = Math.floor(Math.random() * 8) - 4; // Generates -4, -3, -2, -1, 0, 1, 2, 3
         const adjustedOffset = offset >= 0 ? offset + 1 : offset; // Result: -4 to -1, 1 to 4 (excludes 0)
         wrongAnswer = correctAnswer + adjustedOffset;
       } else {
         // Random wrong answer
-        wrongAnswer = Math.floor(Math.random() * 100) + 1;
+        wrongAnswer = Math.floor(Math.random() * MAX_RANDOM_ANSWER) + 1;
       }
       
       if (wrongAnswer > 0 && wrongAnswer !== correctAnswer && !choices.includes(wrongAnswer)) {
