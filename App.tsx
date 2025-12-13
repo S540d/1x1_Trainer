@@ -560,11 +560,7 @@ export default function App() {
     
     // Generate sequence: base, 2*base, 3*base, ...
     for (let i = 1; i <= 10; i++) {
-      if (gameState.operation === Operation.ADDITION) {
-        sequence.push(base * i);
-      } else {
-        sequence.push(base * i);
-      }
+      sequence.push(base * i);
     }
     
     return sequence;
