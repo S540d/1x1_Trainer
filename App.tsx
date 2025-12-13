@@ -29,7 +29,7 @@ enum Operation {
 type ThemeMode = 'light' | 'dark' | 'system';
 type Language = 'en' | 'de';
 
-const APP_VERSION = '1.0.7';
+const APP_VERSION = '1.0.8';
 
 const translations = {
   en: {
@@ -235,8 +235,8 @@ export default function App() {
           }
         }
 
-        // Detect system dark mode
-        if (typeof window !== 'undefined' && window.matchMedia) {
+        // Detect system dark mode (only on web)
+        if (Platform.OS === 'web' && typeof window !== 'undefined' && window.matchMedia) {
           const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
           setSystemDarkMode(darkModeQuery.matches);
 
