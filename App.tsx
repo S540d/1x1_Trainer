@@ -29,7 +29,7 @@ enum Operation {
 type ThemeMode = 'light' | 'dark' | 'system';
 type Language = 'en' | 'de';
 
-const APP_VERSION = '1.0.8';
+const APP_VERSION = '1.0.9';
 
 const translations = {
   en: {

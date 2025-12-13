@@ -21,11 +21,9 @@ class MainActivity : AppCompatActivity() {
         // Check if launched via deep link or directly
         val url = intent.data?.toString() ?: PWA_URL
 
-        // Launch PWA in TWA
+        // Launch PWA in TWA (CustomTab)
+        // The activity will finish itself after successfully launching the tab
         launchPWA(url)
-
-        // Finish this activity - the PWA takes over
-        finish()
     }
 
     private fun launchPWA(url: String) {
@@ -37,14 +35,23 @@ class MainActivity : AppCompatActivity() {
                 .setUrlBarHidingEnabled(true)
 
             val customTabsIntent = builder.build()
+
+            // Set FLAG_ACTIVITY_NEW_TASK to open CustomTab in separate task
+            customTabsIntent.intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
             customTabsIntent.launchUrl(this, Uri.parse(url))
+
+            // Finish this activity after successfully launching the CustomTab
+            finish()
 
         } catch (e: Exception) {
             // Fallback: Open in system browser
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse(url)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             startActivity(intent)
+            finish()
         }
     }
 }
