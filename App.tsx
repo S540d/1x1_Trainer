@@ -534,8 +534,8 @@ export default function App() {
       if (Math.random() < 0.5) {
         // Nearby wrong answer (but not the correct answer)
         // Generate offset from -4 to 4, excluding 0
-        const offset = Math.floor(Math.random() * 8) - 4; // -4 to 3
-        const adjustedOffset = offset >= 0 ? offset + 1 : offset; // -4 to -1, 1 to 4
+        const offset = Math.floor(Math.random() * 8) - 4; // Generates -4 to 3
+        const adjustedOffset = offset >= 0 ? offset + 1 : offset; // Result: -4 to -1, 1 to 4 (excludes 0)
         wrongAnswer = correctAnswer + adjustedOffset;
       } else {
         // Random wrong answer
@@ -568,7 +568,6 @@ export default function App() {
   };
 
   const generateNumberSequence = () => {
-    const correctAnswer = getCorrectAnswer();
     const sequence: number[] = [];
     
     // Determine the base number for the sequence
