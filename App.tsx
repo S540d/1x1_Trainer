@@ -414,10 +414,12 @@ export default function App() {
   };
 
   const checkAnswer = () => {
-    // For INPUT mode, check userAnswer
-    // For MULTIPLE_CHOICE and NUMBER_SEQUENCE modes, check selectedChoice
-    if (gameState.answerMode === AnswerMode.INPUT && gameState.userAnswer === '') return;
-    if ((gameState.answerMode === AnswerMode.MULTIPLE_CHOICE || gameState.answerMode === AnswerMode.NUMBER_SEQUENCE) && gameState.selectedChoice === null) return;
+    // Validate that user has provided an answer
+    const hasInput = gameState.answerMode === AnswerMode.INPUT 
+      ? gameState.userAnswer !== '' 
+      : gameState.selectedChoice !== null;
+    
+    if (!hasInput) return;
 
     let correctAnswer = 0;
     const result = gameState.operation === Operation.ADDITION
@@ -531,8 +533,10 @@ export default function App() {
       let wrongAnswer;
       if (Math.random() < 0.5) {
         // Nearby wrong answer (but not the correct answer)
-        const offset = Math.floor(Math.random() * 9) - 4; // -4 to 4, excluding 0
-        wrongAnswer = correctAnswer + (offset >= 0 ? offset + 1 : offset);
+        // Generate offset from -4 to 4, excluding 0
+        const offset = Math.floor(Math.random() * 8) - 4; // -4 to 3
+        const adjustedOffset = offset >= 0 ? offset + 1 : offset; // -4 to -1, 1 to 4
+        wrongAnswer = correctAnswer + adjustedOffset;
       } else {
         // Random wrong answer
         wrongAnswer = Math.floor(Math.random() * 100) + 1;
