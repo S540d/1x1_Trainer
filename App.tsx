@@ -182,7 +182,7 @@ export default function App() {
         // Load language from storage
         let savedLanguage: string | null = null;
         if (Platform.OS === 'web') {
-          savedLanguage = localStorage.getItem('app-language');
+          savedLanguage = localStorage.getItem('app-language'); // platform-safe
         } else {
           savedLanguage = await AsyncStorage.getItem('app-language');
         }
@@ -199,7 +199,7 @@ export default function App() {
         // Load theme preference
         let savedTheme: string | null = null;
         if (Platform.OS === 'web') {
-          savedTheme = localStorage.getItem('app-theme');
+          savedTheme = localStorage.getItem('app-theme'); // platform-safe
         } else {
           savedTheme = await AsyncStorage.getItem('app-theme');
         }
@@ -211,7 +211,7 @@ export default function App() {
         // Load operation preference
         let savedOperation: string | null = null;
         if (Platform.OS === 'web') {
-          savedOperation = localStorage.getItem('app-operation');
+          savedOperation = localStorage.getItem('app-operation'); // platform-safe
         } else {
           savedOperation = await AsyncStorage.getItem('app-operation');
         }
@@ -223,7 +223,7 @@ export default function App() {
         // Load total solved tasks
         let savedTotalTasks: string | null = null;
         if (Platform.OS === 'web') {
-          savedTotalTasks = localStorage.getItem('app-total-tasks');
+          savedTotalTasks = localStorage.getItem('app-total-tasks'); // platform-safe
         } else {
           savedTotalTasks = await AsyncStorage.getItem('app-total-tasks');
         }
@@ -237,7 +237,7 @@ export default function App() {
 
         // Detect system dark mode (only on web)
         if (Platform.OS === 'web' && typeof window !== 'undefined' && window.matchMedia) {
-          const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+          const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)'); // platform-safe
           setSystemDarkMode(darkModeQuery.matches);
 
           // Listen for changes
@@ -259,7 +259,7 @@ export default function App() {
     const saveLanguage = async () => {
       try {
         if (Platform.OS === 'web') {
-          localStorage.setItem('app-language', language);
+          localStorage.setItem('app-language', language); // platform-safe
         } else {
           await AsyncStorage.setItem('app-language', language);
         }
@@ -275,7 +275,7 @@ export default function App() {
     const saveTheme = async () => {
       try {
         if (Platform.OS === 'web') {
-          localStorage.setItem('app-theme', themeMode);
+          localStorage.setItem('app-theme', themeMode); // platform-safe
         } else {
           await AsyncStorage.setItem('app-theme', themeMode);
         }
@@ -291,7 +291,7 @@ export default function App() {
     const saveOperation = async () => {
       try {
         if (Platform.OS === 'web') {
-          localStorage.setItem('app-operation', gameState.operation);
+          localStorage.setItem('app-operation', gameState.operation); // platform-safe
         } else {
           await AsyncStorage.setItem('app-operation', gameState.operation);
         }
@@ -307,7 +307,7 @@ export default function App() {
     const saveTotalTasks = async () => {
       try {
         if (Platform.OS === 'web') {
-          localStorage.setItem('app-total-tasks', gameState.totalSolvedTasks.toString());
+          localStorage.setItem('app-total-tasks', gameState.totalSolvedTasks.toString()); // platform-safe
         } else {
           await AsyncStorage.setItem('app-total-tasks', gameState.totalSolvedTasks.toString());
         }
