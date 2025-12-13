@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -524,23 +524,43 @@ export default function App() {
     const choices = [correctAnswer];
     
     // Generate two wrong answers
-    while (choices.length < 3) {
+    let attempts = 0;
+    const maxAttempts = 100;
+    while (choices.length < 3 && attempts < maxAttempts) {
+      attempts++;
       let wrongAnswer;
       if (Math.random() < 0.5) {
-        // Nearby wrong answer
-        wrongAnswer = correctAnswer + Math.floor(Math.random() * 10 - 5);
+        // Nearby wrong answer (but not the correct answer)
+        const offset = Math.floor(Math.random() * 9) - 4; // -4 to 4, excluding 0
+        wrongAnswer = correctAnswer + (offset >= 0 ? offset + 1 : offset);
       } else {
         // Random wrong answer
         wrongAnswer = Math.floor(Math.random() * 100) + 1;
       }
       
-      if (wrongAnswer > 0 && !choices.includes(wrongAnswer)) {
+      if (wrongAnswer > 0 && wrongAnswer !== correctAnswer && !choices.includes(wrongAnswer)) {
         choices.push(wrongAnswer);
       }
     }
     
-    // Shuffle the choices
-    return choices.sort(() => Math.random() - 0.5);
+    // Ensure we always have 3 choices - fallback if needed
+    if (choices.length < 3) {
+      const fallbacks = [correctAnswer + 1, correctAnswer + 2, correctAnswer - 1, correctAnswer - 2];
+      for (const fallback of fallbacks) {
+        if (fallback > 0 && fallback !== correctAnswer && !choices.includes(fallback)) {
+          choices.push(fallback);
+          if (choices.length === 3) break;
+        }
+      }
+    }
+    
+    // Fisher-Yates shuffle
+    for (let i = choices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [choices[i], choices[j]] = [choices[j], choices[i]];
+    }
+    
+    return choices;
   };
 
   const generateNumberSequence = () => {
@@ -573,6 +593,21 @@ export default function App() {
   };
 
   const operatorSymbol = gameState.operation === Operation.ADDITION ? '+' : '×';
+
+  // Memoize choices and sequence to avoid recalculating on every render
+  const multipleChoices = useMemo(() => {
+    if (gameState.answerMode === AnswerMode.MULTIPLE_CHOICE) {
+      return generateMultipleChoices();
+    }
+    return [];
+  }, [gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, gameState.answerMode]);
+
+  const numberSequence = useMemo(() => {
+    if (gameState.answerMode === AnswerMode.NUMBER_SEQUENCE) {
+      return generateNumberSequence();
+    }
+    return [];
+  }, [gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, gameState.answerMode]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -993,7 +1028,7 @@ export default function App() {
 
             {gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && (
               <View style={styles.choicesContainer}>
-                {generateMultipleChoices().map((choice, index) => (
+                {multipleChoices.map((choice, index) => (
                   <TouchableOpacity
                     key={index}
                     style={[
@@ -1031,7 +1066,7 @@ export default function App() {
             {gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && (
               <View style={styles.sequenceContainer}>
                 <ScrollView style={styles.sequenceScroll}>
-                  {generateNumberSequence().map((num, index) => (
+                  {numberSequence.map((num, index) => (
                     <TouchableOpacity
                       key={index}
                       style={[
