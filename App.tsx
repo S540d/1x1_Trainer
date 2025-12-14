@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -26,6 +26,12 @@ enum Operation {
   MULTIPLICATION = 'MULTIPLICATION',
 }
 
+enum AnswerMode {
+  INPUT = 'INPUT',
+  MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
+  NUMBER_SEQUENCE = 'NUMBER_SEQUENCE',
+}
+
 type ThemeMode = 'light' | 'dark' | 'system';
 type Language = 'en' | 'de';
 
@@ -45,6 +51,10 @@ const translations = {
     operation: 'OPERATION',
     addition: 'Addition',
     multiplication: 'Multiplication',
+    answerMode: 'ANSWER MODE',
+    inputMode: 'Number Input',
+    multipleChoiceMode: 'Multiple Choice',
+    numberSequenceMode: 'Number Sequence',
     feedback: 'Send Feedback',
     support: 'support me',
     about: 'ABOUT',
@@ -86,6 +96,10 @@ const translations = {
     operation: 'RECHENART',
     addition: 'Addition',
     multiplication: 'Multiplikation',
+    answerMode: 'ANTWORTMODUS',
+    inputMode: 'Zahleneingabe',
+    multipleChoiceMode: 'Auswahl',
+    numberSequenceMode: 'Zahlenreihe',
     feedback: 'Feedback senden',
     support: 'support me',
     about: 'ÜBER',
@@ -125,14 +139,18 @@ interface GameState {
   totalTasks: number;
   gameMode: GameMode;
   operation: Operation;
+  answerMode: AnswerMode;
   questionPart: number; // 0: num1, 1: num2, 2: result
   showResult: boolean;
   lastAnswerCorrect: boolean | null;
   isAnswerChecked: boolean;
   totalSolvedTasks: number; // Track total tasks solved for motivation message
+  selectedChoice: number | null; // For multiple choice and number sequence modes
 }
 
 const TOTAL_TASKS = 10;
+const MAX_CHOICE_GENERATION_ATTEMPTS = 100;
+const MAX_RANDOM_ANSWER = 100;
 
 export default function App() {
   const [gameState, setGameState] = useState<GameState>({
@@ -144,11 +162,13 @@ export default function App() {
     totalTasks: TOTAL_TASKS,
     gameMode: GameMode.NORMAL,
     operation: Operation.MULTIPLICATION,
+    answerMode: AnswerMode.INPUT,
     questionPart: 2,
     showResult: false,
     lastAnswerCorrect: null,
     isAnswerChecked: false,
     totalSolvedTasks: 0,
+    selectedChoice: null,
   });
   const [menuVisible, setMenuVisible] = useState(false);
   const [themeMode, setThemeMode] = useState<ThemeMode>('light');
@@ -346,6 +366,7 @@ export default function App() {
       questionPart: newQuestionPart,
       lastAnswerCorrect: null,
       isAnswerChecked: false,
+      selectedChoice: null,
     }));
   };
 
@@ -381,8 +402,26 @@ export default function App() {
     setTimeout(() => generateQuestion(), 0);
   };
 
+  const changeAnswerMode = (newMode: AnswerMode) => {
+    setGameState((prev) => ({
+      ...prev,
+      answerMode: newMode,
+      currentTask: 1,
+      score: 0,
+      showResult: false,
+      userAnswer: '',
+      selectedChoice: null,
+    }));
+    setTimeout(() => generateQuestion(), 0);
+  };
+
   const checkAnswer = () => {
-    if (gameState.userAnswer === '') return;
+    // Validate that user has provided an answer
+    const hasInput = gameState.answerMode === AnswerMode.INPUT 
+      ? gameState.userAnswer !== '' 
+      : gameState.selectedChoice !== null;
+    
+    if (!hasInput) return;
 
     let correctAnswer = 0;
     const result = gameState.operation === Operation.ADDITION
@@ -400,7 +439,13 @@ export default function App() {
         correctAnswer = result;
     }
 
-    const isCorrect = parseInt(gameState.userAnswer) === correctAnswer;
+    let isCorrect = false;
+    if (gameState.answerMode === AnswerMode.INPUT) {
+      isCorrect = parseInt(gameState.userAnswer) === correctAnswer;
+    } else {
+      isCorrect = gameState.selectedChoice === correctAnswer;
+    }
+
     const newScore = isCorrect ? gameState.score + 1 : gameState.score;
 
     setGameState((prev) => ({
@@ -453,6 +498,98 @@ export default function App() {
     onUserInput(currentAnswer);
   };
 
+  const handleChoiceClick = (value: number) => {
+    if (!gameState.isAnswerChecked) {
+      setGameState((prev) => ({
+        ...prev,
+        selectedChoice: value,
+        lastAnswerCorrect: null,
+      }));
+    }
+  };
+
+  const getCorrectAnswer = () => {
+    const result = gameState.operation === Operation.ADDITION
+      ? gameState.num1 + gameState.num2
+      : gameState.num1 * gameState.num2;
+
+    switch (gameState.questionPart) {
+      case 0:
+        return gameState.num1;
+      case 1:
+        return gameState.num2;
+      default:
+        return result;
+    }
+  };
+
+  const generateMultipleChoices = () => {
+    const correctAnswer = getCorrectAnswer();
+    const choices = [correctAnswer];
+    
+    // Generate two wrong answers
+    let attempts = 0;
+    while (choices.length < 3 && attempts < MAX_CHOICE_GENERATION_ATTEMPTS) {
+      attempts++;
+      let wrongAnswer;
+      if (Math.random() < 0.5) {
+        // Nearby wrong answer (but not the correct answer)
+        // Generate offset range: -4 to 3 (inclusive), then adjust to exclude 0
+        const offset = Math.floor(Math.random() * 8) - 4; // Generates -4, -3, -2, -1, 0, 1, 2, 3
+        const adjustedOffset = offset >= 0 ? offset + 1 : offset; // Result: -4 to -1, 1 to 4 (excludes 0)
+        wrongAnswer = correctAnswer + adjustedOffset;
+      } else {
+        // Random wrong answer
+        wrongAnswer = Math.floor(Math.random() * MAX_RANDOM_ANSWER) + 1;
+      }
+      
+      if (wrongAnswer > 0 && wrongAnswer !== correctAnswer && !choices.includes(wrongAnswer)) {
+        choices.push(wrongAnswer);
+      }
+    }
+    
+    // Ensure we always have 3 choices - fallback if needed
+    if (choices.length < 3) {
+      const fallbacks = [correctAnswer + 1, correctAnswer + 2, correctAnswer - 1, correctAnswer - 2];
+      for (const fallback of fallbacks) {
+        if (fallback > 0 && fallback !== correctAnswer && !choices.includes(fallback)) {
+          choices.push(fallback);
+          if (choices.length === 3) break;
+        }
+      }
+    }
+    
+    // Fisher-Yates shuffle
+    for (let i = choices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [choices[i], choices[j]] = [choices[j], choices[i]];
+    }
+    
+    return choices;
+  };
+
+  const generateNumberSequence = () => {
+    const sequence: number[] = [];
+    
+    // Determine the base number for the sequence
+    let base;
+    if (gameState.questionPart === 0) {
+      base = gameState.num2;
+    } else if (gameState.questionPart === 1) {
+      base = gameState.num1;
+    } else {
+      // For result, use one of the factors
+      base = gameState.num1;
+    }
+    
+    // Generate sequence: base, 2*base, 3*base, ...
+    for (let i = 1; i <= 10; i++) {
+      sequence.push(base * i);
+    }
+    
+    return sequence;
+  };
+
   const getCardColor = () => {
     if (gameState.lastAnswerCorrect === true) return colors.cardCorrect;
     if (gameState.lastAnswerCorrect === false) return colors.cardIncorrect;
@@ -460,6 +597,21 @@ export default function App() {
   };
 
   const operatorSymbol = gameState.operation === Operation.ADDITION ? '+' : '×';
+
+  // Memoize choices and sequence to avoid recalculating on every render
+  const multipleChoices = useMemo(() => {
+    if (gameState.answerMode === AnswerMode.MULTIPLE_CHOICE) {
+      return generateMultipleChoices();
+    }
+    return [];
+  }, [gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, gameState.answerMode]);
+
+  const numberSequence = useMemo(() => {
+    if (gameState.answerMode === AnswerMode.NUMBER_SEQUENCE) {
+      return generateNumberSequence();
+    }
+    return [];
+  }, [gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, gameState.answerMode]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -713,6 +865,63 @@ export default function App() {
 
             <View style={styles.settingsDivider} />
 
+            {/* Answer Mode Settings */}
+            <View style={styles.settingsSection}>
+              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.answerMode}</Text>
+              <View style={styles.gameModeGrid}>
+                <TouchableOpacity
+                  style={[
+                    styles.gameModeSettingsButton,
+                    gameState.answerMode === AnswerMode.INPUT && styles.gameModeSettingsButtonActive,
+                  ]}
+                  onPress={() => changeAnswerMode(AnswerMode.INPUT)}
+                >
+                  <Text
+                    style={[
+                      styles.gameModeSettingsButtonText,
+                      gameState.answerMode === AnswerMode.INPUT && styles.gameModeSettingsButtonTextActive,
+                    ]}
+                  >
+                    {t.inputMode}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.gameModeSettingsButton,
+                    gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && styles.gameModeSettingsButtonActive,
+                  ]}
+                  onPress={() => changeAnswerMode(AnswerMode.MULTIPLE_CHOICE)}
+                >
+                  <Text
+                    style={[
+                      styles.gameModeSettingsButtonText,
+                      gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && styles.gameModeSettingsButtonTextActive,
+                    ]}
+                  >
+                    {t.multipleChoiceMode}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.gameModeSettingsButton,
+                    gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && styles.gameModeSettingsButtonActive,
+                  ]}
+                  onPress={() => changeAnswerMode(AnswerMode.NUMBER_SEQUENCE)}
+                >
+                  <Text
+                    style={[
+                      styles.gameModeSettingsButtonText,
+                      gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && styles.gameModeSettingsButtonTextActive,
+                    ]}
+                  >
+                    {t.numberSequenceMode}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.settingsDivider} />
+
             {/* Feedback and Support in One Row */}
             <View style={[styles.settingsSection, styles.settingsSectionRow]}>
               <TouchableOpacity
@@ -747,19 +956,20 @@ export default function App() {
         </>
       )}
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        style={{ backgroundColor: colors.background }}
-      >
+      <View style={styles.contentArea}>
         <View style={[styles.questionCard, { backgroundColor: getCardColor() }]}>
           <View style={styles.questionRow}>
             {/* First number or answer box */}
             {gameState.questionPart === 0 ? (
-              <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
-                <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
-                  {gameState.userAnswer || '?'}
-                </Text>
-              </View>
+              gameState.answerMode === AnswerMode.INPUT ? (
+                <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
+                  <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
+                    {gameState.userAnswer || '?'}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={[styles.questionText, { color: colors.text }]}>?</Text>
+              )
             ) : (
               <Text style={[styles.questionText, { color: colors.text }]}>
                 {gameState.num1}
@@ -771,11 +981,15 @@ export default function App() {
 
             {/* Second number or answer box */}
             {gameState.questionPart === 1 ? (
-              <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
-                <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
-                  {gameState.userAnswer || '?'}
-                </Text>
-              </View>
+              gameState.answerMode === AnswerMode.INPUT ? (
+                <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
+                  <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
+                    {gameState.userAnswer || '?'}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={[styles.questionText, { color: colors.text }]}>?</Text>
+              )
             ) : (
               <Text style={[styles.questionText, { color: colors.text }]}>
                 {gameState.num2}
@@ -787,11 +1001,15 @@ export default function App() {
 
             {/* Result or answer box */}
             {gameState.questionPart === 2 ? (
-              <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
-                <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
-                  {gameState.userAnswer || '?'}
-                </Text>
-              </View>
+              gameState.answerMode === AnswerMode.INPUT ? (
+                <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
+                  <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
+                    {gameState.userAnswer || '?'}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={[styles.questionText, { color: colors.text }]}>?</Text>
+              )
             ) : (
               <Text style={[styles.questionText, { color: colors.text }]}>
                 {gameState.operation === Operation.ADDITION
@@ -801,14 +1019,95 @@ export default function App() {
             )}
           </View>
 
-          <Numpad
-            onNumberClick={handleNumberClick}
-            onCheck={gameState.isAnswerChecked ? nextQuestion : checkAnswer}
-            userAnswer={gameState.userAnswer}
-            isAnswerChecked={gameState.isAnswerChecked}
-          />
+          {/* Answer Input Area */}
+          <View style={styles.answerArea}>
+            {gameState.answerMode === AnswerMode.INPUT && (
+              <Numpad
+                onNumberClick={handleNumberClick}
+                onCheck={gameState.isAnswerChecked ? nextQuestion : checkAnswer}
+                userAnswer={gameState.userAnswer}
+                isAnswerChecked={gameState.isAnswerChecked}
+              />
+            )}
+
+            {gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && (
+              <View style={styles.choicesContainer}>
+                {multipleChoices.map((choice, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.choiceButton,
+                      gameState.selectedChoice === choice && styles.choiceButtonSelected,
+                      gameState.isAnswerChecked && choice === getCorrectAnswer() && styles.choiceButtonCorrect,
+                      gameState.isAnswerChecked && gameState.selectedChoice === choice && choice !== getCorrectAnswer() && styles.choiceButtonIncorrect,
+                    ]}
+                    onPress={() => handleChoiceClick(choice)}
+                    disabled={gameState.isAnswerChecked}
+                  >
+                    <Text style={[
+                      styles.choiceButtonText,
+                      gameState.selectedChoice === choice && styles.choiceButtonTextSelected,
+                    ]}>
+                      {choice}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+                <TouchableOpacity
+                  style={[
+                    styles.checkButton,
+                    (gameState.selectedChoice === null && !gameState.isAnswerChecked) && styles.checkButtonDisabled,
+                  ]}
+                  onPress={gameState.isAnswerChecked ? nextQuestion : checkAnswer}
+                  disabled={gameState.selectedChoice === null && !gameState.isAnswerChecked}
+                >
+                  <Text style={styles.checkButtonText}>
+                    {gameState.isAnswerChecked ? t.nextQuestion : t.check}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && (
+              <View style={styles.sequenceContainer}>
+                <ScrollView style={styles.sequenceScroll}>
+                  {numberSequence.map((num, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={[
+                        styles.sequenceButton,
+                        gameState.selectedChoice === num && styles.sequenceButtonSelected,
+                        gameState.isAnswerChecked && num === getCorrectAnswer() && styles.sequenceButtonCorrect,
+                        gameState.isAnswerChecked && gameState.selectedChoice === num && num !== getCorrectAnswer() && styles.sequenceButtonIncorrect,
+                      ]}
+                      onPress={() => handleChoiceClick(num)}
+                      disabled={gameState.isAnswerChecked}
+                    >
+                      <Text style={[
+                        styles.sequenceButtonText,
+                        gameState.selectedChoice === num && styles.sequenceButtonTextSelected,
+                      ]}>
+                        {num}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+                <TouchableOpacity
+                  style={[
+                    styles.checkButton,
+                    (gameState.selectedChoice === null && !gameState.isAnswerChecked) && styles.checkButtonDisabled,
+                  ]}
+                  onPress={gameState.isAnswerChecked ? nextQuestion : checkAnswer}
+                  disabled={gameState.selectedChoice === null && !gameState.isAnswerChecked}
+                >
+                  <Text style={styles.checkButtonText}>
+                    {gameState.isAnswerChecked ? t.nextQuestion : t.check}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
         </View>
-      </ScrollView>
+      </View>
 
       <Modal visible={gameState.showResult} transparent animationType="fade">
         <View style={styles.modalOverlay}>
@@ -917,6 +1216,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  contentArea: {
+    flex: 1,
+    padding: 16,
+  },
   scrollContent: {
     padding: 16,
     alignItems: 'center',
@@ -931,7 +1234,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
@@ -941,7 +1244,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   headerScore: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#000',
   },
   settingsButton: {
@@ -1091,11 +1394,11 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   questionCard: {
+    flex: 1,
     width: '100%',
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
-    marginBottom: 24,
   },
   questionRow: {
     flexDirection: 'row',
@@ -1103,7 +1406,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   questionText: {
-    fontSize: 36,
+    fontSize: 48,
     fontWeight: 'bold',
   },
   answerBox: {
@@ -1120,9 +1423,13 @@ const styles = StyleSheet.create({
   answerPlaceholder: {
     color: '#999',
   },
+  answerArea: {
+    width: '100%',
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
   numpad: {
     width: '100%',
-    marginBottom: 24,
   },
   numpadRow: {
     flexDirection: 'row',
@@ -1131,7 +1438,7 @@ const styles = StyleSheet.create({
   },
   numpadButton: {
     flex: 1,
-    height: 50,
+    height: 60,
     backgroundColor: '#E0E0E0',
     borderRadius: 8,
     justifyContent: 'center',
@@ -1143,12 +1450,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   numpadButtonText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
   },
   numpadButtonCheck: {
     flex: 1,
-    height: 50,
+    height: 60,
     backgroundColor: '#03DAC6',
     borderRadius: 8,
     justifyContent: 'center',
@@ -1164,6 +1471,96 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
+  },
+  choicesContainer: {
+    width: '100%',
+    gap: 12,
+  },
+  choiceButton: {
+    width: '100%',
+    height: 60,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#BDBDBD',
+  },
+  choiceButtonSelected: {
+    backgroundColor: '#BBDEFB',
+    borderColor: '#2196F3',
+  },
+  choiceButtonCorrect: {
+    backgroundColor: '#C8E6C9',
+    borderColor: '#4CAF50',
+  },
+  choiceButtonIncorrect: {
+    backgroundColor: '#FFCDD2',
+    borderColor: '#F44336',
+  },
+  choiceButtonText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  choiceButtonTextSelected: {
+    color: '#1976D2',
+  },
+  checkButton: {
+    width: '100%',
+    height: 60,
+    backgroundColor: '#03DAC6',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  checkButtonDisabled: {
+    backgroundColor: '#B0BEC5',
+  },
+  checkButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  sequenceContainer: {
+    width: '100%',
+    flex: 1,
+  },
+  sequenceScroll: {
+    flex: 1,
+    marginBottom: 12,
+  },
+  sequenceButton: {
+    width: '100%',
+    height: 60,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: '#BDBDBD',
+  },
+  sequenceButtonSelected: {
+    backgroundColor: '#BBDEFB',
+    borderColor: '#2196F3',
+  },
+  sequenceButtonCorrect: {
+    backgroundColor: '#C8E6C9',
+    borderColor: '#4CAF50',
+  },
+  sequenceButtonIncorrect: {
+    backgroundColor: '#FFCDD2',
+    borderColor: '#F44336',
+  },
+  sequenceButtonText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  sequenceButtonTextSelected: {
+    color: '#1976D2',
   },
   modalOverlay: {
     flex: 1,
