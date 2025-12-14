@@ -32,6 +32,11 @@ enum AnswerMode {
   NUMBER_SEQUENCE = 'NUMBER_SEQUENCE',
 }
 
+enum DifficultyMode {
+  SIMPLE = 'SIMPLE',
+  CREATIVE = 'CREATIVE',
+}
+
 type ThemeMode = 'light' | 'dark' | 'system';
 type Language = 'en' | 'de';
 
@@ -47,6 +52,11 @@ const translations = {
     language: 'LANGUAGE',
     english: 'English',
     german: 'Deutsch',
+    difficultyMode: 'DIFFICULTY',
+    simpleMode: 'Simple',
+    creativeMode: 'Creative',
+    simpleModeInfo: 'Enter the result via keypad',
+    creativeModeInfo: 'Random input methods and question types',
     gameMode: 'GAME MODE',
     operation: 'OPERATION',
     addition: 'Addition',
@@ -92,6 +102,11 @@ const translations = {
     language: 'SPRACHE',
     english: 'English',
     german: 'Deutsch',
+    difficultyMode: 'SCHWIERIGKEIT',
+    simpleMode: 'Einfach',
+    creativeMode: 'Kreativ',
+    simpleModeInfo: 'Das Ergebnis wird über die Tastatur eingegeben',
+    creativeModeInfo: 'Zufällige Eingabemethoden und Fragetypen',
     gameMode: 'SPIELMODUS',
     operation: 'RECHENART',
     addition: 'Addition',
@@ -140,6 +155,7 @@ interface GameState {
   gameMode: GameMode;
   operation: Operation;
   answerMode: AnswerMode;
+  difficultyMode: DifficultyMode;
   questionPart: number; // 0: num1, 1: num2, 2: result
   showResult: boolean;
   lastAnswerCorrect: boolean | null;
@@ -163,6 +179,7 @@ export default function App() {
     gameMode: GameMode.NORMAL,
     operation: Operation.MULTIPLICATION,
     answerMode: AnswerMode.INPUT,
+    difficultyMode: DifficultyMode.SIMPLE,
     questionPart: 2,
     showResult: false,
     lastAnswerCorrect: null,
@@ -338,24 +355,42 @@ export default function App() {
     saveTotalTasks();
   }, [gameState.totalSolvedTasks]);
 
-  const generateQuestion = (mode: GameMode = gameState.gameMode) => {
+  const generateQuestion = (mode: GameMode = gameState.gameMode, diffMode: DifficultyMode = gameState.difficultyMode) => {
     const newNum1 = Math.floor(Math.random() * 10) + 1;
     const newNum2 = Math.floor(Math.random() * 10) + 1;
     let newQuestionPart = 2;
+    let newAnswerMode = gameState.answerMode;
 
-    switch (mode) {
-      case GameMode.NORMAL:
-        newQuestionPart = 2;
-        break;
-      case GameMode.FIRST_MISSING:
-        newQuestionPart = 0;
-        break;
-      case GameMode.SECOND_MISSING:
-        newQuestionPart = 1;
-        break;
-      case GameMode.MIXED:
-        newQuestionPart = Math.floor(Math.random() * 3);
-        break;
+    // In CREATIVE mode, randomly select answer mode and question type
+    if (diffMode === DifficultyMode.CREATIVE) {
+      // Randomly select answer mode
+      const answerModes = [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE, AnswerMode.NUMBER_SEQUENCE];
+      newAnswerMode = answerModes[Math.floor(Math.random() * answerModes.length)];
+      
+      // Randomly select question part (which number is missing)
+      newQuestionPart = Math.floor(Math.random() * 3);
+    } else {
+      // In SIMPLE mode, always use INPUT and result (questionPart = 2)
+      newAnswerMode = AnswerMode.INPUT;
+      newQuestionPart = 2;
+    }
+
+    // Legacy game mode handling (kept for backward compatibility, but overridden by difficulty mode)
+    if (diffMode !== DifficultyMode.CREATIVE && diffMode !== DifficultyMode.SIMPLE) {
+      switch (mode) {
+        case GameMode.NORMAL:
+          newQuestionPart = 2;
+          break;
+        case GameMode.FIRST_MISSING:
+          newQuestionPart = 0;
+          break;
+        case GameMode.SECOND_MISSING:
+          newQuestionPart = 1;
+          break;
+        case GameMode.MIXED:
+          newQuestionPart = Math.floor(Math.random() * 3);
+          break;
+      }
     }
 
     setGameState((prev) => ({
@@ -364,6 +399,7 @@ export default function App() {
       num2: newNum2,
       userAnswer: '',
       questionPart: newQuestionPart,
+      answerMode: newAnswerMode,
       lastAnswerCorrect: null,
       isAnswerChecked: false,
       selectedChoice: null,
@@ -413,6 +449,19 @@ export default function App() {
       selectedChoice: null,
     }));
     setTimeout(() => generateQuestion(), 0);
+  };
+
+  const changeDifficultyMode = (newMode: DifficultyMode) => {
+    setGameState((prev) => ({
+      ...prev,
+      difficultyMode: newMode,
+      currentTask: 1,
+      score: 0,
+      showResult: false,
+      userAnswer: '',
+      selectedChoice: null,
+    }));
+    setTimeout(() => generateQuestion(gameState.gameMode, newMode), 0);
   };
 
   const checkAnswer = () => {
@@ -792,132 +841,46 @@ export default function App() {
 
             <View style={styles.settingsDivider} />
 
-            {/* Game Mode Settings */}
+            {/* Difficulty Mode Settings */}
             <View style={styles.settingsSection}>
-              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.gameMode}</Text>
-              <View style={styles.gameModeGrid}>
+              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.difficultyMode}</Text>
+              <View style={styles.themeToggle}>
                 <TouchableOpacity
                   style={[
-                    styles.gameModeSettingsButton,
-                    gameState.gameMode === GameMode.NORMAL && styles.gameModeSettingsButtonActive,
+                    styles.themeButton,
+                    gameState.difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonActive,
                   ]}
-                  onPress={() => changeGameMode(GameMode.NORMAL)}
+                  onPress={() => changeDifficultyMode(DifficultyMode.SIMPLE)}
                 >
                   <Text
                     style={[
-                      styles.gameModeSettingsButtonText,
-                      gameState.gameMode === GameMode.NORMAL && styles.gameModeSettingsButtonTextActive,
+                      styles.themeButtonText,
+                      gameState.difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonTextActive,
                     ]}
                   >
-                    {t.normalMode}
+                    {t.simpleMode}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[
-                    styles.gameModeSettingsButton,
-                    gameState.gameMode === GameMode.FIRST_MISSING && styles.gameModeSettingsButtonActive,
+                    styles.themeButton,
+                    gameState.difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonActive,
                   ]}
-                  onPress={() => changeGameMode(GameMode.FIRST_MISSING)}
+                  onPress={() => changeDifficultyMode(DifficultyMode.CREATIVE)}
                 >
                   <Text
                     style={[
-                      styles.gameModeSettingsButtonText,
-                      gameState.gameMode === GameMode.FIRST_MISSING && styles.gameModeSettingsButtonTextActive,
+                      styles.themeButtonText,
+                      gameState.difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonTextActive,
                     ]}
                   >
-                    {t.firstMissing}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    gameState.gameMode === GameMode.SECOND_MISSING && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => changeGameMode(GameMode.SECOND_MISSING)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      gameState.gameMode === GameMode.SECOND_MISSING && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.secondMissing}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    gameState.gameMode === GameMode.MIXED && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => changeGameMode(GameMode.MIXED)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      gameState.gameMode === GameMode.MIXED && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.mixedMode}
+                    {t.creativeMode}
                   </Text>
                 </TouchableOpacity>
               </View>
-            </View>
-
-            <View style={styles.settingsDivider} />
-
-            {/* Answer Mode Settings */}
-            <View style={styles.settingsSection}>
-              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.answerMode}</Text>
-              <View style={styles.gameModeGrid}>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    gameState.answerMode === AnswerMode.INPUT && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => changeAnswerMode(AnswerMode.INPUT)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      gameState.answerMode === AnswerMode.INPUT && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.inputMode}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => changeAnswerMode(AnswerMode.MULTIPLE_CHOICE)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.multipleChoiceMode}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => changeAnswerMode(AnswerMode.NUMBER_SEQUENCE)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.numberSequenceMode}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              <Text style={[styles.difficultyModeInfo, { color: colors.textSecondary }]}>
+                {gameState.difficultyMode === DifficultyMode.SIMPLE ? t.simpleModeInfo : t.creativeModeInfo}
+              </Text>
             </View>
 
             <View style={styles.settingsDivider} />
@@ -1332,6 +1295,12 @@ const styles = StyleSheet.create({
     color: '#999',
     marginBottom: 8,
     textTransform: 'uppercase',
+  },
+  difficultyModeInfo: {
+    fontSize: 11,
+    marginTop: 8,
+    fontStyle: 'italic',
+    textAlign: 'center',
   },
   themeToggle: {
     flexDirection: 'row',
