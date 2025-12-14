@@ -125,14 +125,15 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build Android Release
+      - name: Build Android Debug
         working-directory: ./Android
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew assembleDebug --no-daemon
 
       - name: Verify APK exists
         run: |
-          if [ -f "Android/app/build/outputs/apk/release/app-release.apk" ]; then
+          if [ -f "Android/app/build/outputs/apk/debug/app-debug.apk" ]; then
             echo "✅ Android APK built successfully"
+            ls -lh Android/app/build/outputs/apk/debug/app-debug.apk
           else
             echo "❌ ERROR: Android APK not found!"
             exit 1
