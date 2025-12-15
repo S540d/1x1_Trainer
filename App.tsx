@@ -12,145 +12,22 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Localization from 'expo-localization';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-enum GameMode {
-  NORMAL = 'NORMAL',
-  FIRST_MISSING = 'FIRST_MISSING',
-  SECOND_MISSING = 'SECOND_MISSING',
-  MIXED = 'MIXED',
-}
-
-enum Operation {
-  ADDITION = 'ADDITION',
-  MULTIPLICATION = 'MULTIPLICATION',
-}
-
-enum AnswerMode {
-  INPUT = 'INPUT',
-  MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
-  NUMBER_SEQUENCE = 'NUMBER_SEQUENCE',
-}
-
-type ThemeMode = 'light' | 'dark' | 'system';
-type Language = 'en' | 'de';
-
-const APP_VERSION = '1.0.9';
-
-const translations = {
-  en: {
-    // Settings Menu
-    appearance: 'APPEARANCE',
-    light: 'Light',
-    dark: 'Dark',
-    system: 'System',
-    language: 'LANGUAGE',
-    english: 'English',
-    german: 'Deutsch',
-    gameMode: 'GAME MODE',
-    operation: 'OPERATION',
-    addition: 'Addition',
-    multiplication: 'Multiplication',
-    answerMode: 'ANSWER MODE',
-    inputMode: 'Number Input',
-    multipleChoiceMode: 'Multiple Choice',
-    numberSequenceMode: 'Number Sequence',
-    feedback: 'Send Feedback',
-    support: 'support me',
-    about: 'ABOUT',
-    version: 'Version',
-    copyright: '© 2025 Sven Strohkark',
-    license: 'License: MIT',
-    // Game UI
-    task: 'Task',
-    points: 'Points',
-    of: 'of',
-    // Game Modes
-    normalMode: 'Normal Tasks',
-    firstMissing: 'First Number Missing',
-    secondMissing: 'Second Number Missing',
-    mixedMode: 'Mixed',
-    // Buttons
-    check: 'Check',
-    nextQuestion: 'Next Question',
-    playAgain: 'Play Again',
-    // Results Modal
-    great: 'Great!',
-    youSolved: 'You solved',
-    tasksCorrectly: 'tasks correctly',
-    // Motivation Message
-    motivationTitle: 'Great Progress!',
-    motivationMessage: 'You have already solved 10 tasks. Let\'s try another round!',
-    motivationButton: 'Continue',
-  },
-  de: {
-    // Settings Menu
-    appearance: 'ERSCHEINUNGSBILD',
-    light: 'Hell',
-    dark: 'Dunkel',
-    system: 'System',
-    language: 'SPRACHE',
-    english: 'English',
-    german: 'Deutsch',
-    gameMode: 'SPIELMODUS',
-    operation: 'RECHENART',
-    addition: 'Addition',
-    multiplication: 'Multiplikation',
-    answerMode: 'ANTWORTMODUS',
-    inputMode: 'Zahleneingabe',
-    multipleChoiceMode: 'Auswahl',
-    numberSequenceMode: 'Zahlenreihe',
-    feedback: 'Feedback senden',
-    support: 'support me',
-    about: 'ÜBER',
-    version: 'Version',
-    copyright: '© 2025 Sven Strohkark',
-    license: 'Lizenz: MIT',
-    // Game UI
-    task: 'Aufgabe',
-    points: 'Punkte',
-    of: 'von',
-    // Game Modes
-    normalMode: 'Normale Aufgaben',
-    firstMissing: 'Erste Zahl fehlt',
-    secondMissing: 'Zweite Zahl fehlt',
-    mixedMode: 'Gemischt',
-    // Buttons
-    check: 'Prüfen',
-    nextQuestion: 'Nächste Frage',
-    playAgain: 'Nochmal spielen',
-    // Results Modal
-    great: 'Super!',
-    youSolved: 'Du hast',
-    tasksCorrectly: 'Aufgaben richtig gelöst',
-    // Motivation Message
-    motivationTitle: 'Toll gemacht!',
-    motivationMessage: 'Du hast schon 10 Aufgaben gerechnet. Lass uns noch eine Runde versuchen!',
-    motivationButton: 'Weiter',
-  },
-};
-
-interface GameState {
-  num1: number;
-  num2: number;
-  userAnswer: string;
-  score: number;
-  currentTask: number;
-  totalTasks: number;
-  gameMode: GameMode;
-  operation: Operation;
-  answerMode: AnswerMode;
-  questionPart: number; // 0: num1, 1: num2, 2: result
-  showResult: boolean;
-  lastAnswerCorrect: boolean | null;
-  isAnswerChecked: boolean;
-  totalSolvedTasks: number; // Track total tasks solved for motivation message
-  selectedChoice: number | null; // For multiple choice and number sequence modes
-}
-
-const TOTAL_TASKS = 10;
-const MAX_CHOICE_GENERATION_ATTEMPTS = 100;
-const MAX_RANDOM_ANSWER = 100;
+// Local imports
+import { GameMode, Operation, AnswerMode, ThemeMode, Language, GameState } from './types/game';
+import { translations } from './i18n/translations';
+import { APP_VERSION, TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER } from './utils/constants';
+import { getThemeColors } from './utils/theme';
+import {
+  getLanguage,
+  saveLanguage,
+  getTheme,
+  saveTheme,
+  getOperation,
+  saveOperation,
+  getTotalTasks,
+  saveTotalTasks,
+} from './utils/storage';
 
 export default function App() {
   const [gameState, setGameState] = useState<GameState>({
@@ -181,33 +58,15 @@ export default function App() {
   const isDarkMode = themeMode === 'dark' || (themeMode === 'system' && systemDarkMode);
 
   // Dynamic colors based on theme
-  const colors = {
-    background: isDarkMode ? '#121212' : '#fff',
-    text: isDarkMode ? '#E0E0E0' : '#000',
-    textSecondary: isDarkMode ? '#B0B0B0' : '#666',
-    border: isDarkMode ? '#333' : '#E0E0E0',
-    card: isDarkMode ? '#1E1E1E' : '#f5f5f5',
-    cardCorrect: isDarkMode ? '#1B5E20' : '#C8E6C9',
-    cardIncorrect: isDarkMode ? '#B71C1C' : '#FFCDD2',
-    buttonInactive: isDarkMode ? '#2C2C2C' : '#E0E0E0',
-    buttonInactiveText: isDarkMode ? '#B0B0B0' : '#000',
-    settingsOverlay: 'rgba(0,0,0,0.7)',
-    settingsMenu: isDarkMode ? '#1E1E1E' : '#fff',
-  };
+  const colors = getThemeColors(isDarkMode);
 
   // Load preferences and detect system theme on mount
   useEffect(() => {
     const loadPreferences = async () => {
       try {
         // Load language from storage
-        let savedLanguage: string | null = null;
-        if (Platform.OS === 'web') {
-          savedLanguage = localStorage.getItem('app-language'); // platform-safe
-        } else {
-          savedLanguage = await AsyncStorage.getItem('app-language');
-        }
-
-        if (savedLanguage === 'en' || savedLanguage === 'de') {
+        const savedLanguage = await getLanguage();
+        if (savedLanguage) {
           setLanguage(savedLanguage);
         } else {
           // Auto-detect device language
@@ -217,42 +76,21 @@ export default function App() {
         }
 
         // Load theme preference
-        let savedTheme: string | null = null;
-        if (Platform.OS === 'web') {
-          savedTheme = localStorage.getItem('app-theme'); // platform-safe
-        } else {
-          savedTheme = await AsyncStorage.getItem('app-theme');
-        }
-
-        if (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'system') {
-          setThemeMode(savedTheme as ThemeMode);
+        const savedTheme = await getTheme();
+        if (savedTheme) {
+          setThemeMode(savedTheme);
         }
 
         // Load operation preference
-        let savedOperation: string | null = null;
-        if (Platform.OS === 'web') {
-          savedOperation = localStorage.getItem('app-operation'); // platform-safe
-        } else {
-          savedOperation = await AsyncStorage.getItem('app-operation');
-        }
-
-        if (savedOperation === 'ADDITION' || savedOperation === 'MULTIPLICATION') {
-          setGameState((prev) => ({ ...prev, operation: savedOperation as Operation }));
+        const savedOperation = await getOperation();
+        if (savedOperation) {
+          setGameState((prev) => ({ ...prev, operation: savedOperation }));
         }
 
         // Load total solved tasks
-        let savedTotalTasks: string | null = null;
-        if (Platform.OS === 'web') {
-          savedTotalTasks = localStorage.getItem('app-total-tasks'); // platform-safe
-        } else {
-          savedTotalTasks = await AsyncStorage.getItem('app-total-tasks');
-        }
-
-        if (savedTotalTasks) {
-          const totalTasks = parseInt(savedTotalTasks, 10);
-          if (!isNaN(totalTasks)) {
-            setGameState((prev) => ({ ...prev, totalSolvedTasks: totalTasks }));
-          }
+        const savedTotalTasks = await getTotalTasks();
+        if (savedTotalTasks !== null) {
+          setGameState((prev) => ({ ...prev, totalSolvedTasks: savedTotalTasks }));
         }
 
         // Detect system dark mode (only on web)
@@ -276,66 +114,22 @@ export default function App() {
 
   // Save language preference when it changes
   useEffect(() => {
-    const saveLanguage = async () => {
-      try {
-        if (Platform.OS === 'web') {
-          localStorage.setItem('app-language', language); // platform-safe
-        } else {
-          await AsyncStorage.setItem('app-language', language);
-        }
-      } catch (error) {
-        // Ignore storage errors
-      }
-    };
-    saveLanguage();
+    saveLanguage(language);
   }, [language]);
 
   // Save theme preference when it changes
   useEffect(() => {
-    const saveTheme = async () => {
-      try {
-        if (Platform.OS === 'web') {
-          localStorage.setItem('app-theme', themeMode); // platform-safe
-        } else {
-          await AsyncStorage.setItem('app-theme', themeMode);
-        }
-      } catch (error) {
-        // Ignore storage errors
-      }
-    };
-    saveTheme();
+    saveTheme(themeMode);
   }, [themeMode]);
 
   // Save operation preference when it changes
   useEffect(() => {
-    const saveOperation = async () => {
-      try {
-        if (Platform.OS === 'web') {
-          localStorage.setItem('app-operation', gameState.operation); // platform-safe
-        } else {
-          await AsyncStorage.setItem('app-operation', gameState.operation);
-        }
-      } catch (error) {
-        // Ignore storage errors
-      }
-    };
-    saveOperation();
+    saveOperation(gameState.operation);
   }, [gameState.operation]);
 
   // Save total solved tasks when it changes
   useEffect(() => {
-    const saveTotalTasks = async () => {
-      try {
-        if (Platform.OS === 'web') {
-          localStorage.setItem('app-total-tasks', gameState.totalSolvedTasks.toString()); // platform-safe
-        } else {
-          await AsyncStorage.setItem('app-total-tasks', gameState.totalSolvedTasks.toString());
-        }
-      } catch (error) {
-        // Ignore storage errors
-      }
-    };
-    saveTotalTasks();
+    saveTotalTasks(gameState.totalSolvedTasks);
   }, [gameState.totalSolvedTasks]);
 
   const generateQuestion = (mode: GameMode = gameState.gameMode) => {
