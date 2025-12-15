@@ -163,9 +163,8 @@ bash scripts/test-pwa.sh
 │   ├── generate-screenshots.py # Screenshot Generator
 │   ├── test-pwa.sh             # PWA Validation Script
 │   └── post-build.js           # Build Post-Processing
-├── Android/                     # Android Native Project
-│   ├── gradle.properties       # Gradle Config (Hermes enabled)
-│   └── app/                    # App Module
+├── playstore-assets/            # Play Store Marketing Assets
+├── playstore-screenshots/       # App Screenshots for Store
 ├── .github/
 │   └── workflows/
 │       └── ci-cd.yml           # CI/CD Pipeline
@@ -179,15 +178,37 @@ bash scripts/test-pwa.sh
 ## Technologie-Stack
 
 - **React Native** - Cross-Platform Framework
-- **Expo** - Build & Development Tools
+- **Expo** - Build & Development Tools (Managed Workflow)
+- **EAS Build** - Cloud-basierte Build-Infrastruktur
 - **React Native Web** - Web-Support
 - **TypeScript** - Type Safety
+- **Hermes** - JavaScript Engine für optimierte Performance
+
+## Build-Prozess
+
+### Android Production Builds
+
+Dieses Projekt verwendet **Expo Managed Workflow** mit **EAS Build**:
+
+- Native Android-Code wird automatisch von EAS Build generiert
+- Kein lokales `/android` Verzeichnis erforderlich
+- Builds laufen in der Cloud mit konsistenter Umgebung
+- Signierung erfolgt mit lokalen Credentials (Keystore)
+
+**Build-Kommando:**
+```bash
+npm run build:android
+```
+
+Das generiert eine signierte AAB-Datei für den Play Store Upload.
 
 ## Migration vom Android-Projekt
 
-Das ursprüngliche Android-Projekt (Kotlin + Jetpack Compose) wurde zu React Native portiert, um:
-- Eine gemeinsame Codebasis für Android und Web zu haben
-- PWA-Support zu ermöglichen
-- Einfachere Wartung durch eine einzige Codebasis
+Das ursprüngliche Android-Projekt (Kotlin + Jetpack Compose) wurde zu React Native mit Expo Managed Workflow portiert:
+- ✅ Eine gemeinsame Codebasis für Android und Web
+- ✅ PWA-Support out of the box
+- ✅ Einfachere Wartung durch Expo-Infrastruktur
+- ✅ Cloud-basierte Builds via EAS Build
+- ✅ Automatische Updates via Expo Updates
 
-Das Android-Projekt ist weiterhin verfügbar unter `1x1_Trainer_android/`.
+Das alte native Android-Projekt ist lokal unter `Android_old/` archiviert (nicht im Repository).

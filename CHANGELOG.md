@@ -10,14 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.10] - 2024-12-15
 
 ### Fixed
-- 🚨 **CRITICAL**: Hermes JavaScript engine configuration mismatch
-  - Added `hermesEnabled=true` to Android/gradle.properties
-  - Fixes app startup issue in App Store/Play Store
-  - Ensures consistency with Expo's new architecture settings
+- 🚨 **CRITICAL**: App startup issue in Play Store
+  - Removed old native Android project that conflicted with EAS Build
+  - EAS Build now generates native Android code correctly
+  - Configured Hermes JavaScript engine explicitly in app.json
+  - Fixed "Fix gradlew build phase" error in EAS Build
 - 🐛 TypeScript compilation error in utils/storage.ts
   - Added proper type casting for Operation enum
-- 🔧 CI/CD workflow fixes after refactoring:
+- 🔧 CI/CD workflow fixes for EAS Build:
+  - Removed local Android build job (handled by EAS Build)
   - Updated version check path from App.tsx to utils/constants.ts
+  - Updated Android versionCode check to only validate app.json
   - Expanded code quality checks to include hooks/, utils/, types/, i18n/ directories
   - Excluded utils/platform.ts from Web API checks (it's the platform wrapper)
 - 🐛 Offset calculation in display logic
@@ -52,7 +55,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 📱 Platform-safe Web API usage with proper guards
 
 ### Changed
-- 🔧 EAS Build configuration: Changed credentials source from "remote" to "local"
+- 🏗️ **Build System Migration**: Switched from native Android project to EAS Build
+  - Removed old Kotlin/Jetpack Compose Android project
+  - Now using Expo Managed Workflow with EAS Build
+  - Simplified build process and deployment
+- 🔧 Build configuration updates:
+  - Changed EAS Build credentials source to "local"
+  - Explicitly configured Hermes engine in app.json
+  - Updated .gitignore to exclude AAB/APK artifacts
 - 🔧 Optimized choice generation algorithm
 - 📐 Improved display layout calculations
 - 🧹 Code refactoring and dead code removal
@@ -87,5 +97,6 @@ See git history for older changes.
 ## Notes
 
 - **Current Version in Play Store**: 1.0.9
-- **Latest Version**: 1.0.10 (includes critical Hermes fix + major refactoring)
-- **Current Status**: Production build in progress for Play Store release
+- **Latest Version**: 1.0.10 (includes critical startup fix + major refactoring)
+- **Build Status**: ✅ Successfully built and ready for Play Store deployment
+- **EAS Build**: https://expo.dev/accounts/devsven/projects/1x1-trainer/builds
