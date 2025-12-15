@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - 🐛 Offset calculation in display logic
 - 🔄 Duplicate logic in number sequence generation
+- 🎨 Dark Mode UI: Container now respects theme mode on all screen sizes
+  - Removed hardcoded white background color
+  - Theme background color now applied consistently across all viewports
 
 ## [1.0.9] - 2024-12-13
 
