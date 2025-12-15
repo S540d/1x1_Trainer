@@ -36,22 +36,12 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# generated native folders (old Expo structure)
+# generated native folders
 /ios
+/android
 
-# Deprecated - use /Android folder instead
-# /android
-
-# Android IDE and build artifacts (but not our source code)
-Android/.gradle/
-Android/.idea/
-Android/build/
-Android/app/build/
-Android/.DS_Store
-Android/local.properties
-Android/*.jks
-Android/*.keystore
-Android/.backup/
+# Old native Android project (kept for reference)
+Android_old/
 
 # Keystore directory with signing keys
 Keystore/

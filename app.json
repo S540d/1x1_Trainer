@@ -23,6 +23,7 @@
       },
       "package": "com.sven4321.trainer1x1",
       "versionCode": 11,
+      "jsEngine": "hermes",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "intentFilters": [
