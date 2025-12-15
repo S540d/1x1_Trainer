@@ -87,7 +87,7 @@ export const saveOperation = async (operation: Operation): Promise<void> => {
 export const getOperation = async (): Promise<Operation | null> => {
   const value = await getStorageItem(STORAGE_KEYS.OPERATION);
   if (value === 'ADDITION' || value === 'MULTIPLICATION') {
-    return value;
+    return value as Operation;
   }
   return null;
 };

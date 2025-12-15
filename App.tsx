@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,404 +8,55 @@ import {
   Linking,
   ScrollView,
   SafeAreaView,
-  Platform,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import * as Localization from 'expo-localization';
 
 // Local imports
-import { GameMode, Operation, AnswerMode, ThemeMode, Language, GameState } from './types/game';
+import { GameMode, Operation, AnswerMode } from './types/game';
 import { translations } from './i18n/translations';
-import { APP_VERSION, TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER } from './utils/constants';
-import { getThemeColors } from './utils/theme';
-import {
-  getLanguage,
-  saveLanguage,
-  getTheme,
-  saveTheme,
-  getOperation,
-  saveOperation,
-  getTotalTasks,
-  saveTotalTasks,
-} from './utils/storage';
+import { APP_VERSION } from './utils/constants';
+import { useTheme } from './hooks/useTheme';
+import { usePreferences } from './hooks/usePreferences';
+import { useGameLogic } from './hooks/useGameLogic';
 
 export default function App() {
-  const [gameState, setGameState] = useState<GameState>({
-    num1: 1,
-    num2: 1,
-    userAnswer: '',
-    score: 0,
-    currentTask: 1,
-    totalTasks: TOTAL_TASKS,
-    gameMode: GameMode.NORMAL,
-    operation: Operation.MULTIPLICATION,
-    answerMode: AnswerMode.INPUT,
-    questionPart: 2,
-    showResult: false,
-    lastAnswerCorrect: null,
-    isAnswerChecked: false,
-    totalSolvedTasks: 0,
-    selectedChoice: null,
-  });
   const [menuVisible, setMenuVisible] = useState(false);
-  const [themeMode, setThemeMode] = useState<ThemeMode>('light');
-  const [systemDarkMode, setSystemDarkMode] = useState(false);
-  const [language, setLanguage] = useState<Language>('en');
   const [showMotivation, setShowMotivation] = useState(false);
-  const t = translations[language];
 
-  // Calculate effective dark mode
-  const isDarkMode = themeMode === 'dark' || (themeMode === 'system' && systemDarkMode);
+  // Use custom hooks
+  const preferences = usePreferences();
+  const theme = useTheme(preferences.themeMode);
+  const game = useGameLogic({
+    initialOperation: preferences.operation,
+    initialTotalSolvedTasks: preferences.totalSolvedTasks,
+    onTotalSolvedTasksChange: preferences.setTotalSolvedTasks,
+    onMotivationShow: () => setShowMotivation(true),
+  });
 
-  // Dynamic colors based on theme
-  const colors = getThemeColors(isDarkMode);
+  const t = translations[preferences.language];
+  const { colors, isDarkMode } = theme;
 
-  // Load preferences and detect system theme on mount
+  // Generate first question on mount
   useEffect(() => {
-    const loadPreferences = async () => {
-      try {
-        // Load language from storage
-        const savedLanguage = await getLanguage();
-        if (savedLanguage) {
-          setLanguage(savedLanguage);
-        } else {
-          // Auto-detect device language
-          const locales = Localization.getLocales();
-          const deviceLang = locales[0]?.languageCode || 'en';
-          setLanguage(deviceLang === 'de' ? 'de' : 'en');
-        }
+    if (preferences.isLoaded) {
+      game.generateQuestion();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferences.isLoaded]);
 
-        // Load theme preference
-        const savedTheme = await getTheme();
-        if (savedTheme) {
-          setThemeMode(savedTheme);
-        }
-
-        // Load operation preference
-        const savedOperation = await getOperation();
-        if (savedOperation) {
-          setGameState((prev) => ({ ...prev, operation: savedOperation }));
-        }
-
-        // Load total solved tasks
-        const savedTotalTasks = await getTotalTasks();
-        if (savedTotalTasks !== null) {
-          setGameState((prev) => ({ ...prev, totalSolvedTasks: savedTotalTasks }));
-        }
-
-        // Detect system dark mode (only on web)
-        if (Platform.OS === 'web' && typeof window !== 'undefined' && window.matchMedia) {
-          const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)'); // platform-safe
-          setSystemDarkMode(darkModeQuery.matches);
-
-          // Listen for changes
-          const handler = (e: MediaQueryListEvent) => setSystemDarkMode(e.matches);
-          darkModeQuery.addEventListener('change', handler);
-          return () => darkModeQuery.removeEventListener('change', handler);
-        }
-      } catch (error) {
-        // Fallback to English
-        setLanguage('en');
-      }
-    };
-    loadPreferences();
-    generateQuestion();
-  }, []);
-
-  // Save language preference when it changes
+  // Sync operation changes to preferences
   useEffect(() => {
-    saveLanguage(language);
-  }, [language]);
-
-  // Save theme preference when it changes
-  useEffect(() => {
-    saveTheme(themeMode);
-  }, [themeMode]);
-
-  // Save operation preference when it changes
-  useEffect(() => {
-    saveOperation(gameState.operation);
-  }, [gameState.operation]);
-
-  // Save total solved tasks when it changes
-  useEffect(() => {
-    saveTotalTasks(gameState.totalSolvedTasks);
-  }, [gameState.totalSolvedTasks]);
-
-  const generateQuestion = (mode: GameMode = gameState.gameMode) => {
-    const newNum1 = Math.floor(Math.random() * 10) + 1;
-    const newNum2 = Math.floor(Math.random() * 10) + 1;
-    let newQuestionPart = 2;
-
-    switch (mode) {
-      case GameMode.NORMAL:
-        newQuestionPart = 2;
-        break;
-      case GameMode.FIRST_MISSING:
-        newQuestionPart = 0;
-        break;
-      case GameMode.SECOND_MISSING:
-        newQuestionPart = 1;
-        break;
-      case GameMode.MIXED:
-        newQuestionPart = Math.floor(Math.random() * 3);
-        break;
+    if (preferences.isLoaded && game.gameState.operation !== preferences.operation) {
+      preferences.setOperation(game.gameState.operation);
     }
-
-    setGameState((prev) => ({
-      ...prev,
-      num1: newNum1,
-      num2: newNum2,
-      userAnswer: '',
-      questionPart: newQuestionPart,
-      lastAnswerCorrect: null,
-      isAnswerChecked: false,
-      selectedChoice: null,
-    }));
-  };
-
-  const onUserInput = (input: string) => {
-    if (!gameState.isAnswerChecked) {
-      setGameState((prev) => ({
-        ...prev,
-        userAnswer: input,
-        lastAnswerCorrect: null,
-      }));
-    }
-  };
-
-  const changeGameMode = (newMode: GameMode) => {
-    setGameState((prev) => ({
-      ...prev,
-      gameMode: newMode,
-      currentTask: 1,
-      score: 0,
-      showResult: false,
-    }));
-    setTimeout(() => generateQuestion(newMode), 0);
-  };
-
-  const changeOperation = (newOperation: Operation) => {
-    setGameState((prev) => ({
-      ...prev,
-      operation: newOperation,
-      currentTask: 1,
-      score: 0,
-      showResult: false,
-    }));
-    setTimeout(() => generateQuestion(), 0);
-  };
-
-  const changeAnswerMode = (newMode: AnswerMode) => {
-    setGameState((prev) => ({
-      ...prev,
-      answerMode: newMode,
-      currentTask: 1,
-      score: 0,
-      showResult: false,
-      userAnswer: '',
-      selectedChoice: null,
-    }));
-    setTimeout(() => generateQuestion(), 0);
-  };
-
-  const checkAnswer = () => {
-    // Validate that user has provided an answer
-    const hasInput = gameState.answerMode === AnswerMode.INPUT 
-      ? gameState.userAnswer !== '' 
-      : gameState.selectedChoice !== null;
-    
-    if (!hasInput) return;
-
-    let correctAnswer = 0;
-    const result = gameState.operation === Operation.ADDITION
-      ? gameState.num1 + gameState.num2
-      : gameState.num1 * gameState.num2;
-
-    switch (gameState.questionPart) {
-      case 0:
-        correctAnswer = gameState.num1;
-        break;
-      case 1:
-        correctAnswer = gameState.num2;
-        break;
-      default:
-        correctAnswer = result;
-    }
-
-    let isCorrect = false;
-    if (gameState.answerMode === AnswerMode.INPUT) {
-      isCorrect = parseInt(gameState.userAnswer) === correctAnswer;
-    } else {
-      isCorrect = gameState.selectedChoice === correctAnswer;
-    }
-
-    const newScore = isCorrect ? gameState.score + 1 : gameState.score;
-
-    setGameState((prev) => ({
-      ...prev,
-      lastAnswerCorrect: isCorrect,
-      score: newScore,
-      isAnswerChecked: true,
-    }));
-  };
-
-  const nextQuestion = () => {
-    if (gameState.currentTask < gameState.totalTasks) {
-      const newTotalSolvedTasks = gameState.totalSolvedTasks + 1;
-      setGameState((prev) => ({
-        ...prev,
-        currentTask: prev.currentTask + 1,
-        totalSolvedTasks: newTotalSolvedTasks,
-      }));
-
-      // Show motivation message after every 10 tasks
-      if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
-        setShowMotivation(true);
-      }
-
-      setTimeout(() => generateQuestion(), 0);
-    } else {
-      setGameState((prev) => ({ ...prev, showResult: true }));
-    }
-  };
-
-  const restartGame = () => {
-    setGameState((prev) => ({
-      ...prev,
-      score: 0,
-      currentTask: 1,
-      showResult: false,
-    }));
-    setTimeout(() => generateQuestion(), 0);
-  };
-
-  const handleNumberClick = (num: number) => {
-    let currentAnswer = gameState.userAnswer;
-    if (num === -1) {
-      currentAnswer = currentAnswer.slice(0, -1);
-    } else if (num === -2) {
-      currentAnswer = '';
-    } else {
-      currentAnswer += num.toString();
-    }
-    onUserInput(currentAnswer);
-  };
-
-  const handleChoiceClick = (value: number) => {
-    if (!gameState.isAnswerChecked) {
-      setGameState((prev) => ({
-        ...prev,
-        selectedChoice: value,
-        lastAnswerCorrect: null,
-      }));
-    }
-  };
-
-  const getCorrectAnswer = () => {
-    const result = gameState.operation === Operation.ADDITION
-      ? gameState.num1 + gameState.num2
-      : gameState.num1 * gameState.num2;
-
-    switch (gameState.questionPart) {
-      case 0:
-        return gameState.num1;
-      case 1:
-        return gameState.num2;
-      default:
-        return result;
-    }
-  };
-
-  const generateMultipleChoices = () => {
-    const correctAnswer = getCorrectAnswer();
-    const choices = [correctAnswer];
-    
-    // Generate two wrong answers
-    let attempts = 0;
-    while (choices.length < 3 && attempts < MAX_CHOICE_GENERATION_ATTEMPTS) {
-      attempts++;
-      let wrongAnswer;
-      if (Math.random() < 0.5) {
-        // Nearby wrong answer (but not the correct answer)
-        // Generate offset range: -4 to 3 (inclusive), then adjust to exclude 0
-        const offset = Math.floor(Math.random() * 8) - 4; // Generates -4, -3, -2, -1, 0, 1, 2, 3
-        const adjustedOffset = offset >= 0 ? offset + 1 : offset; // Result: -4 to -1, 1 to 4 (excludes 0)
-        wrongAnswer = correctAnswer + adjustedOffset;
-      } else {
-        // Random wrong answer
-        wrongAnswer = Math.floor(Math.random() * MAX_RANDOM_ANSWER) + 1;
-      }
-      
-      if (wrongAnswer > 0 && wrongAnswer !== correctAnswer && !choices.includes(wrongAnswer)) {
-        choices.push(wrongAnswer);
-      }
-    }
-    
-    // Ensure we always have 3 choices - fallback if needed
-    if (choices.length < 3) {
-      const fallbacks = [correctAnswer + 1, correctAnswer + 2, correctAnswer - 1, correctAnswer - 2];
-      for (const fallback of fallbacks) {
-        if (fallback > 0 && fallback !== correctAnswer && !choices.includes(fallback)) {
-          choices.push(fallback);
-          if (choices.length === 3) break;
-        }
-      }
-    }
-    
-    // Fisher-Yates shuffle
-    for (let i = choices.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [choices[i], choices[j]] = [choices[j], choices[i]];
-    }
-    
-    return choices;
-  };
-
-  const generateNumberSequence = () => {
-    const sequence: number[] = [];
-    
-    // Determine the base number for the sequence
-    let base;
-    if (gameState.questionPart === 0) {
-      base = gameState.num2;
-    } else if (gameState.questionPart === 1) {
-      base = gameState.num1;
-    } else {
-      // For result, use one of the factors
-      base = gameState.num1;
-    }
-    
-    // Generate sequence: base, 2*base, 3*base, ...
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base * i);
-    }
-    
-    return sequence;
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [game.gameState.operation]);
 
   const getCardColor = () => {
-    if (gameState.lastAnswerCorrect === true) return colors.cardCorrect;
-    if (gameState.lastAnswerCorrect === false) return colors.cardIncorrect;
+    if (game.gameState.lastAnswerCorrect === true) return colors.cardCorrect;
+    if (game.gameState.lastAnswerCorrect === false) return colors.cardIncorrect;
     return colors.card;
   };
-
-  const operatorSymbol = gameState.operation === Operation.ADDITION ? '+' : '×';
-
-  // Memoize choices and sequence to avoid recalculating on every render
-  const multipleChoices = useMemo(() => {
-    if (gameState.answerMode === AnswerMode.MULTIPLE_CHOICE) {
-      return generateMultipleChoices();
-    }
-    return [];
-  }, [gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, gameState.answerMode]);
-
-  const numberSequence = useMemo(() => {
-    if (gameState.answerMode === AnswerMode.NUMBER_SEQUENCE) {
-      return generateNumberSequence();
-    }
-    return [];
-  }, [gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, gameState.answerMode]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -414,10 +65,10 @@ export default function App() {
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <Text style={[styles.headerScore, { color: colors.text }]}>
-          {t.task}: {gameState.currentTask}/{gameState.totalTasks}
+          {t.task}: {game.gameState.currentTask}/{game.gameState.totalTasks}
         </Text>
         <Text style={[styles.headerScore, { color: colors.text }]}>
-          {t.points}: <Text style={{ color: colors.text, fontWeight: 'bold' }}>{gameState.score}</Text>
+          {t.points}: <Text style={{ color: colors.text, fontWeight: 'bold' }}>{game.gameState.score}</Text>
         </Text>
         <TouchableOpacity
           onPress={() => setMenuVisible(true)}
@@ -454,14 +105,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
-                    themeMode === 'light' && styles.themeButtonActive,
+                    theme.themeMode === 'light' && styles.themeButtonActive,
                   ]}
-                  onPress={() => setThemeMode('light')}
+                  onPress={() => preferences.setThemeMode('light')}
                 >
                   <Text
                     style={[
                       styles.themeButtonText,
-                      themeMode === 'light' && styles.themeButtonTextActive,
+                      theme.themeMode === 'light' && styles.themeButtonTextActive,
                     ]}
                   >
                     {t.light}
@@ -470,14 +121,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
-                    themeMode === 'dark' && styles.themeButtonActive,
+                    theme.themeMode === 'dark' && styles.themeButtonActive,
                   ]}
-                  onPress={() => setThemeMode('dark')}
+                  onPress={() => preferences.setThemeMode('dark')}
                 >
                   <Text
                     style={[
                       styles.themeButtonText,
-                      themeMode === 'dark' && styles.themeButtonTextActive,
+                      theme.themeMode === 'dark' && styles.themeButtonTextActive,
                     ]}
                   >
                     {t.dark}
@@ -486,14 +137,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
-                    themeMode === 'system' && styles.themeButtonActive,
+                    theme.themeMode === 'system' && styles.themeButtonActive,
                   ]}
-                  onPress={() => setThemeMode('system')}
+                  onPress={() => preferences.setThemeMode('system')}
                 >
                   <Text
                     style={[
                       styles.themeButtonText,
-                      themeMode === 'system' && styles.themeButtonTextActive,
+                      theme.themeMode === 'system' && styles.themeButtonTextActive,
                     ]}
                   >
                     {t.system}
@@ -511,14 +162,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
-                    language === 'en' && styles.themeButtonActive,
+                    preferences.language === 'en' && styles.themeButtonActive,
                   ]}
-                  onPress={() => setLanguage('en')}
+                  onPress={() => preferences.setLanguage('en')}
                 >
                   <Text
                     style={[
                       styles.themeButtonText,
-                      language === 'en' && styles.themeButtonTextActive,
+                      preferences.language === 'en' && styles.themeButtonTextActive,
                     ]}
                   >
                     {t.english}
@@ -527,14 +178,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
-                    language === 'de' && styles.themeButtonActive,
+                    preferences.language === 'de' && styles.themeButtonActive,
                   ]}
-                  onPress={() => setLanguage('de')}
+                  onPress={() => preferences.setLanguage('de')}
                 >
                   <Text
                     style={[
                       styles.themeButtonText,
-                      language === 'de' && styles.themeButtonTextActive,
+                      preferences.language === 'de' && styles.themeButtonTextActive,
                     ]}
                   >
                     {t.german}
@@ -552,14 +203,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
-                    gameState.operation === Operation.ADDITION && styles.themeButtonActive,
+                    game.gameState.operation === Operation.ADDITION && styles.themeButtonActive,
                   ]}
-                  onPress={() => changeOperation(Operation.ADDITION)}
+                  onPress={() => game.changeOperation(Operation.ADDITION)}
                 >
                   <Text
                     style={[
                       styles.themeButtonText,
-                      gameState.operation === Operation.ADDITION && styles.themeButtonTextActive,
+                      game.gameState.operation === Operation.ADDITION && styles.themeButtonTextActive,
                     ]}
                   >
                     {t.addition}
@@ -568,14 +219,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
-                    gameState.operation === Operation.MULTIPLICATION && styles.themeButtonActive,
+                    game.gameState.operation === Operation.MULTIPLICATION && styles.themeButtonActive,
                   ]}
-                  onPress={() => changeOperation(Operation.MULTIPLICATION)}
+                  onPress={() => game.changeOperation(Operation.MULTIPLICATION)}
                 >
                   <Text
                     style={[
                       styles.themeButtonText,
-                      gameState.operation === Operation.MULTIPLICATION && styles.themeButtonTextActive,
+                      game.gameState.operation === Operation.MULTIPLICATION && styles.themeButtonTextActive,
                     ]}
                   >
                     {t.multiplication}
@@ -593,14 +244,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.gameModeSettingsButton,
-                    gameState.gameMode === GameMode.NORMAL && styles.gameModeSettingsButtonActive,
+                    game.gameState.gameMode === GameMode.NORMAL && styles.gameModeSettingsButtonActive,
                   ]}
-                  onPress={() => changeGameMode(GameMode.NORMAL)}
+                  onPress={() => game.changeGameMode(GameMode.NORMAL)}
                 >
                   <Text
                     style={[
                       styles.gameModeSettingsButtonText,
-                      gameState.gameMode === GameMode.NORMAL && styles.gameModeSettingsButtonTextActive,
+                      game.gameState.gameMode === GameMode.NORMAL && styles.gameModeSettingsButtonTextActive,
                     ]}
                   >
                     {t.normalMode}
@@ -609,14 +260,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.gameModeSettingsButton,
-                    gameState.gameMode === GameMode.FIRST_MISSING && styles.gameModeSettingsButtonActive,
+                    game.gameState.gameMode === GameMode.FIRST_MISSING && styles.gameModeSettingsButtonActive,
                   ]}
-                  onPress={() => changeGameMode(GameMode.FIRST_MISSING)}
+                  onPress={() => game.changeGameMode(GameMode.FIRST_MISSING)}
                 >
                   <Text
                     style={[
                       styles.gameModeSettingsButtonText,
-                      gameState.gameMode === GameMode.FIRST_MISSING && styles.gameModeSettingsButtonTextActive,
+                      game.gameState.gameMode === GameMode.FIRST_MISSING && styles.gameModeSettingsButtonTextActive,
                     ]}
                   >
                     {t.firstMissing}
@@ -625,14 +276,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.gameModeSettingsButton,
-                    gameState.gameMode === GameMode.SECOND_MISSING && styles.gameModeSettingsButtonActive,
+                    game.gameState.gameMode === GameMode.SECOND_MISSING && styles.gameModeSettingsButtonActive,
                   ]}
-                  onPress={() => changeGameMode(GameMode.SECOND_MISSING)}
+                  onPress={() => game.changeGameMode(GameMode.SECOND_MISSING)}
                 >
                   <Text
                     style={[
                       styles.gameModeSettingsButtonText,
-                      gameState.gameMode === GameMode.SECOND_MISSING && styles.gameModeSettingsButtonTextActive,
+                      game.gameState.gameMode === GameMode.SECOND_MISSING && styles.gameModeSettingsButtonTextActive,
                     ]}
                   >
                     {t.secondMissing}
@@ -641,14 +292,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.gameModeSettingsButton,
-                    gameState.gameMode === GameMode.MIXED && styles.gameModeSettingsButtonActive,
+                    game.gameState.gameMode === GameMode.MIXED && styles.gameModeSettingsButtonActive,
                   ]}
-                  onPress={() => changeGameMode(GameMode.MIXED)}
+                  onPress={() => game.changeGameMode(GameMode.MIXED)}
                 >
                   <Text
                     style={[
                       styles.gameModeSettingsButtonText,
-                      gameState.gameMode === GameMode.MIXED && styles.gameModeSettingsButtonTextActive,
+                      game.gameState.gameMode === GameMode.MIXED && styles.gameModeSettingsButtonTextActive,
                     ]}
                   >
                     {t.mixedMode}
@@ -666,14 +317,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.gameModeSettingsButton,
-                    gameState.answerMode === AnswerMode.INPUT && styles.gameModeSettingsButtonActive,
+                    game.gameState.answerMode === AnswerMode.INPUT && styles.gameModeSettingsButtonActive,
                   ]}
-                  onPress={() => changeAnswerMode(AnswerMode.INPUT)}
+                  onPress={() => game.changeAnswerMode(AnswerMode.INPUT)}
                 >
                   <Text
                     style={[
                       styles.gameModeSettingsButtonText,
-                      gameState.answerMode === AnswerMode.INPUT && styles.gameModeSettingsButtonTextActive,
+                      game.gameState.answerMode === AnswerMode.INPUT && styles.gameModeSettingsButtonTextActive,
                     ]}
                   >
                     {t.inputMode}
@@ -682,14 +333,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.gameModeSettingsButton,
-                    gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && styles.gameModeSettingsButtonActive,
+                    game.gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && styles.gameModeSettingsButtonActive,
                   ]}
-                  onPress={() => changeAnswerMode(AnswerMode.MULTIPLE_CHOICE)}
+                  onPress={() => game.changeAnswerMode(AnswerMode.MULTIPLE_CHOICE)}
                 >
                   <Text
                     style={[
                       styles.gameModeSettingsButtonText,
-                      gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && styles.gameModeSettingsButtonTextActive,
+                      game.gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && styles.gameModeSettingsButtonTextActive,
                     ]}
                   >
                     {t.multipleChoiceMode}
@@ -698,14 +349,14 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.gameModeSettingsButton,
-                    gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && styles.gameModeSettingsButtonActive,
+                    game.gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && styles.gameModeSettingsButtonActive,
                   ]}
-                  onPress={() => changeAnswerMode(AnswerMode.NUMBER_SEQUENCE)}
+                  onPress={() => game.changeAnswerMode(AnswerMode.NUMBER_SEQUENCE)}
                 >
                   <Text
                     style={[
                       styles.gameModeSettingsButtonText,
-                      gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && styles.gameModeSettingsButtonTextActive,
+                      game.gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && styles.gameModeSettingsButtonTextActive,
                     ]}
                   >
                     {t.numberSequenceMode}
@@ -754,11 +405,11 @@ export default function App() {
         <View style={[styles.questionCard, { backgroundColor: getCardColor() }]}>
           <View style={styles.questionRow}>
             {/* First number or answer box */}
-            {gameState.questionPart === 0 ? (
-              gameState.answerMode === AnswerMode.INPUT ? (
+            {game.gameState.questionPart === 0 ? (
+              game.gameState.answerMode === AnswerMode.INPUT ? (
                 <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
-                  <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
-                    {gameState.userAnswer || '?'}
+                  <Text style={[styles.answerText, { color: colors.text }, game.gameState.userAnswer === '' && styles.answerPlaceholder]}>
+                    {game.gameState.userAnswer || '?'}
                   </Text>
                 </View>
               ) : (
@@ -766,19 +417,19 @@ export default function App() {
               )
             ) : (
               <Text style={[styles.questionText, { color: colors.text }]}>
-                {gameState.num1}
+                {game.gameState.num1}
               </Text>
             )}
 
             {/* Operator */}
-            <Text style={[styles.questionText, { color: colors.text }]}> {operatorSymbol} </Text>
+            <Text style={[styles.questionText, { color: colors.text }]}> {game.operatorSymbol} </Text>
 
             {/* Second number or answer box */}
-            {gameState.questionPart === 1 ? (
-              gameState.answerMode === AnswerMode.INPUT ? (
+            {game.gameState.questionPart === 1 ? (
+              game.gameState.answerMode === AnswerMode.INPUT ? (
                 <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
-                  <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
-                    {gameState.userAnswer || '?'}
+                  <Text style={[styles.answerText, { color: colors.text }, game.gameState.userAnswer === '' && styles.answerPlaceholder]}>
+                    {game.gameState.userAnswer || '?'}
                   </Text>
                 </View>
               ) : (
@@ -786,7 +437,7 @@ export default function App() {
               )
             ) : (
               <Text style={[styles.questionText, { color: colors.text }]}>
-                {gameState.num2}
+                {game.gameState.num2}
               </Text>
             )}
 
@@ -794,11 +445,11 @@ export default function App() {
             <Text style={[styles.questionText, { color: colors.text }]}> = </Text>
 
             {/* Result or answer box */}
-            {gameState.questionPart === 2 ? (
-              gameState.answerMode === AnswerMode.INPUT ? (
+            {game.gameState.questionPart === 2 ? (
+              game.gameState.answerMode === AnswerMode.INPUT ? (
                 <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
-                  <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
-                    {gameState.userAnswer || '?'}
+                  <Text style={[styles.answerText, { color: colors.text }, game.gameState.userAnswer === '' && styles.answerPlaceholder]}>
+                    {game.gameState.userAnswer || '?'}
                   </Text>
                 </View>
               ) : (
@@ -806,41 +457,41 @@ export default function App() {
               )
             ) : (
               <Text style={[styles.questionText, { color: colors.text }]}>
-                {gameState.operation === Operation.ADDITION
-                  ? gameState.num1 + gameState.num2
-                  : gameState.num1 * gameState.num2}
+                {game.gameState.operation === Operation.ADDITION
+                  ? game.gameState.num1 + game.gameState.num2
+                  : game.gameState.num1 * game.gameState.num2}
               </Text>
             )}
           </View>
 
           {/* Answer Input Area */}
           <View style={styles.answerArea}>
-            {gameState.answerMode === AnswerMode.INPUT && (
+            {game.gameState.answerMode === AnswerMode.INPUT && (
               <Numpad
-                onNumberClick={handleNumberClick}
-                onCheck={gameState.isAnswerChecked ? nextQuestion : checkAnswer}
-                userAnswer={gameState.userAnswer}
-                isAnswerChecked={gameState.isAnswerChecked}
+                onNumberClick={game.handleNumberClick}
+                onCheck={game.gameState.isAnswerChecked ? game.nextQuestion : game.checkAnswer}
+                userAnswer={game.gameState.userAnswer}
+                isAnswerChecked={game.gameState.isAnswerChecked}
               />
             )}
 
-            {gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && (
+            {game.gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && (
               <View style={styles.choicesContainer}>
-                {multipleChoices.map((choice, index) => (
+                {game.multipleChoices.map((choice, index) => (
                   <TouchableOpacity
                     key={index}
                     style={[
                       styles.choiceButton,
-                      gameState.selectedChoice === choice && styles.choiceButtonSelected,
-                      gameState.isAnswerChecked && choice === getCorrectAnswer() && styles.choiceButtonCorrect,
-                      gameState.isAnswerChecked && gameState.selectedChoice === choice && choice !== getCorrectAnswer() && styles.choiceButtonIncorrect,
+                      game.gameState.selectedChoice === choice && styles.choiceButtonSelected,
+                      game.gameState.isAnswerChecked && choice === game.getCorrectAnswer() && styles.choiceButtonCorrect,
+                      game.gameState.isAnswerChecked && game.gameState.selectedChoice === choice && choice !== game.getCorrectAnswer() && styles.choiceButtonIncorrect,
                     ]}
-                    onPress={() => handleChoiceClick(choice)}
-                    disabled={gameState.isAnswerChecked}
+                    onPress={() => game.handleChoiceClick(choice)}
+                    disabled={game.gameState.isAnswerChecked}
                   >
                     <Text style={[
                       styles.choiceButtonText,
-                      gameState.selectedChoice === choice && styles.choiceButtonTextSelected,
+                      game.gameState.selectedChoice === choice && styles.choiceButtonTextSelected,
                     ]}>
                       {choice}
                     </Text>
@@ -849,36 +500,36 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.checkButton,
-                    (gameState.selectedChoice === null && !gameState.isAnswerChecked) && styles.checkButtonDisabled,
+                    (game.gameState.selectedChoice === null && !game.gameState.isAnswerChecked) && styles.checkButtonDisabled,
                   ]}
-                  onPress={gameState.isAnswerChecked ? nextQuestion : checkAnswer}
-                  disabled={gameState.selectedChoice === null && !gameState.isAnswerChecked}
+                  onPress={game.gameState.isAnswerChecked ? game.nextQuestion : game.checkAnswer}
+                  disabled={game.gameState.selectedChoice === null && !game.gameState.isAnswerChecked}
                 >
                   <Text style={styles.checkButtonText}>
-                    {gameState.isAnswerChecked ? t.nextQuestion : t.check}
+                    {game.gameState.isAnswerChecked ? t.nextQuestion : t.check}
                   </Text>
                 </TouchableOpacity>
               </View>
             )}
 
-            {gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && (
+            {game.gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && (
               <View style={styles.sequenceContainer}>
                 <ScrollView style={styles.sequenceScroll}>
-                  {numberSequence.map((num, index) => (
+                  {game.numberSequence.map((num, index) => (
                     <TouchableOpacity
                       key={index}
                       style={[
                         styles.sequenceButton,
-                        gameState.selectedChoice === num && styles.sequenceButtonSelected,
-                        gameState.isAnswerChecked && num === getCorrectAnswer() && styles.sequenceButtonCorrect,
-                        gameState.isAnswerChecked && gameState.selectedChoice === num && num !== getCorrectAnswer() && styles.sequenceButtonIncorrect,
+                        game.gameState.selectedChoice === num && styles.sequenceButtonSelected,
+                        game.gameState.isAnswerChecked && num === game.getCorrectAnswer() && styles.sequenceButtonCorrect,
+                        game.gameState.isAnswerChecked && game.gameState.selectedChoice === num && num !== game.getCorrectAnswer() && styles.sequenceButtonIncorrect,
                       ]}
-                      onPress={() => handleChoiceClick(num)}
-                      disabled={gameState.isAnswerChecked}
+                      onPress={() => game.handleChoiceClick(num)}
+                      disabled={game.gameState.isAnswerChecked}
                     >
                       <Text style={[
                         styles.sequenceButtonText,
-                        gameState.selectedChoice === num && styles.sequenceButtonTextSelected,
+                        game.gameState.selectedChoice === num && styles.sequenceButtonTextSelected,
                       ]}>
                         {num}
                       </Text>
@@ -888,13 +539,13 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.checkButton,
-                    (gameState.selectedChoice === null && !gameState.isAnswerChecked) && styles.checkButtonDisabled,
+                    (game.gameState.selectedChoice === null && !game.gameState.isAnswerChecked) && styles.checkButtonDisabled,
                   ]}
-                  onPress={gameState.isAnswerChecked ? nextQuestion : checkAnswer}
-                  disabled={gameState.selectedChoice === null && !gameState.isAnswerChecked}
+                  onPress={game.gameState.isAnswerChecked ? game.nextQuestion : game.checkAnswer}
+                  disabled={game.gameState.selectedChoice === null && !game.gameState.isAnswerChecked}
                 >
                   <Text style={styles.checkButtonText}>
-                    {gameState.isAnswerChecked ? t.nextQuestion : t.check}
+                    {game.gameState.isAnswerChecked ? t.nextQuestion : t.check}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -903,14 +554,14 @@ export default function App() {
         </View>
       </View>
 
-      <Modal visible={gameState.showResult} transparent animationType="fade">
+      <Modal visible={game.gameState.showResult} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.settingsMenu }]}>
             <Text style={[styles.modalTitle, { color: colors.text }]}>{t.great}</Text>
             <Text style={[styles.modalText, { color: colors.text }]}>
-              {t.youSolved} {gameState.score} {t.of} {gameState.totalTasks} {t.tasksCorrectly}.
+              {t.youSolved} {game.gameState.score} {t.of} {game.gameState.totalTasks} {t.tasksCorrectly}.
             </Text>
-            <TouchableOpacity style={styles.restartButton} onPress={restartGame}>
+            <TouchableOpacity style={styles.restartButton} onPress={game.restartGame}>
               <Text style={styles.restartButtonText}>{t.playAgain}</Text>
             </TouchableOpacity>
           </View>
