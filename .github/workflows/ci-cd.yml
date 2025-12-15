@@ -33,7 +33,7 @@ jobs:
       - name: Check for console.log in production code
         run: |
           echo "Checking for console.log statements..."
-          if grep -r "console\.log\|console\.debug" App.tsx --exclude-dir=node_modules --exclude-dir=.git; then
+          if grep -r "console\.log\|console\.debug" App.tsx hooks/ utils/ types/ i18n/ --exclude-dir=node_modules --exclude-dir=.git; then
             echo "❌ ERROR: Found console.log/debug in production code!"
             exit 1
           else
@@ -44,14 +44,14 @@ jobs:
         run: |
           echo "Checking for unsafe Web API usage..."
           # Check for window.* without Platform.OS check
-          if grep -r "window\." App.tsx --exclude-dir=node_modules | grep -v "Platform.OS === 'web'" | grep -v "// platform-safe"; then
+          if grep -r "window\." App.tsx hooks/ utils/ --exclude-dir=node_modules | grep -v "Platform.OS === 'web'" | grep -v "// platform-safe"; then
             echo "❌ ERROR: Found window.* without Platform.OS check!"
             echo "Add 'Platform.OS === web' check or // platform-safe comment"
             exit 1
           fi
 
           # Check for localStorage without Platform.OS check
-          if grep -r "localStorage\." App.tsx --exclude-dir=node_modules | grep -v "Platform.OS === 'web'" | grep -v "// platform-safe"; then
+          if grep -r "localStorage\." App.tsx hooks/ utils/ --exclude-dir=node_modules | grep -v "Platform.OS === 'web'" | grep -v "// platform-safe"; then
             echo "❌ ERROR: Found localStorage without Platform.OS check!"
             echo "Use AsyncStorage for mobile or add Platform.OS check"
             exit 1
@@ -155,11 +155,11 @@ jobs:
 
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           APP_JSON_VERSION=$(node -p "require('./app.json').expo.version")
-          APP_VERSION=$(grep "APP_VERSION = " App.tsx | sed -E "s/.*'(.*)'.*/\1/")
+          APP_VERSION=$(grep "APP_VERSION = " utils/constants.ts | sed -E "s/.*'(.*)'.*/\1/")
 
           echo "package.json: $PACKAGE_VERSION"
           echo "app.json: $APP_JSON_VERSION"
-          echo "App.tsx: $APP_VERSION"
+          echo "utils/constants.ts: $APP_VERSION"
 
           if [ "$PACKAGE_VERSION" != "$APP_JSON_VERSION" ] || [ "$PACKAGE_VERSION" != "$APP_VERSION" ]; then
             echo "❌ ERROR: Version mismatch!"
