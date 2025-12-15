@@ -133,7 +133,21 @@ bash scripts/test-pwa.sh
 
 ```
 1x1_Trainer/
-├── App.tsx                      # Haupt-App-Komponente
+├── App.tsx                      # Haupt-App-Komponente (1044 Zeilen, refactored)
+├── hooks/                       # Custom React Hooks
+│   ├── useTheme.ts             # Theme-Management & Dark Mode
+│   ├── usePreferences.ts       # User Preferences mit Auto-Save
+│   └── useGameLogic.ts         # Game State & Logic
+├── types/                       # TypeScript Type Definitions
+│   └── game.ts                 # Game, Theme, Storage Types
+├── i18n/                        # Internationalization
+│   └── translations.ts         # DE/EN Übersetzungen
+├── utils/                       # Utility-Module
+│   ├── constants.ts            # App-Konstanten & Konfiguration
+│   ├── theme.ts                # Theme Color Management
+│   ├── storage.ts              # Cross-Platform Storage
+│   ├── platform.ts             # Platform-Safe Web API Wrapper
+│   └── calculations.ts         # Game Calculations
 ├── public/                      # PWA Assets & Web-Konfiguration
 │   ├── index.html              # HTML Template für Web
 │   ├── manifest.json           # ✅ PWA Manifest (vollständig)
@@ -149,8 +163,15 @@ bash scripts/test-pwa.sh
 │   ├── generate-screenshots.py # Screenshot Generator
 │   ├── test-pwa.sh             # PWA Validation Script
 │   └── post-build.js           # Build Post-Processing
+├── Android/                     # Android Native Project
+│   ├── gradle.properties       # Gradle Config (Hermes enabled)
+│   └── app/                    # App Module
+├── .github/
+│   └── workflows/
+│       └── ci-cd.yml           # CI/CD Pipeline
 ├── PWA-OPTIMIZATION.md         # Technische Dokumentation
 ├── PWA-TESTING.md              # Testing Guide
+├── CHANGELOG.md                # Version History
 ├── package.json
 └── README.md
 ```
