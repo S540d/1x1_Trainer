@@ -14,6 +14,11 @@ export interface TranslationStrings {
   language: string;
   english: string;
   german: string;
+  difficultyMode: string;
+  simpleMode: string;
+  creativeMode: string;
+  simpleModeInfo: string;
+  creativeModeInfo: string;
   gameMode: string;
   operation: string;
   addition: string;
@@ -61,6 +66,11 @@ export const translations: Record<Language, TranslationStrings> = {
     language: 'LANGUAGE',
     english: 'English',
     german: 'Deutsch',
+    difficultyMode: 'DIFFICULTY',
+    simpleMode: 'Simple',
+    creativeMode: 'Creative',
+    simpleModeInfo: 'Enter the result via keypad',
+    creativeModeInfo: 'Random input methods and question types',
     gameMode: 'GAME MODE',
     operation: 'OPERATION',
     addition: 'Addition',
@@ -106,6 +116,11 @@ export const translations: Record<Language, TranslationStrings> = {
     language: 'SPRACHE',
     english: 'English',
     german: 'Deutsch',
+    difficultyMode: 'SCHWIERIGKEIT',
+    simpleMode: 'Einfach',
+    creativeMode: 'Kreativ',
+    simpleModeInfo: 'Das Ergebnis wird über die Tastatur eingegeben',
+    creativeModeInfo: 'Zufällige Eingabemethoden und Fragetypen',
     gameMode: 'SPIELMODUS',
     operation: 'RECHENART',
     addition: 'Addition',

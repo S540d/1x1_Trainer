@@ -12,7 +12,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 
 // Local imports
-import { GameMode, Operation, AnswerMode } from './types/game';
+import { Operation, AnswerMode, DifficultyMode } from './types/game';
 import { translations } from './i18n/translations';
 import { APP_VERSION } from './utils/constants';
 import { useTheme } from './hooks/useTheme';
@@ -237,132 +237,46 @@ export default function App() {
 
             <View style={styles.settingsDivider} />
 
-            {/* Game Mode Settings */}
+            {/* Difficulty Mode Settings */}
             <View style={styles.settingsSection}>
-              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.gameMode}</Text>
-              <View style={styles.gameModeGrid}>
+              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.difficultyMode}</Text>
+              <View style={styles.themeToggle}>
                 <TouchableOpacity
                   style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.gameMode === GameMode.NORMAL && styles.gameModeSettingsButtonActive,
+                    styles.themeButton,
+                    game.gameState.difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonActive,
                   ]}
-                  onPress={() => game.changeGameMode(GameMode.NORMAL)}
+                  onPress={() => game.changeDifficultyMode(DifficultyMode.SIMPLE)}
                 >
                   <Text
                     style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.gameMode === GameMode.NORMAL && styles.gameModeSettingsButtonTextActive,
+                      styles.themeButtonText,
+                      game.gameState.difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonTextActive,
                     ]}
                   >
-                    {t.normalMode}
+                    {t.simpleMode}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.gameMode === GameMode.FIRST_MISSING && styles.gameModeSettingsButtonActive,
+                    styles.themeButton,
+                    game.gameState.difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonActive,
                   ]}
-                  onPress={() => game.changeGameMode(GameMode.FIRST_MISSING)}
+                  onPress={() => game.changeDifficultyMode(DifficultyMode.CREATIVE)}
                 >
                   <Text
                     style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.gameMode === GameMode.FIRST_MISSING && styles.gameModeSettingsButtonTextActive,
+                      styles.themeButtonText,
+                      game.gameState.difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonTextActive,
                     ]}
                   >
-                    {t.firstMissing}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.gameMode === GameMode.SECOND_MISSING && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => game.changeGameMode(GameMode.SECOND_MISSING)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.gameMode === GameMode.SECOND_MISSING && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.secondMissing}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.gameMode === GameMode.MIXED && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => game.changeGameMode(GameMode.MIXED)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.gameMode === GameMode.MIXED && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.mixedMode}
+                    {t.creativeMode}
                   </Text>
                 </TouchableOpacity>
               </View>
-            </View>
-
-            <View style={styles.settingsDivider} />
-
-            {/* Answer Mode Settings */}
-            <View style={styles.settingsSection}>
-              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.answerMode}</Text>
-              <View style={styles.gameModeGrid}>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.answerMode === AnswerMode.INPUT && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => game.changeAnswerMode(AnswerMode.INPUT)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.answerMode === AnswerMode.INPUT && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.inputMode}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => game.changeAnswerMode(AnswerMode.MULTIPLE_CHOICE)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.multipleChoiceMode}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => game.changeAnswerMode(AnswerMode.NUMBER_SEQUENCE)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.numberSequenceMode}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              <Text style={[styles.settingsModeInfo, { color: colors.textSecondary }]}>
+                {game.gameState.difficultyMode === DifficultyMode.SIMPLE ? t.simpleModeInfo : t.creativeModeInfo}
+              </Text>
             </View>
 
             <View style={styles.settingsDivider} />
@@ -776,6 +690,12 @@ const styles = StyleSheet.create({
     color: '#999',
     marginBottom: 8,
     textTransform: 'uppercase',
+  },
+  settingsModeInfo: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 6,
+    fontStyle: 'italic',
   },
   themeToggle: {
     flexDirection: 'row',
