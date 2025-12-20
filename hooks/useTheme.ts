@@ -12,6 +12,11 @@ export function useTheme(initialTheme: ThemeMode = 'light') {
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialTheme);
   const [systemDarkMode, setSystemDarkMode] = useState(false);
 
+  // Sync themeMode with initialTheme prop
+  useEffect(() => {
+    setThemeMode(initialTheme);
+  }, [initialTheme]);
+
   // Detect system dark mode (only on web)
   useEffect(() => {
     if (Platform.OS === 'web' && typeof window !== 'undefined' && window.matchMedia) {

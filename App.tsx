@@ -36,6 +36,13 @@ export default function App() {
   const t = translations[preferences.language];
   const { colors, isDarkMode } = theme;
 
+  // Set body background color dynamically on web
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.body.style.backgroundColor = isDarkMode ? '#0A0A0A' : '#FAFAFA';
+    }
+  }, [isDarkMode]);
+
   // Generate first question on mount
   useEffect(() => {
     if (preferences.isLoaded) {
@@ -631,7 +638,7 @@ const styles = StyleSheet.create({
     top: 60,
     right: 16,
     minWidth: 200,
-    borderRadius: 8,
+    borderRadius: 16,
     backgroundColor: '#fff',
     elevation: 8,
     shadowColor: '#000',
@@ -705,7 +712,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 6,
     paddingHorizontal: 8,
-    borderRadius: 6,
+    borderRadius: 12,
     backgroundColor: '#f5f5f5',
     alignItems: 'center',
   },
@@ -741,7 +748,7 @@ const styles = StyleSheet.create({
     minWidth: '45%',
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 6,
+    borderRadius: 12,
     backgroundColor: '#f5f5f5',
     alignItems: 'center',
   },
@@ -760,9 +767,15 @@ const styles = StyleSheet.create({
   questionCard: {
     flex: 1,
     width: '100%',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 20,
+    padding: 24,
     alignItems: 'center',
+    // Multi-layer shadow for depth
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
   },
   questionRow: {
     flexDirection: 'row',
@@ -777,7 +790,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 60,
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -804,7 +817,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 60,
     backgroundColor: '#E0E0E0',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
@@ -821,7 +834,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 60,
     backgroundColor: '#03DAC6',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
@@ -844,7 +857,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 60,
     backgroundColor: '#E0E0E0',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -874,7 +887,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 60,
     backgroundColor: '#03DAC6',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
@@ -899,7 +912,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 60,
     backgroundColor: '#E0E0E0',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
@@ -934,10 +947,15 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 24,
+    borderRadius: 20,
+    padding: 32,
     alignItems: 'center',
     minWidth: 280,
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
   },
   modalTitle: {
     fontSize: 24,
@@ -953,7 +971,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#6200EE',
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   restartButtonText: {
     color: '#fff',
