@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Repository Maintenance
+- ✅ Merged `testing` branch into `main`
+- 🧹 Cleaned up stale branches:
+  - Deleted `testing` (merged into main on 2025-12-21)
+  - Deleted `15-einheitliches-aussehen-auf-verschiedenen-bildschirmgrößen` (old feature branch)
+  - Deleted `copilot/optimize-display-layout` (old copilot branch)
+  - Deleted `feature/default-multiplication` (completed feature)
+
 ## [1.0.10] - 2024-12-15
 
 ### Fixed
