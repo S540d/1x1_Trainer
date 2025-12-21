@@ -102,6 +102,23 @@ Die Web-Version kann auf mobilen Geräten und Desktops als App installiert werde
 - ✅ **Schnell** - Intelligentes Caching & Performance
 - ✅ **Responsive** - Perfekt auf allen Bildschirmgrößen
 
+### Testing Umgebungen
+
+Das Projekt hat zwei Deployment-Umgebungen:
+
+| Umgebung | URL | Branch | Auto-Deploy |
+|----------|-----|--------|-------------|
+| **Production** | https://s540d.github.io/1x1_Trainer/ | `main` | ✅ |
+| **Testing/Preview** | https://s540d.github.io/1x1_Trainer/testing/ | `testing` | ✅ |
+
+**Testing Workflow:**
+- Entwickle Features auf Feature-Branches
+- Teste lokal mit `npm run web`
+- Push zu `testing` für Online-Preview
+- Merge zu `main` nach erfolgreichem Testing
+
+Detaillierter Workflow: 📖 [TESTING.md](./TESTING.md)
+
 ### PWA Testing & Validation
 
 **Lokal testen:**
@@ -128,6 +145,7 @@ bash scripts/test-pwa.sh
 **Dokumentation:**
 - 📖 [PWA Optimization Guide](./PWA-OPTIMIZATION.md) - Technische Details
 - 🧪 [PWA Testing Guide](./PWA-TESTING.md) - Detaillierte Test-Anleitungen
+- 🧪 [Testing & Deployment](./TESTING.md) - Branch-Strategie & Workflow
 
 ## Projekt-Struktur
 
