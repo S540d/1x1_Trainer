@@ -12,7 +12,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 
 // Local imports
-import { GameMode, Operation, AnswerMode } from './types/game';
+import { Operation, AnswerMode, DifficultyMode } from './types/game';
 import { translations } from './i18n/translations';
 import { APP_VERSION } from './utils/constants';
 import { useTheme } from './hooks/useTheme';
@@ -35,6 +35,13 @@ export default function App() {
 
   const t = translations[preferences.language];
   const { colors, isDarkMode } = theme;
+
+  // Set body background color dynamically on web
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.body.style.backgroundColor = isDarkMode ? '#0A0A0A' : '#FAFAFA';
+    }
+  }, [isDarkMode]);
 
   // Generate first question on mount
   useEffect(() => {
@@ -237,132 +244,46 @@ export default function App() {
 
             <View style={styles.settingsDivider} />
 
-            {/* Game Mode Settings */}
+            {/* Difficulty Mode Settings */}
             <View style={styles.settingsSection}>
-              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.gameMode}</Text>
-              <View style={styles.gameModeGrid}>
+              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.difficultyMode}</Text>
+              <View style={styles.themeToggle}>
                 <TouchableOpacity
                   style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.gameMode === GameMode.NORMAL && styles.gameModeSettingsButtonActive,
+                    styles.themeButton,
+                    game.gameState.difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonActive,
                   ]}
-                  onPress={() => game.changeGameMode(GameMode.NORMAL)}
+                  onPress={() => game.changeDifficultyMode(DifficultyMode.SIMPLE)}
                 >
                   <Text
                     style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.gameMode === GameMode.NORMAL && styles.gameModeSettingsButtonTextActive,
+                      styles.themeButtonText,
+                      game.gameState.difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonTextActive,
                     ]}
                   >
-                    {t.normalMode}
+                    {t.simpleMode}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.gameMode === GameMode.FIRST_MISSING && styles.gameModeSettingsButtonActive,
+                    styles.themeButton,
+                    game.gameState.difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonActive,
                   ]}
-                  onPress={() => game.changeGameMode(GameMode.FIRST_MISSING)}
+                  onPress={() => game.changeDifficultyMode(DifficultyMode.CREATIVE)}
                 >
                   <Text
                     style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.gameMode === GameMode.FIRST_MISSING && styles.gameModeSettingsButtonTextActive,
+                      styles.themeButtonText,
+                      game.gameState.difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonTextActive,
                     ]}
                   >
-                    {t.firstMissing}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.gameMode === GameMode.SECOND_MISSING && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => game.changeGameMode(GameMode.SECOND_MISSING)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.gameMode === GameMode.SECOND_MISSING && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.secondMissing}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.gameMode === GameMode.MIXED && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => game.changeGameMode(GameMode.MIXED)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.gameMode === GameMode.MIXED && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.mixedMode}
+                    {t.creativeMode}
                   </Text>
                 </TouchableOpacity>
               </View>
-            </View>
-
-            <View style={styles.settingsDivider} />
-
-            {/* Answer Mode Settings */}
-            <View style={styles.settingsSection}>
-              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.answerMode}</Text>
-              <View style={styles.gameModeGrid}>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.answerMode === AnswerMode.INPUT && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => game.changeAnswerMode(AnswerMode.INPUT)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.answerMode === AnswerMode.INPUT && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.inputMode}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => game.changeAnswerMode(AnswerMode.MULTIPLE_CHOICE)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.multipleChoiceMode}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.gameModeSettingsButton,
-                    game.gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && styles.gameModeSettingsButtonActive,
-                  ]}
-                  onPress={() => game.changeAnswerMode(AnswerMode.NUMBER_SEQUENCE)}
-                >
-                  <Text
-                    style={[
-                      styles.gameModeSettingsButtonText,
-                      game.gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && styles.gameModeSettingsButtonTextActive,
-                    ]}
-                  >
-                    {t.numberSequenceMode}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              <Text style={[styles.settingsModeInfo, { color: colors.textSecondary }]}>
+                {game.gameState.difficultyMode === DifficultyMode.SIMPLE ? t.simpleModeInfo : t.creativeModeInfo}
+              </Text>
             </View>
 
             <View style={styles.settingsDivider} />
@@ -717,7 +638,7 @@ const styles = StyleSheet.create({
     top: 60,
     right: 16,
     minWidth: 200,
-    borderRadius: 8,
+    borderRadius: 16,
     backgroundColor: '#fff',
     elevation: 8,
     shadowColor: '#000',
@@ -777,6 +698,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textTransform: 'uppercase',
   },
+  settingsModeInfo: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 6,
+    fontStyle: 'italic',
+  },
   themeToggle: {
     flexDirection: 'row',
     gap: 8,
@@ -785,7 +712,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 6,
     paddingHorizontal: 8,
-    borderRadius: 6,
+    borderRadius: 12,
     backgroundColor: '#f5f5f5',
     alignItems: 'center',
   },
@@ -821,7 +748,7 @@ const styles = StyleSheet.create({
     minWidth: '45%',
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 6,
+    borderRadius: 12,
     backgroundColor: '#f5f5f5',
     alignItems: 'center',
   },
@@ -840,9 +767,15 @@ const styles = StyleSheet.create({
   questionCard: {
     flex: 1,
     width: '100%',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 20,
+    padding: 24,
     alignItems: 'center',
+    // Multi-layer shadow for depth
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
   },
   questionRow: {
     flexDirection: 'row',
@@ -857,7 +790,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 60,
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -884,7 +817,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 60,
     backgroundColor: '#E0E0E0',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
@@ -901,7 +834,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 60,
     backgroundColor: '#03DAC6',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
@@ -924,7 +857,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 60,
     backgroundColor: '#E0E0E0',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -954,7 +887,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 60,
     backgroundColor: '#03DAC6',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
@@ -979,7 +912,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 60,
     backgroundColor: '#E0E0E0',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
@@ -1014,10 +947,15 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 24,
+    borderRadius: 20,
+    padding: 32,
     alignItems: 'center',
     minWidth: 280,
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
   },
   modalTitle: {
     fontSize: 24,
@@ -1033,7 +971,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#6200EE',
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   restartButtonText: {
     color: '#fff',

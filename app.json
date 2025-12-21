@@ -3,8 +3,8 @@
     "name": "1x1 Trainer",
     "slug": "1x1-trainer",
     "version": "1.0.10",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "orientation": "default",
+    "icon": "./icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {

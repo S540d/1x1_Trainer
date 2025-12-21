@@ -20,6 +20,11 @@ export enum AnswerMode {
   NUMBER_SEQUENCE = 'NUMBER_SEQUENCE',
 }
 
+export enum DifficultyMode {
+  SIMPLE = 'SIMPLE',
+  CREATIVE = 'CREATIVE',
+}
+
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type Language = 'en' | 'de';
 
@@ -33,6 +38,7 @@ export interface GameState {
   gameMode: GameMode;
   operation: Operation;
   answerMode: AnswerMode;
+  difficultyMode: DifficultyMode;
   questionPart: number; // 0: num1, 1: num2, 2: result
   showResult: boolean;
   lastAnswerCorrect: boolean | null;

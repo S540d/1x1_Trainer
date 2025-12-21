@@ -4,7 +4,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { GameMode, Operation, AnswerMode, GameState } from '../types/game';
+import { GameMode, Operation, AnswerMode, DifficultyMode, GameState } from '../types/game';
 import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER } from '../utils/constants';
 
 interface UseGameLogicProps {
@@ -30,6 +30,7 @@ export function useGameLogic({
     gameMode: GameMode.NORMAL,
     operation: initialOperation,
     answerMode: AnswerMode.INPUT,
+    difficultyMode: DifficultyMode.SIMPLE,
     questionPart: 2,
     showResult: false,
     lastAnswerCorrect: null,
@@ -227,6 +228,36 @@ export function useGameLogic({
     setTimeout(() => generateQuestion(), 0);
   };
 
+  // Change difficulty mode
+  const changeDifficultyMode = (newMode: DifficultyMode) => {
+    let newGameMode: GameMode;
+    let newAnswerMode: AnswerMode;
+
+    if (newMode === DifficultyMode.SIMPLE) {
+      // Simple: Normal tasks with keypad input
+      newGameMode = GameMode.NORMAL;
+      newAnswerMode = AnswerMode.INPUT;
+    } else {
+      // Creative: Mixed tasks with random answer mode
+      newGameMode = GameMode.MIXED;
+      const answerModes = [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE, AnswerMode.NUMBER_SEQUENCE];
+      newAnswerMode = answerModes[Math.floor(Math.random() * answerModes.length)];
+    }
+
+    setGameState((prev) => ({
+      ...prev,
+      difficultyMode: newMode,
+      gameMode: newGameMode,
+      answerMode: newAnswerMode,
+      currentTask: 1,
+      score: 0,
+      showResult: false,
+      userAnswer: '',
+      selectedChoice: null,
+    }));
+    setTimeout(() => generateQuestion(newGameMode), 0);
+  };
+
   // Generate multiple choice options
   const generateMultipleChoices = () => {
     const correctAnswer = getCorrectAnswer();
@@ -324,6 +355,7 @@ export function useGameLogic({
     changeGameMode,
     changeOperation,
     changeAnswerMode,
+    changeDifficultyMode,
     handleNumberClick,
     handleChoiceClick,
     multipleChoices,
