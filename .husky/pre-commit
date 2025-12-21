@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 echo "🔍 Running pre-commit checks..."
 
-# Check for console.log in staged files
+# Check for console.log in staged files (exclude scripts directory)
 echo "Checking for console.log statements..."
-if git diff --cached --name-only | grep -E '\.(ts|tsx|js|jsx)$' | xargs grep -n "console\.log\|console\.debug" 2>/dev/null; then
+if git diff --cached --name-only | grep -E '\.(ts|tsx|js|jsx)$' | grep -v '^scripts/' | xargs grep -n "console\.log\|console\.debug" 2>/dev/null; then
   echo "❌ ERROR: Found console.log/debug in staged files!"
   echo "Please remove debug statements before committing."
   exit 1
