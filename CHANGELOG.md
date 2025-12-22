@@ -145,6 +145,6 @@ See git history for older changes.
 - **Latest Version**: 1.0.12 (includes modernized UI, difficulty mode, Creative Mode bugfix)
 - **Build Status**: ✅ Successfully built and ready for Play Store deployment
   - v1.0.11 Build artifact: https://expo.dev/artifacts/eas/9Pu5SgYYtkTsH3DdHBM2cW.aab
-  - v1.0.12 Build artifact: Pending (issue #30 bugfix)
-- **EAS Build**: https://expo.dev/accounts/devsven/projects/1x1-trainer/builds
-- **Next Steps**: Build v1.0.12 and submit to Play Store
+  - v1.0.12 Build artifact: https://expo.dev/artifacts/eas/5LYQE6yhp8ikXsi3xiU3e.aab
+- **EAS Build**: https://expo.dev/accounts/devsven/projects/1x1-trainer/builds/00aab1ea-1999-4674-b102-0c05ec1314e9
+- **Next Steps**: Submit v1.0.12 to Play Store

@@ -67,8 +67,22 @@
 2. Remove old AAB/APK build artifacts after successful Play Store deployment
 3. Keep `gh-pages` branch for GitHub Pages documentation
 
+### 2025-12-22: Issue #30 Bugfix - Creative Mode Randomization
+
+✅ **Issue #30 Fixed**
+- Fixed Creative Mode answer mode randomization per question
+- NUMBER_SEQUENCE properly restricted to result questions (questionPart === 2)
+- Version bumped to 1.0.12
+- Android versionCode: 11 → 13 (versionCode 12 for v1.0.11)
+
+✅ **v1.0.12 Build Completed**
+- EAS Build successful
+- Build artifact: https://expo.dev/artifacts/eas/5LYQE6yhp8ikXsi3xiU3e.aab
+- Build ID: 00aab1ea-1999-4674-b102-0c05ec1314e9
+- All CI/CD checks passed
+
 ## Next Steps
-- Submit v1.0.11 to Play Store
+- Submit v1.0.12 to Play Store (with Issue #30 fix)
 - Monitor Play Store approval process
 - Plan v1.1.0 feature development
 - Repository is clean and ready for continued development
