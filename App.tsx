@@ -21,6 +21,7 @@ import { useGameLogic } from './hooks/useGameLogic';
 
 export default function App() {
   const [menuVisible, setMenuVisible] = useState(false);
+  const [aboutVisible, setAboutVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
 
   // Use custom hooks
@@ -288,7 +289,7 @@ export default function App() {
 
             <View style={styles.settingsDivider} />
 
-            {/* Feedback and Support in One Row */}
+            {/* Feedback, Support and About in One Row */}
             <View style={[styles.settingsSection, styles.settingsSectionRow]}>
               <TouchableOpacity
                 style={styles.settingsMenuLinkFlex}
@@ -308,15 +309,15 @@ export default function App() {
               >
                 <Text style={styles.settingsMenuLinkText}>{t.support}</Text>
               </TouchableOpacity>
-            </View>
-
-            <View style={styles.settingsDivider} />
-
-            {/* About */}
-            <View style={styles.settingsSection}>
-              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.about}</Text>
-              <Text style={[styles.settingsAboutText, { color: colors.textSecondary }]}>{t.version} {APP_VERSION}</Text>
-              <Text style={[styles.settingsAboutText, { color: colors.textSecondary }]}>{t.license}</Text>
+              <TouchableOpacity
+                style={styles.settingsMenuLinkFlex}
+                onPress={() => {
+                  setAboutVisible(true);
+                  setMenuVisible(false);
+                }}
+              >
+                <Text style={styles.settingsMenuLinkText}>{t.about}</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </>
@@ -502,6 +503,35 @@ export default function App() {
               onPress={() => setShowMotivation(false)}
             >
               <Text style={styles.restartButtonText}>{t.motivationButton}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* About Modal */}
+      <Modal visible={aboutVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.settingsMenu }]}>
+            <View style={styles.aboutModalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>{t.about}</Text>
+              <TouchableOpacity
+                style={styles.aboutModalCloseButton}
+                onPress={() => setAboutVisible(false)}
+              >
+                <Text style={[styles.aboutModalCloseText, { color: colors.text }]}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={[styles.modalText, { color: colors.text }]}>
+              {t.version} {APP_VERSION}
+            </Text>
+            <Text style={[styles.aboutModalInfoText, { color: colors.textSecondary }]}>
+              {t.license}
+            </Text>
+            <TouchableOpacity
+              style={styles.restartButton}
+              onPress={() => setAboutVisible(false)}
+            >
+              <Text style={styles.restartButtonText}>OK</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -990,5 +1020,29 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  aboutModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  aboutModalCloseButton: {
+    padding: 8,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  aboutModalCloseText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  aboutModalInfoText: {
+    fontSize: 13,
+    fontWeight: '400',
+    marginTop: 8,
+    marginBottom: 16,
+    lineHeight: 1.5,
   },
 });
