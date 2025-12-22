@@ -37,8 +37,25 @@ jobs:
       - name: Prepare testing deployment
         run: |
           echo "🧪 Preparing Testing Environment Deployment"
+
+          # Check if dist directory exists
+          if [ ! -d "dist" ]; then
+            echo "❌ Error: dist directory not found after build"
+            echo "Available directories:"
+            ls -la
+            exit 1
+          fi
+
           mkdir -p testing-deploy
+
+          # Copy dist contents safely
+          if [ -z "$(ls -A dist)" ]; then
+            echo "❌ Error: dist directory is empty"
+            exit 1
+          fi
+
           cp -r dist/* testing-deploy/
+
           # Add testing environment marker
           sed -i 's/<body>/<body data-environment="testing">/' testing-deploy/index.html || true
           # Add base href for /testing/ subdirectory
