@@ -2,7 +2,7 @@
  * Application Constants for 1x1 Trainer
  */
 
-export const APP_VERSION = '1.0.10';
+export const APP_VERSION = '1.0.11';
 
 // Game Configuration
 export const TOTAL_TASKS = 10;

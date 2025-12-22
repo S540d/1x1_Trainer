@@ -103,10 +103,11 @@ git commit -m "Add pre-commit hooks"
 
 3. **Release:**
    ```bash
-   git tag v1.0.9
-   git push origin v1.0.9
+   git tag v1.0.11
+   git push origin v1.0.11
    npm run deploy  # für Web
-   # Upload AAB zu Play Store
+   # AAB-Artefakt zum Play Store hochladen
+   # https://expo.dev/accounts/devsven/projects/1x1-trainer/builds
    ```
 
 ---
@@ -257,11 +258,11 @@ git commit -m "feat: my feature"  # Pre-commit läuft automatisch
 
 # Build lokal testen
 npm run build:web
-./gradlew assembleRelease
+npm run build:android  # EAS Build für Android
 
 # Release Tag erstellen
-git tag v1.0.9
-git push origin v1.0.9
+git tag v1.0.11
+git push origin v1.0.11
 ```
 
 ---

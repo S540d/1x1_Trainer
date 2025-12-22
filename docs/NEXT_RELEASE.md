@@ -1,9 +1,10 @@
-# Vorbereitung für Version 1.1.0
+# Planung für Version 1.1.0
 
 ## Status
-- **Aktuelle Version im Play Store**: 1.0.9 (in Prüfung seit 2024-12-13)
-- **Entwicklungsstand**: main branch
-- **Geplante nächste Version**: 1.1.0
+- **Aktuelle Version im Play Store**: 1.0.9
+- **Aktuelle Entwicklungsversion**: 1.0.11 (released 2025-12-22, bereit für Play Store)
+- **Entwicklungsstand**: main branch mit stabilen Features
+- **Geplante nächste Version**: 1.1.0 (weitere Features geplant)
 
 ## ✅ Bereits implementierte Features (warten auf Release)
 
@@ -101,11 +102,10 @@
 
 ```bash
 # Version in allen Dateien aktualisieren:
+# - utils/constants.ts: APP_VERSION = "1.1.0"
 # - package.json: "version": "1.1.0"
 # - app.json: "expo.version": "1.1.0"
-# - app.json: "expo.android.versionCode": 11
-# - Android/app/build.gradle.kts: versionCode = 11, versionName = "1.1.0"
-# - App.tsx: APP_VERSION = "1.1.0"
+# - app.json: "expo.android.versionCode": <increment>
 ```
 
 ### 6. CHANGELOG aktualisieren
@@ -118,8 +118,10 @@
 ### 7. Release Build erstellen
 
 ```bash
-cd Android
-./gradlew assembleRelease
+# EAS Build für Android & iOS
+npm run build:android
+# oder für iOS
+npx eas build --platform ios
 ```
 
 ### 8. Release Notes für Play Store schreiben

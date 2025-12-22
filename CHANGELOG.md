@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.11] - 2025-12-22
+
+### Added
+- ✨ **Modernized UI Design** ("Soft & Modern" style)
+  - Updated theme colors for better visual cohesion
+  - Improved dark mode with warmer tones
+  - Enhanced light mode with softer contrasts
+- 🎮 **Difficulty Mode** added to Settings menu
+  - Simplified settings interface with new mode selector
+  - Allows players to adjust challenge level
+- 🔧 **Code Refactoring (Phase 2)**:
+  - Custom Hooks optimization (useGameLogic improvements)
+  - Better state management and performance
+
+### Fixed
+- 🐛 **Android Platform**:
+  - Enabled Hermes JavaScript engine for better performance
+  - Fixed orientation restrictions to support large displays
+- 🔧 **Pre-commit Hook**: Fixed xargs bug when no staged TS/JS files
+
+### Changed
+- 📱 Updated Android versionCode to 12
+
+### Build & Deployment
+- Build artifact: https://expo.dev/artifacts/eas/9Pu5SgYYtkTsH3DdHBM2cW.aab
+- React 19.1.0 confirmed as production-ready
+- Ready for App Store deployment
+
 ### Repository Maintenance
 - ✅ Merged `testing` branch into `main`
 - 🧹 Cleaned up stale branches:
@@ -104,7 +132,9 @@ See git history for older changes.
 
 ## Notes
 
-- **Current Version in Play Store**: 1.0.9
-- **Latest Version**: 1.0.10 (includes critical startup fix + major refactoring)
+- **Current Version in Play Store**: 1.0.9 (as of 2025-12-21)
+- **Latest Version**: 1.0.11 (includes modernized UI, difficulty mode, enhanced code structure)
 - **Build Status**: ✅ Successfully built and ready for Play Store deployment
+  - v1.0.11 Build artifact: https://expo.dev/artifacts/eas/9Pu5SgYYtkTsH3DdHBM2cW.aab
 - **EAS Build**: https://expo.dev/accounts/devsven/projects/1x1-trainer/builds
+- **Next Steps**: Submit v1.0.11 to Play Store

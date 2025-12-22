@@ -53,10 +53,9 @@ Lies [NEXT_RELEASE.md](NEXT_RELEASE.md) für die komplette Anleitung.
 ### 3. Version bumpen
 
 Alle Versionen müssen synchron sein:
+- `utils/constants.ts` - `APP_VERSION`
 - `package.json`
-- `app.json`
-- `App.tsx`
-- `Android/app/build.gradle.kts`
+- `app.json` - `expo.version` und `expo.android.versionCode`
 
 ### 4. Release erstellen
 
@@ -64,9 +63,10 @@ Siehe [NEXT_RELEASE.md](NEXT_RELEASE.md) Schritt 7-10.
 
 ## 🔧 Aktueller Status
 
-- **Version im Play Store**: 1.0.9 (in Prüfung)
-- **Entwicklungsstand**: main branch mit unreleased Features
-- **Nächste geplante Version**: 1.1.0
+- **Version im Play Store**: 1.0.9
+- **Aktuelle Entwicklungsversion**: 1.0.11 (bereit für Play Store)
+- **Entwicklungsstand**: main branch mit stabilen Features
+- **Nächste geplante Version**: 1.1.0 (zukünftige Features)
 - **Offene Issues**: 2 (#10 Code Refactoring, #8 Screenshots)
 
 ## 📊 Automatisierung
@@ -92,10 +92,10 @@ Das Projekt verfügt über:
 
 ## 🎯 Nächste Schritte
 
-1. ⏳ **Warten** auf Play Store Genehmigung von 1.0.9
-2. 🧪 **Testen** der unreleased Features
-3. 📝 **Entscheiden** ob Issue #10 in 1.1.0 oder später
-4. 🚀 **Vorbereiten** von Release 1.1.0
+1. 📤 **Submitten** von v1.0.11 zum Play Store
+2. ⏳ **Warten** auf Play Store Genehmigung
+3. 🧪 **Vorbereiten** von Release 1.1.0
+4. 📝 **Planen** zukünftiger Features
 
 Siehe [NEXT_RELEASE.md](NEXT_RELEASE.md) für Details.
 

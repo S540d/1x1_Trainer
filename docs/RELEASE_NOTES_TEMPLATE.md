@@ -93,9 +93,49 @@ Diese Version bringt signifikante Verbesserungen bei der Darstellung:
 
 ---
 
-## Version 1.0.9 (Aktuell im Play Store)
+## Version 1.0.11 (Aktuelle Entwicklungsversion)
 
 ### Für Play Store (Deutsch)
+
+```
+✨ Großes Update - Version 1.0.11:
+
+Neue Features:
+• Modernes, überarbeitetes Design ("Soft & Modern" Style)
+• Neuer Schwierigkeitsmodus für flexible Herausforderungen
+• Verbesserte Benutzeroberfläche mit weicheren Farben
+
+Verbesserungen:
+• Optimierter Code für bessere Leistung
+• Unterstützung für größere Bildschirme
+• Android Hermes Engine für schnellere Ausführung
+
+Genießen Sie das verbesserte Lernerlebnis!
+```
+
+### Für Play Store (Englisch)
+
+```
+✨ Major Update - Version 1.0.11:
+
+New Features:
+• Modernized, redesigned interface ("Soft & Modern" Style)
+• New difficulty mode for flexible challenges
+• Improved UI with softer color palette
+
+Improvements:
+• Optimized code for better performance
+• Support for larger screens
+• Android Hermes Engine for faster execution
+
+Enjoy the enhanced learning experience!
+```
+
+---
+
+## Version 1.0.9 (Referenz - Früheres Release)
+
+### Für Play Store (Deutsch) - Beispiel
 
 ```
 🚨 Wichtiges Update - Version 1.0.9:
@@ -109,22 +149,6 @@ Technisch:
 • Optimierte Build-Konfiguration
 
 Bitte aktualisieren Sie für ein stabiles Erlebnis!
-```
-
-### Für Play Store (Englisch)
-
-```
-🚨 Important Update - Version 1.0.9:
-
-Critical Bugfix:
-• Fixes Android crash on app launch
-• Improved platform compatibility
-
-Technical:
-• Removed problematic dependencies
-• Optimized build configuration
-
-Please update for a stable experience!
 ```
 
 ---
