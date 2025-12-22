@@ -30,6 +30,12 @@ jobs:
       - name: Fetch all branches
         run: git fetch --all
 
+      - name: Clean up submodule conflicts
+        run: |
+          echo "Cleaning up submodule modifications..."
+          git submodule deinit -f .
+          git clean -ffd
+
       - name: Sync main to testing
         run: |
           echo "Current branch: $(git branch --show-current)"
