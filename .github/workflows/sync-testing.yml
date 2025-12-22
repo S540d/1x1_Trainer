@@ -30,17 +30,12 @@ jobs:
       - name: Fetch all branches
         run: git fetch --all
 
-      - name: Clean up submodule conflicts
-        run: |
-          echo "Cleaning up submodule modifications..."
-          git submodule deinit -f .
-          git clean -ffd
-
       - name: Sync main to testing
         run: |
           echo "Current branch: $(git branch --show-current)"
           echo "Switching to testing branch..."
-          git checkout testing
+          # Use --track to avoid ambiguity with submodule files
+          git checkout --track origin/testing 2>/dev/null || git checkout testing --
 
           echo "Attempting to merge main into testing..."
           if git merge origin/main --no-edit -m "chore: Auto-sync main → testing
