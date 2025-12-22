@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.12] - 2025-12-22
+
+### Fixed
+- 🐛 **Creative Mode** (Issue #30): Fixed answer mode randomization
+  - Answer modes now randomize after each question in Creative Mode
+  - NUMBER_SEQUENCE properly restricted to result questions only (questionPart === 2)
+  - Ensures varied gameplay experience throughout Creative Mode sessions
+- 📱 Updated Android versionCode to 13
+
 ## [1.0.11] - 2025-12-22
 
 ### Added
@@ -133,8 +142,9 @@ See git history for older changes.
 ## Notes
 
 - **Current Version in Play Store**: 1.0.9 (as of 2025-12-21)
-- **Latest Version**: 1.0.11 (includes modernized UI, difficulty mode, enhanced code structure)
+- **Latest Version**: 1.0.12 (includes modernized UI, difficulty mode, Creative Mode bugfix)
 - **Build Status**: ✅ Successfully built and ready for Play Store deployment
   - v1.0.11 Build artifact: https://expo.dev/artifacts/eas/9Pu5SgYYtkTsH3DdHBM2cW.aab
+  - v1.0.12 Build artifact: Pending (issue #30 bugfix)
 - **EAS Build**: https://expo.dev/accounts/devsven/projects/1x1-trainer/builds
-- **Next Steps**: Submit v1.0.11 to Play Store
+- **Next Steps**: Build v1.0.12 and submit to Play Store

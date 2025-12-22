@@ -77,12 +77,24 @@ export function useGameLogic({
         break;
     }
 
+    // In CREATIVE mode (which uses MIXED), randomize answer mode each question
+    // NUMBER_SEQUENCE only available when asking for result (questionPart === 2)
+    let newAnswerMode = gameState.answerMode;
+    if (gameState.difficultyMode === DifficultyMode.CREATIVE) {
+      const availableModes =
+        newQuestionPart === 2
+          ? [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE, AnswerMode.NUMBER_SEQUENCE]
+          : [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE];
+      newAnswerMode = availableModes[Math.floor(Math.random() * availableModes.length)];
+    }
+
     setGameState((prev) => ({
       ...prev,
       num1: newNum1,
       num2: newNum2,
       userAnswer: '',
       questionPart: newQuestionPart,
+      answerMode: newAnswerMode,
       lastAnswerCorrect: null,
       isAnswerChecked: false,
       selectedChoice: null,
