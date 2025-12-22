@@ -82,7 +82,7 @@ export default function App() {
           style={styles.settingsButton}
           aria-label="Settings"
         >
-          <Text style={styles.settingsButtonText}>⋮</Text>
+          <Text style={[styles.settingsButtonText, { color: colors.text }]}>⋮</Text>
         </TouchableOpacity>
       </View>
 
@@ -95,15 +95,15 @@ export default function App() {
             onPress={() => setMenuVisible(false)}
           />
           <View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu }]}>
-            <TouchableOpacity
-              style={styles.settingsMenuCloseButton}
-              onPress={() => setMenuVisible(false)}
-            >
-              <Text style={[styles.settingsMenuCloseButtonText, { color: colors.text }]}>✕</Text>
-            </TouchableOpacity>
-
-            {/* App Name */}
-            <Text style={[styles.appName, { color: colors.text }]}>1x1 Trainer</Text>
+            <View style={[styles.settingsMenuHeader, { borderBottomColor: colors.border }]}>
+              <Text style={[styles.settingsMenuTitle, { color: colors.text }]}>Settings</Text>
+              <TouchableOpacity
+                style={styles.settingsMenuCloseButton}
+                onPress={() => setMenuVisible(false)}
+              >
+                <Text style={[styles.settingsMenuCloseButtonText, { color: colors.text }]}>✕</Text>
+              </TouchableOpacity>
+            </View>
 
             {/* Appearance Settings - Light/Dark/System */}
             <View style={styles.settingsSection}>
@@ -647,6 +647,19 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     zIndex: 1000,
     overflow: 'hidden',
+  },
+  settingsMenuHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+  },
+  settingsMenuTitle: {
+    fontSize: 18,
+    fontWeight: '600',
   },
   settingsMenuCloseButton: {
     padding: 12,
