@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- 🐛 **Creative Mode - NUMBER_SEQUENCE Layout** (Issue #31): Fixed number buttons overflow
+  - ScrollView properly allocates space with `flex: 1` to expand and scroll when needed
+  - Check button preserves fixed height (60px) with `flexShrink: 0` to prevent compression
+  - Explicit `flexDirection: 'column'` on container ensures correct flex layout behavior
+  - When many number buttons exceed available space, ScrollView scrolls while check button remains accessible
+  - Resolves off-screen check button when number sequence is too long
+
 ## [1.0.12] - 2025-12-22
 
 ### Fixed
