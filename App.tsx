@@ -934,6 +934,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
+    flexShrink: 0,
   },
   checkButtonDisabled: {
     backgroundColor: '#B0BEC5',
@@ -946,6 +947,7 @@ const styles = StyleSheet.create({
   sequenceContainer: {
     width: '100%',
     flex: 1,
+    flexDirection: 'column',
   },
   sequenceScroll: {
     flex: 1,
