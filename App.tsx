@@ -948,7 +948,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sequenceScroll: {
-    flex: 1,
     marginBottom: 12,
   },
   sequenceButton: {
