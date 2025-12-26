@@ -2,7 +2,7 @@
   "expo": {
     "name": "1x1 Trainer",
     "slug": "1x1-trainer",
-    "version": "1.0.13",
+    "version": "1.0.12",
     "orientation": "default",
     "icon": "./icon.png",
     "userInterfaceStyle": "light",
