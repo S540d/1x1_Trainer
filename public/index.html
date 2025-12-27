@@ -11,9 +11,9 @@
     <meta name="description" content="Practice multiplication tables with different game modes" />
     <meta name="keywords" content="1x1, multiplication, trainer, math, learning, PWA, education" />
     <meta name="author" content="S540d" />
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" type="image/png" href="/icon-192.png" />
-    <link rel="apple-touch-icon" href="/icon-180.png" />
+    <link rel="manifest" href="/1x1_Trainer/manifest.json" />
+    <link rel="icon" type="image/png" href="/1x1_Trainer/icon-192.png" />
+    <link rel="apple-touch-icon" href="/1x1_Trainer/icon-180.png" />
     <meta name="theme-color" content="#6200EE" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -50,11 +50,11 @@
         window.addEventListener('load', () => {
           navigator.serviceWorker
             .register('/1x1_Trainer/service-worker.js', { scope: '/1x1_Trainer/' })
-            .then((registration) => {
-              console.log('SW registered: ', registration);
+            .then(() => {
+              // Service worker registered successfully
             })
-            .catch((registrationError) => {
-              console.log('SW registration failed: ', registrationError);
+            .catch(() => {
+              // Service worker registration failed
             });
         });
       }
