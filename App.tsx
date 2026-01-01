@@ -40,7 +40,7 @@ export default function App() {
   // Set body background color dynamically on web
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.body.style.backgroundColor = isDarkMode ? '#0A0A0A' : '#FAFAFA';
+      document.body.style.backgroundColor = isDarkMode ? '#0F1419' : '#F8FAFC';
     }
   }, [isDarkMode]);
 
