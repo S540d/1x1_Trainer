@@ -17,32 +17,33 @@ export const STORAGE_KEYS = {
   TOTAL_TASKS: 'app-total-tasks',
 } as const;
 
-// Theme Colors - "Soft & Modern" Design System
+// Theme Colors - "Modern Professional" Design System
+// Inspired by contemporary design trends with clean, sophisticated tones
 export const THEME_COLORS = {
   DARK: {
-    BACKGROUND: '#0A0A0A', // Warmes Dunkelgrau statt pures Schwarz
-    TEXT: '#F5F5F5', // Helleres Text für bessere Lesbarkeit
-    TEXT_SECONDARY: '#B0B0B0',
-    BORDER: '#404040', // Weichere Border-Farbe
-    CARD: '#1A1A1A', // Wärmerer Ton
-    CARD_CORRECT: '#2E7D32', // Satter Grün-Ton
-    CARD_INCORRECT: '#C62828', // Satter Rot-Ton
-    BUTTON_INACTIVE: '#252525', // Wärmerer Ton
-    BUTTON_INACTIVE_TEXT: '#B0B0B0',
-    SETTINGS_OVERLAY: 'rgba(0,0,0,0.7)',
-    SETTINGS_MENU: '#1A1A1A',
+    BACKGROUND: '#0F1419', // Deep slate gray with cool undertone
+    TEXT: '#E8EAED', // Crisp white with subtle warmth
+    TEXT_SECONDARY: '#9AA0A6',
+    BORDER: '#2D3748', // Modern slate border
+    CARD: '#1A202C', // Rich charcoal
+    CARD_CORRECT: '#10B981', // Modern emerald green
+    CARD_INCORRECT: '#EF4444', // Contemporary red
+    BUTTON_INACTIVE: '#1E293B', // Slate gray
+    BUTTON_INACTIVE_TEXT: '#94A3B8',
+    SETTINGS_OVERLAY: 'rgba(15,20,25,0.8)',
+    SETTINGS_MENU: '#1A202C',
   },
   LIGHT: {
-    BACKGROUND: '#FAFAFA', // Cremeweiß statt pures Weiß
-    TEXT: '#1A1A1A', // Weicheres Schwarz
-    TEXT_SECONDARY: '#666',
-    BORDER: '#E0E0E0',
-    CARD: '#EFEFEF', // Weicherer Kontrast
-    CARD_CORRECT: '#C8E6C9',
-    CARD_INCORRECT: '#FFCDD2',
-    BUTTON_INACTIVE: '#EFEFEF', // Weicherer Kontrast
-    BUTTON_INACTIVE_TEXT: '#1A1A1A',
-    SETTINGS_OVERLAY: 'rgba(0,0,0,0.5)',
-    SETTINGS_MENU: '#FAFAFA',
+    BACKGROUND: '#F8FAFC', // Clean, crisp off-white
+    TEXT: '#0F172A', // Deep professional navy
+    TEXT_SECONDARY: '#475569',
+    BORDER: '#CBD5E1',
+    CARD: '#FFFFFF', // Pure white cards for clean look
+    CARD_CORRECT: '#D1FAE5', // Soft mint green
+    CARD_INCORRECT: '#FEE2E2', // Soft coral red
+    BUTTON_INACTIVE: '#F1F5F9', // Light slate
+    BUTTON_INACTIVE_TEXT: '#475569',
+    SETTINGS_OVERLAY: 'rgba(15,23,42,0.6)',
+    SETTINGS_MENU: '#FFFFFF',
   },
 } as const;
