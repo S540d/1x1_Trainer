@@ -521,7 +521,7 @@ export default function App() {
                 <Text style={[styles.aboutModalCloseText, { color: colors.text }]}>✕</Text>
               </TouchableOpacity>
             </View>
-            <Text style={[styles.modalText, { color: colors.text }]}>
+            <Text style={[styles.aboutModalInfoText, { color: colors.text }]}>
               {t.version} {APP_VERSION}
             </Text>
             <Text style={[styles.aboutModalInfoText, { color: colors.textSecondary }]}>
@@ -1040,7 +1040,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   aboutModalInfoText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '400',
     marginTop: 8,
     marginBottom: 16,
