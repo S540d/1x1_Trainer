@@ -940,17 +940,14 @@ const styles = StyleSheet.create({
   choiceButtonSelected: {
     backgroundColor: '#E3F2FD',
     borderColor: '#2196F3',
-    borderWidth: 2,
   },
   choiceButtonCorrect: {
     backgroundColor: '#E8F5E9',
     borderColor: '#4CAF50',
-    borderWidth: 2,
   },
   choiceButtonIncorrect: {
     backgroundColor: '#FFEBEE',
     borderColor: '#F44336',
-    borderWidth: 2,
   },
   choiceButtonText: {
     fontSize: 24,
@@ -999,17 +996,14 @@ const styles = StyleSheet.create({
   sequenceButtonSelected: {
     backgroundColor: '#E3F2FD',
     borderColor: '#2196F3',
-    borderWidth: 2,
   },
   sequenceButtonCorrect: {
     backgroundColor: '#E8F5E9',
     borderColor: '#4CAF50',
-    borderWidth: 2,
   },
   sequenceButtonIncorrect: {
     backgroundColor: '#FFEBEE',
     borderColor: '#F44336',
-    borderWidth: 2,
   },
   sequenceButtonText: {
     fontSize: 24,
