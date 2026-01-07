@@ -345,6 +345,11 @@ export function useGameLogic({
       for (let i = 1; i <= 10; i++) {
         sequence.push(base * i);
       }
+    } else {
+      // Fallback to multiplication for any unexpected operation type
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base * i);
+      }
     }
 
     return sequence;
