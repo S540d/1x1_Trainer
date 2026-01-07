@@ -12,7 +12,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 
 // Local imports
-import { Operation, AnswerMode, DifficultyMode } from './types/game';
+import { Operation, AnswerMode, DifficultyMode, ThemeColors } from './types/game';
 import { translations } from './i18n/translations';
 import { APP_VERSION } from './utils/constants';
 import { useTheme } from './hooks/useTheme';
@@ -113,6 +113,7 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
+                    { borderColor: colors.border },
                     theme.themeMode === 'light' && styles.themeButtonActive,
                   ]}
                   onPress={() => preferences.setThemeMode('light')}
@@ -120,6 +121,7 @@ export default function App() {
                   <Text
                     style={[
                       styles.themeButtonText,
+                      { color: colors.text },
                       theme.themeMode === 'light' && styles.themeButtonTextActive,
                     ]}
                   >
@@ -129,6 +131,7 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
+                    { borderColor: colors.border },
                     theme.themeMode === 'dark' && styles.themeButtonActive,
                   ]}
                   onPress={() => preferences.setThemeMode('dark')}
@@ -136,6 +139,7 @@ export default function App() {
                   <Text
                     style={[
                       styles.themeButtonText,
+                      { color: colors.text },
                       theme.themeMode === 'dark' && styles.themeButtonTextActive,
                     ]}
                   >
@@ -145,6 +149,7 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
+                    { borderColor: colors.border },
                     theme.themeMode === 'system' && styles.themeButtonActive,
                   ]}
                   onPress={() => preferences.setThemeMode('system')}
@@ -152,6 +157,7 @@ export default function App() {
                   <Text
                     style={[
                       styles.themeButtonText,
+                      { color: colors.text },
                       theme.themeMode === 'system' && styles.themeButtonTextActive,
                     ]}
                   >
@@ -170,6 +176,7 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
+                    { borderColor: colors.border },
                     preferences.language === 'en' && styles.themeButtonActive,
                   ]}
                   onPress={() => preferences.setLanguage('en')}
@@ -177,6 +184,7 @@ export default function App() {
                   <Text
                     style={[
                       styles.themeButtonText,
+                      { color: colors.text },
                       preferences.language === 'en' && styles.themeButtonTextActive,
                     ]}
                   >
@@ -186,6 +194,7 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
+                    { borderColor: colors.border },
                     preferences.language === 'de' && styles.themeButtonActive,
                   ]}
                   onPress={() => preferences.setLanguage('de')}
@@ -193,6 +202,7 @@ export default function App() {
                   <Text
                     style={[
                       styles.themeButtonText,
+                      { color: colors.text },
                       preferences.language === 'de' && styles.themeButtonTextActive,
                     ]}
                   >
@@ -211,6 +221,7 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
+                    { borderColor: colors.border },
                     game.gameState.operation === Operation.ADDITION && styles.themeButtonActive,
                   ]}
                   onPress={() => game.changeOperation(Operation.ADDITION)}
@@ -218,6 +229,7 @@ export default function App() {
                   <Text
                     style={[
                       styles.themeButtonText,
+                      { color: colors.text },
                       game.gameState.operation === Operation.ADDITION && styles.themeButtonTextActive,
                     ]}
                   >
@@ -227,6 +239,7 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
+                    { borderColor: colors.border },
                     game.gameState.operation === Operation.MULTIPLICATION && styles.themeButtonActive,
                   ]}
                   onPress={() => game.changeOperation(Operation.MULTIPLICATION)}
@@ -234,6 +247,7 @@ export default function App() {
                   <Text
                     style={[
                       styles.themeButtonText,
+                      { color: colors.text },
                       game.gameState.operation === Operation.MULTIPLICATION && styles.themeButtonTextActive,
                     ]}
                   >
@@ -252,6 +266,7 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
+                    { borderColor: colors.border },
                     game.gameState.difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonActive,
                   ]}
                   onPress={() => game.changeDifficultyMode(DifficultyMode.SIMPLE)}
@@ -259,6 +274,7 @@ export default function App() {
                   <Text
                     style={[
                       styles.themeButtonText,
+                      { color: colors.text },
                       game.gameState.difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonTextActive,
                     ]}
                   >
@@ -268,6 +284,7 @@ export default function App() {
                 <TouchableOpacity
                   style={[
                     styles.themeButton,
+                    { borderColor: colors.border },
                     game.gameState.difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonActive,
                   ]}
                   onPress={() => game.changeDifficultyMode(DifficultyMode.CREATIVE)}
@@ -275,6 +292,7 @@ export default function App() {
                   <Text
                     style={[
                       styles.themeButtonText,
+                      { color: colors.text },
                       game.gameState.difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonTextActive,
                     ]}
                   >
@@ -394,6 +412,7 @@ export default function App() {
                 onCheck={game.gameState.isAnswerChecked ? game.nextQuestion : game.checkAnswer}
                 userAnswer={game.gameState.userAnswer}
                 isAnswerChecked={game.gameState.isAnswerChecked}
+                colors={colors}
               />
             )}
 
@@ -404,6 +423,7 @@ export default function App() {
                     key={index}
                     style={[
                       styles.choiceButton,
+                      { borderColor: colors.border },
                       game.gameState.selectedChoice === choice && styles.choiceButtonSelected,
                       game.gameState.isAnswerChecked && choice === game.getCorrectAnswer() && styles.choiceButtonCorrect,
                       game.gameState.isAnswerChecked && game.gameState.selectedChoice === choice && choice !== game.getCorrectAnswer() && styles.choiceButtonIncorrect,
@@ -413,6 +433,7 @@ export default function App() {
                   >
                     <Text style={[
                       styles.choiceButtonText,
+                      { color: colors.text },
                       game.gameState.selectedChoice === choice && styles.choiceButtonTextSelected,
                     ]}>
                       {choice}
@@ -442,6 +463,7 @@ export default function App() {
                       key={index}
                       style={[
                         styles.sequenceButton,
+                        { borderColor: colors.border },
                         game.gameState.selectedChoice === num && styles.sequenceButtonSelected,
                         game.gameState.isAnswerChecked && num === game.getCorrectAnswer() && styles.sequenceButtonCorrect,
                         game.gameState.isAnswerChecked && game.gameState.selectedChoice === num && num !== game.getCorrectAnswer() && styles.sequenceButtonIncorrect,
@@ -451,6 +473,7 @@ export default function App() {
                     >
                       <Text style={[
                         styles.sequenceButtonText,
+                        { color: colors.text },
                         game.gameState.selectedChoice === num && styles.sequenceButtonTextSelected,
                       ]}>
                         {num}
@@ -544,33 +567,35 @@ function Numpad({
   onNumberClick,
   onCheck,
   userAnswer,
-  isAnswerChecked
+  isAnswerChecked,
+  colors
 }: {
   onNumberClick: (num: number) => void;
   onCheck: () => void;
   userAnswer: string;
   isAnswerChecked: boolean;
+  colors: ThemeColors;
 }) {
   return (
     <View style={styles.numpad}>
       <View style={styles.numpadRow}>
-        <NumpadButton text="1" onPress={() => onNumberClick(1)} />
-        <NumpadButton text="2" onPress={() => onNumberClick(2)} />
-        <NumpadButton text="3" onPress={() => onNumberClick(3)} />
+        <NumpadButton text="1" onPress={() => onNumberClick(1)} colors={colors} />
+        <NumpadButton text="2" onPress={() => onNumberClick(2)} colors={colors} />
+        <NumpadButton text="3" onPress={() => onNumberClick(3)} colors={colors} />
       </View>
       <View style={styles.numpadRow}>
-        <NumpadButton text="4" onPress={() => onNumberClick(4)} />
-        <NumpadButton text="5" onPress={() => onNumberClick(5)} />
-        <NumpadButton text="6" onPress={() => onNumberClick(6)} />
+        <NumpadButton text="4" onPress={() => onNumberClick(4)} colors={colors} />
+        <NumpadButton text="5" onPress={() => onNumberClick(5)} colors={colors} />
+        <NumpadButton text="6" onPress={() => onNumberClick(6)} colors={colors} />
       </View>
       <View style={styles.numpadRow}>
-        <NumpadButton text="7" onPress={() => onNumberClick(7)} />
-        <NumpadButton text="8" onPress={() => onNumberClick(8)} />
-        <NumpadButton text="9" onPress={() => onNumberClick(9)} />
+        <NumpadButton text="7" onPress={() => onNumberClick(7)} colors={colors} />
+        <NumpadButton text="8" onPress={() => onNumberClick(8)} colors={colors} />
+        <NumpadButton text="9" onPress={() => onNumberClick(9)} colors={colors} />
       </View>
       <View style={styles.numpadRow}>
-        <NumpadButton text="←" onPress={() => onNumberClick(-1)} isSpecial />
-        <NumpadButton text="0" onPress={() => onNumberClick(0)} />
+        <NumpadButton text="←" onPress={() => onNumberClick(-1)} isSpecial colors={colors} />
+        <NumpadButton text="0" onPress={() => onNumberClick(0)} colors={colors} />
         <TouchableOpacity
           style={[
             styles.numpadButtonCheck,
@@ -592,17 +617,23 @@ function NumpadButton({
   text,
   onPress,
   isSpecial = false,
+  colors
 }: {
   text: string;
   onPress: () => void;
   isSpecial?: boolean;
+  colors: ThemeColors;
 }) {
   return (
     <TouchableOpacity
-      style={[styles.numpadButton, isSpecial && styles.numpadButtonSpecial]}
+      style={[
+        styles.numpadButton, 
+        { borderColor: isSpecial ? colors.textSecondary : colors.border },
+        isSpecial && styles.numpadButtonSpecial
+      ]}
       onPress={onPress}
     >
-      <Text style={styles.numpadButtonText}>{text}</Text>
+      <Text style={[styles.numpadButtonText, { color: colors.text }]}>{text}</Text>
     </TouchableOpacity>
   );
 }
@@ -668,7 +699,7 @@ const styles = StyleSheet.create({
     top: 60,
     right: 16,
     minWidth: 200,
-    borderRadius: 16,
+    borderRadius: 20,
     backgroundColor: '#fff',
     elevation: 8,
     shadowColor: '#000',
@@ -684,7 +715,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
   },
   settingsMenuTitle: {
@@ -709,14 +740,14 @@ const styles = StyleSheet.create({
   },
   settingsMenuLink: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.1)',
   },
   settingsMenuLinkFlex: {
     flex: 1,
     paddingHorizontal: 8,
-    paddingVertical: 12,
+    paddingVertical: 16,
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.1)',
@@ -728,7 +759,7 @@ const styles = StyleSheet.create({
   },
   settingsSection: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 16,
   },
   settingsSectionRow: {
     flexDirection: 'row',
@@ -744,7 +775,7 @@ const styles = StyleSheet.create({
   settingsModeInfo: {
     fontSize: 11,
     color: '#999',
-    marginTop: 6,
+    marginTop: 8,
     fontStyle: 'italic',
   },
   themeToggle: {
@@ -753,14 +784,16 @@ const styles = StyleSheet.create({
   },
   themeButton: {
     flex: 1,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    borderRadius: 12,
-    backgroundColor: '#f5f5f5',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
     alignItems: 'center',
   },
   themeButtonActive: {
     backgroundColor: '#6200EE',
+    borderColor: '#6200EE',
   },
   themeButtonText: {
     fontSize: 12,
@@ -789,14 +822,16 @@ const styles = StyleSheet.create({
   gameModeSettingsButton: {
     flex: 1,
     minWidth: '45%',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    backgroundColor: '#f5f5f5',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
     alignItems: 'center',
   },
   gameModeSettingsButtonActive: {
     backgroundColor: '#6200EE',
+    borderColor: '#6200EE',
   },
   gameModeSettingsButtonText: {
     fontSize: 12,
@@ -810,7 +845,7 @@ const styles = StyleSheet.create({
   questionCard: {
     flex: 1,
     width: '100%',
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 24,
     alignItems: 'center',
     // Multi-layer shadow for depth
@@ -833,7 +868,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 60,
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -859,15 +894,14 @@ const styles = StyleSheet.create({
   numpadButton: {
     flex: 1,
     height: 60,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 12,
+    backgroundColor: 'transparent',
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#BDBDBD',
+    borderWidth: 2,
   },
   numpadButtonSpecial: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'transparent',
   },
   numpadButtonText: {
     fontSize: 24,
@@ -877,15 +911,13 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 60,
     backgroundColor: '#03DAC6',
-    borderRadius: 12,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#00BFA5',
+    borderWidth: 0,
   },
   numpadButtonCheckDisabled: {
     backgroundColor: '#B0BEC5',
-    borderColor: '#90A4AE',
   },
   numpadButtonCheckText: {
     fontSize: 24,
@@ -899,23 +931,22 @@ const styles = StyleSheet.create({
   choiceButton: {
     width: '100%',
     height: 60,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 12,
+    backgroundColor: 'transparent',
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#BDBDBD',
   },
   choiceButtonSelected: {
-    backgroundColor: '#BBDEFB',
+    backgroundColor: '#E3F2FD',
     borderColor: '#2196F3',
   },
   choiceButtonCorrect: {
-    backgroundColor: '#C8E6C9',
+    backgroundColor: '#E8F5E9',
     borderColor: '#4CAF50',
   },
   choiceButtonIncorrect: {
-    backgroundColor: '#FFCDD2',
+    backgroundColor: '#FFEBEE',
     borderColor: '#F44336',
   },
   choiceButtonText: {
@@ -930,7 +961,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 60,
     backgroundColor: '#03DAC6',
-    borderRadius: 12,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
@@ -955,24 +986,23 @@ const styles = StyleSheet.create({
   sequenceButton: {
     width: '100%',
     height: 60,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 12,
+    backgroundColor: 'transparent',
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
     borderWidth: 2,
-    borderColor: '#BDBDBD',
   },
   sequenceButtonSelected: {
-    backgroundColor: '#BBDEFB',
+    backgroundColor: '#E3F2FD',
     borderColor: '#2196F3',
   },
   sequenceButtonCorrect: {
-    backgroundColor: '#C8E6C9',
+    backgroundColor: '#E8F5E9',
     borderColor: '#4CAF50',
   },
   sequenceButtonIncorrect: {
-    backgroundColor: '#FFCDD2',
+    backgroundColor: '#FFEBEE',
     borderColor: '#F44336',
   },
   sequenceButtonText: {
@@ -991,7 +1021,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#fff',
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 32,
     alignItems: 'center',
     minWidth: 280,
@@ -1013,9 +1043,9 @@ const styles = StyleSheet.create({
   },
   restartButton: {
     backgroundColor: '#6200EE',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 28,
   },
   restartButtonText: {
     color: '#fff',
