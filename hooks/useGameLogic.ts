@@ -339,7 +339,7 @@ export function useGameLogic({
       for (let i = 1; i <= 10; i++) {
         sequence.push(base + i);
       }
-    } else {
+    } else if (gameState.operation === Operation.MULTIPLICATION) {
       // For multiplication, generate: base×1, base×2, base×3, ..., base×10
       // Since num2 ∈ [1,10], correct answer (base×num2) will always be in sequence
       for (let i = 1; i <= 10; i++) {
