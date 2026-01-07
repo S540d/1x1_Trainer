@@ -330,9 +330,17 @@ export function useGameLogic({
       base = gameState.num1;
     }
 
-    // Generate sequence: base, 2*base, 3*base, ...
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base * i);
+    // Generate sequence based on operation type
+    if (gameState.operation === Operation.ADDITION) {
+      // For addition, generate: base+1, base+2, base+3, ..., base+10
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base + i);
+      }
+    } else {
+      // For multiplication, generate: base×1, base×2, base×3, ..., base×10
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base * i);
+      }
     }
 
     return sequence;
