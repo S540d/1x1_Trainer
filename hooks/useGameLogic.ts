@@ -317,7 +317,8 @@ export function useGameLogic({
 
   // Generate number sequence
   // Note: NUMBER_SEQUENCE is only used when questionPart === 2 (asking for result)
-  // This ensures the correct answer is always in the generated sequence
+  // This is enforced in generateQuestion() lines 85-87. The base calculation handles
+  // all questionPart values defensively, but only questionPart===2 will call this function.
   const generateNumberSequence = () => {
     const sequence: number[] = [];
 
@@ -339,14 +340,9 @@ export function useGameLogic({
       for (let i = 1; i <= 10; i++) {
         sequence.push(base + i);
       }
-    } else if (gameState.operation === Operation.MULTIPLICATION) {
-      // For multiplication, generate: base×1, base×2, base×3, ..., base×10
-      // Since num2 ∈ [1,10], correct answer (base×num2) will always be in sequence
-      for (let i = 1; i <= 10; i++) {
-        sequence.push(base * i);
-      }
     } else {
-      // Fallback to multiplication for any unexpected operation type
+      // For multiplication (or fallback), generate: base×1, base×2, base×3, ..., base×10
+      // Since num2 ∈ [1,10], correct answer (base×num2) will always be in sequence
       for (let i = 1; i <= 10; i++) {
         sequence.push(base * i);
       }
