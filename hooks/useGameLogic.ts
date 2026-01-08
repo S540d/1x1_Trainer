@@ -316,6 +316,9 @@ export function useGameLogic({
   };
 
   // Generate number sequence
+  // Note: NUMBER_SEQUENCE is only used when questionPart === 2 (asking for result)
+  // This is enforced in generateQuestion() lines 85-87. The base calculation handles
+  // all questionPart values defensively, but only questionPart===2 will call this function.
   const generateNumberSequence = () => {
     const sequence: number[] = [];
 
@@ -330,9 +333,19 @@ export function useGameLogic({
       base = gameState.num1;
     }
 
-    // Generate sequence: base, 2*base, 3*base, ...
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base * i);
+    // Generate sequence based on operation type
+    if (gameState.operation === Operation.ADDITION) {
+      // For addition, generate: base+1, base+2, base+3, ..., base+10
+      // Since num2 ∈ [1,10], correct answer (base+num2) will always be in sequence
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base + i);
+      }
+    } else {
+      // For multiplication (or fallback), generate: base×1, base×2, base×3, ..., base×10
+      // Since num2 ∈ [1,10], correct answer (base×num2) will always be in sequence
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base * i);
+      }
     }
 
     return sequence;
