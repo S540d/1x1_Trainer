@@ -11,7 +11,7 @@ interface UseGameLogicProps {
   initialOperation: Operation;
   initialTotalSolvedTasks: number;
   onTotalSolvedTasksChange: (total: number) => void;
-  onMotivationShow: () => void;
+  onMotivationShow: (score: number) => void;
 }
 
 export function useGameLogic({
@@ -169,25 +169,37 @@ export function useGameLogic({
 
   // Next question
   const nextQuestion = () => {
-    if (gameState.currentTask < gameState.totalTasks) {
-      const newTotalSolvedTasks = gameState.totalSolvedTasks + 1;
-      setGameState((prev) => ({
-        ...prev,
-        currentTask: prev.currentTask + 1,
-        totalSolvedTasks: newTotalSolvedTasks,
-      }));
-
-      // Notify parent about total tasks change
-      onTotalSolvedTasksChange(newTotalSolvedTasks);
-
+    const isLastTask = gameState.currentTask === gameState.totalTasks;
+    const newTotalSolvedTasks = gameState.totalSolvedTasks + 1;
+    
+    setGameState((prev) => {
       // Show motivation message after every 10 tasks
       if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
-        onMotivationShow();
+        onMotivationShow(prev.score);
       }
+      
+      if (isLastTask) {
+        // Last task - show results
+        return { 
+          ...prev, 
+          showResult: true,
+          totalSolvedTasks: newTotalSolvedTasks,
+        };
+      } else {
+        // Continue to next task
+        return {
+          ...prev,
+          currentTask: prev.currentTask + 1,
+          totalSolvedTasks: newTotalSolvedTasks,
+        };
+      }
+    });
 
+    // Notify parent about total tasks change
+    onTotalSolvedTasksChange(newTotalSolvedTasks);
+
+    if (!isLastTask) {
       setTimeout(() => generateQuestion(), 0);
-    } else {
-      setGameState((prev) => ({ ...prev, showResult: true }));
     }
   };
 
@@ -196,6 +208,16 @@ export function useGameLogic({
     setGameState((prev) => ({
       ...prev,
       score: 0,
+      currentTask: 1,
+      showResult: false,
+    }));
+    setTimeout(() => generateQuestion(), 0);
+  };
+
+  // Continue game (keep score, reset to task 1)
+  const continueGame = () => {
+    setGameState((prev) => ({
+      ...prev,
       currentTask: 1,
       showResult: false,
     }));
@@ -377,6 +399,7 @@ export function useGameLogic({
     checkAnswer,
     nextQuestion,
     restartGame,
+    continueGame,
     changeGameMode,
     changeOperation,
     changeAnswerMode,

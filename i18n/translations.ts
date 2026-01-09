@@ -46,6 +46,8 @@ export interface TranslationStrings {
   check: string;
   nextQuestion: string;
   playAgain: string;
+  newRound: string;
+  continueGame: string;
   // Results Modal
   great: string;
   youSolved: string;
@@ -53,6 +55,8 @@ export interface TranslationStrings {
   // Motivation Message
   motivationTitle: string;
   motivationMessage: string;
+  motivationTitleLowScore: string;
+  motivationMessageLowScore: string;
   motivationButton: string;
 }
 
@@ -98,6 +102,8 @@ export const translations: Record<Language, TranslationStrings> = {
     check: 'Check',
     nextQuestion: 'Next Question',
     playAgain: 'Play Again',
+    newRound: 'New Round',
+    continueGame: 'Continue',
     // Results Modal
     great: 'Great!',
     youSolved: 'You solved',
@@ -105,6 +111,8 @@ export const translations: Record<Language, TranslationStrings> = {
     // Motivation Message
     motivationTitle: 'Great Progress!',
     motivationMessage: 'You have already solved 10 tasks. Let\'s try another round!',
+    motivationTitleLowScore: 'Keep Going!',
+    motivationMessageLowScore: 'Don\'t give up! Practice makes perfect. Let\'s try again!',
     motivationButton: 'Continue',
   },
   de: {
@@ -148,6 +156,8 @@ export const translations: Record<Language, TranslationStrings> = {
     check: 'Prüfen',
     nextQuestion: 'Nächste Frage',
     playAgain: 'Nochmal spielen',
+    newRound: 'Neue Runde',
+    continueGame: 'Fortsetzen',
     // Results Modal
     great: 'Super!',
     youSolved: 'Du hast',
@@ -155,6 +165,8 @@ export const translations: Record<Language, TranslationStrings> = {
     // Motivation Message
     motivationTitle: 'Toll gemacht!',
     motivationMessage: 'Du hast schon 10 Aufgaben gerechnet. Lass uns noch eine Runde versuchen!',
+    motivationTitleLowScore: 'Weiter so!',
+    motivationMessageLowScore: 'Nicht aufgeben! Übung macht den Meister. Versuchen wir es nochmal!',
     motivationButton: 'Weiter',
   },
 };

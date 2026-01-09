@@ -23,6 +23,7 @@ export default function App() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
+  const [motivationScore, setMotivationScore] = useState(0);
 
   // Use custom hooks
   const preferences = usePreferences();
@@ -31,7 +32,10 @@ export default function App() {
     initialOperation: preferences.operation,
     initialTotalSolvedTasks: preferences.totalSolvedTasks,
     onTotalSolvedTasksChange: preferences.setTotalSolvedTasks,
-    onMotivationShow: () => setShowMotivation(true),
+    onMotivationShow: (score: number) => {
+      setMotivationScore(score);
+      setShowMotivation(true);
+    },
   });
 
   const t = translations[preferences.language];
@@ -40,7 +44,7 @@ export default function App() {
   // Set body background color dynamically on web
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.body.style.backgroundColor = isDarkMode ? '#0A0A0A' : '#FAFAFA';
+      document.body.style.backgroundColor = isDarkMode ? '#0F1419' : '#F8FAFC';
     }
   }, [isDarkMode]);
 
@@ -506,9 +510,14 @@ export default function App() {
             <Text style={[styles.modalText, { color: colors.text }]}>
               {t.youSolved} {game.gameState.score} {t.of} {game.gameState.totalTasks} {t.tasksCorrectly}.
             </Text>
-            <TouchableOpacity style={styles.restartButton} onPress={game.restartGame}>
-              <Text style={styles.restartButtonText}>{t.playAgain}</Text>
-            </TouchableOpacity>
+            <View style={styles.modalButtonRow}>
+              <TouchableOpacity style={styles.modalButton} onPress={game.restartGame}>
+                <Text style={styles.modalButtonText}>{t.newRound}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalButton} onPress={game.continueGame}>
+                <Text style={styles.modalButtonText}>{t.continueGame}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -517,9 +526,11 @@ export default function App() {
       <Modal visible={showMotivation} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.settingsMenu }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>{t.motivationTitle}</Text>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>
+              {motivationScore < 5 ? t.motivationTitleLowScore : t.motivationTitle}
+            </Text>
             <Text style={[styles.modalText, { color: colors.text }]}>
-              {t.motivationMessage}
+              {motivationScore < 5 ? t.motivationMessageLowScore : t.motivationMessage}
             </Text>
             <TouchableOpacity
               style={styles.restartButton}
@@ -1048,6 +1059,24 @@ const styles = StyleSheet.create({
     borderRadius: 28,
   },
   restartButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalButtonRow: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  modalButton: {
+    flex: 1,
+    backgroundColor: '#6200EE',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  modalButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
