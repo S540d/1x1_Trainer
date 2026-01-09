@@ -46,6 +46,8 @@ export interface TranslationStrings {
   check: string;
   nextQuestion: string;
   playAgain: string;
+  newRound: string;
+  continueGame: string;
   // Results Modal
   great: string;
   youSolved: string;
@@ -98,6 +100,8 @@ export const translations: Record<Language, TranslationStrings> = {
     check: 'Check',
     nextQuestion: 'Next Question',
     playAgain: 'Play Again',
+    newRound: 'New Round',
+    continueGame: 'Continue',
     // Results Modal
     great: 'Great!',
     youSolved: 'You solved',
@@ -148,6 +152,8 @@ export const translations: Record<Language, TranslationStrings> = {
     check: 'Prüfen',
     nextQuestion: 'Nächste Frage',
     playAgain: 'Nochmal spielen',
+    newRound: 'Neue Runde',
+    continueGame: 'Fortsetzen',
     // Results Modal
     great: 'Super!',
     youSolved: 'Du hast',
