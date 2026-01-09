@@ -170,9 +170,11 @@ export function useGameLogic({
   // Next question
   const nextQuestion = () => {
     const isLastTask = gameState.currentTask >= gameState.totalTasks;
+    let updatedTotalSolvedTasks = 0;
     
     setGameState((prev) => {
       const newTotalSolvedTasks = prev.totalSolvedTasks + 1;
+      updatedTotalSolvedTasks = newTotalSolvedTasks;
       
       // Show motivation message after every 10 tasks
       if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
@@ -196,11 +198,8 @@ export function useGameLogic({
       }
     });
 
-    // Notify parent about total tasks change (using callback to get updated value)
-    setGameState((prev) => {
-      onTotalSolvedTasksChange(prev.totalSolvedTasks);
-      return prev;
-    });
+    // Notify parent about total tasks change
+    onTotalSolvedTasksChange(updatedTotalSolvedTasks);
 
     if (!isLastTask) {
       setTimeout(() => generateQuestion(), 0);
