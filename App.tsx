@@ -23,6 +23,7 @@ export default function App() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
+  const [motivationScore, setMotivationScore] = useState(0);
 
   // Use custom hooks
   const preferences = usePreferences();
@@ -31,7 +32,10 @@ export default function App() {
     initialOperation: preferences.operation,
     initialTotalSolvedTasks: preferences.totalSolvedTasks,
     onTotalSolvedTasksChange: preferences.setTotalSolvedTasks,
-    onMotivationShow: () => setShowMotivation(true),
+    onMotivationShow: (score: number) => {
+      setMotivationScore(score);
+      setShowMotivation(true);
+    },
   });
 
   const t = translations[preferences.language];
@@ -494,9 +498,11 @@ export default function App() {
       <Modal visible={showMotivation} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.settingsMenu }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>{t.motivationTitle}</Text>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>
+              {motivationScore < 5 ? t.motivationTitleLowScore : t.motivationTitle}
+            </Text>
             <Text style={[styles.modalText, { color: colors.text }]}>
-              {t.motivationMessage}
+              {motivationScore < 5 ? t.motivationMessageLowScore : t.motivationMessage}
             </Text>
             <TouchableOpacity
               style={styles.restartButton}

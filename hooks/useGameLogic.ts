@@ -11,7 +11,7 @@ interface UseGameLogicProps {
   initialOperation: Operation;
   initialTotalSolvedTasks: number;
   onTotalSolvedTasksChange: (total: number) => void;
-  onMotivationShow: () => void;
+  onMotivationShow: (score: number) => void;
 }
 
 export function useGameLogic({
@@ -171,23 +171,41 @@ export function useGameLogic({
   const nextQuestion = () => {
     if (gameState.currentTask < gameState.totalTasks) {
       const newTotalSolvedTasks = gameState.totalSolvedTasks + 1;
-      setGameState((prev) => ({
-        ...prev,
-        currentTask: prev.currentTask + 1,
-        totalSolvedTasks: newTotalSolvedTasks,
-      }));
+      setGameState((prev) => {
+        // Show motivation message after every 10 tasks
+        if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
+          onMotivationShow(prev.score);
+        }
+        
+        return {
+          ...prev,
+          currentTask: prev.currentTask + 1,
+          totalSolvedTasks: newTotalSolvedTasks,
+        };
+      });
 
       // Notify parent about total tasks change
       onTotalSolvedTasksChange(newTotalSolvedTasks);
 
-      // Show motivation message after every 10 tasks
-      if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
-        onMotivationShow();
-      }
-
       setTimeout(() => generateQuestion(), 0);
     } else {
-      setGameState((prev) => ({ ...prev, showResult: true }));
+      // Last task - check for motivation before showing results
+      const newTotalSolvedTasks = gameState.totalSolvedTasks + 1;
+      setGameState((prev) => {
+        // Show motivation message after every 10 tasks
+        if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
+          onMotivationShow(prev.score);
+        }
+        
+        return { 
+          ...prev, 
+          showResult: true,
+          totalSolvedTasks: newTotalSolvedTasks,
+        };
+      });
+
+      // Notify parent about total tasks change
+      onTotalSolvedTasksChange(newTotalSolvedTasks);
     }
   };
 
