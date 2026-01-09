@@ -214,6 +214,16 @@ export function useGameLogic({
     setTimeout(() => generateQuestion(), 0);
   };
 
+  // Continue game (keep score, reset to task 1)
+  const continueGame = () => {
+    setGameState((prev) => ({
+      ...prev,
+      currentTask: 1,
+      showResult: false,
+    }));
+    setTimeout(() => generateQuestion(), 0);
+  };
+
   // Change game mode
   const changeGameMode = (newMode: GameMode) => {
     setGameState((prev) => ({
@@ -376,6 +386,7 @@ export function useGameLogic({
     checkAnswer,
     nextQuestion,
     restartGame,
+    continueGame,
     changeGameMode,
     changeOperation,
     changeAnswerMode,

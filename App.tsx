@@ -487,9 +487,14 @@ export default function App() {
             <Text style={[styles.modalText, { color: colors.text }]}>
               {t.youSolved} {game.gameState.score} {t.of} {game.gameState.totalTasks} {t.tasksCorrectly}.
             </Text>
-            <TouchableOpacity style={styles.restartButton} onPress={game.restartGame}>
-              <Text style={styles.restartButtonText}>{t.playAgain}</Text>
-            </TouchableOpacity>
+            <View style={styles.modalButtonRow}>
+              <TouchableOpacity style={styles.modalButton} onPress={game.restartGame}>
+                <Text style={styles.modalButtonText}>{t.newRound}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalButton} onPress={game.continueGame}>
+                <Text style={styles.modalButtonText}>{t.continueGame}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -1023,6 +1028,24 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   restartButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalButtonRow: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  modalButton: {
+    flex: 1,
+    backgroundColor: '#6200EE',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  modalButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
