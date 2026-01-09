@@ -169,7 +169,7 @@ export function useGameLogic({
 
   // Next question
   const nextQuestion = () => {
-    const isLastTask = gameState.currentTask >= gameState.totalTasks;
+    const isLastTask = gameState.currentTask === gameState.totalTasks;
     const newTotalSolvedTasks = gameState.totalSolvedTasks + 1;
     
     setGameState((prev) => {
