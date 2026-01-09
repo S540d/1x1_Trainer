@@ -169,43 +169,41 @@ export function useGameLogic({
 
   // Next question
   const nextQuestion = () => {
-    if (gameState.currentTask < gameState.totalTasks) {
-      const newTotalSolvedTasks = gameState.totalSolvedTasks + 1;
-      setGameState((prev) => {
-        // Show motivation message after every 10 tasks
-        if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
-          onMotivationShow(prev.score);
-        }
-        
-        return {
-          ...prev,
-          currentTask: prev.currentTask + 1,
-          totalSolvedTasks: newTotalSolvedTasks,
-        };
-      });
-
-      // Notify parent about total tasks change
-      onTotalSolvedTasksChange(newTotalSolvedTasks);
-
-      setTimeout(() => generateQuestion(), 0);
-    } else {
-      // Last task - check for motivation before showing results
-      const newTotalSolvedTasks = gameState.totalSolvedTasks + 1;
-      setGameState((prev) => {
-        // Show motivation message after every 10 tasks
-        if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
-          onMotivationShow(prev.score);
-        }
-        
+    const isLastTask = gameState.currentTask >= gameState.totalTasks;
+    
+    setGameState((prev) => {
+      const newTotalSolvedTasks = prev.totalSolvedTasks + 1;
+      
+      // Show motivation message after every 10 tasks
+      if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
+        onMotivationShow(prev.score);
+      }
+      
+      if (isLastTask) {
+        // Last task - show results
         return { 
           ...prev, 
           showResult: true,
           totalSolvedTasks: newTotalSolvedTasks,
         };
-      });
+      } else {
+        // Continue to next task
+        return {
+          ...prev,
+          currentTask: prev.currentTask + 1,
+          totalSolvedTasks: newTotalSolvedTasks,
+        };
+      }
+    });
 
-      // Notify parent about total tasks change
-      onTotalSolvedTasksChange(newTotalSolvedTasks);
+    // Notify parent about total tasks change (using callback to get updated value)
+    setGameState((prev) => {
+      onTotalSolvedTasksChange(prev.totalSolvedTasks);
+      return prev;
+    });
+
+    if (!isLastTask) {
+      setTimeout(() => generateQuestion(), 0);
     }
   };
 
