@@ -22,7 +22,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.sven4321.trainer1x1",
-      "versionCode": 13,
+      "versionCode": 14,
       "jsEngine": "hermes",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
