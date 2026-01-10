@@ -1033,7 +1033,7 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     borderRadius: 24,
-    padding: 32,
+    padding: 16,
     alignItems: 'center',
     minWidth: 280,
     elevation: 12,
@@ -1043,8 +1043,8 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
   },
   modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     marginBottom: 16,
   },
   modalText: {
@@ -1095,7 +1095,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   aboutModalCloseText: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   aboutModalInfoText: {
