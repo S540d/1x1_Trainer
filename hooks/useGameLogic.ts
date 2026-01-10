@@ -14,6 +14,52 @@ interface UseGameLogicProps {
   onMotivationShow: (score: number) => void;
 }
 
+/**
+ * Pure function to generate number sequence for NUMBER_SEQUENCE answer mode
+ * Exported for testing purposes
+ * @param num1 - First number in the operation
+ * @param num2 - Second number in the operation
+ * @param questionPart - Which part of the operation is being asked (0: num1, 1: num2, 2: result)
+ * @param operation - Type of operation (ADDITION or MULTIPLICATION)
+ * @returns Array of 10 numbers forming the sequence
+ */
+export function generateNumberSequenceForState(
+  num1: number,
+  num2: number,
+  questionPart: number,
+  operation: Operation
+): number[] {
+  const sequence: number[] = [];
+
+  // Determine the base number for the sequence
+  let base;
+  if (questionPart === 0) {
+    base = num2;
+  } else if (questionPart === 1) {
+    base = num1;
+  } else {
+    // For result, use one of the factors
+    base = num1;
+  }
+
+  // Generate sequence based on operation type
+  if (operation === Operation.ADDITION) {
+    // For addition, generate: base+1, base+2, base+3, ..., base+10
+    // Since num2 ∈ [1,10], correct answer (base+num2) will always be in sequence
+    for (let i = 1; i <= 10; i++) {
+      sequence.push(base + i);
+    }
+  } else {
+    // For multiplication (or fallback), generate: base×1, base×2, base×3, ..., base×10
+    // Since num2 ∈ [1,10], correct answer (base×num2) will always be in sequence
+    for (let i = 1; i <= 10; i++) {
+      sequence.push(base * i);
+    }
+  }
+
+  return sequence;
+}
+
 export function useGameLogic({
   initialOperation,
   initialTotalSolvedTasks,
@@ -342,35 +388,7 @@ export function useGameLogic({
   // This is enforced in generateQuestion() lines 85-87. The base calculation handles
   // all questionPart values defensively, but only questionPart===2 will call this function.
   const generateNumberSequence = () => {
-    const sequence: number[] = [];
-
-    // Determine the base number for the sequence
-    let base;
-    if (gameState.questionPart === 0) {
-      base = gameState.num2;
-    } else if (gameState.questionPart === 1) {
-      base = gameState.num1;
-    } else {
-      // For result, use one of the factors
-      base = gameState.num1;
-    }
-
-    // Generate sequence based on operation type
-    if (gameState.operation === Operation.ADDITION) {
-      // For addition, generate: base+1, base+2, base+3, ..., base+10
-      // Since num2 ∈ [1,10], correct answer (base+num2) will always be in sequence
-      for (let i = 1; i <= 10; i++) {
-        sequence.push(base + i);
-      }
-    } else {
-      // For multiplication (or fallback), generate: base×1, base×2, base×3, ..., base×10
-      // Since num2 ∈ [1,10], correct answer (base×num2) will always be in sequence
-      for (let i = 1; i <= 10; i++) {
-        sequence.push(base * i);
-      }
-    }
-
-    return sequence;
+    return generateNumberSequenceForState(gameState.num1, gameState.num2, gameState.questionPart, gameState.operation);
   };
 
   // Memoize choices and sequence
