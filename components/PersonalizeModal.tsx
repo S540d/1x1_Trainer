@@ -3,238 +3,147 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ScrollView,
   StyleSheet,
-  Modal,
 } from 'react-native';
-import { ThemeColors } from '../types/game';
+import { ThemeColors, Language, ThemeMode } from '../types/game';
 import { translations } from '../i18n/translations';
-import { Operation, DifficultyMode, Language, NumberRange } from '../types/game';
 
 interface PersonalizeModalProps {
   visible: boolean;
   onClose: () => void;
   colors: ThemeColors;
-  operation: Operation;
-  onOperationChange: (operation: Operation) => void;
-  difficultyMode: DifficultyMode;
-  onDifficultyModeChange: (mode: DifficultyMode) => void;
-  numberRange: NumberRange;
-  onNumberRangeChange: (range: NumberRange) => void;
   language: Language;
   onLanguageChange: (language: Language) => void;
+  themeMode: ThemeMode;
+  onThemeModeChange: (mode: ThemeMode) => void;
 }
 
 /**
- * Personalize Modal for game mode configuration
- * Allows users to set operation, difficulty mode, and language
- * Similar to CustomizeModal in EnergyPriceGermany
+ * Personalize Modal for personal preferences
+ * Separate modal similar to EnergyPriceGermany's CustomizeModal
+ * Contains: Language and Appearance (Theme)
  */
 export function PersonalizeModal({
   visible,
   onClose,
   colors,
-  operation,
-  onOperationChange,
-  difficultyMode,
-  onDifficultyModeChange,
-  numberRange,
-  onNumberRangeChange,
   language,
   onLanguageChange,
+  themeMode,
+  onThemeModeChange,
 }: PersonalizeModalProps) {
   const t = translations[language];
 
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <>
-        {/* Overlay */}
-        <TouchableOpacity
-          style={styles.overlay}
-          activeOpacity={1}
-          onPress={onClose}
-        />
+  if (!visible) return null;
 
-        {/* Modal Panel */}
-        <ScrollView style={[styles.menu, { backgroundColor: colors.settingsMenu }]}>
-        {/* Header with Close Button */}
-        <View style={[styles.menuHeader, { borderBottomColor: colors.border }]}>
-          <Text style={[styles.menuTitle, { color: colors.text }]}>
+  return (
+    <>
+      {/* Overlay */}
+      <TouchableOpacity
+        style={[styles.settingsOverlay, { backgroundColor: colors.settingsOverlay }]}
+        activeOpacity={1}
+        onPress={onClose}
+      />
+
+      {/* Modal Panel */}
+      <View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu }]}>
+        {/* Header */}
+        <View style={[styles.settingsMenuHeader, { borderBottomColor: colors.border }]}>
+          <Text style={[styles.settingsMenuTitle, { color: colors.text }]}>
             {t.personalize}
           </Text>
-          <TouchableOpacity onPress={onClose}>
-            <Text style={[styles.closeButton, { color: colors.text }]}>✕</Text>
+          <TouchableOpacity
+            style={styles.settingsMenuCloseButton}
+            onPress={onClose}
+          >
+            <Text style={[styles.settingsMenuCloseButtonText, { color: colors.text }]}>✕</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Operation Section */}
+        {/* Appearance Settings */}
         <View style={styles.settingsSection}>
           <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
-            {t.operation}
+            {t.appearance}
           </Text>
-          <View style={styles.buttonGroup}>
+          <View style={styles.themeToggle}>
             <TouchableOpacity
               style={[
-                styles.button,
+                styles.themeButton,
                 { borderColor: colors.border },
-                operation === Operation.ADDITION && styles.buttonActive,
+                themeMode === 'light' && styles.themeButtonActive,
               ]}
-              onPress={() => onOperationChange(Operation.ADDITION)}
+              onPress={() => onThemeModeChange('light')}
             >
               <Text
                 style={[
-                  styles.buttonText,
+                  styles.themeButtonText,
                   { color: colors.text },
-                  operation === Operation.ADDITION && styles.buttonTextActive,
+                  themeMode === 'light' && styles.themeButtonTextActive,
                 ]}
               >
-                {t.addition}
+                {t.light}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
-                styles.button,
+                styles.themeButton,
                 { borderColor: colors.border },
-                operation === Operation.MULTIPLICATION && styles.buttonActive,
+                themeMode === 'dark' && styles.themeButtonActive,
               ]}
-              onPress={() => onOperationChange(Operation.MULTIPLICATION)}
+              onPress={() => onThemeModeChange('dark')}
             >
               <Text
                 style={[
-                  styles.buttonText,
+                  styles.themeButtonText,
                   { color: colors.text },
-                  operation === Operation.MULTIPLICATION && styles.buttonTextActive,
+                  themeMode === 'dark' && styles.themeButtonTextActive,
                 ]}
               >
-                {t.multiplication}
+                {t.dark}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.themeButton,
+                { borderColor: colors.border },
+                themeMode === 'system' && styles.themeButtonActive,
+              ]}
+              onPress={() => onThemeModeChange('system')}
+            >
+              <Text
+                style={[
+                  styles.themeButtonText,
+                  { color: colors.text },
+                  themeMode === 'system' && styles.themeButtonTextActive,
+                ]}
+              >
+                {t.system}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        <View style={[styles.separator, { backgroundColor: colors.border }]} />
+        <View style={styles.settingsDivider} />
 
-        {/* Difficulty Mode Section */}
-        <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
-            {t.difficultyMode}
-          </Text>
-          <View style={styles.buttonGroup}>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                { borderColor: colors.border },
-                difficultyMode === DifficultyMode.SIMPLE && styles.buttonActive,
-              ]}
-              onPress={() => onDifficultyModeChange(DifficultyMode.SIMPLE)}
-            >
-              <Text
-                style={[
-                  styles.buttonText,
-                  { color: colors.text },
-                  difficultyMode === DifficultyMode.SIMPLE && styles.buttonTextActive,
-                ]}
-              >
-                {t.simpleMode}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                { borderColor: colors.border },
-                difficultyMode === DifficultyMode.CREATIVE && styles.buttonActive,
-              ]}
-              onPress={() => onDifficultyModeChange(DifficultyMode.CREATIVE)}
-            >
-              <Text
-                style={[
-                  styles.buttonText,
-                  { color: colors.text },
-                  difficultyMode === DifficultyMode.CREATIVE && styles.buttonTextActive,
-                ]}
-              >
-                {t.creativeMode}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <Text style={[styles.modeInfo, { color: colors.textSecondary }]}>
-            {difficultyMode === DifficultyMode.SIMPLE ? t.simpleModeInfo : t.creativeModeInfo}
-          </Text>
-        </View>
-
-        <View style={[styles.separator, { backgroundColor: colors.border }]} />
-
-        {/* Number Range Section */}
-        <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
-            {t.numberRange}
-          </Text>
-          <View style={styles.buttonGroup}>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                { borderColor: colors.border },
-                numberRange === NumberRange.SMALL && styles.buttonActive,
-              ]}
-              onPress={() => onNumberRangeChange(NumberRange.SMALL)}
-            >
-              <Text
-                style={[
-                  styles.buttonText,
-                  { color: colors.text },
-                  numberRange === NumberRange.SMALL && styles.buttonTextActive,
-                ]}
-              >
-                {t.upTo20}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                { borderColor: colors.border },
-                numberRange === NumberRange.LARGE && styles.buttonActive,
-              ]}
-              onPress={() => onNumberRangeChange(NumberRange.LARGE)}
-            >
-              <Text
-                style={[
-                  styles.buttonText,
-                  { color: colors.text },
-                  numberRange === NumberRange.LARGE && styles.buttonTextActive,
-                ]}
-              >
-                {t.upTo100}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={[styles.separator, { backgroundColor: colors.border }]} />
-
-        {/* Language Section */}
+        {/* Language Settings */}
         <View style={styles.settingsSection}>
           <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
             {t.language}
           </Text>
-          <View style={styles.buttonGroup}>
+          <View style={styles.themeToggle}>
             <TouchableOpacity
               style={[
-                styles.button,
+                styles.themeButton,
                 { borderColor: colors.border },
-                language === 'en' && styles.buttonActive,
+                language === 'en' && styles.themeButtonActive,
               ]}
               onPress={() => onLanguageChange('en')}
             >
               <Text
                 style={[
-                  styles.buttonText,
+                  styles.themeButtonText,
                   { color: colors.text },
-                  language === 'en' && styles.buttonTextActive,
+                  language === 'en' && styles.themeButtonTextActive,
                 ]}
               >
                 {t.english}
@@ -242,17 +151,17 @@ export function PersonalizeModal({
             </TouchableOpacity>
             <TouchableOpacity
               style={[
-                styles.button,
+                styles.themeButton,
                 { borderColor: colors.border },
-                language === 'de' && styles.buttonActive,
+                language === 'de' && styles.themeButtonActive,
               ]}
               onPress={() => onLanguageChange('de')}
             >
               <Text
                 style={[
-                  styles.buttonText,
+                  styles.themeButtonText,
                   { color: colors.text },
-                  language === 'de' && styles.buttonTextActive,
+                  language === 'de' && styles.themeButtonTextActive,
                 ]}
               >
                 {t.german}
@@ -260,23 +169,21 @@ export function PersonalizeModal({
             </TouchableOpacity>
           </View>
         </View>
-        </ScrollView>
-      </>
-    </Modal>
+      </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
+  settingsOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     zIndex: 999,
   },
-  menu: {
+  settingsMenu: {
     position: 'absolute',
     top: 60,
     right: 8,
@@ -292,18 +199,21 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 16,
   },
-  menuHeader: {
+  settingsMenuHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingBottom: 12,
     borderBottomWidth: 1,
   },
-  menuTitle: {
+  settingsMenuTitle: {
     fontSize: 18,
     fontWeight: '700',
   },
-  closeButton: {
+  settingsMenuCloseButton: {
+    padding: 4,
+  },
+  settingsMenuCloseButtonText: {
     fontSize: 24,
     fontWeight: '300',
   },
@@ -316,11 +226,11 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  buttonGroup: {
+  themeToggle: {
     flexDirection: 'row',
     gap: 8,
   },
-  button: {
+  themeButton: {
     flex: 1,
     paddingVertical: 10,
     paddingHorizontal: 12,
@@ -328,23 +238,19 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     alignItems: 'center',
   },
-  buttonActive: {
+  themeButtonActive: {
     borderWidth: 2.5,
   },
-  buttonText: {
+  themeButtonText: {
     fontSize: 14,
     fontWeight: '500',
   },
-  buttonTextActive: {
+  themeButtonTextActive: {
     fontWeight: '700',
   },
-  modeInfo: {
-    fontSize: 12,
-    marginTop: 8,
-    lineHeight: 16,
-  },
-  separator: {
+  settingsDivider: {
     height: 1,
-    marginVertical: 4,
+    backgroundColor: '#E0E0E0',
+    marginVertical: 8,
   },
 });

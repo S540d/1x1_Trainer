@@ -113,114 +113,6 @@ export default function App() {
               </TouchableOpacity>
             </View>
 
-            {/* Appearance Settings - Light/Dark/System */}
-            <View style={styles.settingsSection}>
-              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.appearance}</Text>
-              <View style={styles.themeToggle}>
-                <TouchableOpacity
-                  style={[
-                    styles.themeButton,
-                    { borderColor: colors.border },
-                    theme.themeMode === 'light' && styles.themeButtonActive,
-                  ]}
-                  onPress={() => preferences.setThemeMode('light')}
-                >
-                  <Text
-                    style={[
-                      styles.themeButtonText,
-                      { color: colors.text },
-                      theme.themeMode === 'light' && styles.themeButtonTextActive,
-                    ]}
-                  >
-                    {t.light}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.themeButton,
-                    { borderColor: colors.border },
-                    theme.themeMode === 'dark' && styles.themeButtonActive,
-                  ]}
-                  onPress={() => preferences.setThemeMode('dark')}
-                >
-                  <Text
-                    style={[
-                      styles.themeButtonText,
-                      { color: colors.text },
-                      theme.themeMode === 'dark' && styles.themeButtonTextActive,
-                    ]}
-                  >
-                    {t.dark}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.themeButton,
-                    { borderColor: colors.border },
-                    theme.themeMode === 'system' && styles.themeButtonActive,
-                  ]}
-                  onPress={() => preferences.setThemeMode('system')}
-                >
-                  <Text
-                    style={[
-                      styles.themeButtonText,
-                      { color: colors.text },
-                      theme.themeMode === 'system' && styles.themeButtonTextActive,
-                    ]}
-                  >
-                    {t.system}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.settingsDivider} />
-
-            {/* Language Settings */}
-            <View style={styles.settingsSection}>
-              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.language}</Text>
-              <View style={styles.themeToggle}>
-                <TouchableOpacity
-                  style={[
-                    styles.themeButton,
-                    { borderColor: colors.border },
-                    preferences.language === 'en' && styles.themeButtonActive,
-                  ]}
-                  onPress={() => preferences.setLanguage('en')}
-                >
-                  <Text
-                    style={[
-                      styles.themeButtonText,
-                      { color: colors.text },
-                      preferences.language === 'en' && styles.themeButtonTextActive,
-                    ]}
-                  >
-                    {t.english}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.themeButton,
-                    { borderColor: colors.border },
-                    preferences.language === 'de' && styles.themeButtonActive,
-                  ]}
-                  onPress={() => preferences.setLanguage('de')}
-                >
-                  <Text
-                    style={[
-                      styles.themeButtonText,
-                      { color: colors.text },
-                      preferences.language === 'de' && styles.themeButtonTextActive,
-                    ]}
-                  >
-                    {t.german}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.settingsDivider} />
-
             {/* Operation Settings */}
             <View style={styles.settingsSection}>
               <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.operation}</Text>
@@ -314,6 +206,51 @@ export default function App() {
 
             <View style={styles.settingsDivider} />
 
+            {/* Number Range Settings */}
+            <View style={styles.settingsSection}>
+              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.numberRange}</Text>
+              <View style={styles.themeToggle}>
+                <TouchableOpacity
+                  style={[
+                    styles.themeButton,
+                    { borderColor: colors.border },
+                    preferences.numberRange === 'SMALL' && styles.themeButtonActive,
+                  ]}
+                  onPress={() => preferences.setNumberRange('SMALL' as any)}
+                >
+                  <Text
+                    style={[
+                      styles.themeButtonText,
+                      { color: colors.text },
+                      preferences.numberRange === 'SMALL' && styles.themeButtonTextActive,
+                    ]}
+                  >
+                    {t.upTo20}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.themeButton,
+                    { borderColor: colors.border },
+                    preferences.numberRange === 'LARGE' && styles.themeButtonActive,
+                  ]}
+                  onPress={() => preferences.setNumberRange('LARGE' as any)}
+                >
+                  <Text
+                    style={[
+                      styles.themeButtonText,
+                      { color: colors.text },
+                      preferences.numberRange === 'LARGE' && styles.themeButtonTextActive,
+                    ]}
+                  >
+                    {t.upTo100}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.settingsDivider} />
+
             {/* Personalize Button */}
             <TouchableOpacity
               style={[styles.settingsButton, { borderColor: colors.border, borderWidth: 1.5 }]}
@@ -368,14 +305,10 @@ export default function App() {
         visible={personalizeVisible}
         onClose={() => setPersonalizeVisible(false)}
         colors={colors}
-        operation={game.gameState.operation}
-        onOperationChange={(op) => game.changeOperation(op)}
-        difficultyMode={game.gameState.difficultyMode}
-        onDifficultyModeChange={(mode) => game.changeDifficultyMode(mode)}
-        numberRange={preferences.numberRange}
-        onNumberRangeChange={(range) => preferences.setNumberRange(range)}
         language={preferences.language}
         onLanguageChange={(lang) => preferences.setLanguage(lang)}
+        themeMode={theme.themeMode}
+        onThemeModeChange={(mode) => preferences.setThemeMode(mode)}
       />
 
       <View style={styles.contentArea}>
