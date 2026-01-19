@@ -18,10 +18,12 @@ import { APP_VERSION } from './utils/constants';
 import { useTheme } from './hooks/useTheme';
 import { usePreferences } from './hooks/usePreferences';
 import { useGameLogic } from './hooks/useGameLogic';
+import { PersonalizeModal } from './components/PersonalizeModal';
 
 export default function App() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
+  const [personalizeVisible, setPersonalizeVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
 
@@ -311,6 +313,21 @@ export default function App() {
 
             <View style={styles.settingsDivider} />
 
+            {/* Personalize Button */}
+            <TouchableOpacity
+              style={[styles.settingsButton, { borderColor: colors.border, borderWidth: 1.5 }]}
+              onPress={() => {
+                setPersonalizeVisible(true);
+                setMenuVisible(false);
+              }}
+            >
+              <Text style={[styles.settingsButtonText, { color: colors.text }]}>
+                {t.personalize}
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.settingsDivider} />
+
             {/* Feedback, Support and About in One Row */}
             <View style={[styles.settingsSection, styles.settingsSectionRow]}>
               <TouchableOpacity
@@ -344,6 +361,19 @@ export default function App() {
           </View>
         </>
       )}
+
+      {/* Personalize Modal */}
+      <PersonalizeModal
+        visible={personalizeVisible}
+        onClose={() => setPersonalizeVisible(false)}
+        colors={colors}
+        operation={game.gameState.operation}
+        onOperationChange={(op) => game.changeOperation(op)}
+        difficultyMode={game.gameState.difficultyMode}
+        onDifficultyModeChange={(mode) => game.changeDifficultyMode(mode)}
+        language={preferences.language}
+        onLanguageChange={(lang) => preferences.setLanguage(lang)}
+      />
 
       <View style={styles.contentArea}>
         <View style={[styles.questionCard, { backgroundColor: getCardColor() }]}>
