@@ -8,7 +8,7 @@ import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange
 import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER } from '../utils/constants';
 
 interface UseGameLogicProps {
-  initialOperation: Operation;
+  initialOperations: Operation[];
   initialTotalSolvedTasks: number;
   initialNumberRange: NumberRange;
   onTotalSolvedTasksChange: (total: number) => void;
@@ -62,7 +62,7 @@ export function generateNumberSequenceForState(
 }
 
 export function useGameLogic({
-  initialOperation,
+  initialOperations,
   initialTotalSolvedTasks,
   initialNumberRange,
   onTotalSolvedTasksChange,
@@ -76,7 +76,8 @@ export function useGameLogic({
     currentTask: 1,
     totalTasks: TOTAL_TASKS,
     gameMode: GameMode.NORMAL,
-    operation: initialOperation,
+    operation: initialOperations[0] || Operation.MULTIPLICATION,
+    enabledOperations: initialOperations,
     answerMode: AnswerMode.INPUT,
     difficultyMode: DifficultyMode.SIMPLE,
     questionPart: 2,
@@ -89,10 +90,15 @@ export function useGameLogic({
 
   // Helper: Get correct answer for current question
   const getCorrectAnswer = () => {
-    const result =
-      gameState.operation === Operation.ADDITION
-        ? gameState.num1 + gameState.num2
-        : gameState.num1 * gameState.num2;
+    let result: number;
+
+    if (gameState.operation === Operation.ADDITION) {
+      result = gameState.num1 + gameState.num2;
+    } else if (gameState.operation === Operation.SUBTRACTION) {
+      result = gameState.num1 - gameState.num2;
+    } else {
+      result = gameState.num1 * gameState.num2;
+    }
 
     switch (gameState.questionPart) {
       case 0:
@@ -106,26 +112,44 @@ export function useGameLogic({
 
   // Generate a new question
   const generateQuestion = (mode: GameMode = gameState.gameMode) => {
+    // Randomly select operation from enabled operations
+    const selectedOperation =
+      gameState.enabledOperations[Math.floor(Math.random() * gameState.enabledOperations.length)] ||
+      Operation.MULTIPLICATION;
+
     let newNum1: number;
     let newNum2: number;
 
-    // Apply number range restrictions
+    // Apply number range restrictions based on selected operation
     if (initialNumberRange === NumberRange.SMALL) {
-      // "Up to 20" mode:
-      // - For multiplication: only 1x and 2x (num1 ∈ [1,2], num2 ∈ [1,10])
-      // - For addition: both numbers up to 20 but sum ≤ 20 (num1, num2 ∈ [1,10])
-      if (gameState.operation === Operation.MULTIPLICATION) {
+      // "Up to 20" mode with operation-specific rules
+      if (selectedOperation === Operation.MULTIPLICATION) {
+        // Only 1x and 2x tables
         newNum1 = Math.floor(Math.random() * 2) + 1; // 1 or 2
         newNum2 = Math.floor(Math.random() * 10) + 1; // 1-10
+      } else if (selectedOperation === Operation.SUBTRACTION) {
+        // Subtraction: ensure positive result (num1 > num2), both ≤ 20
+        // Generate result (1-20), then generate num2, then num1 = result + num2
+        const result = Math.floor(Math.random() * 20) + 1;
+        const num2 = Math.floor(Math.random() * (20 - result)) + 1;
+        newNum1 = result + num2;
+        newNum2 = num2;
       } else {
         // Addition: keep numbers small so sum doesn't exceed 20
         newNum1 = Math.floor(Math.random() * 10) + 1; // 1-10
         newNum2 = Math.floor(Math.random() * 10) + 1; // 1-10
       }
     } else {
-      // "Up to 100" mode: full range (1-10)
-      newNum1 = Math.floor(Math.random() * 10) + 1;
-      newNum2 = Math.floor(Math.random() * 10) + 1;
+      // "Up to 100" mode
+      if (selectedOperation === Operation.SUBTRACTION) {
+        // Ensure positive result: num1 >= num2
+        newNum1 = Math.floor(Math.random() * 100) + 1;
+        newNum2 = Math.floor(Math.random() * newNum1) + 1;
+      } else {
+        // Addition and Multiplication: full range (1-10)
+        newNum1 = Math.floor(Math.random() * 10) + 1;
+        newNum2 = Math.floor(Math.random() * 10) + 1;
+      }
     }
     let newQuestionPart = 2;
 
@@ -157,6 +181,7 @@ export function useGameLogic({
 
     setGameState((prev) => ({
       ...prev,
+      operation: selectedOperation,
       num1: newNum1,
       num2: newNum2,
       userAnswer: '',
@@ -303,11 +328,12 @@ export function useGameLogic({
     setTimeout(() => generateQuestion(newMode), 0);
   };
 
-  // Change operation
-  const changeOperation = (newOperation: Operation) => {
+  // Update enabled operations (called when user toggles operations)
+  const updateEnabledOperations = (operations: Operation[]) => {
+    if (operations.length === 0) return; // Don't allow empty operations
     setGameState((prev) => ({
       ...prev,
-      operation: newOperation,
+      enabledOperations: operations,
       currentTask: 1,
       score: 0,
       showResult: false,
@@ -430,7 +456,12 @@ export function useGameLogic({
   }, [gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, gameState.answerMode]);
 
   // Get operator symbol
-  const operatorSymbol = gameState.operation === Operation.ADDITION ? '+' : '×';
+  const operatorSymbol =
+    gameState.operation === Operation.ADDITION
+      ? '+'
+      : gameState.operation === Operation.SUBTRACTION
+      ? '−'
+      : '×';
 
   return {
     gameState,
@@ -440,7 +471,7 @@ export function useGameLogic({
     restartGame,
     continueGame,
     changeGameMode,
-    changeOperation,
+    updateEnabledOperations,
     changeAnswerMode,
     changeDifficultyMode,
     handleNumberClick,

@@ -22,6 +22,7 @@ export interface TranslationStrings {
   gameMode: string;
   operation: string;
   addition: string;
+  subtraction: string;
   multiplication: string;
   answerMode: string;
   inputMode: string;
@@ -82,12 +83,13 @@ export const translations: Record<Language, TranslationStrings> = {
     gameMode: 'GAME MODE',
     operation: 'OPERATION',
     addition: 'Addition',
+    subtraction: 'Subtraction',
     multiplication: 'Multiplication',
     answerMode: 'ANSWER MODE',
     inputMode: 'Number Input',
     multipleChoiceMode: 'Multiple Choice',
     numberSequenceMode: 'Number Sequence',
-    personalize: 'PERSONALIZE',
+    personalize: 'Personalize',
     numberRange: 'NUMBER RANGE',
     upTo20: 'Up to 20',
     upTo100: 'Up to 100',
@@ -140,12 +142,13 @@ export const translations: Record<Language, TranslationStrings> = {
     gameMode: 'SPIELMODUS',
     operation: 'RECHENART',
     addition: 'Addition',
+    subtraction: 'Subtraktion',
     multiplication: 'Multiplikation',
     answerMode: 'ANTWORTMODUS',
     inputMode: 'Zahleneingabe',
     multipleChoiceMode: 'Auswahl',
     numberSequenceMode: 'Zahlenreihe',
-    personalize: 'PERSONALISIEREN',
+    personalize: 'Personalisieren',
     numberRange: 'ZAHLENBEREICH',
     upTo20: 'Bis 20',
     upTo100: 'Bis 100',

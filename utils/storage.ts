@@ -80,13 +80,43 @@ export const getTheme = async (): Promise<ThemeMode | null> => {
   return null;
 };
 
+export const saveOperations = async (operations: Operation[]): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.OPERATIONS, JSON.stringify(operations));
+};
+
+export const getOperations = async (): Promise<Operation[]> => {
+  const value = await getStorageItem(STORAGE_KEYS.OPERATIONS);
+  if (value) {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed) && parsed.every(op => ['ADDITION', 'SUBTRACTION', 'MULTIPLICATION'].includes(op))) {
+        return parsed as Operation[];
+      }
+    } catch {
+      // Fall through to migration logic
+    }
+  }
+
+  // Migration: try old single-operation storage
+  const oldValue = await getStorageItem(STORAGE_KEYS.OPERATION);
+  if (oldValue === 'ADDITION' || oldValue === 'SUBTRACTION' || oldValue === 'MULTIPLICATION') {
+    const migratedOps = [oldValue as Operation];
+    await saveOperations(migratedOps);
+    return migratedOps;
+  }
+
+  // Default: multiplication only
+  return [Operation.MULTIPLICATION];
+};
+
+// Legacy function for backward compatibility
 export const saveOperation = async (operation: Operation): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.OPERATION, operation);
 };
 
 export const getOperation = async (): Promise<Operation | null> => {
   const value = await getStorageItem(STORAGE_KEYS.OPERATION);
-  if (value === 'ADDITION' || value === 'MULTIPLICATION') {
+  if (value === 'ADDITION' || value === 'SUBTRACTION' || value === 'MULTIPLICATION') {
     return value as Operation;
   }
   return null;

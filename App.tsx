@@ -31,7 +31,7 @@ export default function App() {
   const preferences = usePreferences();
   const theme = useTheme(preferences.themeMode);
   const game = useGameLogic({
-    initialOperation: preferences.operation,
+    initialOperations: preferences.operations,
     initialTotalSolvedTasks: preferences.totalSolvedTasks,
     initialNumberRange: preferences.numberRange,
     onTotalSolvedTasksChange: preferences.setTotalSolvedTasks,
@@ -59,13 +59,13 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preferences.isLoaded]);
 
-  // Sync operation changes to preferences
+  // Sync operations changes
   useEffect(() => {
-    if (preferences.isLoaded && game.gameState.operation !== preferences.operation) {
-      preferences.setOperation(game.gameState.operation);
+    if (preferences.isLoaded && game.gameState.enabledOperations !== preferences.operations) {
+      game.updateEnabledOperations(preferences.operations);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [game.gameState.operation]);
+  }, [preferences.operations]);
 
   const getCardColor = () => {
     if (game.gameState.lastAnswerCorrect === true) return colors.cardCorrect;
@@ -116,38 +116,58 @@ export default function App() {
             {/* Operation Settings */}
             <View style={styles.settingsSection}>
               <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.operation}</Text>
-              <View style={styles.themeToggle}>
+              <View style={styles.operationGrid}>
                 <TouchableOpacity
                   style={[
-                    styles.themeButton,
+                    styles.operationButton,
                     { borderColor: colors.border },
-                    game.gameState.operation === Operation.ADDITION && styles.themeButtonActive,
+                    preferences.operations.includes(Operation.ADDITION) && styles.operationButtonActive,
                   ]}
-                  onPress={() => game.changeOperation(Operation.ADDITION)}
+                  onPress={() => preferences.toggleOperation(Operation.ADDITION)}
                 >
                   <Text
                     style={[
-                      styles.themeButtonText,
+                      styles.operationButtonText,
                       { color: colors.text },
-                      game.gameState.operation === Operation.ADDITION && styles.themeButtonTextActive,
+                      preferences.operations.includes(Operation.ADDITION) && styles.operationButtonTextActive,
                     ]}
                   >
                     {t.addition}
                   </Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity
                   style={[
-                    styles.themeButton,
+                    styles.operationButton,
                     { borderColor: colors.border },
-                    game.gameState.operation === Operation.MULTIPLICATION && styles.themeButtonActive,
+                    preferences.operations.includes(Operation.SUBTRACTION) && styles.operationButtonActive,
                   ]}
-                  onPress={() => game.changeOperation(Operation.MULTIPLICATION)}
+                  onPress={() => preferences.toggleOperation(Operation.SUBTRACTION)}
                 >
                   <Text
                     style={[
-                      styles.themeButtonText,
+                      styles.operationButtonText,
                       { color: colors.text },
-                      game.gameState.operation === Operation.MULTIPLICATION && styles.themeButtonTextActive,
+                      preferences.operations.includes(Operation.SUBTRACTION) && styles.operationButtonTextActive,
+                    ]}
+                  >
+                    {t.subtraction}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.operationButton,
+                    { borderColor: colors.border },
+                    preferences.operations.includes(Operation.MULTIPLICATION) && styles.operationButtonActive,
+                  ]}
+                  onPress={() => preferences.toggleOperation(Operation.MULTIPLICATION)}
+                >
+                  <Text
+                    style={[
+                      styles.operationButtonText,
+                      { color: colors.text },
+                      preferences.operations.includes(Operation.MULTIPLICATION) && styles.operationButtonTextActive,
                     ]}
                   >
                     {t.multiplication}
@@ -252,17 +272,22 @@ export default function App() {
             <View style={styles.settingsDivider} />
 
             {/* Personalize Button */}
-            <TouchableOpacity
-              style={[styles.settingsButton, { borderColor: colors.border, borderWidth: 1.5 }]}
-              onPress={() => {
-                setPersonalizeVisible(true);
-                setMenuVisible(false);
-              }}
-            >
-              <Text style={[styles.settingsButtonText, { color: colors.text }]}>
-                {t.personalize}
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.settingsSection}>
+              <TouchableOpacity
+                style={[
+                  styles.personalizeButton,
+                  { borderColor: colors.border }
+                ]}
+                onPress={() => {
+                  setPersonalizeVisible(true);
+                  setMenuVisible(false);
+                }}
+              >
+                <Text style={[styles.personalizeButtonText, { color: colors.text }]}>
+                  {t.personalize}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.settingsDivider} />
 
@@ -790,6 +815,45 @@ const styles = StyleSheet.create({
     color: '#999',
     textAlign: 'center',
     paddingVertical: 4,
+  },
+  personalizeButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    alignItems: 'center',
+  },
+  personalizeButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  operationGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  operationButton: {
+    flex: 1,
+    minWidth: '30%',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    alignItems: 'center',
+  },
+  operationButtonActive: {
+    backgroundColor: '#6200EE',
+    borderColor: '#6200EE',
+  },
+  operationButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+  },
+  operationButtonTextActive: {
+    color: '#fff',
   },
   gameModeGrid: {
     flexDirection: 'row',

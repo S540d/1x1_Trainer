@@ -11,8 +11,8 @@ import {
   saveLanguage,
   getTheme,
   saveTheme,
-  getOperation,
-  saveOperation,
+  getOperations,
+  saveOperations,
   getTotalTasks,
   saveTotalTasks,
   getNumberRange,
@@ -22,7 +22,7 @@ import {
 export function usePreferences() {
   const [language, setLanguage] = useState<Language>('en');
   const [themeMode, setThemeMode] = useState<ThemeMode>('light');
-  const [operation, setOperation] = useState<Operation>(Operation.MULTIPLICATION);
+  const [operations, setOperations] = useState<Operation[]>([Operation.MULTIPLICATION]);
   const [numberRange, setNumberRange] = useState<NumberRange>(NumberRange.LARGE);
   const [totalSolvedTasks, setTotalSolvedTasks] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -48,11 +48,9 @@ export function usePreferences() {
           setThemeMode(savedTheme);
         }
 
-        // Load operation
-        const savedOperation = await getOperation();
-        if (savedOperation) {
-          setOperation(savedOperation);
-        }
+        // Load operations
+        const savedOperations = await getOperations();
+        setOperations(savedOperations);
 
         // Load total solved tasks
         const savedTotalTasks = await getTotalTasks();
@@ -90,12 +88,26 @@ export function usePreferences() {
     }
   }, [themeMode, isLoaded]);
 
-  // Auto-save operation
+  // Auto-save operations
   useEffect(() => {
     if (isLoaded) {
-      saveOperation(operation);
+      saveOperations(operations);
     }
-  }, [operation, isLoaded]);
+  }, [operations, isLoaded]);
+
+  // Toggle operation in multi-select
+  const toggleOperation = (op: Operation) => {
+    setOperations(prev => {
+      const newOps = prev.includes(op)
+        ? prev.filter(o => o !== op)
+        : [...prev, op];
+
+      // Ensure at least one operation is always enabled
+      if (newOps.length === 0) return prev;
+
+      return newOps;
+    });
+  };
 
   // Auto-save total solved tasks
   useEffect(() => {
@@ -116,8 +128,9 @@ export function usePreferences() {
     setLanguage,
     themeMode,
     setThemeMode,
-    operation,
-    setOperation,
+    operations,
+    setOperations,
+    toggleOperation,
     numberRange,
     setNumberRange,
     totalSolvedTasks,

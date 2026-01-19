@@ -14,6 +14,7 @@ export const STORAGE_KEYS = {
   LANGUAGE: 'app-language',
   THEME: 'app-theme',
   OPERATION: 'app-operation',
+  OPERATIONS: 'app-operations',
   TOTAL_TASKS: 'app-total-tasks',
   NUMBER_RANGE: 'app-number-range',
 } as const;
