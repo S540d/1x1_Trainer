@@ -4,12 +4,13 @@
  */
 
 import { useState, useMemo } from 'react';
-import { GameMode, Operation, AnswerMode, DifficultyMode, GameState } from '../types/game';
+import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange } from '../types/game';
 import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER } from '../utils/constants';
 
 interface UseGameLogicProps {
   initialOperation: Operation;
   initialTotalSolvedTasks: number;
+  initialNumberRange: NumberRange;
   onTotalSolvedTasksChange: (total: number) => void;
   onMotivationShow: (score: number) => void;
 }
@@ -63,6 +64,7 @@ export function generateNumberSequenceForState(
 export function useGameLogic({
   initialOperation,
   initialTotalSolvedTasks,
+  initialNumberRange,
   onTotalSolvedTasksChange,
   onMotivationShow,
 }: UseGameLogicProps) {
@@ -104,8 +106,27 @@ export function useGameLogic({
 
   // Generate a new question
   const generateQuestion = (mode: GameMode = gameState.gameMode) => {
-    const newNum1 = Math.floor(Math.random() * 10) + 1;
-    const newNum2 = Math.floor(Math.random() * 10) + 1;
+    let newNum1: number;
+    let newNum2: number;
+
+    // Apply number range restrictions
+    if (initialNumberRange === NumberRange.SMALL) {
+      // "Up to 20" mode:
+      // - For multiplication: only 1x and 2x (num1 ∈ [1,2], num2 ∈ [1,10])
+      // - For addition: both numbers up to 20 but sum ≤ 20 (num1, num2 ∈ [1,10])
+      if (gameState.operation === Operation.MULTIPLICATION) {
+        newNum1 = Math.floor(Math.random() * 2) + 1; // 1 or 2
+        newNum2 = Math.floor(Math.random() * 10) + 1; // 1-10
+      } else {
+        // Addition: keep numbers small so sum doesn't exceed 20
+        newNum1 = Math.floor(Math.random() * 10) + 1; // 1-10
+        newNum2 = Math.floor(Math.random() * 10) + 1; // 1-10
+      }
+    } else {
+      // "Up to 100" mode: full range (1-10)
+      newNum1 = Math.floor(Math.random() * 10) + 1;
+      newNum2 = Math.floor(Math.random() * 10) + 1;
+    }
     let newQuestionPart = 2;
 
     switch (mode) {

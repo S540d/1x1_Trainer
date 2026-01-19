@@ -15,6 +15,7 @@ export const STORAGE_KEYS = {
   THEME: 'app-theme',
   OPERATION: 'app-operation',
   TOTAL_TASKS: 'app-total-tasks',
+  NUMBER_RANGE: 'app-number-range',
 } as const;
 
 // Theme Colors - "Modern Professional" Design System
