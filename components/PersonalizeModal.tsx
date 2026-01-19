@@ -214,7 +214,7 @@ export function PersonalizeModal({
           </View>
         </View>
 
-        <View style={styles.separator} />
+        <View style={[styles.separator, { backgroundColor: colors.border }]} />
 
         {/* Language Section */}
         <View style={styles.settingsSection}>
