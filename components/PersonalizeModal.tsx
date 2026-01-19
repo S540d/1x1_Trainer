@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { ThemeColors } from '../types/game';
 import { translations } from '../i18n/translations';
-import { Operation, DifficultyMode, Language } from '../types/game';
+import { Operation, DifficultyMode, Language, NumberRange } from '../types/game';
 
 interface PersonalizeModalProps {
   visible: boolean;
@@ -19,6 +19,8 @@ interface PersonalizeModalProps {
   onOperationChange: (operation: Operation) => void;
   difficultyMode: DifficultyMode;
   onDifficultyModeChange: (mode: DifficultyMode) => void;
+  numberRange: NumberRange;
+  onNumberRangeChange: (range: NumberRange) => void;
   language: Language;
   onLanguageChange: (language: Language) => void;
 }
@@ -36,6 +38,8 @@ export function PersonalizeModal({
   onOperationChange,
   difficultyMode,
   onDifficultyModeChange,
+  numberRange,
+  onNumberRangeChange,
   language,
   onLanguageChange,
 }: PersonalizeModalProps) {
@@ -164,6 +168,53 @@ export function PersonalizeModal({
         </View>
 
         <View style={[styles.separator, { backgroundColor: colors.border }]} />
+
+        {/* Number Range Section */}
+        <View style={styles.settingsSection}>
+          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
+            {t.numberRange}
+          </Text>
+          <View style={styles.buttonGroup}>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                { borderColor: colors.border },
+                numberRange === NumberRange.SMALL && styles.buttonActive,
+              ]}
+              onPress={() => onNumberRangeChange(NumberRange.SMALL)}
+            >
+              <Text
+                style={[
+                  styles.buttonText,
+                  { color: colors.text },
+                  numberRange === NumberRange.SMALL && styles.buttonTextActive,
+                ]}
+              >
+                {t.upTo20}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                { borderColor: colors.border },
+                numberRange === NumberRange.LARGE && styles.buttonActive,
+              ]}
+              onPress={() => onNumberRangeChange(NumberRange.LARGE)}
+            >
+              <Text
+                style={[
+                  styles.buttonText,
+                  { color: colors.text },
+                  numberRange === NumberRange.LARGE && styles.buttonTextActive,
+                ]}
+              >
+                {t.upTo100}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.separator} />
 
         {/* Language Section */}
         <View style={styles.settingsSection}>

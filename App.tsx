@@ -33,6 +33,7 @@ export default function App() {
   const game = useGameLogic({
     initialOperation: preferences.operation,
     initialTotalSolvedTasks: preferences.totalSolvedTasks,
+    initialNumberRange: preferences.numberRange,
     onTotalSolvedTasksChange: preferences.setTotalSolvedTasks,
     onMotivationShow: (score: number) => {
       setMotivationScore(score);
@@ -371,6 +372,8 @@ export default function App() {
         onOperationChange={(op) => game.changeOperation(op)}
         difficultyMode={game.gameState.difficultyMode}
         onDifficultyModeChange={(mode) => game.changeDifficultyMode(mode)}
+        numberRange={preferences.numberRange}
+        onNumberRangeChange={(range) => preferences.setNumberRange(range)}
         language={preferences.language}
         onLanguageChange={(lang) => preferences.setLanguage(lang)}
       />

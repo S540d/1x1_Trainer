@@ -28,6 +28,9 @@ export interface TranslationStrings {
   multipleChoiceMode: string;
   numberSequenceMode: string;
   personalize: string;
+  numberRange: string;
+  upTo20: string;
+  upTo100: string;
   feedback: string;
   support: string;
   about: string;
@@ -85,6 +88,9 @@ export const translations: Record<Language, TranslationStrings> = {
     multipleChoiceMode: 'Multiple Choice',
     numberSequenceMode: 'Number Sequence',
     personalize: 'PERSONALIZE',
+    numberRange: 'NUMBER RANGE',
+    upTo20: 'Up to 20',
+    upTo100: 'Up to 100',
     feedback: 'Send Feedback',
     support: 'Support me',
     about: 'ABOUT',
@@ -140,6 +146,9 @@ export const translations: Record<Language, TranslationStrings> = {
     multipleChoiceMode: 'Auswahl',
     numberSequenceMode: 'Zahlenreihe',
     personalize: 'PERSONALISIEREN',
+    numberRange: 'ZAHLENBEREICH',
+    upTo20: 'Bis 20',
+    upTo100: 'Bis 100',
     feedback: 'Feedback senden',
     support: 'Support me',
     about: 'ÜBER',

@@ -6,7 +6,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from './constants';
-import { ThemeMode, Language, Operation } from '../types/game';
+import { ThemeMode, Language, Operation, NumberRange } from '../types/game';
 
 /**
  * Get a value from storage (platform-safe)
@@ -101,6 +101,18 @@ export const getTotalTasks = async (): Promise<number | null> => {
   if (value) {
     const parsed = parseInt(value, 10);
     return isNaN(parsed) ? null : parsed;
+  }
+  return null;
+};
+
+export const saveNumberRange = async (range: NumberRange): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.NUMBER_RANGE, range);
+};
+
+export const getNumberRange = async (): Promise<NumberRange | null> => {
+  const value = await getStorageItem(STORAGE_KEYS.NUMBER_RANGE);
+  if (value === 'SMALL' || value === 'LARGE') {
+    return value as NumberRange;
   }
   return null;
 };

@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import * as Localization from 'expo-localization';
-import { Language, ThemeMode, Operation } from '../types/game';
+import { Language, ThemeMode, Operation, NumberRange } from '../types/game';
 import {
   getLanguage,
   saveLanguage,
@@ -15,12 +15,15 @@ import {
   saveOperation,
   getTotalTasks,
   saveTotalTasks,
+  getNumberRange,
+  saveNumberRange,
 } from '../utils/storage';
 
 export function usePreferences() {
   const [language, setLanguage] = useState<Language>('en');
   const [themeMode, setThemeMode] = useState<ThemeMode>('light');
   const [operation, setOperation] = useState<Operation>(Operation.MULTIPLICATION);
+  const [numberRange, setNumberRange] = useState<NumberRange>(NumberRange.LARGE);
   const [totalSolvedTasks, setTotalSolvedTasks] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -55,6 +58,12 @@ export function usePreferences() {
         const savedTotalTasks = await getTotalTasks();
         if (savedTotalTasks !== null) {
           setTotalSolvedTasks(savedTotalTasks);
+        }
+
+        // Load number range
+        const savedNumberRange = await getNumberRange();
+        if (savedNumberRange) {
+          setNumberRange(savedNumberRange);
         }
 
         setIsLoaded(true);
@@ -95,6 +104,13 @@ export function usePreferences() {
     }
   }, [totalSolvedTasks, isLoaded]);
 
+  // Auto-save number range
+  useEffect(() => {
+    if (isLoaded) {
+      saveNumberRange(numberRange);
+    }
+  }, [numberRange, isLoaded]);
+
   return {
     language,
     setLanguage,
@@ -102,6 +118,8 @@ export function usePreferences() {
     setThemeMode,
     operation,
     setOperation,
+    numberRange,
+    setNumberRange,
     totalSolvedTasks,
     setTotalSolvedTasks,
     isLoaded,
