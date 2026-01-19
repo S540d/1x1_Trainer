@@ -129,8 +129,8 @@ export function useGameLogic({
         newNum2 = Math.floor(Math.random() * 10) + 1; // 1-10
       } else if (selectedOperation === Operation.SUBTRACTION) {
         // Subtraction: ensure positive result (num1 > num2), both ≤ 20
-        // Generate result (1-20), then generate num2, then num1 = result + num2
-        const result = Math.floor(Math.random() * 20) + 1;
+        // Generate result (1-19), then generate num2, then num1 = result + num2
+        const result = Math.floor(Math.random() * 19) + 1;
         const num2 = Math.floor(Math.random() * (20 - result)) + 1;
         newNum1 = result + num2;
         newNum2 = num2;
@@ -142,9 +142,9 @@ export function useGameLogic({
     } else {
       // "Up to 100" mode
       if (selectedOperation === Operation.SUBTRACTION) {
-        // Ensure positive result: num1 >= num2
+        // Ensure positive result: num1 > num2
         newNum1 = Math.floor(Math.random() * 100) + 1;
-        newNum2 = Math.floor(Math.random() * newNum1) + 1;
+        newNum2 = Math.floor(Math.random() * newNum1);
       } else {
         // Addition and Multiplication: full range (1-10)
         newNum1 = Math.floor(Math.random() * 10) + 1;

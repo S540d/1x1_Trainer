@@ -190,7 +190,6 @@ const styles = StyleSheet.create({
     right: 16,
     minWidth: 200,
     borderRadius: 20,
-    backgroundColor: '#fff',
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -219,7 +218,6 @@ const styles = StyleSheet.create({
   settingsMenuCloseButtonText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#000',
   },
   settingsSection: {
     paddingHorizontal: 16,
@@ -228,7 +226,6 @@ const styles = StyleSheet.create({
   settingsSectionTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#999',
     marginBottom: 8,
     textTransform: 'uppercase',
   },
@@ -252,7 +249,6 @@ const styles = StyleSheet.create({
   themeButtonText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#333',
   },
   themeButtonTextActive: {
     color: '#fff',

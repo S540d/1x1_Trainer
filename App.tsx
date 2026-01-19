@@ -61,7 +61,7 @@ export default function App() {
 
   // Sync operations changes
   useEffect(() => {
-    if (preferences.isLoaded && game.gameState.enabledOperations !== preferences.operations) {
+    if (preferences.isLoaded) {
       game.updateEnabledOperations(preferences.operations);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -850,7 +850,6 @@ const styles = StyleSheet.create({
   operationButtonText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#333',
   },
   operationButtonTextActive: {
     color: '#fff',
