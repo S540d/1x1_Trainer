@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Modal,
 } from 'react-native';
 import { ThemeColors } from '../types/game';
 import { translations } from '../i18n/translations';
@@ -40,19 +41,23 @@ export function PersonalizeModal({
 }: PersonalizeModalProps) {
   const t = translations[language];
 
-  if (!visible) return null;
-
   return (
-    <>
-      {/* Overlay */}
-      <TouchableOpacity
-        style={styles.overlay}
-        activeOpacity={1}
-        onPress={onClose}
-      />
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <>
+        {/* Overlay */}
+        <TouchableOpacity
+          style={styles.overlay}
+          activeOpacity={1}
+          onPress={onClose}
+        />
 
-      {/* Modal Panel */}
-      <ScrollView style={[styles.menu, { backgroundColor: colors.settingsMenu }]}>
+        {/* Modal Panel */}
+        <ScrollView style={[styles.menu, { backgroundColor: colors.settingsMenu }]}>
         {/* Header with Close Button */}
         <View style={[styles.menuHeader, { borderBottomColor: colors.border }]}>
           <Text style={[styles.menuTitle, { color: colors.text }]}>
@@ -108,7 +113,7 @@ export function PersonalizeModal({
           </View>
         </View>
 
-        <View style={styles.separator} />
+        <View style={[styles.separator, { backgroundColor: colors.border }]} />
 
         {/* Difficulty Mode Section */}
         <View style={styles.settingsSection}>
@@ -158,7 +163,7 @@ export function PersonalizeModal({
           </Text>
         </View>
 
-        <View style={styles.separator} />
+        <View style={[styles.separator, { backgroundColor: colors.border }]} />
 
         {/* Language Section */}
         <View style={styles.settingsSection}>
@@ -204,8 +209,9 @@ export function PersonalizeModal({
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
-    </>
+        </ScrollView>
+      </>
+    </Modal>
   );
 }
 
@@ -272,7 +278,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonActive: {
-    opacity: 0.8,
+    borderWidth: 2.5,
   },
   buttonText: {
     fontSize: 14,
@@ -288,11 +294,6 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
     marginVertical: 4,
-  },
-  personalizeButtonContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
   },
 });
