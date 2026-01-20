@@ -165,13 +165,34 @@ export function useGameLogic({
     do {
       attempts++;
       if (attempts > MAX_ATTEMPTS) {
-        // Fallback to safe defaults
+        // Fallback to safe defaults if we somehow fail to generate a valid question
+        // This should be rare, but ensures we always have a valid question
         if (selectedOperation === Operation.MULTIPLICATION) {
+          // Simple multiplication that is valid in all modes
           newNum1 = 1;
           newNum2 = 1;
+        } else if (initialNumberRange === NumberRange.SMALL) {
+          // "Up to 20" mode fallbacks
+          if (selectedOperation === Operation.SUBTRACTION) {
+            // 10 - 5 = 5, within 1–20, and only one 2-digit number
+            newNum1 = 10;
+            newNum2 = 5;
+          } else {
+            // Addition: small numbers, sum within 1–20
+            newNum1 = 5;
+            newNum2 = 5;
+          }
         } else {
-          newNum1 = 10;
-          newNum2 = 5;
+          // "Up to 100" mode fallbacks
+          if (selectedOperation === Operation.SUBTRACTION) {
+            // Ensure positive result and stay within 1–100
+            newNum1 = 100;
+            newNum2 = 50;
+          } else {
+            // Addition: keep within the typical 1–10 range used for LARGE additions
+            newNum1 = 10;
+            newNum2 = 10;
+          }
         }
         break;
       }
@@ -187,16 +208,17 @@ export function useGameLogic({
           // Subtraction: ensure positive result (num1 > num2), both ≤ 20
           // Generate with restriction: no two 2-digit numbers
           const maxNum1 = 20;
-          newNum1 = Math.floor(Math.random() * maxNum1) + 1; // 1-20
+          newNum1 = Math.floor(Math.random() * (maxNum1 - 1)) + 2; // 2-20 to ensure num1 > num2
           // Ensure num2 < num1 and no two 2-digit numbers
           const num1Is2Digit = newNum1 >= 10;
           const maxNum2 = num1Is2Digit ? 9 : Math.min(newNum1 - 1, 20);
           newNum2 = Math.floor(Math.random() * maxNum2) + 1;
         } else {
           // Addition: keep numbers small so sum doesn't exceed 20
-          // Avoid two 2-digit numbers
+          // Avoid two 2-digit numbers by constraining the second operand
           newNum1 = Math.floor(Math.random() * 10) + 1; // 1-10
-          newNum2 = Math.floor(Math.random() * 10) + 1; // 1-10
+          const maxSecond = newNum1 === 10 ? 9 : 10;
+          newNum2 = Math.floor(Math.random() * maxSecond) + 1; // 1-maxSecond
         }
       } else {
         // "Up to 100" mode
