@@ -64,9 +64,18 @@ jobs:
           sed -i 's|"\./1x1_Trainer/|"\./|g' testing-deploy/index.html || true
           sed -i 's|href="./icon-|href="/1x1_Trainer/testing/icon-|g' testing-deploy/index.html || true
 
+          # Fix service worker paths for testing subdirectory
+          sed -i "s|'/1x1_Trainer/service-worker.js'|'/1x1_Trainer/testing/service-worker.js'|g" testing-deploy/index.html || true
+          sed -i "s|scope: '/1x1_Trainer/'|scope: '/1x1_Trainer/testing/'|g" testing-deploy/index.html || true
+
           # Fix manifest.json paths if it exists
           if [ -f "testing-deploy/manifest.json" ]; then
             sed -i 's|1x1_Trainer/|1x1_Trainer/testing/|g' testing-deploy/manifest.json || true
+          fi
+
+          # Fix service-worker.js paths if it exists
+          if [ -f "testing-deploy/service-worker.js" ]; then
+            sed -i 's|/1x1_Trainer/|/1x1_Trainer/testing/|g' testing-deploy/service-worker.js || true
           fi
 
           echo "✅ Testing environment prepared"
