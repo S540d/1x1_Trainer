@@ -69,6 +69,7 @@ jobs:
           publish_dir: ./testing-deploy
           destination_dir: testing
           commit_message: '🧪 Testing deployment from ${{ github.sha }}'
+          keep_files: true
 
       - name: Deployment Summary
         run: |
