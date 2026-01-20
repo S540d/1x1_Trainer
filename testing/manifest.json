@@ -65,8 +65,8 @@
       "form_factor": "wide"
     }
   ],
-  "start_url": "/1x1_Trainer/",
-  "scope": "/1x1_Trainer/",
+  "start_url": "/1x1_Trainer/testing/",
+  "scope": "/1x1_Trainer/testing/",
   "display": "standalone",
   "theme_color": "#6200EE",
   "background_color": "#ffffff",
@@ -77,7 +77,7 @@
       "name": "Start Training",
       "short_name": "Training",
       "description": "Start a new 1x1 training session",
-      "url": "/1x1_Trainer/?mode=normal",
+      "url": "/1x1_Trainer/testing/?mode=normal",
       "icons": [
         {
           "src": "/icon-192.png",
