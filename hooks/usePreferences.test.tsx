@@ -41,7 +41,7 @@ jest.mock('../utils/storage', () => ({
   saveNumberRange: jest.fn(),
 }));
 
-// Mock expo-localization
+// Mock expo-localization - Localization.getLocales() for system language detection
 jest.mock('expo-localization', () => ({
   getLocales: jest.fn(),
 }));
