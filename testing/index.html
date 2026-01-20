@@ -12,7 +12,8 @@
     <meta name="keywords" content="1x1, multiplication, trainer, math, learning, PWA, education" />
     <meta name="author" content="S540d" />
     <link rel="manifest" href="./1x1_Trainer/manifest.json" />
-    <link rel="icon" type="image/png" href="./1x1_Trainer/icon.png" />
+    <link rel="icon" type="image/png" sizes="128x128" href="./1x1_Trainer/icon-128.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="./1x1_Trainer/icon-96.png" />
     <link rel="apple-touch-icon" href="./1x1_Trainer/icon.png" />
     <meta name="theme-color" content="#6200EE" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -20,7 +21,7 @@
     <meta name="apple-mobile-web-app-title" content="1x1 Trainer" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-touch-fullscreen" content="yes" />
-    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+    <link rel="shortcut icon" href="./icon-192.png" />
     <style>
       #root,
       body,
@@ -39,27 +40,62 @@
         background-color: #FAFAFA;
         /* Background will be set dynamically by React */
       }
+
+      /* Block landscape orientation */
+      @media (orientation: landscape) {
+        body::before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.95);
+          z-index: 9999;
+        }
+
+        body::after {
+          content: 'Please use portrait mode';
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          color: white;
+          font-size: 24px;
+          font-weight: bold;
+          text-align: center;
+          z-index: 10000;
+          white-space: nowrap;
+        }
+
+        #root {
+          display: none;
+        }
+      }
     </style>
     <base href="/1x1_Trainer/testing/">
 </head>
   <body data-environment="testing">
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="orientation-alert" aria-live="polite" aria-atomic="true" role="status" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
     <div id="root"></div>
     <script src="./pwa-update.js"></script>
     <script>
+      const updateOrientationAnnouncement = () => {
+        const mediaQuery = window.matchMedia('(orientation: landscape)');
+        const alertDiv = document.getElementById('orientation-alert');
+        if (mediaQuery.matches) {
+          alertDiv.textContent = 'Your device is in landscape mode. Please rotate your device to portrait mode.';
+        }
+      };
+      updateOrientationAnnouncement();
+      window.matchMedia('(orientation: landscape)').addEventListener('change', updateOrientationAnnouncement);
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker
-            .register('/1x1_Trainer/service-worker.js', { scope: '/1x1_Trainer/' })
-            .then(() => {
-              // Service worker registered successfully
-            })
-            .catch(() => {
-              // Service worker registration failed
-            });
+          navigator.serviceWorker.register('/1x1_Trainer/service-worker.js', { scope: '/1x1_Trainer/' }).then(() => {}).catch(() => {});
         });
       }
     </script>
-  <script src="./_expo/static/js/web/index-b2376c10888f5013217c738dca876cb2.js" defer></script>
+  <script src="./_expo/static/js/web/index-7f123e20bdc2c87a8ca4a5851a5c6dc9.js" defer></script>
 </body>
 </html>
