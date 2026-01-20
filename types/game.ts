@@ -27,6 +27,12 @@ export enum DifficultyMode {
   CREATIVE = 'CREATIVE',
 }
 
+export enum NumberRange {
+  SMALL = 'SMALL',   // 1-10
+  MEDIUM = 'MEDIUM', // 1-20
+  LARGE = 'LARGE',   // 1-100
+}
+
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type Language = 'en' | 'de';
 
