@@ -13,6 +13,7 @@ export enum Operation {
   ADDITION = 'ADDITION',
   SUBTRACTION = 'SUBTRACTION',
   MULTIPLICATION = 'MULTIPLICATION',
+  DIVISION = 'DIVISION',
 }
 
 export enum AnswerMode {
@@ -26,11 +27,6 @@ export enum DifficultyMode {
   CREATIVE = 'CREATIVE',
 }
 
-export enum NumberRange {
-  SMALL = 'SMALL',    // Up to 20 (1x-2x and addition up to 20)
-  LARGE = 'LARGE',    // Up to 100 (full range)
-}
-
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type Language = 'en' | 'de';
 
@@ -42,8 +38,8 @@ export interface GameState {
   currentTask: number;
   totalTasks: number;
   gameMode: GameMode;
-  operation: Operation;
-  enabledOperations: Operation[]; // User-selected operations for multi-select
+  operation: Operation; // Current operation being used
+  selectedOperations: Set<Operation>; // Operations that can be randomly selected
   answerMode: AnswerMode;
   difficultyMode: DifficultyMode;
   questionPart: number; // 0: num1, 1: num2, 2: result

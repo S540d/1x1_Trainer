@@ -24,6 +24,7 @@ export interface TranslationStrings {
   addition: string;
   subtraction: string;
   multiplication: string;
+  division: string;
   answerMode: string;
   inputMode: string;
   multipleChoiceMode: string;
@@ -85,6 +86,7 @@ export const translations: Record<Language, TranslationStrings> = {
     addition: 'Addition',
     subtraction: 'Subtraction',
     multiplication: 'Multiplication',
+    division: 'Division',
     answerMode: 'ANSWER MODE',
     inputMode: 'Number Input',
     multipleChoiceMode: 'Multiple Choice',
@@ -144,6 +146,7 @@ export const translations: Record<Language, TranslationStrings> = {
     addition: 'Addition',
     subtraction: 'Subtraktion',
     multiplication: 'Multiplikation',
+    division: 'Division',
     answerMode: 'ANTWORTMODUS',
     inputMode: 'Zahleneingabe',
     multipleChoiceMode: 'Auswahl',
