@@ -369,15 +369,19 @@ export function useGameLogic({
         newSelectedOperations.add(operation);
       }
 
-      return {
+      const newState = {
         ...prev,
         selectedOperations: newSelectedOperations,
         currentTask: 1,
         score: 0,
         showResult: false,
       };
+      
+      // Generate a new question with the updated operations
+      setTimeout(() => generateQuestion(prev.gameMode, newSelectedOperations), 0);
+      
+      return newState;
     });
-    setTimeout(() => generateQuestion(gameState.gameMode, new Set([...gameState.selectedOperations])), 0);
   };
 
   // Change answer mode
