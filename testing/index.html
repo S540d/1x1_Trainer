@@ -11,15 +11,16 @@
     <meta name="description" content="Practice multiplication tables with different game modes" />
     <meta name="keywords" content="1x1, multiplication, trainer, math, learning, PWA, education" />
     <meta name="author" content="S540d" />
-    <link rel="manifest" href="./manifest.json" />
-    <link rel="icon" type="image/png" href="./icon-192.png" />
-    <link rel="apple-touch-icon" href="./icon-180.png" />
+    <link rel="manifest" href="./1x1_Trainer/manifest.json" />
+    <link rel="icon" type="image/png" href="./1x1_Trainer/icon.png" />
+    <link rel="apple-touch-icon" href="./1x1_Trainer/icon.png" />
     <meta name="theme-color" content="#6200EE" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="1x1 Trainer" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-touch-fullscreen" content="yes" />
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
     <style>
       #root,
       body,
@@ -39,8 +40,9 @@
         /* Background will be set dynamically by React */
       }
     </style>
-  <link rel="icon" href="./favicon.ico" /></head>
-  <body>
+    <base href="/1x1_Trainer/testing/">
+</head>
+  <body data-environment="testing">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <script src="./pwa-update.js"></script>
@@ -48,16 +50,16 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('/1x1_Trainer/testing/service-worker.js', { scope: '/1x1_Trainer/testing/' })
-            .then((registration) => {
-              console.log('SW registered: ', registration);
+            .register('/1x1_Trainer/service-worker.js', { scope: '/1x1_Trainer/' })
+            .then(() => {
+              // Service worker registered successfully
             })
-            .catch((registrationError) => {
-              console.log('SW registration failed: ', registrationError);
+            .catch(() => {
+              // Service worker registration failed
             });
         });
       }
     </script>
-  <script src="./_expo/static/js/web/index-88baf1c21cd0b9b22050986f0fe44726.js" defer></script>
+  <script src="./_expo/static/js/web/index-b2376c10888f5013217c738dca876cb2.js" defer></script>
 </body>
 </html>
