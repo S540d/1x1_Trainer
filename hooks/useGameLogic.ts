@@ -4,13 +4,12 @@
  */
 
 import { useState, useMemo } from 'react';
-import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange } from '../types/game';
+import { GameMode, Operation, AnswerMode, DifficultyMode, GameState } from '../types/game';
 import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER } from '../utils/constants';
 
 interface UseGameLogicProps {
-  initialOperations: Operation[];
+  initialOperation: Operation;
   initialTotalSolvedTasks: number;
-  initialNumberRange: NumberRange;
   onTotalSolvedTasksChange: (total: number) => void;
   onMotivationShow: (score: number) => void;
 }
@@ -21,7 +20,7 @@ interface UseGameLogicProps {
  * @param num1 - First number in the operation
  * @param num2 - Second number in the operation
  * @param questionPart - Which part of the operation is being asked (0: num1, 1: num2, 2: result)
- * @param operation - Type of operation (ADDITION or MULTIPLICATION)
+ * @param operation - Type of operation
  * @returns Array of 10 numbers forming the sequence
  */
 export function generateNumberSequenceForState(
@@ -50,6 +49,24 @@ export function generateNumberSequenceForState(
     for (let i = 1; i <= 10; i++) {
       sequence.push(base + i);
     }
+  } else if (operation === Operation.SUBTRACTION) {
+    // For subtraction, generate a range around the base
+    // Generate: base-4, base-3, base-2, base-1, base, base+1, base+2, base+3, base+4, base+5
+    for (let i = -4; i <= 5; i++) {
+      const value = base + i;
+      if (value > 0) {
+        sequence.push(value);
+      }
+    }
+    // Ensure we have exactly 10 values
+    while (sequence.length < 10) {
+      sequence.push(base + sequence.length);
+    }
+  } else if (operation === Operation.DIVISION) {
+    // For division, generate multiples of the divisor
+    for (let i = 1; i <= 10; i++) {
+      sequence.push(base * i);
+    }
   } else {
     // For multiplication (or fallback), generate: base×1, base×2, base×3, ..., base×10
     // Since num2 ∈ [1,10], correct answer (base×num2) will always be in sequence
@@ -62,9 +79,8 @@ export function generateNumberSequenceForState(
 }
 
 export function useGameLogic({
-  initialOperations,
+  initialOperation,
   initialTotalSolvedTasks,
-  initialNumberRange,
   onTotalSolvedTasksChange,
   onMotivationShow,
 }: UseGameLogicProps) {
@@ -76,8 +92,8 @@ export function useGameLogic({
     currentTask: 1,
     totalTasks: TOTAL_TASKS,
     gameMode: GameMode.NORMAL,
-    operation: initialOperations[0] || Operation.MULTIPLICATION,
-    enabledOperations: initialOperations,
+    operation: initialOperation,
+    selectedOperations: new Set([initialOperation]),
     answerMode: AnswerMode.INPUT,
     difficultyMode: DifficultyMode.SIMPLE,
     questionPart: 2,
@@ -91,13 +107,22 @@ export function useGameLogic({
   // Helper: Get correct answer for current question
   const getCorrectAnswer = () => {
     let result: number;
-
-    if (gameState.operation === Operation.ADDITION) {
-      result = gameState.num1 + gameState.num2;
-    } else if (gameState.operation === Operation.SUBTRACTION) {
-      result = gameState.num1 - gameState.num2;
-    } else {
-      result = gameState.num1 * gameState.num2;
+    
+    switch (gameState.operation) {
+      case Operation.ADDITION:
+        result = gameState.num1 + gameState.num2;
+        break;
+      case Operation.SUBTRACTION:
+        result = gameState.num1 - gameState.num2;
+        break;
+      case Operation.MULTIPLICATION:
+        result = gameState.num1 * gameState.num2;
+        break;
+      case Operation.DIVISION:
+        result = gameState.num1 / gameState.num2;
+        break;
+      default:
+        result = 0;
     }
 
     switch (gameState.questionPart) {
@@ -110,130 +135,44 @@ export function useGameLogic({
     }
   };
 
-  // Validate if a question meets all requirements
-  const isValidQuestion = (num1: number, num2: number, operation: Operation): boolean => {
-    // Rule 1: Only positive whole numbers (no zero)
-    if (num1 <= 0 || num2 <= 0) return false;
-
-    // Calculate result based on operation
-    let result: number;
-    if (operation === Operation.ADDITION) {
-      result = num1 + num2;
-    } else if (operation === Operation.SUBTRACTION) {
-      result = num1 - num2;
-    } else {
-      result = num1 * num2;
-    }
-
-    // Rule 2: No zero result
-    if (result <= 0) return false;
-
-    // Rule 3: Result must be within range limits
-    if (initialNumberRange === NumberRange.SMALL && result > 20) return false;
-    if (initialNumberRange === NumberRange.LARGE && result > 100) return false;
-
-    // Rule 4: All elements (num1, num2) must be within range limits
-    if (initialNumberRange === NumberRange.SMALL && (num1 > 20 || num2 > 20)) return false;
-    if (initialNumberRange === NumberRange.LARGE && (num1 > 100 || num2 > 100)) return false;
-
-    // Rule 5: At "up to 20" - no Addition or Subtraction of two 2-digit numbers
-    if (initialNumberRange === NumberRange.SMALL && (operation === Operation.ADDITION || operation === Operation.SUBTRACTION)) {
-      const is2Digit1 = num1 >= 10;
-      const is2Digit2 = num2 >= 10;
-      if (is2Digit1 && is2Digit2) return false;
-    }
-
-    // Rule 6: For Subtraction - result must be positive (num1 > num2)
-    if (operation === Operation.SUBTRACTION && num1 <= num2) return false;
-
-    return true;
-  };
-
-  // Generate a new question
-  const generateQuestion = (mode: GameMode = gameState.gameMode) => {
-    // Randomly select operation from enabled operations
-    const selectedOperation =
-      gameState.enabledOperations[Math.floor(Math.random() * gameState.enabledOperations.length)] ||
-      Operation.MULTIPLICATION;
-
+  // Generate a new question with proper number generation for each operation
+  const generateQuestion = (mode: GameMode = gameState.gameMode, operationSet: Set<Operation> = gameState.selectedOperations) => {
+    // Pick a random operation from selected operations
+    const operations = Array.from(operationSet);
+    const selectedOp = operations[Math.floor(Math.random() * operations.length)];
+    
     let newNum1: number;
     let newNum2: number;
-    let attempts = 0;
-    const MAX_ATTEMPTS = 50;
-
-    // Generate valid numbers with retries
-    do {
-      attempts++;
-      if (attempts > MAX_ATTEMPTS) {
-        // Fallback to safe defaults if we somehow fail to generate a valid question
-        // This should be rare, but ensures we always have a valid question
-        if (selectedOperation === Operation.MULTIPLICATION) {
-          // Simple multiplication that is valid in all modes
-          newNum1 = 1;
-          newNum2 = 1;
-        } else if (initialNumberRange === NumberRange.SMALL) {
-          // "Up to 20" mode fallbacks
-          if (selectedOperation === Operation.SUBTRACTION) {
-            // 10 - 5 = 5, within 1–20, and only one 2-digit number
-            newNum1 = 10;
-            newNum2 = 5;
-          } else {
-            // Addition: small numbers, sum within 1–20
-            newNum1 = 5;
-            newNum2 = 5;
-          }
-        } else {
-          // "Up to 100" mode fallbacks
-          if (selectedOperation === Operation.SUBTRACTION) {
-            // Ensure positive result and stay within 1–100
-            newNum1 = 100;
-            newNum2 = 50;
-          } else {
-            // Addition: keep within the typical 1–10 range used for LARGE additions
-            newNum1 = 10;
-            newNum2 = 10;
-          }
-        }
+    
+    // Generate appropriate numbers based on operation
+    switch (selectedOp) {
+      case Operation.ADDITION:
+      case Operation.MULTIPLICATION:
+        // For addition and multiplication: both numbers 1-10
+        newNum1 = Math.floor(Math.random() * 10) + 1;
+        newNum2 = Math.floor(Math.random() * 10) + 1;
         break;
-      }
-
-      // Apply number range restrictions based on selected operation
-      if (initialNumberRange === NumberRange.SMALL) {
-        // "Up to 20" mode with operation-specific rules
-        if (selectedOperation === Operation.MULTIPLICATION) {
-          // Only 1x and 2x tables (no two 2-digit numbers)
-          newNum1 = Math.floor(Math.random() * 2) + 1; // 1 or 2
-          newNum2 = Math.floor(Math.random() * 10) + 1; // 1-10
-        } else if (selectedOperation === Operation.SUBTRACTION) {
-          // Subtraction: ensure positive result (num1 > num2), both ≤ 20
-          // Generate with restriction: no two 2-digit numbers
-          const maxNum1 = 20;
-          newNum1 = Math.floor(Math.random() * (maxNum1 - 1)) + 2; // 2-20 to ensure num1 > num2
-          // Ensure num2 < num1 and no two 2-digit numbers
-          const num1Is2Digit = newNum1 >= 10;
-          const maxNum2 = num1Is2Digit ? 9 : Math.min(newNum1 - 1, 20);
-          newNum2 = Math.floor(Math.random() * maxNum2) + 1;
-        } else {
-          // Addition: keep numbers small so sum doesn't exceed 20
-          // Avoid two 2-digit numbers by constraining the second operand
-          newNum1 = Math.floor(Math.random() * 10) + 1; // 1-10
-          const maxSecond = newNum1 === 10 ? 9 : 10;
-          newNum2 = Math.floor(Math.random() * maxSecond) + 1; // 1-maxSecond
-        }
-      } else {
-        // "Up to 100" mode
-        if (selectedOperation === Operation.SUBTRACTION) {
-          // Ensure positive result: num1 > num2
-          newNum1 = Math.floor(Math.random() * 100) + 1;
-          newNum2 = Math.floor(Math.random() * (newNum1 - 1)) + 1;
-        } else {
-          // Addition and Multiplication: full range (1-10)
-          newNum1 = Math.floor(Math.random() * 10) + 1;
-          newNum2 = Math.floor(Math.random() * 10) + 1;
-        }
-      }
-    } while (!isValidQuestion(newNum1, newNum2, selectedOperation));
-
+        
+      case Operation.SUBTRACTION:
+        // For subtraction: ensure result is positive and at least 1
+        // num1 should be larger than num2
+        newNum2 = Math.floor(Math.random() * 9) + 1; // 1-9
+        newNum1 = newNum2 + Math.floor(Math.random() * (10 - newNum2)) + 1; // num2+1 to 10
+        break;
+        
+      case Operation.DIVISION:
+        // For division: ensure clean division (no remainders)
+        // First pick divisor (num2), then pick result, then calculate dividend (num1)
+        newNum2 = Math.floor(Math.random() * 10) + 1; // divisor: 1-10
+        const quotient = Math.floor(Math.random() * 10) + 1; // result: 1-10
+        newNum1 = newNum2 * quotient; // dividend = divisor × quotient
+        break;
+        
+      default:
+        newNum1 = Math.floor(Math.random() * 10) + 1;
+        newNum2 = Math.floor(Math.random() * 10) + 1;
+    }
+    
     let newQuestionPart = 2;
 
     switch (mode) {
@@ -264,9 +203,9 @@ export function useGameLogic({
 
     setGameState((prev) => ({
       ...prev,
-      operation: selectedOperation,
       num1: newNum1,
       num2: newNum2,
+      operation: selectedOp,
       userAnswer: '',
       questionPart: newQuestionPart,
       answerMode: newAnswerMode,
@@ -411,17 +350,34 @@ export function useGameLogic({
     setTimeout(() => generateQuestion(newMode), 0);
   };
 
-  // Update enabled operations (called when user toggles operations)
-  const updateEnabledOperations = (operations: Operation[]) => {
-    if (operations.length === 0) return; // Don't allow empty operations
-    setGameState((prev) => ({
-      ...prev,
-      enabledOperations: operations,
-      currentTask: 1,
-      score: 0,
-      showResult: false,
-    }));
-    setTimeout(() => generateQuestion(), 0);
+  // Toggle operation selection (allow multiple operations)
+  const toggleOperation = (operation: Operation) => {
+    setGameState((prev) => {
+      const newSelectedOperations = new Set(prev.selectedOperations);
+      
+      if (newSelectedOperations.has(operation)) {
+        // Prevent deselecting the last operation
+        if (newSelectedOperations.size === 1) {
+          return prev; // Don't allow deselecting the last operation
+        }
+        newSelectedOperations.delete(operation);
+      } else {
+        newSelectedOperations.add(operation);
+      }
+
+      const newState = {
+        ...prev,
+        selectedOperations: newSelectedOperations,
+        currentTask: 1,
+        score: 0,
+        showResult: false,
+      };
+      
+      // Generate a new question with the updated operations
+      setTimeout(() => generateQuestion(prev.gameMode, newSelectedOperations), 0);
+      
+      return newState;
+    });
   };
 
   // Change answer mode
@@ -539,12 +495,20 @@ export function useGameLogic({
   }, [gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, gameState.answerMode]);
 
   // Get operator symbol
-  const operatorSymbol =
-    gameState.operation === Operation.ADDITION
-      ? '+'
-      : gameState.operation === Operation.SUBTRACTION
-      ? '−'
-      : '×';
+  const operatorSymbol = () => {
+    switch (gameState.operation) {
+      case Operation.ADDITION:
+        return '+';
+      case Operation.SUBTRACTION:
+        return '−';
+      case Operation.MULTIPLICATION:
+        return '×';
+      case Operation.DIVISION:
+        return '÷';
+      default:
+        return '?';
+    }
+  };
 
   return {
     gameState,
@@ -554,14 +518,14 @@ export function useGameLogic({
     restartGame,
     continueGame,
     changeGameMode,
-    updateEnabledOperations,
+    toggleOperation,
     changeAnswerMode,
     changeDifficultyMode,
     handleNumberClick,
     handleChoiceClick,
     multipleChoices,
     numberSequence,
-    operatorSymbol,
+    operatorSymbol: operatorSymbol(),
     getCorrectAnswer,
   };
 }
