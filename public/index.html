@@ -75,19 +75,22 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="orientation-alert" aria-live="polite" aria-atomic="true" role="status" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
     <div id="root"></div>
     <script src="/pwa-update.js"></script>
     <script>
+      const updateOrientationAnnouncement = () => {
+        const mediaQuery = window.matchMedia('(orientation: landscape)');
+        const alertDiv = document.getElementById('orientation-alert');
+        if (mediaQuery.matches) {
+          alertDiv.textContent = 'Your device is in landscape mode. Please rotate your device to portrait mode.';
+        }
+      };
+      updateOrientationAnnouncement();
+      window.matchMedia('(orientation: landscape)').addEventListener('change', updateOrientationAnnouncement);
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker
-            .register('/1x1_Trainer/service-worker.js', { scope: '/1x1_Trainer/' })
-            .then(() => {
-              // Service worker registered successfully
-            })
-            .catch(() => {
-              // Service worker registration failed
-            });
+          navigator.serviceWorker.register('/1x1_Trainer/service-worker.js', { scope: '/1x1_Trainer/' }).then(() => {}).catch(() => {});
         });
       }
     </script>
