@@ -11,7 +11,9 @@ export enum GameMode {
 
 export enum Operation {
   ADDITION = 'ADDITION',
+  SUBTRACTION = 'SUBTRACTION',
   MULTIPLICATION = 'MULTIPLICATION',
+  DIVISION = 'DIVISION',
 }
 
 export enum AnswerMode {
@@ -36,7 +38,8 @@ export interface GameState {
   currentTask: number;
   totalTasks: number;
   gameMode: GameMode;
-  operation: Operation;
+  operation: Operation; // Current operation being used
+  selectedOperations: Set<Operation>; // Operations that can be randomly selected
   answerMode: AnswerMode;
   difficultyMode: DifficultyMode;
   questionPart: number; // 0: num1, 1: num2, 2: result

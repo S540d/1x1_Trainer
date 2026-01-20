@@ -20,7 +20,7 @@ interface UseGameLogicProps {
  * @param num1 - First number in the operation
  * @param num2 - Second number in the operation
  * @param questionPart - Which part of the operation is being asked (0: num1, 1: num2, 2: result)
- * @param operation - Type of operation (ADDITION or MULTIPLICATION)
+ * @param operation - Type of operation
  * @returns Array of 10 numbers forming the sequence
  */
 export function generateNumberSequenceForState(
@@ -49,6 +49,24 @@ export function generateNumberSequenceForState(
     for (let i = 1; i <= 10; i++) {
       sequence.push(base + i);
     }
+  } else if (operation === Operation.SUBTRACTION) {
+    // For subtraction, generate: base-10, base-9, ..., base-1
+    // This ensures reasonable answers
+    for (let i = 10; i >= 1; i--) {
+      const value = base - i;
+      if (value > 0) {
+        sequence.push(value);
+      }
+    }
+    // Pad with positive values if needed
+    while (sequence.length < 10) {
+      sequence.push(base + sequence.length);
+    }
+  } else if (operation === Operation.DIVISION) {
+    // For division, generate multiples of the divisor
+    for (let i = 1; i <= 10; i++) {
+      sequence.push(base * i);
+    }
   } else {
     // For multiplication (or fallback), generate: base×1, base×2, base×3, ..., base×10
     // Since num2 ∈ [1,10], correct answer (base×num2) will always be in sequence
@@ -75,6 +93,7 @@ export function useGameLogic({
     totalTasks: TOTAL_TASKS,
     gameMode: GameMode.NORMAL,
     operation: initialOperation,
+    selectedOperations: new Set([initialOperation]),
     answerMode: AnswerMode.INPUT,
     difficultyMode: DifficultyMode.SIMPLE,
     questionPart: 2,
@@ -87,10 +106,24 @@ export function useGameLogic({
 
   // Helper: Get correct answer for current question
   const getCorrectAnswer = () => {
-    const result =
-      gameState.operation === Operation.ADDITION
-        ? gameState.num1 + gameState.num2
-        : gameState.num1 * gameState.num2;
+    let result: number;
+    
+    switch (gameState.operation) {
+      case Operation.ADDITION:
+        result = gameState.num1 + gameState.num2;
+        break;
+      case Operation.SUBTRACTION:
+        result = gameState.num1 - gameState.num2;
+        break;
+      case Operation.MULTIPLICATION:
+        result = gameState.num1 * gameState.num2;
+        break;
+      case Operation.DIVISION:
+        result = gameState.num1 / gameState.num2;
+        break;
+      default:
+        result = 0;
+    }
 
     switch (gameState.questionPart) {
       case 0:
@@ -102,10 +135,48 @@ export function useGameLogic({
     }
   };
 
-  // Generate a new question
-  const generateQuestion = (mode: GameMode = gameState.gameMode) => {
-    const newNum1 = Math.floor(Math.random() * 10) + 1;
-    const newNum2 = Math.floor(Math.random() * 10) + 1;
+  // Generate a new question with proper number generation for each operation
+  const generateQuestion = (mode: GameMode = gameState.gameMode, operationSet: Set<Operation> = gameState.selectedOperations) => {
+    // Pick a random operation from selected operations
+    const operations = Array.from(operationSet);
+    const selectedOp = operations[Math.floor(Math.random() * operations.length)];
+    
+    let newNum1: number;
+    let newNum2: number;
+    
+    // Generate appropriate numbers based on operation
+    switch (selectedOp) {
+      case Operation.ADDITION:
+      case Operation.MULTIPLICATION:
+        // For addition and multiplication: both numbers 1-10
+        newNum1 = Math.floor(Math.random() * 10) + 1;
+        newNum2 = Math.floor(Math.random() * 10) + 1;
+        break;
+        
+      case Operation.SUBTRACTION:
+        // For subtraction: ensure result is positive
+        // num1 should be larger than num2
+        newNum1 = Math.floor(Math.random() * 10) + 1; // 1-10
+        newNum2 = Math.floor(Math.random() * newNum1) + 1; // 1 to num1
+        // Ensure num1 > num2 for positive result
+        if (newNum1 === newNum2) {
+          newNum1 = newNum2 + 1;
+        }
+        break;
+        
+      case Operation.DIVISION:
+        // For division: ensure clean division (no remainders)
+        // First pick divisor (num2), then pick result, then calculate dividend (num1)
+        newNum2 = Math.floor(Math.random() * 10) + 1; // divisor: 1-10
+        const quotient = Math.floor(Math.random() * 10) + 1; // result: 1-10
+        newNum1 = newNum2 * quotient; // dividend = divisor × quotient
+        break;
+        
+      default:
+        newNum1 = Math.floor(Math.random() * 10) + 1;
+        newNum2 = Math.floor(Math.random() * 10) + 1;
+    }
+    
     let newQuestionPart = 2;
 
     switch (mode) {
@@ -138,6 +209,7 @@ export function useGameLogic({
       ...prev,
       num1: newNum1,
       num2: newNum2,
+      operation: selectedOp,
       userAnswer: '',
       questionPart: newQuestionPart,
       answerMode: newAnswerMode,
@@ -282,16 +354,30 @@ export function useGameLogic({
     setTimeout(() => generateQuestion(newMode), 0);
   };
 
-  // Change operation
-  const changeOperation = (newOperation: Operation) => {
-    setGameState((prev) => ({
-      ...prev,
-      operation: newOperation,
-      currentTask: 1,
-      score: 0,
-      showResult: false,
-    }));
-    setTimeout(() => generateQuestion(), 0);
+  // Toggle operation selection (allow multiple operations)
+  const toggleOperation = (operation: Operation) => {
+    setGameState((prev) => {
+      const newSelectedOperations = new Set(prev.selectedOperations);
+      
+      if (newSelectedOperations.has(operation)) {
+        // Prevent deselecting the last operation
+        if (newSelectedOperations.size === 1) {
+          return prev; // Don't allow deselecting the last operation
+        }
+        newSelectedOperations.delete(operation);
+      } else {
+        newSelectedOperations.add(operation);
+      }
+
+      return {
+        ...prev,
+        selectedOperations: newSelectedOperations,
+        currentTask: 1,
+        score: 0,
+        showResult: false,
+      };
+    });
+    setTimeout(() => generateQuestion(gameState.gameMode, new Set([...gameState.selectedOperations])), 0);
   };
 
   // Change answer mode
@@ -409,7 +495,20 @@ export function useGameLogic({
   }, [gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, gameState.answerMode]);
 
   // Get operator symbol
-  const operatorSymbol = gameState.operation === Operation.ADDITION ? '+' : '×';
+  const operatorSymbol = () => {
+    switch (gameState.operation) {
+      case Operation.ADDITION:
+        return '+';
+      case Operation.SUBTRACTION:
+        return '−';
+      case Operation.MULTIPLICATION:
+        return '×';
+      case Operation.DIVISION:
+        return '÷';
+      default:
+        return '?';
+    }
+  };
 
   return {
     gameState,
@@ -419,14 +518,14 @@ export function useGameLogic({
     restartGame,
     continueGame,
     changeGameMode,
-    changeOperation,
+    toggleOperation,
     changeAnswerMode,
     changeDifficultyMode,
     handleNumberClick,
     handleChoiceClick,
     multipleChoices,
     numberSequence,
-    operatorSymbol,
+    operatorSymbol: operatorSymbol(),
     getCorrectAnswer,
   };
 }

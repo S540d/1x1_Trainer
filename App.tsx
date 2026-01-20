@@ -221,41 +221,77 @@ export default function App() {
             {/* Operation Settings */}
             <View style={styles.settingsSection}>
               <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.operation}</Text>
-              <View style={styles.themeToggle}>
+              <View style={styles.operationGrid}>
                 <TouchableOpacity
                   style={[
-                    styles.themeButton,
+                    styles.operationButton,
                     { borderColor: colors.border },
-                    game.gameState.operation === Operation.ADDITION && styles.themeButtonActive,
+                    game.gameState.selectedOperations.has(Operation.ADDITION) && styles.operationButtonActive,
                   ]}
-                  onPress={() => game.changeOperation(Operation.ADDITION)}
+                  onPress={() => game.toggleOperation(Operation.ADDITION)}
                 >
                   <Text
                     style={[
-                      styles.themeButtonText,
+                      styles.operationButtonText,
                       { color: colors.text },
-                      game.gameState.operation === Operation.ADDITION && styles.themeButtonTextActive,
+                      game.gameState.selectedOperations.has(Operation.ADDITION) && styles.operationButtonTextActive,
                     ]}
                   >
-                    {t.addition}
+                    + {t.addition}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[
-                    styles.themeButton,
+                    styles.operationButton,
                     { borderColor: colors.border },
-                    game.gameState.operation === Operation.MULTIPLICATION && styles.themeButtonActive,
+                    game.gameState.selectedOperations.has(Operation.SUBTRACTION) && styles.operationButtonActive,
                   ]}
-                  onPress={() => game.changeOperation(Operation.MULTIPLICATION)}
+                  onPress={() => game.toggleOperation(Operation.SUBTRACTION)}
                 >
                   <Text
                     style={[
-                      styles.themeButtonText,
+                      styles.operationButtonText,
                       { color: colors.text },
-                      game.gameState.operation === Operation.MULTIPLICATION && styles.themeButtonTextActive,
+                      game.gameState.selectedOperations.has(Operation.SUBTRACTION) && styles.operationButtonTextActive,
                     ]}
                   >
-                    {t.multiplication}
+                    − {t.subtraction}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.operationButton,
+                    { borderColor: colors.border },
+                    game.gameState.selectedOperations.has(Operation.MULTIPLICATION) && styles.operationButtonActive,
+                  ]}
+                  onPress={() => game.toggleOperation(Operation.MULTIPLICATION)}
+                >
+                  <Text
+                    style={[
+                      styles.operationButtonText,
+                      { color: colors.text },
+                      game.gameState.selectedOperations.has(Operation.MULTIPLICATION) && styles.operationButtonTextActive,
+                    ]}
+                  >
+                    × {t.multiplication}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.operationButton,
+                    { borderColor: colors.border },
+                    game.gameState.selectedOperations.has(Operation.DIVISION) && styles.operationButtonActive,
+                  ]}
+                  onPress={() => game.toggleOperation(Operation.DIVISION)}
+                >
+                  <Text
+                    style={[
+                      styles.operationButtonText,
+                      { color: colors.text },
+                      game.gameState.selectedOperations.has(Operation.DIVISION) && styles.operationButtonTextActive,
+                    ]}
+                  >
+                    ÷ {t.division}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -403,6 +439,10 @@ export default function App() {
               <Text style={[styles.questionText, { color: colors.text }]}>
                 {game.gameState.operation === Operation.ADDITION
                   ? game.gameState.num1 + game.gameState.num2
+                  : game.gameState.operation === Operation.SUBTRACTION
+                  ? game.gameState.num1 - game.gameState.num2
+                  : game.gameState.operation === Operation.DIVISION
+                  ? game.gameState.num1 / game.gameState.num2
                   : game.gameState.num1 * game.gameState.num2}
               </Text>
             )}
@@ -812,6 +852,33 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   themeButtonTextActive: {
+    color: '#fff',
+  },
+  operationGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  operationButton: {
+    flex: 1,
+    minWidth: '45%',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    alignItems: 'center',
+  },
+  operationButtonActive: {
+    backgroundColor: '#6200EE',
+    borderColor: '#6200EE',
+  },
+  operationButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+  },
+  operationButtonTextActive: {
     color: '#fff',
   },
   settingsDivider: {
