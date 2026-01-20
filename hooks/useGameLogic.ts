@@ -110,6 +110,45 @@ export function useGameLogic({
     }
   };
 
+  // Validate if a question meets all requirements
+  const isValidQuestion = (num1: number, num2: number, operation: Operation): boolean => {
+    // Rule 1: Only positive whole numbers (no zero)
+    if (num1 <= 0 || num2 <= 0) return false;
+
+    // Calculate result based on operation
+    let result: number;
+    if (operation === Operation.ADDITION) {
+      result = num1 + num2;
+    } else if (operation === Operation.SUBTRACTION) {
+      result = num1 - num2;
+    } else {
+      result = num1 * num2;
+    }
+
+    // Rule 2: No zero result
+    if (result <= 0) return false;
+
+    // Rule 3: Result must be within range limits
+    if (initialNumberRange === NumberRange.SMALL && result > 20) return false;
+    if (initialNumberRange === NumberRange.LARGE && result > 100) return false;
+
+    // Rule 4: All elements (num1, num2) must be within range limits
+    if (initialNumberRange === NumberRange.SMALL && (num1 > 20 || num2 > 20)) return false;
+    if (initialNumberRange === NumberRange.LARGE && (num1 > 100 || num2 > 100)) return false;
+
+    // Rule 5: At "up to 20" - no Addition or Subtraction of two 2-digit numbers
+    if (initialNumberRange === NumberRange.SMALL && (operation === Operation.ADDITION || operation === Operation.SUBTRACTION)) {
+      const is2Digit1 = num1 >= 10;
+      const is2Digit2 = num2 >= 10;
+      if (is2Digit1 && is2Digit2) return false;
+    }
+
+    // Rule 6: For Subtraction - result must be positive (num1 > num2)
+    if (operation === Operation.SUBTRACTION && num1 <= num2) return false;
+
+    return true;
+  };
+
   // Generate a new question
   const generateQuestion = (mode: GameMode = gameState.gameMode) => {
     // Randomly select operation from enabled operations
@@ -119,38 +158,82 @@ export function useGameLogic({
 
     let newNum1: number;
     let newNum2: number;
+    let attempts = 0;
+    const MAX_ATTEMPTS = 50;
 
-    // Apply number range restrictions based on selected operation
-    if (initialNumberRange === NumberRange.SMALL) {
-      // "Up to 20" mode with operation-specific rules
-      if (selectedOperation === Operation.MULTIPLICATION) {
-        // Only 1x and 2x tables
-        newNum1 = Math.floor(Math.random() * 2) + 1; // 1 or 2
-        newNum2 = Math.floor(Math.random() * 10) + 1; // 1-10
-      } else if (selectedOperation === Operation.SUBTRACTION) {
-        // Subtraction: ensure positive result (num1 > num2), both ≤ 20
-        // Generate result (1-19), then generate num2, then num1 = result + num2
-        const result = Math.floor(Math.random() * 19) + 1;
-        const num2 = Math.floor(Math.random() * (20 - result)) + 1;
-        newNum1 = result + num2;
-        newNum2 = num2;
-      } else {
-        // Addition: keep numbers small so sum doesn't exceed 20
-        newNum1 = Math.floor(Math.random() * 10) + 1; // 1-10
-        newNum2 = Math.floor(Math.random() * 10) + 1; // 1-10
+    // Generate valid numbers with retries
+    do {
+      attempts++;
+      if (attempts > MAX_ATTEMPTS) {
+        // Fallback to safe defaults if we somehow fail to generate a valid question
+        // This should be rare, but ensures we always have a valid question
+        if (selectedOperation === Operation.MULTIPLICATION) {
+          // Simple multiplication that is valid in all modes
+          newNum1 = 1;
+          newNum2 = 1;
+        } else if (initialNumberRange === NumberRange.SMALL) {
+          // "Up to 20" mode fallbacks
+          if (selectedOperation === Operation.SUBTRACTION) {
+            // 10 - 5 = 5, within 1–20, and only one 2-digit number
+            newNum1 = 10;
+            newNum2 = 5;
+          } else {
+            // Addition: small numbers, sum within 1–20
+            newNum1 = 5;
+            newNum2 = 5;
+          }
+        } else {
+          // "Up to 100" mode fallbacks
+          if (selectedOperation === Operation.SUBTRACTION) {
+            // Ensure positive result and stay within 1–100
+            newNum1 = 100;
+            newNum2 = 50;
+          } else {
+            // Addition: keep within the typical 1–10 range used for LARGE additions
+            newNum1 = 10;
+            newNum2 = 10;
+          }
+        }
+        break;
       }
-    } else {
-      // "Up to 100" mode
-      if (selectedOperation === Operation.SUBTRACTION) {
-        // Ensure positive result: num1 > num2
-        newNum1 = Math.floor(Math.random() * 100) + 1;
-        newNum2 = Math.floor(Math.random() * newNum1);
+
+      // Apply number range restrictions based on selected operation
+      if (initialNumberRange === NumberRange.SMALL) {
+        // "Up to 20" mode with operation-specific rules
+        if (selectedOperation === Operation.MULTIPLICATION) {
+          // Only 1x and 2x tables (no two 2-digit numbers)
+          newNum1 = Math.floor(Math.random() * 2) + 1; // 1 or 2
+          newNum2 = Math.floor(Math.random() * 10) + 1; // 1-10
+        } else if (selectedOperation === Operation.SUBTRACTION) {
+          // Subtraction: ensure positive result (num1 > num2), both ≤ 20
+          // Generate with restriction: no two 2-digit numbers
+          const maxNum1 = 20;
+          newNum1 = Math.floor(Math.random() * (maxNum1 - 1)) + 2; // 2-20 to ensure num1 > num2
+          // Ensure num2 < num1 and no two 2-digit numbers
+          const num1Is2Digit = newNum1 >= 10;
+          const maxNum2 = num1Is2Digit ? 9 : Math.min(newNum1 - 1, 20);
+          newNum2 = Math.floor(Math.random() * maxNum2) + 1;
+        } else {
+          // Addition: keep numbers small so sum doesn't exceed 20
+          // Avoid two 2-digit numbers by constraining the second operand
+          newNum1 = Math.floor(Math.random() * 10) + 1; // 1-10
+          const maxSecond = newNum1 === 10 ? 9 : 10;
+          newNum2 = Math.floor(Math.random() * maxSecond) + 1; // 1-maxSecond
+        }
       } else {
-        // Addition and Multiplication: full range (1-10)
-        newNum1 = Math.floor(Math.random() * 10) + 1;
-        newNum2 = Math.floor(Math.random() * 10) + 1;
+        // "Up to 100" mode
+        if (selectedOperation === Operation.SUBTRACTION) {
+          // Ensure positive result: num1 > num2
+          newNum1 = Math.floor(Math.random() * 100) + 1;
+          newNum2 = Math.floor(Math.random() * (newNum1 - 1)) + 1;
+        } else {
+          // Addition and Multiplication: full range (1-10)
+          newNum1 = Math.floor(Math.random() * 10) + 1;
+          newNum2 = Math.floor(Math.random() * 10) + 1;
+        }
       }
-    }
+    } while (!isValidQuestion(newNum1, newNum2, selectedOperation));
+
     let newQuestionPart = 2;
 
     switch (mode) {
