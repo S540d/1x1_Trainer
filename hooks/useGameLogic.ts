@@ -50,15 +50,15 @@ export function generateNumberSequenceForState(
       sequence.push(base + i);
     }
   } else if (operation === Operation.SUBTRACTION) {
-    // For subtraction, generate: base-10, base-9, ..., base-1
-    // This ensures reasonable answers
-    for (let i = 10; i >= 1; i--) {
-      const value = base - i;
+    // For subtraction, generate a range around the base
+    // Generate: base-4, base-3, base-2, base-1, base, base+1, base+2, base+3, base+4, base+5
+    for (let i = -4; i <= 5; i++) {
+      const value = base + i;
       if (value > 0) {
         sequence.push(value);
       }
     }
-    // Pad with positive values if needed
+    // Ensure we have exactly 10 values
     while (sequence.length < 10) {
       sequence.push(base + sequence.length);
     }
@@ -154,14 +154,10 @@ export function useGameLogic({
         break;
         
       case Operation.SUBTRACTION:
-        // For subtraction: ensure result is positive
+        // For subtraction: ensure result is positive and at least 1
         // num1 should be larger than num2
-        newNum1 = Math.floor(Math.random() * 10) + 1; // 1-10
-        newNum2 = Math.floor(Math.random() * newNum1) + 1; // 1 to num1
-        // Ensure num1 > num2 for positive result
-        if (newNum1 === newNum2) {
-          newNum1 = newNum2 + 1;
-        }
+        newNum2 = Math.floor(Math.random() * 9) + 1; // 1-9
+        newNum1 = newNum2 + Math.floor(Math.random() * (10 - newNum2)) + 1; // num2+1 to 10
         break;
         
       case Operation.DIVISION:
