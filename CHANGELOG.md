@@ -8,12 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- 🐛 **CRITICAL: Game Logic Bugs** (Issue #66): Fixed multiple critical bugs in game operations
+  - Fixed initial operation: Now defaults to MULTIPLICATION instead of undefined
+  - Fixed TypeError: `setOperation is not a function` by syncing useGameLogic with usePreferences
+  - Fixed NUMBER_SEQUENCE for factors: When asking for factors (e.g., `9×?=36`), now correctly shows 1-10 instead of multiples
+  - **CRITICAL:** Fixed division NUMBER_SEQUENCE: `20÷4=?` now shows 1-10 sequence (answer 5 is included!)
+  - Fixed subtraction logic: No more impossible questions like `11-?=66`
+  - Fixed number range violations in subtraction (e.g., `?-33=1683`)
+  - Fixed favicon: Replaced incorrect EnergyPriceGermany icon with correct 1x1 Trainer icon
+  - All 267 tests passing with 89.67% coverage
 - 🐛 **Creative Mode - NUMBER_SEQUENCE Layout** (Issue #31): Fixed number buttons overflow on all devices
   - Removed `flex: 1` from ScrollView to prevent competing for parent flex space
   - ScrollView now sizes naturally to content and scrolls only when needed
   - Check button remains visible and accessible on phones, tablets, and desktop
   - When many number buttons exceed available space, ScrollView scrolls smoothly
   - Resolves off-screen check button issue across all screen sizes
+
+### Added
+- ✅ **Comprehensive Tests for useTheme Hook**: Added 26 new tests
+  - Theme initialization (light/dark/system)
+  - System dark mode detection on web
+  - matchMedia listener setup and cleanup
+  - Mobile platform handling (iOS/Android)
+  - Achieved 100% coverage for useTheme.ts
+  - Overall test coverage increased from 85.27% to 89.67%
 
 ## [1.0.12] - 2025-12-22
 
