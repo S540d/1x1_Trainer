@@ -9,6 +9,7 @@ import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER } from '
 
 interface UseGameLogicProps {
   initialOperation: Operation;
+  initialOperations?: Operation[]; // Optional: array of selected operations
   initialTotalSolvedTasks: number;
   onTotalSolvedTasksChange: (total: number) => void;
   onMotivationShow: (score: number) => void;
@@ -31,47 +32,92 @@ export function generateNumberSequenceForState(
 ): number[] {
   const sequence: number[] = [];
 
-  // Determine the base number for the sequence
-  let base;
-  if (questionPart === 0) {
-    base = num2;
-  } else if (questionPart === 1) {
-    base = num1;
-  } else {
-    // For result, use one of the factors
-    base = num1;
-  }
+  // Determine which number is being asked for and generate appropriate sequence
+  // For multiplication/division: we need the multiplication table of the known factor
+  // For addition/subtraction: we need a range around the known value
 
-  // Generate sequence based on operation type
-  if (operation === Operation.ADDITION) {
-    // For addition, generate: base+1, base+2, base+3, ..., base+10
-    // Since num2 ∈ [1,10], correct answer (base+num2) will always be in sequence
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base + i);
-    }
-  } else if (operation === Operation.SUBTRACTION) {
-    // For subtraction, generate a range around the base
-    // Generate: base-4, base-3, base-2, base-1, base, base+1, base+2, base+3, base+4, base+5
-    for (let i = -4; i <= 5; i++) {
-      const value = base + i;
-      if (value > 0) {
-        sequence.push(value);
+  if (operation === Operation.MULTIPLICATION) {
+    // For multiplication, the sequence depends on what we're asking for:
+    // - If asking for a FACTOR (questionPart 0 or 1): show simple sequence 1-10
+    // - If asking for RESULT (questionPart 2): show multiples of one factor
+
+    if (questionPart === 2) {
+      // Asking for result: num1 × num2 = ?
+      // Show multiples of num1: num1×1, num1×2, ..., num1×10
+      const base = num1;
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base * i);
+      }
+    } else {
+      // Asking for a factor: ? × num2 = result OR num1 × ? = result
+      // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(i);
       }
     }
-    // Ensure we have exactly 10 values
-    while (sequence.length < 10) {
-      sequence.push(base + sequence.length);
+  } else if (operation === Operation.ADDITION) {
+    // For addition:
+    // - If asking for ADDEND (questionPart 0 or 1): show simple sequence 1-10
+    // - If asking for SUM (questionPart 2): show range num1+1 to num1+10
+
+    if (questionPart === 2) {
+      // Asking for sum: num1 + num2 = ?
+      // Show: num1+1, num1+2, ..., num1+10
+      const base = num1;
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base + i);
+      }
+    } else {
+      // Asking for an addend: ? + num2 = result OR num1 + ? = result
+      // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(i);
+      }
+    }
+  } else if (operation === Operation.SUBTRACTION) {
+    // For subtraction:
+    // - If asking for MINUEND or SUBTRAHEND (questionPart 0 or 1): show simple sequence 1-10
+    // - If asking for DIFFERENCE (questionPart 2): show range around num1
+
+    if (questionPart === 2) {
+      // Asking for difference: num1 - num2 = ?
+      // Show range around num1: base-4 to base+5
+      const base = num1;
+      for (let i = -4; i <= 5; i++) {
+        const value = base + i;
+        if (value > 0) {
+          sequence.push(value);
+        }
+      }
+      // Ensure we have exactly 10 values
+      while (sequence.length < 10) {
+        sequence.push(base + sequence.length);
+      }
+    } else {
+      // Asking for minuend or subtrahend: ? - num2 = result OR num1 - ? = result
+      // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(i);
+      }
     }
   } else if (operation === Operation.DIVISION) {
-    // For division, generate multiples of the divisor
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base * i);
-    }
-  } else {
-    // For multiplication (or fallback), generate: base×1, base×2, base×3, ..., base×10
-    // Since num2 ∈ [1,10], correct answer (base×num2) will always be in sequence
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base * i);
+    // For division, all question types should show simple sequence 1-10
+    // since we're always looking for a factor or quotient (both in range 1-10)
+
+    if (questionPart === 0) {
+      // Asking for dividend: ? ÷ num2 = result
+      // The dividend = divisor × quotient, so show multiples of num2
+      const base = num2;
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base * i);
+      }
+    } else {
+      // Asking for divisor OR quotient: num1 ÷ ? = result OR num1 ÷ num2 = ?
+      // Both divisor and quotient are in range 1-10
+      // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(i);
+      }
     }
   }
 
@@ -80,10 +126,16 @@ export function generateNumberSequenceForState(
 
 export function useGameLogic({
   initialOperation,
+  initialOperations,
   initialTotalSolvedTasks,
   onTotalSolvedTasksChange,
   onMotivationShow,
 }: UseGameLogicProps) {
+  // Use initialOperations if provided, otherwise fallback to single initialOperation
+  const selectedOps = initialOperations && initialOperations.length > 0
+    ? initialOperations
+    : [initialOperation || Operation.MULTIPLICATION];
+
   const [gameState, setGameState] = useState<GameState>({
     num1: 1,
     num2: 1,
@@ -92,8 +144,8 @@ export function useGameLogic({
     currentTask: 1,
     totalTasks: TOTAL_TASKS,
     gameMode: GameMode.NORMAL,
-    operation: initialOperation,
-    selectedOperations: new Set([initialOperation]),
+    operation: selectedOps[0],
+    selectedOperations: new Set(selectedOps),
     answerMode: AnswerMode.INPUT,
     difficultyMode: DifficultyMode.SIMPLE,
     questionPart: 2,

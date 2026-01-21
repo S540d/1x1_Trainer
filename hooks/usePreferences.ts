@@ -128,6 +128,9 @@ export function usePreferences() {
     setLanguage,
     themeMode,
     setThemeMode,
+    operation: operations.length > 0
+      ? operations[0]
+      : Operation.MULTIPLICATION, // First selected operation as primary
     operations,
     setOperations,
     toggleOperation,
