@@ -468,25 +468,25 @@ describe('generateNumberSequenceForState - Extended Coverage (Phase 1 MVP)', () 
     it('should use num2 as base when questionPart === 0', () => {
       const num1 = 5;
       const num2 = 3;
-      const questionPart = 0; // asking for num1
+      const questionPart = 0; // asking for num1: ? + 3 = 8
       const operation = Operation.ADDITION;
 
       const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
-      // Base is num2 (3), so sequence is 4-13 for addition
-      expect(sequence).toEqual([4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+      // When asking for an addend, show simple sequence 1-10
+      expect(sequence).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     });
 
     it('should use num1 as base when questionPart === 1', () => {
       const num1 = 5;
       const num2 = 3;
-      const questionPart = 1; // asking for num2
+      const questionPart = 1; // asking for num2: 5 + ? = 8
       const operation = Operation.ADDITION;
 
       const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
-      // Base is num1 (5), so sequence is 6-15 for addition
-      expect(sequence).toEqual([6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+      // When asking for an addend, show simple sequence 1-10
+      expect(sequence).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     });
 
     it('should use num1 as base when questionPart === 2 (result)', () => {

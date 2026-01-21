@@ -37,79 +37,95 @@ export function generateNumberSequenceForState(
   // For addition/subtraction: we need a range around the known value
 
   if (operation === Operation.MULTIPLICATION) {
-    // Example: 9 × ? = 36 (questionPart=1, num1=9, num2=4)
-    // We need the multiplication table of 9: 9, 18, 27, 36, 45, 54, 63, 72, 81, 90
-    let base;
-    if (questionPart === 0) {
-      // ? × num2 = result → need multiples of num2
-      base = num2;
-    } else if (questionPart === 1) {
-      // num1 × ? = result → need multiples of num1
-      base = num1;
-    } else {
-      // num1 × num2 = ? → need multiples of num1 (or num2, doesn't matter)
-      base = num1;
-    }
+    // For multiplication, the sequence depends on what we're asking for:
+    // - If asking for a FACTOR (questionPart 0 or 1): show simple sequence 1-10
+    // - If asking for RESULT (questionPart 2): show multiples of one factor
 
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base * i);
-    }
-  } else if (operation === Operation.ADDITION) {
-    // For addition, generate: base+1, base+2, base+3, ..., base+10
-    let base;
-    if (questionPart === 0) {
-      base = num2;
-    } else if (questionPart === 1) {
-      base = num1;
+    if (questionPart === 2) {
+      // Asking for result: num1 × num2 = ?
+      // Show multiples of num1: num1×1, num1×2, ..., num1×10
+      const base = num1;
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base * i);
+      }
     } else {
-      base = num1;
-    }
-
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base + i);
-    }
-  } else if (operation === Operation.SUBTRACTION) {
-    // For subtraction, determine base similar to other operations
-    // The base determines the reference point for the sequence
-    let base;
-    if (questionPart === 0) {
-      // ? - num2 = result → base = num2 (similar to other operations)
-      base = num2;
-    } else if (questionPart === 1) {
-      // num1 - ? = result → base = num1
-      base = num1;
-    } else {
-      // num1 - num2 = ? → base = num1 (the minuend)
-      base = num1;
-    }
-
-    // Generate: base-4, base-3, base-2, base-1, base, base+1, base+2, base+3, base+4, base+5
-    for (let i = -4; i <= 5; i++) {
-      const value = base + i;
-      if (value > 0) {
-        sequence.push(value);
+      // Asking for a factor: ? × num2 = result OR num1 × ? = result
+      // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(i);
       }
     }
-    // Ensure we have exactly 10 values
-    while (sequence.length < 10) {
-      sequence.push(base + sequence.length);
+  } else if (operation === Operation.ADDITION) {
+    // For addition:
+    // - If asking for ADDEND (questionPart 0 or 1): show simple sequence 1-10
+    // - If asking for SUM (questionPart 2): show range num1+1 to num1+10
+
+    if (questionPart === 2) {
+      // Asking for sum: num1 + num2 = ?
+      // Show: num1+1, num1+2, ..., num1+10
+      const base = num1;
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base + i);
+      }
+    } else {
+      // Asking for an addend: ? + num2 = result OR num1 + ? = result
+      // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(i);
+      }
+    }
+  } else if (operation === Operation.SUBTRACTION) {
+    // For subtraction:
+    // - If asking for MINUEND or SUBTRAHEND (questionPart 0 or 1): show simple sequence 1-10
+    // - If asking for DIFFERENCE (questionPart 2): show range around num1
+
+    if (questionPart === 2) {
+      // Asking for difference: num1 - num2 = ?
+      // Show range around num1: base-4 to base+5
+      const base = num1;
+      for (let i = -4; i <= 5; i++) {
+        const value = base + i;
+        if (value > 0) {
+          sequence.push(value);
+        }
+      }
+      // Ensure we have exactly 10 values
+      while (sequence.length < 10) {
+        sequence.push(base + sequence.length);
+      }
+    } else {
+      // Asking for minuend or subtrahend: ? - num2 = result OR num1 - ? = result
+      // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(i);
+      }
     }
   } else if (operation === Operation.DIVISION) {
-    // For division, similar to multiplication - use multiples
-    let base;
-    if (questionPart === 0) {
-      // ? ÷ num2 = result → need multiples of num2
-      base = num2;
-    } else if (questionPart === 1) {
-      // num1 ÷ ? = result → need multiples of num1
-      base = num1;
-    } else {
-      // num1 ÷ num2 = ? → need multiples of num1 (dividend)
-      base = num1;
-    }
+    // For division:
+    // - If asking for DIVIDEND (questionPart 0): show multiples of num2
+    // - If asking for DIVISOR (questionPart 1): show simple sequence 1-10
+    // - If asking for QUOTIENT (questionPart 2): show multiples of dividend
 
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base * i);
+    if (questionPart === 0) {
+      // Asking for dividend: ? ÷ num2 = result
+      // Show multiples of num2 (divisor): num2×1, num2×2, ..., num2×10
+      const base = num2;
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base * i);
+      }
+    } else if (questionPart === 1) {
+      // Asking for divisor: num1 ÷ ? = result
+      // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(i);
+      }
+    } else {
+      // Asking for quotient: num1 ÷ num2 = ?
+      // Show multiples of num1 (dividend): num1×1, num1×2, ..., num1×10
+      const base = num1;
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base * i);
+      }
     }
   }
 
