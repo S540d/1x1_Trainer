@@ -351,53 +351,59 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
   });
 
   describe('DIVISION operation', () => {
-    it('should generate sequence base×1 through base×10 for division', () => {
-      const num1 = 6;
-      const num2 = 2;
-      const questionPart = 2;
+    it('should generate simple sequence 1-10 for quotient (questionPart=2)', () => {
+      const num1 = 20;
+      const num2 = 4;
+      const questionPart = 2; // Asking for quotient: 20 ÷ 4 = ?
       const operation = Operation.DIVISION;
 
       const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
-      // For division with base=6: 6×1, 6×2, ..., 6×10
-      // Expected: 6, 12, 18, 24, 30, 36, 42, 48, 54, 60
-      const expected = [6, 12, 18, 24, 30, 36, 42, 48, 54, 60];
+      // For division asking for quotient, show simple sequence 1-10
+      // This ensures the correct answer (5) is in the sequence
+      const expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
       expect(sequence).toEqual(expected);
       expect(sequence).toHaveLength(10);
     });
 
-    it('should include correct divisor multiples', () => {
-      const num1 = 8;
-      const num2 = 2;
-      const questionPart = 2;
+    it('should include correct answer in sequence', () => {
+      const num1 = 24;
+      const num2 = 3;
+      const questionPart = 2; // Asking for quotient: 24 ÷ 3 = 8
       const operation = Operation.DIVISION;
 
       const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
-      // For division: dividend ÷ divisor = quotient
-      // In PR #67, division questions are generated as: dividend = divisor × quotient
-      // So base is num1 (dividend)
-      // Sequence: 8, 16, 24, 32, 40, 48, 56, 64, 72, 80
-      expect(sequence).toEqual([8, 16, 24, 32, 40, 48, 56, 64, 72, 80]);
+      // Quotient is 8, and sequence is 1-10, so 8 should be included
+      expect(sequence).toContain(8);
+      expect(sequence).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     });
 
-    it('should handle all bases from 1 to 10 for division', () => {
-      const questionPart = 2;
+    it('should generate multiples for dividend (questionPart=0)', () => {
+      const num1 = 5; // This value doesn't matter for questionPart=0
+      const num2 = 3; // divisor
+      const questionPart = 0; // Asking for dividend: ? ÷ 3 = result
       const operation = Operation.DIVISION;
 
-      for (let base = 1; base <= 10; base++) {
-        const sequence = generateNumberSequenceForState(base, 5, questionPart, operation);
+      const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
-        expect(sequence).toHaveLength(10);
-        expect(sequence[0]).toBe(base * 1);
-        expect(sequence[9]).toBe(base * 10);
+      // For dividend, show multiples of divisor (num2)
+      expect(sequence).toEqual([3, 6, 9, 12, 15, 18, 21, 24, 27, 30]);
+      expect(sequence).toHaveLength(10);
+    });
 
-        // Verify increments of base (multiplication table)
-        for (let i = 1; i < sequence.length; i++) {
-          expect(sequence[i]).toBe(sequence[i - 1] + base);
-        }
-      }
+    it('should generate simple sequence 1-10 for divisor (questionPart=1)', () => {
+      const num1 = 24;
+      const num2 = 3;
+      const questionPart = 1; // Asking for divisor: 24 ÷ ? = result
+      const operation = Operation.DIVISION;
+
+      const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
+
+      // For divisor, show simple sequence 1-10
+      expect(sequence).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+      expect(sequence).toHaveLength(10);
     });
   });
 
@@ -418,14 +424,15 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       expect(multSeq).toHaveLength(10);
       expect(divSeq).toHaveLength(10);
 
-      // All should be unique sequences except division and multiplication
+      // All should be unique sequences
       expect(addSeq).not.toEqual(multSeq);
       expect(addSeq).not.toEqual(subSeq);
       expect(addSeq).not.toEqual(divSeq);
       expect(subSeq).not.toEqual(multSeq);
       expect(subSeq).not.toEqual(divSeq);
-      // Division uses same pattern as multiplication (base multiples)
-      expect(divSeq).toEqual(multSeq);
+      // Division now uses 1-10 sequence (not multiples like multiplication)
+      expect(divSeq).not.toEqual(multSeq);
+      expect(divSeq).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     });
 
     it('should include correct answer for ADDITION, SUBTRACTION, and MULTIPLICATION in their sequences', () => {

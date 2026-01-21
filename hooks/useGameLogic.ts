@@ -101,30 +101,22 @@ export function generateNumberSequenceForState(
       }
     }
   } else if (operation === Operation.DIVISION) {
-    // For division:
-    // - If asking for DIVIDEND (questionPart 0): show multiples of num2
-    // - If asking for DIVISOR (questionPart 1): show simple sequence 1-10
-    // - If asking for QUOTIENT (questionPart 2): show multiples of dividend
+    // For division, all question types should show simple sequence 1-10
+    // since we're always looking for a factor or quotient (both in range 1-10)
 
     if (questionPart === 0) {
       // Asking for dividend: ? ÷ num2 = result
-      // Show multiples of num2 (divisor): num2×1, num2×2, ..., num2×10
+      // The dividend = divisor × quotient, so show multiples of num2
       const base = num2;
       for (let i = 1; i <= 10; i++) {
         sequence.push(base * i);
       }
-    } else if (questionPart === 1) {
-      // Asking for divisor: num1 ÷ ? = result
+    } else {
+      // Asking for divisor OR quotient: num1 ÷ ? = result OR num1 ÷ num2 = ?
+      // Both divisor and quotient are in range 1-10
       // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
       for (let i = 1; i <= 10; i++) {
         sequence.push(i);
-      }
-    } else {
-      // Asking for quotient: num1 ÷ num2 = ?
-      // Show multiples of num1 (dividend): num1×1, num1×2, ..., num1×10
-      const base = num1;
-      for (let i = 1; i <= 10; i++) {
-        sequence.push(base * i);
       }
     }
   }
