@@ -32,6 +32,7 @@ export default function App() {
   const theme = useTheme(preferences.themeMode);
   const game = useGameLogic({
     initialOperation: preferences.operation,
+    initialOperations: preferences.operations,
     initialTotalSolvedTasks: preferences.totalSolvedTasks,
     onTotalSolvedTasksChange: preferences.setTotalSolvedTasks,
     onMotivationShow: (score: number) => {
@@ -60,11 +61,13 @@ export default function App() {
 
   // Sync operation changes to preferences
   useEffect(() => {
-    if (preferences.isLoaded && game.gameState.operation !== preferences.operation) {
-      preferences.setOperation(game.gameState.operation);
+    if (preferences.isLoaded && !preferences.operations.includes(game.gameState.operation)) {
+      // Update operations array when game operation changes
+      const newOps = Array.from(game.gameState.selectedOperations);
+      preferences.setOperations(newOps);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [game.gameState.operation]);
+  }, [game.gameState.selectedOperations]);
 
   const getCardColor = () => {
     if (game.gameState.lastAnswerCorrect === true) return colors.cardCorrect;

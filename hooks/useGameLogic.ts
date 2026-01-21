@@ -9,6 +9,7 @@ import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER } from '
 
 interface UseGameLogicProps {
   initialOperation: Operation;
+  initialOperations?: Operation[]; // Optional: array of selected operations
   initialTotalSolvedTasks: number;
   onTotalSolvedTasksChange: (total: number) => void;
   onMotivationShow: (score: number) => void;
@@ -31,26 +32,57 @@ export function generateNumberSequenceForState(
 ): number[] {
   const sequence: number[] = [];
 
-  // Determine the base number for the sequence
-  let base;
-  if (questionPart === 0) {
-    base = num2;
-  } else if (questionPart === 1) {
-    base = num1;
-  } else {
-    // For result, use one of the factors
-    base = num1;
-  }
+  // Determine which number is being asked for and generate appropriate sequence
+  // For multiplication/division: we need the multiplication table of the known factor
+  // For addition/subtraction: we need a range around the known value
 
-  // Generate sequence based on operation type
-  if (operation === Operation.ADDITION) {
+  if (operation === Operation.MULTIPLICATION) {
+    // Example: 9 × ? = 36 (questionPart=1, num1=9, num2=4)
+    // We need the multiplication table of 9: 9, 18, 27, 36, 45, 54, 63, 72, 81, 90
+    let base;
+    if (questionPart === 0) {
+      // ? × num2 = result → need multiples of num2
+      base = num2;
+    } else if (questionPart === 1) {
+      // num1 × ? = result → need multiples of num1
+      base = num1;
+    } else {
+      // num1 × num2 = ? → need multiples of num1 (or num2, doesn't matter)
+      base = num1;
+    }
+
+    for (let i = 1; i <= 10; i++) {
+      sequence.push(base * i);
+    }
+  } else if (operation === Operation.ADDITION) {
     // For addition, generate: base+1, base+2, base+3, ..., base+10
-    // Since num2 ∈ [1,10], correct answer (base+num2) will always be in sequence
+    let base;
+    if (questionPart === 0) {
+      base = num2;
+    } else if (questionPart === 1) {
+      base = num1;
+    } else {
+      base = num1;
+    }
+
     for (let i = 1; i <= 10; i++) {
       sequence.push(base + i);
     }
   } else if (operation === Operation.SUBTRACTION) {
-    // For subtraction, generate a range around the base
+    // For subtraction, determine base similar to other operations
+    // The base determines the reference point for the sequence
+    let base;
+    if (questionPart === 0) {
+      // ? - num2 = result → base = num2 (similar to other operations)
+      base = num2;
+    } else if (questionPart === 1) {
+      // num1 - ? = result → base = num1
+      base = num1;
+    } else {
+      // num1 - num2 = ? → base = num1 (the minuend)
+      base = num1;
+    }
+
     // Generate: base-4, base-3, base-2, base-1, base, base+1, base+2, base+3, base+4, base+5
     for (let i = -4; i <= 5; i++) {
       const value = base + i;
@@ -63,13 +95,19 @@ export function generateNumberSequenceForState(
       sequence.push(base + sequence.length);
     }
   } else if (operation === Operation.DIVISION) {
-    // For division, generate multiples of the divisor
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base * i);
+    // For division, similar to multiplication - use multiples
+    let base;
+    if (questionPart === 0) {
+      // ? ÷ num2 = result → need multiples of num2
+      base = num2;
+    } else if (questionPart === 1) {
+      // num1 ÷ ? = result → need multiples of num1
+      base = num1;
+    } else {
+      // num1 ÷ num2 = ? → need multiples of num1 (dividend)
+      base = num1;
     }
-  } else {
-    // For multiplication (or fallback), generate: base×1, base×2, base×3, ..., base×10
-    // Since num2 ∈ [1,10], correct answer (base×num2) will always be in sequence
+
     for (let i = 1; i <= 10; i++) {
       sequence.push(base * i);
     }
@@ -80,10 +118,16 @@ export function generateNumberSequenceForState(
 
 export function useGameLogic({
   initialOperation,
+  initialOperations,
   initialTotalSolvedTasks,
   onTotalSolvedTasksChange,
   onMotivationShow,
 }: UseGameLogicProps) {
+  // Use initialOperations if provided, otherwise fallback to single initialOperation
+  const selectedOps = initialOperations && initialOperations.length > 0
+    ? initialOperations
+    : [initialOperation || Operation.MULTIPLICATION];
+
   const [gameState, setGameState] = useState<GameState>({
     num1: 1,
     num2: 1,
@@ -92,8 +136,8 @@ export function useGameLogic({
     currentTask: 1,
     totalTasks: TOTAL_TASKS,
     gameMode: GameMode.NORMAL,
-    operation: initialOperation,
-    selectedOperations: new Set([initialOperation]),
+    operation: selectedOps[0],
+    selectedOperations: new Set(selectedOps),
     answerMode: AnswerMode.INPUT,
     difficultyMode: DifficultyMode.SIMPLE,
     questionPart: 2,
