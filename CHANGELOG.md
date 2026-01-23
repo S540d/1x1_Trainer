@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- ✨ **Flexible Number Range** (Issue #80, PR #80): Enhanced number range selection
+  - Expanded from 2 ranges to 4 selectable ranges: 1-10, 1-20, 1-50, 1-100
+  - Added NumberRange enum with values RANGE_10, RANGE_20, RANGE_50, RANGE_100
+  - Implemented storage migration from old SMALL/MEDIUM/LARGE to new format
+  - Added UI in PersonalizeModal with 2x2 grid layout for range selection
+  - Updated translations for all ranges in English and German
+  - All 272 tests passing
+- 🎯 **Three-Tier Motivational Messages** (Issue #76, PR #77): Improved feedback system
+  - Replaced binary scoring with three-tier system:
+    - 1-3 points: "Schade, versuche es nochmal!" / "Keep Going!"
+    - 4-6 points: "Fast geschafft!" / "Almost There!"
+    - 7-10 points: "Super!" / "Great!"
+  - More granular encouragement based on performance
+  - Updated translations in both languages
+
+### Fixed
+- 🐛 **CRITICAL: Number Range Enforcement** (Issue #81, PR #82): Fixed range violations
+  - Problem: Tasks like "42×32=?" appeared even with 1-20 range selected
+  - Root cause: Division/multiplication could generate numbers beyond selected range
+  - Solution: Implemented smart generation (Option A - pedagogically sound):
+    - **Multiplication**: Factors limited to 1-10 (follows 1x1 trainer pedagogy)
+    - **Division**: Divisor 1-10, dividend capped at 100
+    - **Addition/Subtraction**: Use full selected range
+  - Prevents invalid tasks from being generated (no validation overhead)
+  - Better UX: Problems stay manageable and learnable
+  - All 272 tests passing
+
 ### Changed
 - 🔄 **Deployment Workflow**: Implemented 3-tier deployment strategy for safer releases
   - Added `staging` branch between `testing` and `main`
