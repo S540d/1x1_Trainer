@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1.00001, viewport-fit=cover"
+    />
+    <meta name="screen-orientation" content="portrait" />
+    <meta name="x5-orientation" content="portrait" />
+    <title>1x1 Trainer - Learn Multiplication</title>
+    <meta name="description" content="Practice multiplication tables with different game modes" />
+    <meta name="keywords" content="1x1, multiplication, trainer, math, learning, PWA, education" />
+    <meta name="author" content="S540d" />
+    <link rel="manifest" href="./1x1_Trainer/manifest.json" />
+    <link rel="icon" type="image/png" sizes="128x128" href="./1x1_Trainer/icon-128.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="./1x1_Trainer/icon-96.png" />
+    <link rel="apple-touch-icon" href="./1x1_Trainer/icon.png" />
+    <meta name="theme-color" content="#6200EE" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="1x1 Trainer" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <link rel="shortcut icon" href="./icon-192.png" />
+    <style>
+      #root,
+      body,
+      html {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #FAFAFA;
+        /* Background will be set dynamically by React */
+      }
+      @media screen and (orientation: landscape) {
+        body::before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.95);
+          z-index: 1000;
+        }
+        body::after {
+          content: '📱 Bitte drehen Sie Ihr Gerät ins Hochformat / Please rotate your device to portrait mode';
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 1001;
+          color: white;
+          font-size: 18px;
+          text-align: center;
+          padding: 20px;
+          max-width: 80%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="orientation-alert" aria-live="polite" aria-atomic="true" role="status" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
+    <div id="root"></div>
+    <script src="./pwa-update.js"></script>
+    <script>
+      const updateOrientationAnnouncement = () => {
+        const mediaQuery = window.matchMedia('(orientation: landscape)');
+        const alertDiv = document.getElementById('orientation-alert');
+        if (mediaQuery.matches) {
+          alertDiv.textContent = 'Your device is in landscape mode. Please rotate your device to portrait mode.';
+        }
+      };
+      updateOrientationAnnouncement();
+      window.matchMedia('(orientation: landscape)').addEventListener('change', updateOrientationAnnouncement);
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/1x1_Trainer/service-worker.js', { scope: '/1x1_Trainer/' }).then(() => {}).catch(() => {});
+        });
+      }
+    </script>
+  <script src="./_expo/static/js/web/index-2e2bb1b0bd7d5856406ca5c0a9d6f5ab.js" defer></script>
+</body>
+</html>

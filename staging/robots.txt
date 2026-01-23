@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /.well-known/
+Disallow: /private/
+
+Sitemap: /sitemap.xml
+
+# Performance directives
+Request-rate: 1/s
