@@ -478,10 +478,18 @@ export default function App() {
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.settingsMenu }]}>
             <Text style={[styles.modalTitle, { color: colors.text }]}>
-              {motivationScore < 5 ? t.motivationTitleLowScore : t.motivationTitle}
+              {motivationScore <= 3
+                ? t.motivationTitleLowScore
+                : motivationScore <= 6
+                ? t.motivationTitleMediumScore
+                : t.motivationTitleHighScore}
             </Text>
             <Text style={[styles.modalText, { color: colors.text }]}>
-              {motivationScore < 5 ? t.motivationMessageLowScore : t.motivationMessage}
+              {motivationScore <= 3
+                ? t.motivationMessageLowScore
+                : motivationScore <= 6
+                ? t.motivationMessageMediumScore
+                : t.motivationMessageHighScore}
             </Text>
             <TouchableOpacity
               style={styles.restartButton}
