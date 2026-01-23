@@ -224,10 +224,17 @@ export function useGameLogic({
     // Generate appropriate numbers based on operation
     switch (selectedOp) {
       case Operation.ADDITION:
-      case Operation.MULTIPLICATION:
-        // For addition and multiplication: both numbers within range
+        // For addition: operands can use full range, result naturally scales
         newNum1 = Math.floor(Math.random() * maxNumber) + 1;
         newNum2 = Math.floor(Math.random() * maxNumber) + 1;
+        break;
+
+      case Operation.MULTIPLICATION:
+        // For multiplication: keep factors 1-10 for learning, but scale based on range
+        // This follows 1x1 trainer pedagogy (master 1-10 factors first)
+        const maxFactor = Math.min(10, maxNumber);
+        newNum1 = Math.floor(Math.random() * maxFactor) + 1;
+        newNum2 = Math.floor(Math.random() * maxFactor) + 1;
         break;
 
       case Operation.SUBTRACTION:
@@ -238,10 +245,17 @@ export function useGameLogic({
         break;
 
       case Operation.DIVISION:
-        // For division: ensure clean division (no remainders)
-        // First pick divisor (num2), then pick result, then calculate dividend (num1)
-        newNum2 = Math.floor(Math.random() * maxNumber) + 1; // divisor: 1 to maxNumber
-        const quotient = Math.floor(Math.random() * maxNumber) + 1; // result: 1 to maxNumber
+        // For division: keep divisor small (1-10) for manageability
+        // Scale quotient based on range to allow results to grow
+        // This ensures dividend doesn't exceed reasonable bounds
+        const maxDivisor = Math.min(10, maxNumber);
+        newNum2 = Math.floor(Math.random() * maxDivisor) + 1; // divisor: 1-10
+
+        // Calculate max quotient to keep dividend within reasonable bounds
+        // For larger ranges, cap dividend at 100 for UX (division stays learnable)
+        const maxDividend = Math.min(maxNumber * 10, 100);
+        const maxQuotient = Math.min(10, Math.floor(maxDividend / newNum2));
+        const quotient = Math.floor(Math.random() * maxQuotient) + 1;
         newNum1 = newNum2 * quotient; // dividend = divisor × quotient
         break;
 
