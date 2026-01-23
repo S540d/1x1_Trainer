@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- 🔄 **Deployment Workflow**: Implemented 3-tier deployment strategy for safer releases
+  - Added `staging` branch between `testing` and `main`
+  - Workflow: `feature → testing → staging → main`
+  - New staging environment: https://s540d.github.io/1x1_Trainer/staging/
+  - Added automated deployment workflow for staging branch
+  - Updated CI/CD to run on all three branches (testing, staging, main)
+  - Enhanced TESTING.md with comprehensive 3-tier workflow documentation
+  - Reason: 1x1 Trainer has most active users - extra safety layer needed
+
+### Added
+- 🎨 **Landscape Mode Blocking**: Added bilingual landscape orientation blocking
+  - Shows overlay message when device is in landscape mode
+  - Message: "📱 Bitte drehen Sie Ihr Gerät ins Hochformat / Please rotate your device to portrait mode"
+  - Includes accessibility support with ARIA live region
+  - Enhances mobile UX by enforcing portrait mode
+
 ### Fixed
 - 🐛 **CRITICAL: Game Logic Bugs** (Issue #66): Fixed multiple critical bugs in game operations
   - Fixed initial operation: Now defaults to MULTIPLICATION instead of undefined
