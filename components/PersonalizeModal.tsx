@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { ThemeColors, Language, ThemeMode } from '../types/game';
+import { ThemeColors, Language, ThemeMode, NumberRange } from '../types/game';
 import { translations } from '../i18n/translations';
 
 interface PersonalizeModalProps {
@@ -16,6 +16,8 @@ interface PersonalizeModalProps {
   onLanguageChange: (language: Language) => void;
   themeMode: ThemeMode;
   onThemeModeChange: (mode: ThemeMode) => void;
+  numberRange: NumberRange;
+  onNumberRangeChange: (range: NumberRange) => void;
 }
 
 /**
@@ -31,6 +33,8 @@ export function PersonalizeModal({
   onLanguageChange,
   themeMode,
   onThemeModeChange,
+  numberRange,
+  onNumberRangeChange,
 }: PersonalizeModalProps) {
   const t = translations[language];
 
@@ -169,6 +173,89 @@ export function PersonalizeModal({
             </TouchableOpacity>
           </View>
         </View>
+
+        <View style={styles.settingsDivider} />
+
+        {/* Number Range Settings */}
+        <View style={styles.settingsSection}>
+          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
+            {t.numberRange}
+          </Text>
+          <View style={styles.numberRangeGrid}>
+            <TouchableOpacity
+              style={[
+                styles.rangeButton,
+                { borderColor: colors.border },
+                numberRange === NumberRange.RANGE_10 && styles.rangeButtonActive,
+              ]}
+              onPress={() => onNumberRangeChange(NumberRange.RANGE_10)}
+            >
+              <Text
+                style={[
+                  styles.rangeButtonText,
+                  { color: colors.text },
+                  numberRange === NumberRange.RANGE_10 && styles.rangeButtonTextActive,
+                ]}
+              >
+                {t.upTo10}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.rangeButton,
+                { borderColor: colors.border },
+                numberRange === NumberRange.RANGE_20 && styles.rangeButtonActive,
+              ]}
+              onPress={() => onNumberRangeChange(NumberRange.RANGE_20)}
+            >
+              <Text
+                style={[
+                  styles.rangeButtonText,
+                  { color: colors.text },
+                  numberRange === NumberRange.RANGE_20 && styles.rangeButtonTextActive,
+                ]}
+              >
+                {t.upTo20}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.rangeButton,
+                { borderColor: colors.border },
+                numberRange === NumberRange.RANGE_50 && styles.rangeButtonActive,
+              ]}
+              onPress={() => onNumberRangeChange(NumberRange.RANGE_50)}
+            >
+              <Text
+                style={[
+                  styles.rangeButtonText,
+                  { color: colors.text },
+                  numberRange === NumberRange.RANGE_50 && styles.rangeButtonTextActive,
+                ]}
+              >
+                {t.upTo50}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.rangeButton,
+                { borderColor: colors.border },
+                numberRange === NumberRange.RANGE_100 && styles.rangeButtonActive,
+              ]}
+              onPress={() => onNumberRangeChange(NumberRange.RANGE_100)}
+            >
+              <Text
+                style={[
+                  styles.rangeButtonText,
+                  { color: colors.text },
+                  numberRange === NumberRange.RANGE_100 && styles.rangeButtonTextActive,
+                ]}
+              >
+                {t.upTo100}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </>
   );
@@ -257,5 +344,31 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(0,0,0,0.1)',
     marginVertical: 8,
+  },
+  numberRangeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  rangeButton: {
+    flex: 1,
+    minWidth: '45%',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    alignItems: 'center',
+  },
+  rangeButtonActive: {
+    backgroundColor: '#6200EE',
+    borderColor: '#6200EE',
+  },
+  rangeButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  rangeButtonTextActive: {
+    color: '#fff',
   },
 });
