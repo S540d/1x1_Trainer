@@ -28,9 +28,10 @@ export enum DifficultyMode {
 }
 
 export enum NumberRange {
-  SMALL = 'SMALL',   // 1-10
-  MEDIUM = 'MEDIUM', // 1-20
-  LARGE = 'LARGE',   // 1-100
+  RANGE_10 = 'RANGE_10',   // 1-10
+  RANGE_20 = 'RANGE_20',   // 1-20
+  RANGE_50 = 'RANGE_50',   // 1-50
+  RANGE_100 = 'RANGE_100', // 1-100
 }
 
 export type ThemeMode = 'light' | 'dark' | 'system';

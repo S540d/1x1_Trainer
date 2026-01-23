@@ -4,7 +4,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { GameMode, Operation, AnswerMode, DifficultyMode, GameState } from '../types/game';
+import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange } from '../types/game';
 import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER } from '../utils/constants';
 
 interface UseGameLogicProps {
@@ -13,6 +13,7 @@ interface UseGameLogicProps {
   initialTotalSolvedTasks: number;
   onTotalSolvedTasksChange: (total: number) => void;
   onMotivationShow: (score: number) => void;
+  numberRange: NumberRange;
 }
 
 /**
@@ -22,13 +23,15 @@ interface UseGameLogicProps {
  * @param num2 - Second number in the operation
  * @param questionPart - Which part of the operation is being asked (0: num1, 1: num2, 2: result)
  * @param operation - Type of operation
+ * @param maxNumber - Maximum number in the range (10, 20, 50, or 100)
  * @returns Array of 10 numbers forming the sequence
  */
 export function generateNumberSequenceForState(
   num1: number,
   num2: number,
   questionPart: number,
-  operation: Operation
+  operation: Operation,
+  maxNumber: number = 10
 ): number[] {
   const sequence: number[] = [];
 
@@ -50,8 +53,9 @@ export function generateNumberSequenceForState(
       }
     } else {
       // Asking for a factor: ? × num2 = result OR num1 × ? = result
-      // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-      for (let i = 1; i <= 10; i++) {
+      // Show simple sequence: 1 to min(10, maxNumber)
+      const limit = Math.min(10, maxNumber);
+      for (let i = 1; i <= limit; i++) {
         sequence.push(i);
       }
     }
@@ -69,8 +73,9 @@ export function generateNumberSequenceForState(
       }
     } else {
       // Asking for an addend: ? + num2 = result OR num1 + ? = result
-      // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-      for (let i = 1; i <= 10; i++) {
+      // Show simple sequence: 1 to min(10, maxNumber)
+      const limit = Math.min(10, maxNumber);
+      for (let i = 1; i <= limit; i++) {
         sequence.push(i);
       }
     }
@@ -95,8 +100,9 @@ export function generateNumberSequenceForState(
       }
     } else {
       // Asking for minuend or subtrahend: ? - num2 = result OR num1 - ? = result
-      // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-      for (let i = 1; i <= 10; i++) {
+      // Show simple sequence: 1 to min(10, maxNumber)
+      const limit = Math.min(10, maxNumber);
+      for (let i = 1; i <= limit; i++) {
         sequence.push(i);
       }
     }
@@ -113,9 +119,10 @@ export function generateNumberSequenceForState(
       }
     } else {
       // Asking for divisor OR quotient: num1 ÷ ? = result OR num1 ÷ num2 = ?
-      // Both divisor and quotient are in range 1-10
-      // Show simple sequence: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-      for (let i = 1; i <= 10; i++) {
+      // Both divisor and quotient are in range 1 to min(10, maxNumber)
+      // Show simple sequence
+      const limit = Math.min(10, maxNumber);
+      for (let i = 1; i <= limit; i++) {
         sequence.push(i);
       }
     }
@@ -130,7 +137,25 @@ export function useGameLogic({
   initialTotalSolvedTasks,
   onTotalSolvedTasksChange,
   onMotivationShow,
+  numberRange,
 }: UseGameLogicProps) {
+  // Helper: Get max number based on number range
+  const getMaxNumber = () => {
+    switch (numberRange) {
+      case NumberRange.RANGE_10:
+        return 10;
+      case NumberRange.RANGE_20:
+        return 20;
+      case NumberRange.RANGE_50:
+        return 50;
+      case NumberRange.RANGE_100:
+        return 100;
+      default:
+        return 10;
+    }
+  };
+
+  const maxNumber = getMaxNumber();
   // Use initialOperations if provided, otherwise fallback to single initialOperation
   const selectedOps = initialOperations && initialOperations.length > 0
     ? initialOperations
@@ -200,29 +225,29 @@ export function useGameLogic({
     switch (selectedOp) {
       case Operation.ADDITION:
       case Operation.MULTIPLICATION:
-        // For addition and multiplication: both numbers 1-10
-        newNum1 = Math.floor(Math.random() * 10) + 1;
-        newNum2 = Math.floor(Math.random() * 10) + 1;
+        // For addition and multiplication: both numbers within range
+        newNum1 = Math.floor(Math.random() * maxNumber) + 1;
+        newNum2 = Math.floor(Math.random() * maxNumber) + 1;
         break;
-        
+
       case Operation.SUBTRACTION:
         // For subtraction: ensure result is positive and at least 1
         // num1 should be larger than num2
-        newNum2 = Math.floor(Math.random() * 9) + 1; // 1-9
-        newNum1 = newNum2 + Math.floor(Math.random() * (10 - newNum2)) + 1; // num2+1 to 10
+        newNum2 = Math.floor(Math.random() * (maxNumber - 1)) + 1; // 1 to maxNumber-1
+        newNum1 = newNum2 + Math.floor(Math.random() * (maxNumber - newNum2)) + 1; // num2+1 to maxNumber
         break;
-        
+
       case Operation.DIVISION:
         // For division: ensure clean division (no remainders)
         // First pick divisor (num2), then pick result, then calculate dividend (num1)
-        newNum2 = Math.floor(Math.random() * 10) + 1; // divisor: 1-10
-        const quotient = Math.floor(Math.random() * 10) + 1; // result: 1-10
+        newNum2 = Math.floor(Math.random() * maxNumber) + 1; // divisor: 1 to maxNumber
+        const quotient = Math.floor(Math.random() * maxNumber) + 1; // result: 1 to maxNumber
         newNum1 = newNum2 * quotient; // dividend = divisor × quotient
         break;
-        
+
       default:
-        newNum1 = Math.floor(Math.random() * 10) + 1;
-        newNum2 = Math.floor(Math.random() * 10) + 1;
+        newNum1 = Math.floor(Math.random() * maxNumber) + 1;
+        newNum2 = Math.floor(Math.random() * maxNumber) + 1;
     }
     
     let newQuestionPart = 2;
@@ -526,7 +551,7 @@ export function useGameLogic({
   // This is enforced in generateQuestion() lines 85-87. The base calculation handles
   // all questionPart values defensively, but only questionPart===2 will call this function.
   const generateNumberSequence = () => {
-    return generateNumberSequenceForState(gameState.num1, gameState.num2, gameState.questionPart, gameState.operation);
+    return generateNumberSequenceForState(gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, maxNumber);
   };
 
   // Memoize choices and sequence

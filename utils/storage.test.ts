@@ -302,27 +302,57 @@ describe('storage.ts - Typed Storage Helpers', () => {
   });
 
   describe('Number range storage', () => {
-    it('should save and retrieve SMALL range', async () => {
-      await saveNumberRange(NumberRange.SMALL);
+    it('should save and retrieve RANGE_10', async () => {
+      await saveNumberRange(NumberRange.RANGE_10);
       const range = await getNumberRange();
-      expect(range).toBe(NumberRange.SMALL);
+      expect(range).toBe(NumberRange.RANGE_10);
     });
 
-    it('should save and retrieve LARGE range', async () => {
-      await saveNumberRange(NumberRange.LARGE);
+    it('should save and retrieve RANGE_20', async () => {
+      await saveNumberRange(NumberRange.RANGE_20);
       const range = await getNumberRange();
-      expect(range).toBe(NumberRange.LARGE);
+      expect(range).toBe(NumberRange.RANGE_20);
     });
 
-    it('should return null if no range stored', async () => {
+    it('should save and retrieve RANGE_50', async () => {
+      await saveNumberRange(NumberRange.RANGE_50);
       const range = await getNumberRange();
-      expect(range).toBeNull();
+      expect(range).toBe(NumberRange.RANGE_50);
     });
 
-    it('should return null for invalid range values', async () => {
+    it('should save and retrieve RANGE_100', async () => {
+      await saveNumberRange(NumberRange.RANGE_100);
+      const range = await getNumberRange();
+      expect(range).toBe(NumberRange.RANGE_100);
+    });
+
+    it('should return default RANGE_100 if no range stored', async () => {
+      const range = await getNumberRange();
+      expect(range).toBe(NumberRange.RANGE_100);
+    });
+
+    it('should return default RANGE_100 for invalid range values', async () => {
       mockLocalStorage['app-number-range'] = 'INVALID';
       const range = await getNumberRange();
-      expect(range).toBeNull();
+      expect(range).toBe(NumberRange.RANGE_100);
+    });
+
+    it('should migrate old SMALL to RANGE_10', async () => {
+      mockLocalStorage['app-number-range'] = 'SMALL';
+      const range = await getNumberRange();
+      expect(range).toBe(NumberRange.RANGE_10);
+    });
+
+    it('should migrate old MEDIUM to RANGE_20', async () => {
+      mockLocalStorage['app-number-range'] = 'MEDIUM';
+      const range = await getNumberRange();
+      expect(range).toBe(NumberRange.RANGE_20);
+    });
+
+    it('should migrate old LARGE to RANGE_100', async () => {
+      mockLocalStorage['app-number-range'] = 'LARGE';
+      const range = await getNumberRange();
+      expect(range).toBe(NumberRange.RANGE_100);
     });
   });
 });

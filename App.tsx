@@ -39,6 +39,7 @@ export default function App() {
       setMotivationScore(score);
       setShowMotivation(true);
     },
+    numberRange: preferences.numberRange,
   });
 
   const t = translations[preferences.language];
@@ -501,6 +502,8 @@ export default function App() {
         onLanguageChange={preferences.setLanguage}
         themeMode={theme.themeMode}
         onThemeModeChange={preferences.setThemeMode}
+        numberRange={preferences.numberRange}
+        onNumberRangeChange={preferences.setNumberRange}
       />
 
       {/* About Modal */}

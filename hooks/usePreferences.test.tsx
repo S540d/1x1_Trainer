@@ -66,7 +66,7 @@ describe('usePreferences Hook', () => {
     mockGetTheme.mockResolvedValue(null);
     mockGetOperations.mockResolvedValue([Operation.MULTIPLICATION]);
     mockGetTotalTasks.mockResolvedValue(null);
-    mockGetNumberRange.mockResolvedValue(null);
+    mockGetNumberRange.mockResolvedValue(NumberRange.RANGE_100); // Now returns RANGE_100 by default
     mockGetLocales.mockReturnValue([{ languageCode: 'en' } as any]);
   });
 
@@ -109,7 +109,7 @@ describe('usePreferences Hook', () => {
       expect(result.current.language).toBe('en');
       expect(result.current.themeMode).toBe('light');
       expect(result.current.operations).toEqual([Operation.MULTIPLICATION]);
-      expect(result.current.numberRange).toBe(NumberRange.LARGE);
+      expect(result.current.numberRange).toBe(NumberRange.RANGE_100);
       expect(result.current.totalSolvedTasks).toBe(0);
     });
 
@@ -485,7 +485,8 @@ describe('usePreferences Hook', () => {
 
   describe('Number Range Selection', () => {
     it('should default to LARGE range when no saved preference', async () => {
-      mockGetNumberRange.mockResolvedValue(null);
+      // getNumberRange now always returns RANGE_100 as default (never null)
+      mockGetNumberRange.mockResolvedValue(NumberRange.RANGE_100);
 
       const { result } = renderHook(() => usePreferences());
 
@@ -493,11 +494,11 @@ describe('usePreferences Hook', () => {
         expect(result.current.isLoaded).toBe(true);
       });
 
-      expect(result.current.numberRange).toBe(NumberRange.LARGE);
+      expect(result.current.numberRange).toBe(NumberRange.RANGE_100);
     });
 
     it('should load saved number range (SMALL)', async () => {
-      mockGetNumberRange.mockResolvedValue(NumberRange.SMALL);
+      mockGetNumberRange.mockResolvedValue(NumberRange.RANGE_10);
 
       const { result } = renderHook(() => usePreferences());
 
@@ -505,11 +506,11 @@ describe('usePreferences Hook', () => {
         expect(result.current.isLoaded).toBe(true);
       });
 
-      expect(result.current.numberRange).toBe(NumberRange.SMALL);
+      expect(result.current.numberRange).toBe(NumberRange.RANGE_10);
     });
 
     it('should load saved number range (LARGE)', async () => {
-      mockGetNumberRange.mockResolvedValue(NumberRange.LARGE);
+      mockGetNumberRange.mockResolvedValue(NumberRange.RANGE_100);
 
       const { result } = renderHook(() => usePreferences());
 
@@ -517,7 +518,7 @@ describe('usePreferences Hook', () => {
         expect(result.current.isLoaded).toBe(true);
       });
 
-      expect(result.current.numberRange).toBe(NumberRange.LARGE);
+      expect(result.current.numberRange).toBe(NumberRange.RANGE_100);
     });
 
     it('should save number range when changed', async () => {
@@ -528,11 +529,11 @@ describe('usePreferences Hook', () => {
       });
 
       act(() => {
-        result.current.setNumberRange(NumberRange.SMALL);
+        result.current.setNumberRange(NumberRange.RANGE_10);
       });
 
       await waitFor(() => {
-        expect(mockSaveNumberRange).toHaveBeenCalledWith(NumberRange.SMALL);
+        expect(mockSaveNumberRange).toHaveBeenCalledWith(NumberRange.RANGE_10);
       });
     });
 
@@ -548,7 +549,7 @@ describe('usePreferences Hook', () => {
     });
 
     it('should persist number range across sessions', async () => {
-      mockGetNumberRange.mockResolvedValue(NumberRange.SMALL);
+      mockGetNumberRange.mockResolvedValue(NumberRange.RANGE_10);
 
       const { result: result1 } = renderHook(() => usePreferences());
 
@@ -556,7 +557,7 @@ describe('usePreferences Hook', () => {
         expect(result1.current.isLoaded).toBe(true);
       });
 
-      expect(result1.current.numberRange).toBe(NumberRange.SMALL);
+      expect(result1.current.numberRange).toBe(NumberRange.RANGE_10);
 
       const { result: result2 } = renderHook(() => usePreferences());
 
@@ -564,7 +565,7 @@ describe('usePreferences Hook', () => {
         expect(result2.current.isLoaded).toBe(true);
       });
 
-      expect(result2.current.numberRange).toBe(NumberRange.SMALL);
+      expect(result2.current.numberRange).toBe(NumberRange.RANGE_10);
     });
   });
 
@@ -706,11 +707,11 @@ describe('usePreferences Hook', () => {
       mockSaveNumberRange.mockClear();
 
       act(() => {
-        result.current.setNumberRange(NumberRange.SMALL);
+        result.current.setNumberRange(NumberRange.RANGE_10);
       });
 
       await waitFor(() => {
-        expect(mockSaveNumberRange).toHaveBeenCalledWith(NumberRange.SMALL);
+        expect(mockSaveNumberRange).toHaveBeenCalledWith(NumberRange.RANGE_10);
       });
     });
 
@@ -873,12 +874,12 @@ describe('usePreferences Hook', () => {
       act(() => {
         result.current.setLanguage('de');
         result.current.setThemeMode('dark');
-        result.current.setNumberRange(NumberRange.SMALL);
+        result.current.setNumberRange(NumberRange.RANGE_10);
       });
 
       expect(result.current.language).toBe('de');
       expect(result.current.themeMode).toBe('dark');
-      expect(result.current.numberRange).toBe(NumberRange.SMALL);
+      expect(result.current.numberRange).toBe(NumberRange.RANGE_10);
     });
 
     it('should handle rapid preference changes', async () => {
@@ -904,7 +905,7 @@ describe('usePreferences Hook', () => {
       mockGetTheme.mockResolvedValue('dark');
       mockGetOperations.mockResolvedValue([Operation.ADDITION, Operation.SUBTRACTION]);
       mockGetTotalTasks.mockResolvedValue(50);
-      mockGetNumberRange.mockResolvedValue(NumberRange.SMALL);
+      mockGetNumberRange.mockResolvedValue(NumberRange.RANGE_10);
 
       const { result } = renderHook(() => usePreferences());
 
@@ -916,7 +917,7 @@ describe('usePreferences Hook', () => {
       expect(result.current.themeMode).toBe('dark');
       expect(result.current.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION]);
       expect(result.current.totalSolvedTasks).toBe(50);
-      expect(result.current.numberRange).toBe(NumberRange.SMALL);
+      expect(result.current.numberRange).toBe(NumberRange.RANGE_10);
     });
   });
 
