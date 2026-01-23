@@ -17,6 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enhanced TESTING.md with comprehensive 3-tier workflow documentation
   - Reason: 1x1 Trainer has most active users - extra safety layer needed
 
+### Fixed
+- 🐛 **Deployment**: Fixed staging deployment path corrections (Issue #78)
+  - Added preparation step to `deploy-staging.yml` matching `deploy-testing.yml` pattern
+  - Fixed asset paths for staging subdirectory (`/1x1_Trainer/staging/`)
+  - Fixed service worker and manifest.json paths for staging environment
+  - Fixed pre-commit hook for macOS compatibility (xargs -r not supported)
+  - Staging deployment now correctly processes paths before publishing to gh-pages
+  - Files deployed to gh-pages successfully, URL verification pending (CDN propagation)
+
 ### Added
 - 🎨 **Landscape Mode Blocking**: Added bilingual landscape orientation blocking
   - Shows overlay message when device is in landscape mode
