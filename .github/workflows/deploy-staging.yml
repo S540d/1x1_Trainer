@@ -30,11 +30,57 @@ jobs:
       env:
         PUBLIC_URL: /1x1_Trainer/staging
 
+    - name: Prepare staging deployment
+      run: |
+        echo "🎨 Preparing Staging Environment Deployment"
+
+        # Check if dist directory exists
+        if [ ! -d "dist" ]; then
+          echo "❌ Error: dist directory not found after build"
+          echo "Available directories:"
+          ls -la
+          exit 1
+        fi
+
+        mkdir -p staging-deploy
+
+        # Copy dist contents safely
+        if [ -z "$(ls -A dist)" ]; then
+          echo "❌ Error: dist directory is empty"
+          exit 1
+        fi
+
+        cp -r dist/* staging-deploy/
+
+        # Add staging environment marker
+        sed -i 's/<body>/<body data-environment="staging">/' staging-deploy/index.html || true
+
+        # Fix asset paths for staging subdirectory
+        # Replace ./1x1_Trainer/ with ./  (relative to /1x1_Trainer/staging/)
+        sed -i 's|"\./1x1_Trainer/|"\./|g' staging-deploy/index.html || true
+        sed -i 's|href="./icon-|href="/1x1_Trainer/staging/icon-|g' staging-deploy/index.html || true
+
+        # Fix service worker paths for staging subdirectory
+        sed -i "s|'/1x1_Trainer/service-worker.js'|'/1x1_Trainer/staging/service-worker.js'|g" staging-deploy/index.html || true
+        sed -i "s|scope: '/1x1_Trainer/'|scope: '/1x1_Trainer/staging/'|g" staging-deploy/index.html || true
+
+        # Fix manifest.json paths if it exists
+        if [ -f "staging-deploy/manifest.json" ]; then
+          sed -i 's|1x1_Trainer/|1x1_Trainer/staging/|g' staging-deploy/manifest.json || true
+        fi
+
+        # Fix service-worker.js paths if it exists
+        if [ -f "staging-deploy/service-worker.js" ]; then
+          sed -i 's|/1x1_Trainer/|/1x1_Trainer/staging/|g' staging-deploy/service-worker.js || true
+        fi
+
+        echo "✅ Staging environment prepared"
+
     - name: Deploy to Staging Subdirectory
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
+        publish_dir: ./staging-deploy
         publish_branch: gh-pages
         destination_dir: staging
         keep_files: true
