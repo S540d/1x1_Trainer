@@ -12,7 +12,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 
 // Local imports
-import { Operation, AnswerMode, DifficultyMode, ThemeColors } from './types/game';
+import { Operation, AnswerMode, DifficultyMode, NumberRange, ThemeColors } from './types/game';
 import { translations } from './i18n/translations';
 import { APP_VERSION } from './utils/constants';
 import { useTheme } from './hooks/useTheme';
@@ -343,6 +343,51 @@ export default function App() {
               <Text style={[styles.settingsModeInfo, { color: colors.textSecondary }]}>
                 {game.gameState.difficultyMode === DifficultyMode.SIMPLE ? t.simpleModeInfo : t.creativeModeInfo}
               </Text>
+            </View>
+
+            <View style={styles.settingsDivider} />
+
+            {/* Number Range Settings */}
+            <View style={styles.settingsSection}>
+              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.numberRange}</Text>
+              <View style={styles.themeToggle}>
+                <TouchableOpacity
+                  style={[
+                    styles.themeButton,
+                    { borderColor: colors.border },
+                    preferences.numberRange === NumberRange.SMALL && styles.themeButtonActive,
+                  ]}
+                  onPress={() => preferences.setNumberRange(NumberRange.SMALL)}
+                >
+                  <Text
+                    style={[
+                      styles.themeButtonText,
+                      { color: colors.text },
+                      preferences.numberRange === NumberRange.SMALL && styles.themeButtonTextActive,
+                    ]}
+                  >
+                    {t.upTo20}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.themeButton,
+                    { borderColor: colors.border },
+                    preferences.numberRange === NumberRange.LARGE && styles.themeButtonActive,
+                  ]}
+                  onPress={() => preferences.setNumberRange(NumberRange.LARGE)}
+                >
+                  <Text
+                    style={[
+                      styles.themeButtonText,
+                      { color: colors.text },
+                      preferences.numberRange === NumberRange.LARGE && styles.themeButtonTextActive,
+                    ]}
+                  >
+                    {t.upTo100}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             <View style={styles.settingsDivider} />
