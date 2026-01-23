@@ -186,7 +186,7 @@ export const translations: Record<Language, TranslationStrings> = {
     tasksCorrectly: 'Aufgaben richtig gelöst',
     // Motivation Message
     motivationTitleLowScore: 'Weiter so!',
-    motivationMessageLowScore: 'Schade versuche es nochmal!',
+    motivationMessageLowScore: 'Schade, versuche es nochmal!',
     motivationTitleMediumScore: 'Fast geschafft!',
     motivationMessageMediumScore: 'Du machst das schon gut! Noch ein bisschen üben und du schaffst es!',
     motivationTitleHighScore: 'Super!',
