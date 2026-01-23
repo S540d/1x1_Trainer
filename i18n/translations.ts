@@ -59,10 +59,12 @@ export interface TranslationStrings {
   youSolved: string;
   tasksCorrectly: string;
   // Motivation Message
-  motivationTitle: string;
-  motivationMessage: string;
   motivationTitleLowScore: string;
   motivationMessageLowScore: string;
+  motivationTitleMediumScore: string;
+  motivationMessageMediumScore: string;
+  motivationTitleHighScore: string;
+  motivationMessageHighScore: string;
   motivationButton: string;
 }
 
@@ -121,10 +123,12 @@ export const translations: Record<Language, TranslationStrings> = {
     youSolved: 'You solved',
     tasksCorrectly: 'tasks correctly',
     // Motivation Message
-    motivationTitle: 'Great Progress!',
-    motivationMessage: 'You have already solved 10 tasks. Let\'s try another round!',
     motivationTitleLowScore: 'Keep Going!',
     motivationMessageLowScore: 'Don\'t give up! Practice makes perfect. Let\'s try again!',
+    motivationTitleMediumScore: 'Almost There!',
+    motivationMessageMediumScore: 'You\'re doing well! Just a bit more practice and you\'ll master it!',
+    motivationTitleHighScore: 'Great!',
+    motivationMessageHighScore: 'Excellent work! You have already solved 10 tasks. Let\'s try another round!',
     motivationButton: 'Continue',
   },
   de: {
@@ -181,10 +185,12 @@ export const translations: Record<Language, TranslationStrings> = {
     youSolved: 'Du hast',
     tasksCorrectly: 'Aufgaben richtig gelöst',
     // Motivation Message
-    motivationTitle: 'Toll gemacht!',
-    motivationMessage: 'Du hast schon 10 Aufgaben gerechnet. Lass uns noch eine Runde versuchen!',
     motivationTitleLowScore: 'Weiter so!',
-    motivationMessageLowScore: 'Nicht aufgeben! Übung macht den Meister. Versuchen wir es nochmal!',
+    motivationMessageLowScore: 'Schade versuche es nochmal!',
+    motivationTitleMediumScore: 'Fast geschafft!',
+    motivationMessageMediumScore: 'Du machst das schon gut! Noch ein bisschen üben und du schaffst es!',
+    motivationTitleHighScore: 'Super!',
+    motivationMessageHighScore: 'Toll gemacht! Du hast schon 10 Aufgaben gerechnet. Lass uns noch eine Runde versuchen!',
     motivationButton: 'Weiter',
   },
 };
