@@ -12,11 +12,11 @@ const CACHE_NAMES = {
 
 // URLs zum cachen beim Installation
 const urlsToCache = [
-  '/1x1_Trainer/',
-  '/1x1_Trainer/index.html',
-  '/1x1_Trainer/manifest.json',
-  '/1x1_Trainer/icon-192.png',
-  '/1x1_Trainer/icon-512.png',
+  '/1x1_Trainer/staging/',
+  '/1x1_Trainer/staging/index.html',
+  '/1x1_Trainer/staging/manifest.json',
+  '/1x1_Trainer/staging/icon-192.png',
+  '/1x1_Trainer/staging/icon-512.png',
 ];
 
 /**
@@ -141,7 +141,7 @@ self.addEventListener('fetch', (event) => {
               }
               // Offline Fallback Page
               if (request.headers.get('accept').includes('text/html')) {
-                return caches.match('/1x1_Trainer/index.html');
+                return caches.match('/1x1_Trainer/staging/index.html');
               }
               return new Response('Offline', {
                 status: 503,
