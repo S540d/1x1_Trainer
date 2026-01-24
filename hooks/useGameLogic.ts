@@ -62,14 +62,16 @@ export function generateNumberSequenceForState(
   } else if (operation === Operation.ADDITION) {
     // For addition:
     // - If asking for ADDEND (questionPart 0 or 1): show simple sequence 1-10
-    // - If asking for SUM (questionPart 2): show range num1+1 to num1+10
+    // - If asking for SUM (questionPart 2): show range around the CORRECT ANSWER
 
     if (questionPart === 2) {
       // Asking for sum: num1 + num2 = ?
-      // Show: num1+1, num1+2, ..., num1+10
-      const base = num1;
-      for (let i = 1; i <= 10; i++) {
-        sequence.push(base + i);
+      // Show range around correct answer: (result-4) to (result+5)
+      const correctAnswer = num1 + num2;
+      const startValue = Math.max(1, correctAnswer - 4);
+
+      for (let i = 0; i < 10; i++) {
+        sequence.push(startValue + i);
       }
     } else {
       // Asking for an addend: ? + num2 = result OR num1 + ? = result
@@ -82,21 +84,16 @@ export function generateNumberSequenceForState(
   } else if (operation === Operation.SUBTRACTION) {
     // For subtraction:
     // - If asking for MINUEND or SUBTRAHEND (questionPart 0 or 1): show simple sequence 1-10
-    // - If asking for DIFFERENCE (questionPart 2): show range around num1
+    // - If asking for DIFFERENCE (questionPart 2): show range around the CORRECT ANSWER
 
     if (questionPart === 2) {
       // Asking for difference: num1 - num2 = ?
-      // Show range around num1: base-4 to base+5
-      const base = num1;
-      for (let i = -4; i <= 5; i++) {
-        const value = base + i;
-        if (value > 0) {
-          sequence.push(value);
-        }
-      }
-      // Ensure we have exactly 10 values
-      while (sequence.length < 10) {
-        sequence.push(base + sequence.length);
+      // Show range around correct answer: (result-4) to (result+5)
+      const correctAnswer = num1 - num2;
+      const startValue = Math.max(1, correctAnswer - 4);
+
+      for (let i = 0; i < 10; i++) {
+        sequence.push(startValue + i);
       }
     } else {
       // Asking for minuend or subtrahend: ? - num2 = result OR num1 - ? = result

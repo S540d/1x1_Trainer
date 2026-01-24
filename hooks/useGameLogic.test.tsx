@@ -12,7 +12,7 @@ import { Operation, GameMode, AnswerMode, DifficultyMode } from '../types/game';
 
 describe('useGameLogic - generateNumberSequenceForState', () => {
   describe('ADDITION operation', () => {
-    it('should generate sequence base+1 through base+10 for addition', () => {
+    it('should generate sequence around correct answer (sum) for addition', () => {
       const num1 = 5;
       const num2 = 3;
       const questionPart = 2; // asking for result
@@ -20,17 +20,17 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
 
       const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
-      // For questionPart=2, base is num1 (5)
-      // Sequence should be 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
-      const expected = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-      
+      // For questionPart=2, sequence should be around correct answer (5+3=8)
+      // Sequence should be (8-4) to (8+5): 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+      const expected = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+
       expect(sequence).toEqual(expected);
       expect(sequence).toHaveLength(10);
-      expect(sequence[0]).toBe(6); // base + 1
-      expect(sequence[9]).toBe(15); // base + 10
+      expect(sequence[0]).toBe(4); // correctAnswer - 4
+      expect(sequence[9]).toBe(13); // correctAnswer + 5
     });
 
-    it('should include correct answer (base+num2) in sequence when num2 is between 1-10', () => {
+    it('should include correct answer (sum) in sequence when num2 is between 1-10', () => {
       const num1 = 7;
       const num2 = 4;
       const questionPart = 2;
@@ -39,10 +39,10 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
       // Correct answer is 7 + 4 = 11
-      // Base is num1 (7), sequence is 8 through 17
+      // Sequence should be around 11: (11-4) to (11+5) = 7 through 16
       // So 11 should be in the sequence
       const correctAnswer = num1 + num2;
-      
+
       expect(sequence).toContain(correctAnswer);
       expect(correctAnswer).toBe(11);
     });
@@ -61,7 +61,7 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       }
     });
 
-    it('should handle base=1 correctly for addition (sequence 2-11)', () => {
+    it('should handle small sum correctly (1+5=6, sequence 2-11)', () => {
       const num1 = 1;
       const num2 = 5;
       const questionPart = 2;
@@ -69,11 +69,11 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
 
       const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
-      // For base=1, sequence should be 2, 3, 4, ..., 11
+      // For sum=6, sequence should be around 6: (6-4) to (6+5) = 2 to 11
       expect(sequence).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
     });
 
-    it('should handle base=10 correctly for addition (sequence 11-20)', () => {
+    it('should handle large sum correctly (10+7=17, sequence 13-22)', () => {
       const num1 = 10;
       const num2 = 7;
       const questionPart = 2;
@@ -81,8 +81,8 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
 
       const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
-      // For base=10, sequence should be 11, 12, 13, ..., 20
-      expect(sequence).toEqual([11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
+      // For sum=17, sequence should be around 17: (17-4) to (17+5) = 13 to 22
+      expect(sequence).toEqual([13, 14, 15, 16, 17, 18, 19, 20, 21, 22]);
     });
 
     it('should always include correct answer for any valid num2 between 1-10', () => {
@@ -210,7 +210,7 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       }
     });
 
-    it('should have addition sequence start higher than base, multiplication equal to base', () => {
+    it('should have addition sequence around sum, multiplication showing multiples', () => {
       const num1 = 5;
       const num2 = 3;
       const questionPart = 2;
@@ -218,9 +218,9 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       const addSequence = generateNumberSequenceForState(num1, num2, questionPart, Operation.ADDITION);
       const multSequence = generateNumberSequenceForState(num1, num2, questionPart, Operation.MULTIPLICATION);
 
-      // Addition sequence starts at base+1
-      expect(addSequence[0]).toBe(num1 + 1); // 6
-      
+      // Addition sequence around sum (5+3=8): starts at 8-4=4
+      expect(addSequence[0]).toBe(4);
+
       // Multiplication sequence starts at base×1
       expect(multSequence[0]).toBe(num1 * 1); // 5
     });
@@ -231,12 +231,14 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       const questionPart = 2;
       const operation = Operation.ADDITION;
 
-      for (let base = 1; base <= 10; base++) {
-        const sequence = generateNumberSequenceForState(base, 5, questionPart, operation);
+      for (let num1 = 1; num1 <= 10; num1++) {
+        const num2 = 5;
+        const sum = num1 + num2;
+        const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
         expect(sequence).toHaveLength(10);
-        expect(sequence[0]).toBe(base + 1);
-        expect(sequence[9]).toBe(base + 10);
+        // Sequence should be around sum: (sum-4) to (sum+5)
+        expect(sequence[0]).toBe(Math.max(1, sum - 4));
 
         // Verify consecutive increments
         for (let i = 1; i < sequence.length; i++) {
@@ -265,7 +267,7 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
   });
 
   describe('SUBTRACTION operation', () => {
-    it('should generate range around base: base-4 to base+5', () => {
+    it('should generate range around difference (correct answer)', () => {
       const num1 = 10;
       const num2 = 3;
       const questionPart = 2;
@@ -273,9 +275,9 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
 
       const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
-      // For base=10: 10-4=6, 10-3=7, ..., 10+5=15 (all positive)
-      // Expected: 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
-      const expected = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+      // Correct answer is 10-3=7
+      // Sequence should be around 7: (7-4) to (7+5) = 3 to 12
+      const expected = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
       expect(sequence).toEqual(expected);
       expect(sequence).toHaveLength(10);
@@ -292,60 +294,60 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       // Correct answer is 8 - 3 = 5
       const correctAnswer = 5;
 
-      // With subtraction pattern (base-4 to base+5), for base=8:
-      // 8-4=4, 8-3=5, ..., 8+5=13
-      // Expected: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+      // Sequence should be around correct answer (5): (5-4) to (5+5) = 1 to 10
       expect(sequence).toContain(correctAnswer);
-      expect(sequence).toEqual([4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+      expect(sequence).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     });
 
-    it('should handle low bases correctly (base < 4)', () => {
+    it('should handle small differences correctly', () => {
       const questionPart = 2;
       const operation = Operation.SUBTRACTION;
 
-      // For base=1: 1-4=-3 (skip), 1-3=-2 (skip), ..., 1-1=0 (skip), 1, 2, 3, 4, 5, 6
-      // Then fill to 10: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-      const seq1 = generateNumberSequenceForState(1, 5, questionPart, operation);
+      // For 6-5=1: sequence around 1: (1-4) to (1+5)
+      // Negative values skipped, so: 1, 2, 3, 4, 5, 6 then fill to 10
+      const seq1 = generateNumberSequenceForState(6, 5, questionPart, operation);
       expect(seq1).toHaveLength(10);
-      expect(seq1[0]).toBe(1);
       expect(seq1.every(n => n > 0)).toBe(true);
+      expect(seq1).toContain(1); // Correct answer
 
-      // For base=3: 3-4=-1 (skip), 3-3=0 (skip), 3-2=1, 3-1=2, 3, 4, 5, 6, 7, 8
-      const seq3 = generateNumberSequenceForState(3, 5, questionPart, operation);
+      // For 8-5=3: sequence around 3: (3-4) to (3+5)
+      // Skip negatives, then fill: should contain 3
+      const seq3 = generateNumberSequenceForState(8, 5, questionPart, operation);
       expect(seq3).toHaveLength(10);
-      expect(seq3[0]).toBe(1); // First positive value
       expect(seq3.every(n => n > 0)).toBe(true);
+      expect(seq3).toContain(3); // Correct answer
     });
 
-    it('should handle all bases from 1 to 10 for subtraction pattern', () => {
+    it('should handle all differences from 1 to 10 for subtraction pattern', () => {
       const questionPart = 2;
       const operation = Operation.SUBTRACTION;
 
-      for (let base = 1; base <= 10; base++) {
-        const sequence = generateNumberSequenceForState(base, 5, questionPart, operation);
+      for (let diff = 1; diff <= 10; diff++) {
+        // Create subtraction with specific difference
+        const num2 = 5;
+        const num1 = num2 + diff; // ensures difference = diff
+        const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
         expect(sequence).toHaveLength(10);
 
         // All values should be positive
         expect(sequence.every(n => n > 0)).toBe(true);
 
+        // Sequence should contain the correct answer
+        expect(sequence).toContain(diff);
+
         // Sequence should be sorted ascending
         for (let i = 1; i < sequence.length; i++) {
-          expect(sequence[i]).toBeGreaterThan(sequence[i - 1]);
+          expect(sequence[i]).toBe(sequence[i - 1] + 1);
         }
 
         // Should start from positive values
         expect(sequence[0]).toBeGreaterThan(0);
 
-        // For low bases (<= 4), some negative/zero values are skipped,
-        // so the sequence gets filled with extra values
-        // For higher bases (> 4), it should fit within base-4 to base+5
-        if (base > 4) {
-          const rangeStart = base - 4;
-          const rangeEnd = base + 5;
-          expect(sequence[0]).toBe(rangeStart);
-          expect(sequence[sequence.length - 1]).toBe(rangeEnd);
-        }
+        // Sequence should be around the difference (correct answer)
+        const startValue = Math.max(1, diff - 4);
+        expect(sequence[0]).toBe(startValue);
+        expect(sequence[9]).toBe(startValue + 9);
       }
     });
   });
@@ -424,15 +426,19 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       expect(multSeq).toHaveLength(10);
       expect(divSeq).toHaveLength(10);
 
-      // All should be unique sequences
+      // Different operations should generally have different patterns
       expect(addSeq).not.toEqual(multSeq);
       expect(addSeq).not.toEqual(subSeq);
       expect(addSeq).not.toEqual(divSeq);
-      expect(subSeq).not.toEqual(multSeq);
-      expect(subSeq).not.toEqual(divSeq);
-      // Division now uses 1-10 sequence (not multiples like multiplication)
-      expect(divSeq).not.toEqual(multSeq);
+      expect(multSeq).not.toEqual(divSeq);
+
+      // Division should use 1-10 sequence for quotient questions
       expect(divSeq).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+      // For num1=7, num2=4: subtraction is 7-4=3
+      // Sequence around 3 is max(1, 3-4) to max(1, 3-4)+9 = 1 to 10
+      // This happens to match division sequence, which is OK
+      expect(subSeq).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     });
 
     it('should include correct answer for ADDITION, SUBTRACTION, and MULTIPLICATION in their sequences', () => {
@@ -496,7 +502,7 @@ describe('generateNumberSequenceForState - Extended Coverage (Phase 1 MVP)', () 
       expect(sequence).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     });
 
-    it('should use num1 as base when questionPart === 2 (result)', () => {
+    it('should use sum as base when questionPart === 2 (result)', () => {
       const num1 = 5;
       const num2 = 3;
       const questionPart = 2; // asking for result (default)
@@ -504,8 +510,8 @@ describe('generateNumberSequenceForState - Extended Coverage (Phase 1 MVP)', () 
 
       const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
 
-      // Base is num1 (5), so sequence is 6-15 for addition
-      expect(sequence).toEqual([6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+      // Sum is 5+3=8, sequence around 8: (8-4) to (8+5) = 4 to 13
+      expect(sequence).toEqual([4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
     });
   });
 
@@ -518,8 +524,8 @@ describe('generateNumberSequenceForState - Extended Coverage (Phase 1 MVP)', () 
       const addSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.ADDITION);
       const multSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.MULTIPLICATION);
 
-      // Addition: base=10, sequence 11-20
-      expect(addSeq).toEqual([11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
+      // Addition: sum=20, sequence around 20: (20-4) to (20+5) = 16 to 25
+      expect(addSeq).toEqual([16, 17, 18, 19, 20, 21, 22, 23, 24, 25]);
 
       // Multiplication: base=10, sequence 10,20,...,100
       expect(multSeq).toEqual([10, 20, 30, 40, 50, 60, 70, 80, 90, 100]);
@@ -533,8 +539,11 @@ describe('generateNumberSequenceForState - Extended Coverage (Phase 1 MVP)', () 
       const addSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.ADDITION);
       const multSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.MULTIPLICATION);
 
-      // Addition: base=1, sequence 2-11
-      expect(addSeq).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+      // Addition: sum=2, sequence around 2: (2-4) to (2+5) but skip negatives
+      // Should have 10 values, all positive
+      expect(addSeq).toHaveLength(10);
+      expect(addSeq.every(n => n > 0)).toBe(true);
+      expect(addSeq).toContain(2); // Correct answer
 
       // Multiplication: base=1, sequence 1-10
       expect(multSeq).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
