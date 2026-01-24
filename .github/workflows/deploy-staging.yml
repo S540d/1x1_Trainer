@@ -88,22 +88,26 @@ jobs:
         commit_message: '🎨 Staging deployment from ${{ github.sha }}'
         force_orphan: false
 
-    - name: Checkout gh-pages branch for rebuild trigger
-      uses: actions/checkout@v4
-      with:
-        ref: gh-pages
-        fetch-depth: 0
-
     - name: Trigger GitHub Pages build
       run: |
         set -e
         echo "🔄 Triggering GitHub Pages rebuild..."
-        # Create an empty commit to gh-pages to trigger Pages rebuild
+
+        # Configure git
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+        # Clone gh-pages branch to temporary directory
+        git clone --depth 1 --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-temp
+        cd gh-pages-temp
+
+        # Create empty commit and push
         git commit --allow-empty -m "🔄 Trigger Pages rebuild for staging deployment"
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
         git push origin gh-pages
+
+        cd ..
+        rm -rf gh-pages-temp
+
         echo "✅ GitHub Pages rebuild triggered"
 
     - name: Comment deployment URL
