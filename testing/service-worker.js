@@ -3,7 +3,7 @@
  * Bietet Offline-Funktionalität und intelligentes Caching
  */
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAMES = {
   static: `1x1-trainer-static-${CACHE_VERSION}`,
   dynamic: `1x1-trainer-dynamic-${CACHE_VERSION}`,
@@ -15,6 +15,9 @@ const urlsToCache = [
   '/1x1_Trainer/testing/',
   '/1x1_Trainer/testing/index.html',
   '/1x1_Trainer/testing/manifest.json',
+  '/1x1_Trainer/testing/icon.png',
+  '/1x1_Trainer/testing/icon-96.png',
+  '/1x1_Trainer/testing/icon-128.png',
   '/1x1_Trainer/testing/icon-192.png',
   '/1x1_Trainer/testing/icon-512.png',
 ];
@@ -23,18 +26,14 @@ const urlsToCache = [
  * Installation: Cache kritische Assets
  */
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing Service Worker...');
-  
   event.waitUntil(
     caches.open(CACHE_NAMES.static)
       .then((cache) => {
-        console.log('[SW] Caching app shell');
-        return cache.addAll(urlsToCache).catch((error) => {
-          console.warn('[SW] Cache.addAll error:', error);
+        return cache.addAll(urlsToCache).catch(() => {
+          // Silent error handling
         });
       })
       .then(() => {
-        console.log('[SW] Service Worker installed');
         self.skipWaiting();
       })
   );
@@ -44,8 +43,6 @@ self.addEventListener('install', (event) => {
  * Aktivierung: Alte Caches löschen
  */
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating Service Worker...');
-  
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
@@ -53,14 +50,12 @@ self.addEventListener('activate', (event) => {
           cacheNames.map((cacheName) => {
             // Lösche alte Cache-Versionen
             if (!Object.values(CACHE_NAMES).includes(cacheName)) {
-              console.log('[SW] Deleting old cache:', cacheName);
               return caches.delete(cacheName);
             }
           })
         );
       })
       .then(() => {
-        console.log('[SW] Service Worker activated');
         self.clients.matchAll().then((clients) => {
           clients.forEach((client) => {
             client.postMessage({ type: 'SW_ACTIVATED' });
