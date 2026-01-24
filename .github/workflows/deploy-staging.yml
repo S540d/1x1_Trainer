@@ -84,7 +84,7 @@ jobs:
         publish_branch: gh-pages
         destination_dir: staging
         keep_files: true
-        allow_empty_commit: false
+        allow_empty_commit: true
         commit_message: '🎨 Staging deployment from ${{ github.sha }}'
         force_orphan: false
 

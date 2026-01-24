@@ -88,6 +88,7 @@ jobs:
           destination_dir: testing
           commit_message: '🧪 Testing deployment from ${{ github.sha }}'
           keep_files: true
+          allow_empty_commit: true
 
       - name: Deployment Summary
         run: |
