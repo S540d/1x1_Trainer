@@ -12,16 +12,18 @@ import {
 import { StatusBar } from 'expo-status-bar';
 
 // Local imports
-import { Operation, AnswerMode, DifficultyMode, ThemeColors } from './types/game';
+import { Operation, AnswerMode, DifficultyMode, NumberRange, ThemeColors } from './types/game';
 import { translations } from './i18n/translations';
 import { APP_VERSION } from './utils/constants';
 import { useTheme } from './hooks/useTheme';
 import { usePreferences } from './hooks/usePreferences';
 import { useGameLogic } from './hooks/useGameLogic';
+import { PersonalizeModal } from './components/PersonalizeModal';
 
 export default function App() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
+  const [personalizeVisible, setPersonalizeVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
 
@@ -30,12 +32,14 @@ export default function App() {
   const theme = useTheme(preferences.themeMode);
   const game = useGameLogic({
     initialOperation: preferences.operation,
+    initialOperations: preferences.operations,
     initialTotalSolvedTasks: preferences.totalSolvedTasks,
     onTotalSolvedTasksChange: preferences.setTotalSolvedTasks,
     onMotivationShow: (score: number) => {
       setMotivationScore(score);
       setShowMotivation(true);
     },
+    numberRange: preferences.numberRange,
   });
 
   const t = translations[preferences.language];
@@ -58,11 +62,13 @@ export default function App() {
 
   // Sync operation changes to preferences
   useEffect(() => {
-    if (preferences.isLoaded && game.gameState.operation !== preferences.operation) {
-      preferences.setOperation(game.gameState.operation);
+    if (preferences.isLoaded && !preferences.operations.includes(game.gameState.operation)) {
+      // Update operations array when game operation changes
+      const newOps = Array.from(game.gameState.selectedOperations);
+      preferences.setOperations(newOps);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [game.gameState.operation]);
+  }, [game.gameState.selectedOperations]);
 
   const getCardColor = () => {
     if (game.gameState.lastAnswerCorrect === true) return colors.cardCorrect;
@@ -110,111 +116,16 @@ export default function App() {
               </TouchableOpacity>
             </View>
 
-            {/* Appearance Settings - Light/Dark/System */}
-            <View style={styles.settingsSection}>
-              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.appearance}</Text>
-              <View style={styles.themeToggle}>
-                <TouchableOpacity
-                  style={[
-                    styles.themeButton,
-                    { borderColor: colors.border },
-                    theme.themeMode === 'light' && styles.themeButtonActive,
-                  ]}
-                  onPress={() => preferences.setThemeMode('light')}
-                >
-                  <Text
-                    style={[
-                      styles.themeButtonText,
-                      { color: colors.text },
-                      theme.themeMode === 'light' && styles.themeButtonTextActive,
-                    ]}
-                  >
-                    {t.light}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.themeButton,
-                    { borderColor: colors.border },
-                    theme.themeMode === 'dark' && styles.themeButtonActive,
-                  ]}
-                  onPress={() => preferences.setThemeMode('dark')}
-                >
-                  <Text
-                    style={[
-                      styles.themeButtonText,
-                      { color: colors.text },
-                      theme.themeMode === 'dark' && styles.themeButtonTextActive,
-                    ]}
-                  >
-                    {t.dark}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.themeButton,
-                    { borderColor: colors.border },
-                    theme.themeMode === 'system' && styles.themeButtonActive,
-                  ]}
-                  onPress={() => preferences.setThemeMode('system')}
-                >
-                  <Text
-                    style={[
-                      styles.themeButtonText,
-                      { color: colors.text },
-                      theme.themeMode === 'system' && styles.themeButtonTextActive,
-                    ]}
-                  >
-                    {t.system}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.settingsDivider} />
-
-            {/* Language Settings */}
-            <View style={styles.settingsSection}>
-              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.language}</Text>
-              <View style={styles.themeToggle}>
-                <TouchableOpacity
-                  style={[
-                    styles.themeButton,
-                    { borderColor: colors.border },
-                    preferences.language === 'en' && styles.themeButtonActive,
-                  ]}
-                  onPress={() => preferences.setLanguage('en')}
-                >
-                  <Text
-                    style={[
-                      styles.themeButtonText,
-                      { color: colors.text },
-                      preferences.language === 'en' && styles.themeButtonTextActive,
-                    ]}
-                  >
-                    {t.english}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.themeButton,
-                    { borderColor: colors.border },
-                    preferences.language === 'de' && styles.themeButtonActive,
-                  ]}
-                  onPress={() => preferences.setLanguage('de')}
-                >
-                  <Text
-                    style={[
-                      styles.themeButtonText,
-                      { color: colors.text },
-                      preferences.language === 'de' && styles.themeButtonTextActive,
-                    ]}
-                  >
-                    {t.german}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+            {/* Personalize Button */}
+            <TouchableOpacity
+              style={styles.settingsMenuLink}
+              onPress={() => {
+                setPersonalizeVisible(true);
+                setMenuVisible(false);
+              }}
+            >
+              <Text style={styles.settingsMenuLinkText}>{t.personalize}</Text>
+            </TouchableOpacity>
 
             <View style={styles.settingsDivider} />
 
@@ -343,6 +254,87 @@ export default function App() {
               <Text style={[styles.settingsModeInfo, { color: colors.textSecondary }]}>
                 {game.gameState.difficultyMode === DifficultyMode.SIMPLE ? t.simpleModeInfo : t.creativeModeInfo}
               </Text>
+            </View>
+
+            <View style={styles.settingsDivider} />
+
+            {/* Number Range Settings */}
+            <View style={styles.settingsSection}>
+              <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.numberRange}</Text>
+              <View style={styles.numberRangeGrid}>
+                <TouchableOpacity
+                  style={[
+                    styles.rangeButton,
+                    { borderColor: colors.border },
+                    preferences.numberRange === NumberRange.RANGE_10 && styles.rangeButtonActive,
+                  ]}
+                  onPress={() => preferences.setNumberRange(NumberRange.RANGE_10)}
+                >
+                  <Text
+                    style={[
+                      styles.rangeButtonText,
+                      { color: colors.text },
+                      preferences.numberRange === NumberRange.RANGE_10 && styles.rangeButtonTextActive,
+                    ]}
+                  >
+                    {t.upTo10}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.rangeButton,
+                    { borderColor: colors.border },
+                    preferences.numberRange === NumberRange.RANGE_20 && styles.rangeButtonActive,
+                  ]}
+                  onPress={() => preferences.setNumberRange(NumberRange.RANGE_20)}
+                >
+                  <Text
+                    style={[
+                      styles.rangeButtonText,
+                      { color: colors.text },
+                      preferences.numberRange === NumberRange.RANGE_20 && styles.rangeButtonTextActive,
+                    ]}
+                  >
+                    {t.upTo20}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.rangeButton,
+                    { borderColor: colors.border },
+                    preferences.numberRange === NumberRange.RANGE_50 && styles.rangeButtonActive,
+                  ]}
+                  onPress={() => preferences.setNumberRange(NumberRange.RANGE_50)}
+                >
+                  <Text
+                    style={[
+                      styles.rangeButtonText,
+                      { color: colors.text },
+                      preferences.numberRange === NumberRange.RANGE_50 && styles.rangeButtonTextActive,
+                    ]}
+                  >
+                    {t.upTo50}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.rangeButton,
+                    { borderColor: colors.border },
+                    preferences.numberRange === NumberRange.RANGE_100 && styles.rangeButtonActive,
+                  ]}
+                  onPress={() => preferences.setNumberRange(NumberRange.RANGE_100)}
+                >
+                  <Text
+                    style={[
+                      styles.rangeButtonText,
+                      { color: colors.text },
+                      preferences.numberRange === NumberRange.RANGE_100 && styles.rangeButtonTextActive,
+                    ]}
+                  >
+                    {t.upTo100}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             <View style={styles.settingsDivider} />
@@ -581,6 +573,17 @@ export default function App() {
           </View>
         </View>
       </Modal>
+
+      {/* Personalize Modal */}
+      <PersonalizeModal
+        visible={personalizeVisible}
+        onClose={() => setPersonalizeVisible(false)}
+        colors={colors}
+        language={preferences.language}
+        onLanguageChange={preferences.setLanguage}
+        themeMode={theme.themeMode}
+        onThemeModeChange={preferences.setThemeMode}
+      />
 
       {/* About Modal */}
       <Modal visible={aboutVisible} transparent animationType="fade">
@@ -1171,5 +1174,31 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 16,
     lineHeight: 1.5,
+  },
+  numberRangeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  rangeButton: {
+    flex: 1,
+    minWidth: '45%',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    alignItems: 'center',
+  },
+  rangeButtonActive: {
+    backgroundColor: '#6200EE',
+    borderColor: '#6200EE',
+  },
+  rangeButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  rangeButtonTextActive: {
+    color: '#fff',
   },
 });

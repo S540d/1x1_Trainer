@@ -60,3 +60,6 @@ Android/playstore-screenshots/
 Android/release/
 credentials.json
 test-results/
+
+# Test coverage
+coverage/

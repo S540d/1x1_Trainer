@@ -23,7 +23,7 @@ export function usePreferences() {
   const [language, setLanguage] = useState<Language>('en');
   const [themeMode, setThemeMode] = useState<ThemeMode>('light');
   const [operations, setOperations] = useState<Operation[]>([Operation.MULTIPLICATION]);
-  const [numberRange, setNumberRange] = useState<NumberRange>(NumberRange.LARGE);
+  const [numberRange, setNumberRange] = useState<NumberRange>(NumberRange.RANGE_100);
   const [totalSolvedTasks, setTotalSolvedTasks] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -58,11 +58,9 @@ export function usePreferences() {
           setTotalSolvedTasks(savedTotalTasks);
         }
 
-        // Load number range
+        // Load number range (always returns a value, with migration)
         const savedNumberRange = await getNumberRange();
-        if (savedNumberRange) {
-          setNumberRange(savedNumberRange);
-        }
+        setNumberRange(savedNumberRange);
 
         setIsLoaded(true);
       } catch (error) {
@@ -128,6 +126,9 @@ export function usePreferences() {
     setLanguage,
     themeMode,
     setThemeMode,
+    operation: operations.length > 0
+      ? operations[0]
+      : Operation.MULTIPLICATION, // First selected operation as primary
     operations,
     setOperations,
     toggleOperation,

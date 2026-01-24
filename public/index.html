@@ -7,6 +7,8 @@
       name="viewport"
       content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1.00001, viewport-fit=cover"
     />
+    <meta name="screen-orientation" content="portrait" />
+    <meta name="x5-orientation" content="portrait" />
     <title>1x1 Trainer - Learn Multiplication</title>
     <meta name="description" content="Practice multiplication tables with different game modes" />
     <meta name="keywords" content="1x1, multiplication, trainer, math, learning, PWA, education" />
@@ -40,9 +42,7 @@
         background-color: #FAFAFA;
         /* Background will be set dynamically by React */
       }
-
-      /* Block landscape orientation */
-      @media (orientation: landscape) {
+      @media screen and (orientation: landscape) {
         body::before {
           content: '';
           position: fixed;
@@ -51,25 +51,20 @@
           width: 100%;
           height: 100%;
           background-color: rgba(0, 0, 0, 0.95);
-          z-index: 9999;
+          z-index: 1000;
         }
-
         body::after {
-          content: 'Please use portrait mode';
+          content: '📱 Bitte drehen Sie Ihr Gerät ins Hochformat / Please rotate your device to portrait mode';
           position: fixed;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
+          z-index: 1001;
           color: white;
-          font-size: 24px;
-          font-weight: bold;
+          font-size: 18px;
           text-align: center;
-          z-index: 10000;
-          white-space: nowrap;
-        }
-
-        #root {
-          display: none;
+          padding: 20px;
+          max-width: 80%;
         }
       }
     </style>

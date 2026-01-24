@@ -4,14 +4,16 @@
  */
 
 import { useState, useMemo } from 'react';
-import { GameMode, Operation, AnswerMode, DifficultyMode, GameState } from '../types/game';
+import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange } from '../types/game';
 import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER } from '../utils/constants';
 
 interface UseGameLogicProps {
   initialOperation: Operation;
+  initialOperations?: Operation[]; // Optional: array of selected operations
   initialTotalSolvedTasks: number;
   onTotalSolvedTasksChange: (total: number) => void;
   onMotivationShow: (score: number) => void;
+  numberRange: NumberRange;
 }
 
 /**
@@ -21,57 +23,105 @@ interface UseGameLogicProps {
  * @param num2 - Second number in the operation
  * @param questionPart - Which part of the operation is being asked (0: num1, 1: num2, 2: result)
  * @param operation - Type of operation
+ * @param maxNumber - Maximum number in the range (10, 20, 50, or 100)
  * @returns Array of 10 numbers forming the sequence
  */
 export function generateNumberSequenceForState(
   num1: number,
   num2: number,
   questionPart: number,
-  operation: Operation
+  operation: Operation,
+  maxNumber: number = 10
 ): number[] {
   const sequence: number[] = [];
 
-  // Determine the base number for the sequence
-  let base;
-  if (questionPart === 0) {
-    base = num2;
-  } else if (questionPart === 1) {
-    base = num1;
-  } else {
-    // For result, use one of the factors
-    base = num1;
-  }
+  // Determine which number is being asked for and generate appropriate sequence
+  // For multiplication/division: we need the multiplication table of the known factor
+  // For addition/subtraction: we need a range around the known value
 
-  // Generate sequence based on operation type
-  if (operation === Operation.ADDITION) {
-    // For addition, generate: base+1, base+2, base+3, ..., base+10
-    // Since num2 ∈ [1,10], correct answer (base+num2) will always be in sequence
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base + i);
-    }
-  } else if (operation === Operation.SUBTRACTION) {
-    // For subtraction, generate a range around the base
-    // Generate: base-4, base-3, base-2, base-1, base, base+1, base+2, base+3, base+4, base+5
-    for (let i = -4; i <= 5; i++) {
-      const value = base + i;
-      if (value > 0) {
-        sequence.push(value);
+  if (operation === Operation.MULTIPLICATION) {
+    // For multiplication, the sequence depends on what we're asking for:
+    // - If asking for a FACTOR (questionPart 0 or 1): show simple sequence 1-10
+    // - If asking for RESULT (questionPart 2): show multiples of one factor
+
+    if (questionPart === 2) {
+      // Asking for result: num1 × num2 = ?
+      // Show multiples of num1: num1×1, num1×2, ..., num1×10
+      const base = num1;
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base * i);
+      }
+    } else {
+      // Asking for a factor: ? × num2 = result OR num1 × ? = result
+      // Show simple sequence: 1 to min(10, maxNumber)
+      const limit = Math.min(10, maxNumber);
+      for (let i = 1; i <= limit; i++) {
+        sequence.push(i);
       }
     }
-    // Ensure we have exactly 10 values
-    while (sequence.length < 10) {
-      sequence.push(base + sequence.length);
+  } else if (operation === Operation.ADDITION) {
+    // For addition:
+    // - If asking for ADDEND (questionPart 0 or 1): show simple sequence 1-10
+    // - If asking for SUM (questionPart 2): show range around the CORRECT ANSWER
+
+    if (questionPart === 2) {
+      // Asking for sum: num1 + num2 = ?
+      // Show range around correct answer: (result-4) to (result+5)
+      const correctAnswer = num1 + num2;
+      const startValue = Math.max(1, correctAnswer - 4);
+
+      for (let i = 0; i < 10; i++) {
+        sequence.push(startValue + i);
+      }
+    } else {
+      // Asking for an addend: ? + num2 = result OR num1 + ? = result
+      // Show simple sequence: 1 to min(10, maxNumber)
+      const limit = Math.min(10, maxNumber);
+      for (let i = 1; i <= limit; i++) {
+        sequence.push(i);
+      }
+    }
+  } else if (operation === Operation.SUBTRACTION) {
+    // For subtraction:
+    // - If asking for MINUEND or SUBTRAHEND (questionPart 0 or 1): show simple sequence 1-10
+    // - If asking for DIFFERENCE (questionPart 2): show range around the CORRECT ANSWER
+
+    if (questionPart === 2) {
+      // Asking for difference: num1 - num2 = ?
+      // Show range around correct answer: (result-4) to (result+5)
+      const correctAnswer = num1 - num2;
+      const startValue = Math.max(1, correctAnswer - 4);
+
+      for (let i = 0; i < 10; i++) {
+        sequence.push(startValue + i);
+      }
+    } else {
+      // Asking for minuend or subtrahend: ? - num2 = result OR num1 - ? = result
+      // Show simple sequence: 1 to min(10, maxNumber)
+      const limit = Math.min(10, maxNumber);
+      for (let i = 1; i <= limit; i++) {
+        sequence.push(i);
+      }
     }
   } else if (operation === Operation.DIVISION) {
-    // For division, generate multiples of the divisor
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base * i);
-    }
-  } else {
-    // For multiplication (or fallback), generate: base×1, base×2, base×3, ..., base×10
-    // Since num2 ∈ [1,10], correct answer (base×num2) will always be in sequence
-    for (let i = 1; i <= 10; i++) {
-      sequence.push(base * i);
+    // For division, all question types should show simple sequence 1-10
+    // since we're always looking for a factor or quotient (both in range 1-10)
+
+    if (questionPart === 0) {
+      // Asking for dividend: ? ÷ num2 = result
+      // The dividend = divisor × quotient, so show multiples of num2
+      const base = num2;
+      for (let i = 1; i <= 10; i++) {
+        sequence.push(base * i);
+      }
+    } else {
+      // Asking for divisor OR quotient: num1 ÷ ? = result OR num1 ÷ num2 = ?
+      // Both divisor and quotient are in range 1 to min(10, maxNumber)
+      // Show simple sequence
+      const limit = Math.min(10, maxNumber);
+      for (let i = 1; i <= limit; i++) {
+        sequence.push(i);
+      }
     }
   }
 
@@ -80,10 +130,34 @@ export function generateNumberSequenceForState(
 
 export function useGameLogic({
   initialOperation,
+  initialOperations,
   initialTotalSolvedTasks,
   onTotalSolvedTasksChange,
   onMotivationShow,
+  numberRange,
 }: UseGameLogicProps) {
+  // Helper: Get max number based on number range
+  const getMaxNumber = () => {
+    switch (numberRange) {
+      case NumberRange.RANGE_10:
+        return 10;
+      case NumberRange.RANGE_20:
+        return 20;
+      case NumberRange.RANGE_50:
+        return 50;
+      case NumberRange.RANGE_100:
+        return 100;
+      default:
+        return 10;
+    }
+  };
+
+  const maxNumber = getMaxNumber();
+  // Use initialOperations if provided, otherwise fallback to single initialOperation
+  const selectedOps = initialOperations && initialOperations.length > 0
+    ? initialOperations
+    : [initialOperation || Operation.MULTIPLICATION];
+
   const [gameState, setGameState] = useState<GameState>({
     num1: 1,
     num2: 1,
@@ -92,8 +166,8 @@ export function useGameLogic({
     currentTask: 1,
     totalTasks: TOTAL_TASKS,
     gameMode: GameMode.NORMAL,
-    operation: initialOperation,
-    selectedOperations: new Set([initialOperation]),
+    operation: selectedOps[0],
+    selectedOperations: new Set(selectedOps),
     answerMode: AnswerMode.INPUT,
     difficultyMode: DifficultyMode.SIMPLE,
     questionPart: 2,
@@ -145,32 +219,49 @@ export function useGameLogic({
     let newNum2: number;
     
     // Generate appropriate numbers based on operation
+    // IMPORTANT: ALL numbers (operands AND results) must be within numberRange
     switch (selectedOp) {
       case Operation.ADDITION:
+        // For addition: ensure sum (num1 + num2) is within range
+        // Strategy: Pick num1, then num2 such that sum <= maxNumber
+        newNum1 = Math.floor(Math.random() * (maxNumber - 1)) + 1; // 1 to maxNumber-1
+        const maxNum2ForAddition = maxNumber - newNum1; // Ensure sum <= maxNumber
+        newNum2 = Math.floor(Math.random() * maxNum2ForAddition) + 1; // 1 to (maxNumber - num1)
+        break;
+
       case Operation.MULTIPLICATION:
-        // For addition and multiplication: both numbers 1-10
-        newNum1 = Math.floor(Math.random() * 10) + 1;
-        newNum2 = Math.floor(Math.random() * 10) + 1;
+        // For multiplication: ensure product (num1 * num2) is within range
+        // Strategy: Pick smaller factor from 1-10 (pedagogy), then ensure product <= maxNumber
+        const maxFirstFactor = Math.min(10, maxNumber);
+        newNum1 = Math.floor(Math.random() * maxFirstFactor) + 1; // 1 to min(10, maxNumber)
+        const maxSecondFactor = Math.min(10, Math.floor(maxNumber / newNum1)); // Ensure product <= maxNumber
+        newNum2 = Math.floor(Math.random() * maxSecondFactor) + 1;
         break;
-        
+
       case Operation.SUBTRACTION:
-        // For subtraction: ensure result is positive and at least 1
-        // num1 should be larger than num2
-        newNum2 = Math.floor(Math.random() * 9) + 1; // 1-9
-        newNum1 = newNum2 + Math.floor(Math.random() * (10 - newNum2)) + 1; // num2+1 to 10
+        // For subtraction: ensure minuend, subtrahend AND difference are all within range
+        // Strategy: Pick difference first, then subtrahend, calculate minuend
+        const difference = Math.floor(Math.random() * (maxNumber - 1)) + 1; // 1 to maxNumber-1
+        const maxSubtrahend = maxNumber - difference; // Ensure minuend = subtrahend + difference <= maxNumber
+        newNum2 = Math.floor(Math.random() * maxSubtrahend) + 1; // subtrahend
+        newNum1 = newNum2 + difference; // minuend = subtrahend + difference
         break;
-        
+
       case Operation.DIVISION:
-        // For division: ensure clean division (no remainders)
-        // First pick divisor (num2), then pick result, then calculate dividend (num1)
-        newNum2 = Math.floor(Math.random() * 10) + 1; // divisor: 1-10
-        const quotient = Math.floor(Math.random() * 10) + 1; // result: 1-10
+        // For division: ensure dividend, divisor AND quotient are all within range
+        // Strategy: Pick divisor and quotient from range, calculate dividend
+        const maxDivisor = Math.min(10, maxNumber); // Keep divisor 1-10 for pedagogy
+        newNum2 = Math.floor(Math.random() * maxDivisor) + 1; // divisor: 1 to min(10, maxNumber)
+
+        // Calculate max quotient ensuring dividend = divisor × quotient <= maxNumber
+        const maxQuotient = Math.min(10, Math.floor(maxNumber / newNum2));
+        const quotient = Math.floor(Math.random() * maxQuotient) + 1; // quotient: 1 to maxQuotient
         newNum1 = newNum2 * quotient; // dividend = divisor × quotient
         break;
-        
+
       default:
-        newNum1 = Math.floor(Math.random() * 10) + 1;
-        newNum2 = Math.floor(Math.random() * 10) + 1;
+        newNum1 = Math.floor(Math.random() * maxNumber) + 1;
+        newNum2 = Math.floor(Math.random() * maxNumber) + 1;
     }
     
     let newQuestionPart = 2;
@@ -474,7 +565,7 @@ export function useGameLogic({
   // This is enforced in generateQuestion() lines 85-87. The base calculation handles
   // all questionPart values defensively, but only questionPart===2 will call this function.
   const generateNumberSequence = () => {
-    return generateNumberSequenceForState(gameState.num1, gameState.num2, gameState.questionPart, gameState.operation);
+    return generateNumberSequenceForState(gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, maxNumber);
   };
 
   // Memoize choices and sequence

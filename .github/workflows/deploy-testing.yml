@@ -58,8 +58,26 @@ jobs:
 
           # Add testing environment marker
           sed -i 's/<body>/<body data-environment="testing">/' testing-deploy/index.html || true
-          # Add base href for /testing/ subdirectory
-          sed -i 's|</head>|  <base href="/1x1_Trainer/testing/">\n</head>|' testing-deploy/index.html || true
+
+          # Fix asset paths for testing subdirectory
+          # Replace ./1x1_Trainer/ with ./  (relative to /1x1_Trainer/testing/)
+          sed -i 's|"\./1x1_Trainer/|"\./|g' testing-deploy/index.html || true
+          sed -i 's|href="./icon-|href="/1x1_Trainer/testing/icon-|g' testing-deploy/index.html || true
+
+          # Fix service worker paths for testing subdirectory
+          sed -i "s|'/1x1_Trainer/service-worker.js'|'/1x1_Trainer/testing/service-worker.js'|g" testing-deploy/index.html || true
+          sed -i "s|scope: '/1x1_Trainer/'|scope: '/1x1_Trainer/testing/'|g" testing-deploy/index.html || true
+
+          # Fix manifest.json paths if it exists
+          if [ -f "testing-deploy/manifest.json" ]; then
+            sed -i 's|1x1_Trainer/|1x1_Trainer/testing/|g' testing-deploy/manifest.json || true
+          fi
+
+          # Fix service-worker.js paths if it exists
+          if [ -f "testing-deploy/service-worker.js" ]; then
+            sed -i 's|/1x1_Trainer/|/1x1_Trainer/testing/|g' testing-deploy/service-worker.js || true
+          fi
+
           echo "✅ Testing environment prepared"
 
       - name: Upload to gh-pages (testing subdirectory)
@@ -70,9 +88,11 @@ jobs:
           destination_dir: testing
           commit_message: '🧪 Testing deployment from ${{ github.sha }}'
           keep_files: true
+          allow_empty_commit: true
 
       - name: Deployment Summary
         run: |
           echo "🧪 Testing deployment successful!"
           echo "Testing URL: https://s540d.github.io/1x1_Trainer/testing/"
           echo "Branch: gh-pages (subdirectory: /testing/)"
+          echo "Note: GitHub Pages will auto-rebuild from branch (1-2 minutes)"

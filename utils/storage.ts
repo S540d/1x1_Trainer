@@ -139,10 +139,31 @@ export const saveNumberRange = async (range: NumberRange): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.NUMBER_RANGE, range);
 };
 
-export const getNumberRange = async (): Promise<NumberRange | null> => {
+export const getNumberRange = async (): Promise<NumberRange> => {
   const value = await getStorageItem(STORAGE_KEYS.NUMBER_RANGE);
-  if (value === 'SMALL' || value === 'LARGE') {
+
+  // Handle new format
+  if (value === 'RANGE_10' || value === 'RANGE_20' || value === 'RANGE_50' || value === 'RANGE_100') {
     return value as NumberRange;
   }
-  return null;
+
+  // Migration: handle old format
+  if (value === 'SMALL') {
+    const migratedValue = NumberRange.RANGE_10;
+    await saveNumberRange(migratedValue);
+    return migratedValue;
+  }
+  if (value === 'MEDIUM') {
+    const migratedValue = NumberRange.RANGE_20;
+    await saveNumberRange(migratedValue);
+    return migratedValue;
+  }
+  if (value === 'LARGE') {
+    const migratedValue = NumberRange.RANGE_100;
+    await saveNumberRange(migratedValue);
+    return migratedValue;
+  }
+
+  // Default: 1-100 for existing users
+  return NumberRange.RANGE_100;
 };

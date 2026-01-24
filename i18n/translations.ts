@@ -31,7 +31,9 @@ export interface TranslationStrings {
   numberSequenceMode: string;
   personalize: string;
   numberRange: string;
+  upTo10: string;
   upTo20: string;
+  upTo50: string;
   upTo100: string;
   feedback: string;
   support: string;
@@ -93,8 +95,10 @@ export const translations: Record<Language, TranslationStrings> = {
     numberSequenceMode: 'Number Sequence',
     personalize: 'Personalize',
     numberRange: 'NUMBER RANGE',
-    upTo20: 'Up to 20',
-    upTo100: 'Up to 100',
+    upTo10: '1-10',
+    upTo20: '1-20',
+    upTo50: '1-50',
+    upTo100: '1-100',
     feedback: 'Send Feedback',
     support: 'Support me',
     about: 'ABOUT',
@@ -153,8 +157,10 @@ export const translations: Record<Language, TranslationStrings> = {
     numberSequenceMode: 'Zahlenreihe',
     personalize: 'Personalisieren',
     numberRange: 'ZAHLENBEREICH',
-    upTo20: 'Bis 20',
-    upTo100: 'Bis 100',
+    upTo10: '1-10',
+    upTo20: '1-20',
+    upTo50: '1-50',
+    upTo100: '1-100',
     feedback: 'Feedback senden',
     support: 'Support me',
     about: 'ÜBER',

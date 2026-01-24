@@ -4,13 +4,20 @@ Dieses Dokument beschreibt den Testing-Workflow und die Deployment-Strategie fü
 
 ## 📋 Branch-Strategie
 
-Das Projekt nutzt ein einfaches aber effektives Branching-Modell:
+Das Projekt nutzt ein drei-stufiges Branching-Modell für maximale Sicherheit:
 
 | Branch | Zweck | URL | Auto-Deploy |
 |--------|-------|-----|-------------|
 | `main` | Production (Stable) | https://s540d.github.io/1x1_Trainer/ | ✅ Ja |
-| `testing` | Testing/Preview | https://s540d.github.io/1x1_Trainer/testing/ | ✅ Ja |
+| `staging` | Pre-Production (Final Review) | https://s540d.github.io/1x1_Trainer/staging/ | ✅ Ja |
+| `testing` | Development Testing | https://s540d.github.io/1x1_Trainer/testing/ | ✅ Ja |
 | `gh-pages` | GitHub Pages (auto-generated) | - | - |
+
+### Workflow-Fluss
+```
+feature/xyz → testing → staging → main
+   (Dev)      (Test)    (Review)   (Prod)
+```
 
 ## 🧪 Testing Workflow
 
@@ -41,23 +48,47 @@ git push origin testing
 - ✅ Deployment zu `/testing/` auf GitHub Pages
 - ✅ Verfügbar unter: https://s540d.github.io/1x1_Trainer/testing/
 
-### 3. Testing durchführen
+### 3. Development Testing durchführen
 
-**Partner testet online:**
+**Entwickler testet online:**
 - [ ] Funktionalität funktioniert wie erwartet
 - [ ] Keine Console Errors
 - [ ] UI/UX ist korrekt
 - [ ] Mobile Ansicht funktioniert
+
+### 4. Merge zu Staging (Pre-Production)
+```bash
+# Nach erfolgreichem Testing zu staging mergen
+git checkout staging
+git pull origin staging
+git merge testing
+git push origin staging
+```
+
+**Automatisch passiert dann:**
+- ✅ GitHub Action wird ausgelöst
+- ✅ Web-Build wird erstellt
+- ✅ Deployment zu `/staging/` auf GitHub Pages
+- ✅ Verfügbar unter: https://s540d.github.io/1x1_Trainer/staging/
+
+### 5. Final Review auf Staging
+
+**Partner/Endnutzer testet online:**
+- [ ] Alle Features funktionieren wie erwartet
+- [ ] Keine Console Errors
+- [ ] UI/UX ist korrekt
+- [ ] Mobile Ansicht funktioniert perfekt
 - [ ] PWA Features funktionieren
 - [ ] Performance ist gut
 - [ ] Service Worker wird korrekt aktualisiert
+- [ ] Cross-Browser Testing (Chrome, Safari, Firefox)
 
-### 4. Merge zu Production
+### 6. Merge zu Production
 ```bash
-# Nach erfolgreichem Testing in main mergen
+# Nach erfolgreichem Final Review in main mergen
 git checkout main
 git pull origin main
-git merge testing
+git merge staging
 git push origin main
 ```
 
@@ -70,14 +101,14 @@ git push origin main
 ## 🔄 GitHub Actions Workflows
 
 ### ci-cd.yml
-Läuft bei jedem Push auf `main` und `develop`:
+Läuft bei jedem Push auf `main`, `staging`, `testing` und `develop`:
 - Code Quality & Linting
 - Console.log Check
 - Web API Platform Safety Check
 - TypeScript Compilation
 - Build Verification
 
-**Trigger:** `push` zu `main` oder `develop`, `pull_request`
+**Trigger:** `push` zu `main`, `staging`, `testing` oder `develop`, `pull_request`
 
 ### deploy.yml
 Deployment der Production Version auf GitHub Pages:
@@ -86,14 +117,23 @@ Deployment der Production Version auf GitHub Pages:
 
 **Trigger:** `push` zu `main`
 
-### deploy-testing.yml (Neu)
+### deploy-testing.yml
 Deployment der Testing Version auf GitHub Pages:
-- Erstellt Web-Build  
+- Erstellt Web-Build
 - Fügt Testing-Marker hinzu
 - Deployed zu `/testing/` (Subdirectory)
 - Setzt `base href="/1x1_Trainer/testing/"`
 
 **Trigger:** `push` zu `testing`
+
+### deploy-staging.yml (Neu)
+Deployment der Staging Version auf GitHub Pages:
+- Erstellt Web-Build
+- Fügt Staging-Marker hinzu
+- Deployed zu `/staging/` (Subdirectory)
+- Pre-Production Final Review Environment
+
+**Trigger:** `push` zu `staging`
 
 ## 📝 Lokales Testen
 
@@ -114,21 +154,24 @@ Simuliert das Production Deployment lokal
 - Chrome DevTools: F12 → Toggle Device Toolbar (Ctrl+Shift+M)
 - Oder echte Geräte über LAN testen
 
-## 🚀 Release-Prozess
+## 🚀 Release-Prozess (3-Stufen-Modell)
 
 1. **Feature Development** → `feature/xyz` Branch
 2. **Lokales Testen** → `npm run web` und `npm run build:web`
 3. **Testing Deployment** → Push zu `testing` Branch
-4. **Online Testing** → Partner testet auf `/testing/`
-5. **Production Release** → Merge zu `main` Branch
-6. **Monitor** → Feedback und Fehlerberichterstattung
+4. **Development Testing** → Entwickler testet auf `/testing/`
+5. **Staging Deployment** → Merge zu `staging` Branch
+6. **Final Review** → Partner/Endnutzer testet auf `/staging/`
+7. **Production Release** → Merge zu `main` Branch
+8. **Monitor** → Feedback und Fehlerberichterstattung
 
 ## 🔍 URLs
 
-| URL | Umgebung | Status |
-|-----|----------|--------|
-| https://s540d.github.io/1x1_Trainer/ | Production | ✅ Live |
-| https://s540d.github.io/1x1_Trainer/testing/ | Testing | ✅ Live |
+| URL | Umgebung | Status | Zweck |
+|-----|----------|--------|-------|
+| https://s540d.github.io/1x1_Trainer/ | Production | ✅ Live | Stabile Version für Endnutzer |
+| https://s540d.github.io/1x1_Trainer/staging/ | Staging | ✅ Live | Pre-Production Final Review |
+| https://s540d.github.io/1x1_Trainer/testing/ | Testing | ✅ Live | Development Testing |
 
 ## 📊 Debugging & Monitoring
 
@@ -152,13 +195,20 @@ Simuliert das Production Deployment lokal
 ## ⚠️ Wichtige Hinweise
 
 ### Beim Merge zu Testing
-- `testing` sollte immer auf Stand mit `main` sein
+- Features sollten lokal getestet sein
 - Falls Konflikte: `git merge --abort` und manuell auflösen
 
+### Beim Merge zu Staging
+- `staging` sollte immer von `testing` kommen
+- Alle Features müssen auf `testing` erfolgreich sein
+- Sicherstellen, dass testing-Deployment fehlerfrei war
+
 ### Beim Merge zu Production
-- Sicherstellen, dass testing erfolgreich deployed wurde
-- Nur stabile, getestete Features mergen
+- **NUR von `staging` nach `main` mergen!**
+- Sicherstellen, dass staging erfolgreich deployed und getestet wurde
+- Nur stabile, mehrfach getestete Features mergen
 - Nach Release Git Tag erstellen: `git tag v1.0.x`
+- **NIEMALS** direkt von `testing` nach `main` mergen!
 
 ### Branch-Namen
 - Features: `feature/description`
@@ -172,7 +222,17 @@ Die `main` Branch hat folgende Protection Rules:
 - Requires status checks to pass ✅
 - Requires branches to be up to date ✅
 
+## 💡 Warum 3 Stufen?
+
+**1x1 Trainer hat die meisten aktiven Nutzer** - daher maximale Vorsicht!
+
+- **Testing**: Schnelle Iteration, Entwickler-Tests, kann instabil sein
+- **Staging**: Pre-Production, Partner/Endnutzer-Tests, muss stabil sein
+- **Main**: Production, nur mehrfach getestete Features, maximale Stabilität
+
+**Regel:** Niemals direkt von `testing` nach `main`! Immer über `staging`!
+
 ---
 
-**Zuletzt aktualisiert:** 2025-12-22
-**Version:** 1.0.11
+**Zuletzt aktualisiert:** 2026-01-23
+**Version:** 1.0.14
