@@ -88,31 +88,9 @@ jobs:
         commit_message: '🎨 Staging deployment from ${{ github.sha }}'
         force_orphan: false
 
-    - name: Trigger GitHub Pages build
-      run: |
-        set -e
-        echo "🔄 Triggering GitHub Pages rebuild..."
-
-        # Configure git
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-        # Clone gh-pages branch to temporary directory
-        git clone --depth 1 --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-temp
-        cd gh-pages-temp
-
-        # Create empty commit and push
-        git commit --allow-empty -m "🔄 Trigger Pages rebuild for staging deployment"
-        git push origin gh-pages
-
-        cd ..
-        rm -rf gh-pages-temp
-
-        echo "✅ GitHub Pages rebuild triggered"
-
     - name: Comment deployment URL
       run: |
         echo "🎨 Staging deployment successful!"
         echo "Staging URL: https://${{ github.repository_owner }}.github.io/1x1_Trainer/staging/"
         echo "Branch: gh-pages (subdirectory: /staging/)"
-        echo "Note: GitHub Pages may take 1-2 minutes to reflect changes"
+        echo "Note: GitHub Pages will auto-rebuild from branch (1-2 minutes)"
