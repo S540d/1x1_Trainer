@@ -1,6 +1,6 @@
 {
   "name": "1x1_trainer",
-  "version": "1.0.12",
+  "version": "1.1.0",
   "description": "Cross-platform 1x1 multiplication trainer with multiple game modes",
   "main": "index.ts",
   "homepage": "https://s540d.github.io/1x1_Trainer/",
