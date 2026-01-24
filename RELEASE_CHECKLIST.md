@@ -14,9 +14,11 @@ Diese Checklist muss vor jedem Release durchlaufen werden.
 - [ ] Dark Mode funktioniert
 - [ ] Settings werden korrekt gespeichert
 
-### Android Platform
-- [ ] Build erfolgreich: `./gradlew bundleRelease`
-- [ ] APK installiert auf physischem Gerät
+### Android Platform (EAS Build)
+- [ ] Build erfolgreich: `npx eas build --platform android --profile production`
+- [ ] Build-Status auf expo.dev überprüft
+- [ ] AAB heruntergeladen von expo.dev
+- [ ] App auf physischem Gerät getestet (via Internal Testing Track)
 - [ ] App startet ohne Crash
 - [ ] Alle Features funktionieren
 - [ ] Dark Mode funktioniert
@@ -49,19 +51,21 @@ Diese Checklist muss vor jedem Release durchlaufen werden.
 
 ## Version & Metadata
 
-### Version Numbers
+### Version Numbers (MUST be consistent!)
 - [ ] `package.json` version aktualisiert
-- [ ] `app.json` version aktualisiert
-- [ ] `app.json` android.versionCode erhöht
-- [ ] `Android/app/build.gradle.kts` versionCode erhöht
-- [ ] `Android/app/build.gradle.kts` versionName aktualisiert
-- [ ] `App.tsx` APP_VERSION Konstante aktualisiert
+- [ ] `app.json` expo.version aktualisiert (muss mit package.json übereinstimmen!)
+- [ ] `app.json` expo.android.versionCode erhöht
+- [ ] `utils/constants.ts` APP_VERSION aktualisiert (muss mit package.json übereinstimmen!)
+- [ ] Pre-commit hook prüft automatisch Version-Konsistenz
 
-### Git
+### Git & Branches
 - [ ] Alle Änderungen committed
 - [ ] Commit Messages sind aussagekräftig
-- [ ] Branch ist up-to-date mit main
+- [ ] Feature getestet auf `testing` Branch
+- [ ] Feature reviewed auf `staging` Branch
+- [ ] Bereit für Merge zu `main`
 - [ ] Keine merge conflicts
+- [ ] CI/CD Tests bestanden auf allen Branches
 
 ## Documentation
 
@@ -73,11 +77,11 @@ Diese Checklist muss vor jedem Release durchlaufen werden.
 
 ## Build Artifacts
 
-### Android
-- [ ] Signiertes AAB generiert
-- [ ] AAB nach `Android/release/` kopiert
-- [ ] Dateiname: `1x1-trainer-v{VERSION}-signed.aab`
-- [ ] Dateigröße überprüft (sollte ~5MB sein)
+### Android (EAS Build)
+- [ ] Signiertes AAB von expo.dev heruntergeladen
+- [ ] AAB lokal gespeichert: `1x1-trainer-v{VERSION}-signed.aab`
+- [ ] Dateigröße überprüft (sollte ~8-12MB sein)
+- [ ] Build-Logs auf expo.dev überprüft (keine Warnings)
 
 ### Web
 - [ ] Build in `dist/` Verzeichnis

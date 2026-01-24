@@ -102,20 +102,28 @@ Die Web-Version kann auf mobilen Geräten und Desktops als App installiert werde
 - ✅ **Schnell** - Intelligentes Caching & Performance
 - ✅ **Responsive** - Perfekt auf allen Bildschirmgrößen
 
-### Testing Umgebungen
+### Deployment-Umgebungen
 
-Das Projekt hat zwei Deployment-Umgebungen:
+Das Projekt verwendet eine **3-Tier Deployment-Strategie** für sicheres Testen:
 
-| Umgebung | URL | Branch | Auto-Deploy |
-|----------|-----|--------|-------------|
-| **Production** | https://s540d.github.io/1x1_Trainer/ | `main` | ✅ |
-| **Testing/Preview** | https://s540d.github.io/1x1_Trainer/testing/ | `testing` | ✅ |
+| Umgebung | URL | Branch | Auto-Deploy | Zweck |
+|----------|-----|--------|-------------|-------|
+| **Production** | https://s540d.github.io/1x1_Trainer/ | `main` | ✅ | Produktiv-Version für Nutzer |
+| **Staging** | https://s540d.github.io/1x1_Trainer/staging/ | `staging` | ✅ | Pre-Production Testing |
+| **Testing** | https://s540d.github.io/1x1_Trainer/testing/ | `testing` | ✅ | Feature Testing & Development |
 
-**Testing Workflow:**
+**3-Tier Workflow:**
+```
+Feature Branch → testing → staging → main
+                   ↓         ↓        ↓
+                 Tests    Final QA  Release
+```
+
 - Entwickle Features auf Feature-Branches
 - Teste lokal mit `npm run web`
-- Push zu `testing` für Online-Preview
-- Merge zu `main` nach erfolgreichem Testing
+- Push zu `testing` für erste Online-Tests
+- Merge zu `staging` für Pre-Production QA
+- Merge zu `main` für Production Release
 
 Detaillierter Workflow: 📖 [TESTING.md](./TESTING.md)
 

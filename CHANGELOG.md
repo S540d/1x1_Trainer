@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-01-24
+
 ### Added
 - ✨ **Flexible Number Range** (Issue #80, PR #80): Enhanced number range selection
   - Expanded from 2 ranges to 4 selectable ranges: 1-10, 1-20, 1-50, 1-100
