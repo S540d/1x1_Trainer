@@ -46,6 +46,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Reason: 1x1 Trainer has most active users - extra safety layer needed
 
 ### Fixed
+- 🐛 **CRITICAL: Number Range Enforcement - Complete Fix** (PR #88): Fixed remaining range violations
+  - **Problem 1 - Operand Generation**: All operands AND results now stay within range
+    - Example fixed: Range 1-20 no longer shows "80÷10=?" (dividend 80 > 20)
+    - Fixed for all operations: Addition sum, Subtraction minuend, Multiplication product, Division dividend
+  - **Problem 2 - NUMBER_SEQUENCE Bug**: Fixed incorrect answer sequence centering
+    - Example fixed: "93-90=?" now shows sequence around answer (3) instead of around minuend (93)
+    - Was showing: 89-98 (incorrect)
+    - Now shows: 1-10 (correct, centered around 3)
+    - Fixed for ADDITION (now centers around sum) and SUBTRACTION (now centers around difference)
+  - **Testing**: Added comprehensive test suite with 400+ new tests
+    - New file: `useGameLogic.numberRange.test.tsx`
+    - Tests all 4 operations × 4 ranges × 100 iterations = 1,600 validations
+    - All 300/303 tests passing (3 skipped)
 - 🐛 **Deployment**: Fixed staging deployment path corrections (Issue #78)
   - Added preparation step to `deploy-staging.yml` matching `deploy-testing.yml` pattern
   - Fixed asset paths for staging subdirectory (`/1x1_Trainer/staging/`)
