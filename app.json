@@ -4,7 +4,7 @@
     "slug": "1x1-trainer",
     "version": "1.1.0",
     "orientation": "portrait",
-    "icon": "./icon.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
