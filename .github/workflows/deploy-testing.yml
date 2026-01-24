@@ -89,8 +89,27 @@ jobs:
           commit_message: '🧪 Testing deployment from ${{ github.sha }}'
           keep_files: true
 
+      - name: Checkout gh-pages branch for rebuild trigger
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Trigger GitHub Pages build
+        run: |
+          set -e
+          echo "🔄 Triggering GitHub Pages rebuild..."
+          # Create an empty commit to gh-pages to trigger Pages rebuild
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "🔄 Trigger Pages rebuild for testing deployment"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push origin gh-pages
+          echo "✅ GitHub Pages rebuild triggered"
+
       - name: Deployment Summary
         run: |
           echo "🧪 Testing deployment successful!"
           echo "Testing URL: https://s540d.github.io/1x1_Trainer/testing/"
           echo "Branch: gh-pages (subdirectory: /testing/)"
+          echo "Note: GitHub Pages may take 1-2 minutes to reflect changes"
