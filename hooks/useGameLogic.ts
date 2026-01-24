@@ -62,14 +62,16 @@ export function generateNumberSequenceForState(
   } else if (operation === Operation.ADDITION) {
     // For addition:
     // - If asking for ADDEND (questionPart 0 or 1): show simple sequence 1-10
-    // - If asking for SUM (questionPart 2): show range num1+1 to num1+10
+    // - If asking for SUM (questionPart 2): show range around the CORRECT ANSWER
 
     if (questionPart === 2) {
       // Asking for sum: num1 + num2 = ?
-      // Show: num1+1, num1+2, ..., num1+10
-      const base = num1;
-      for (let i = 1; i <= 10; i++) {
-        sequence.push(base + i);
+      // Show range around correct answer: (result-4) to (result+5)
+      const correctAnswer = num1 + num2;
+      const startValue = Math.max(1, correctAnswer - 4);
+
+      for (let i = 0; i < 10; i++) {
+        sequence.push(startValue + i);
       }
     } else {
       // Asking for an addend: ? + num2 = result OR num1 + ? = result
@@ -82,21 +84,16 @@ export function generateNumberSequenceForState(
   } else if (operation === Operation.SUBTRACTION) {
     // For subtraction:
     // - If asking for MINUEND or SUBTRAHEND (questionPart 0 or 1): show simple sequence 1-10
-    // - If asking for DIFFERENCE (questionPart 2): show range around num1
+    // - If asking for DIFFERENCE (questionPart 2): show range around the CORRECT ANSWER
 
     if (questionPart === 2) {
       // Asking for difference: num1 - num2 = ?
-      // Show range around num1: base-4 to base+5
-      const base = num1;
-      for (let i = -4; i <= 5; i++) {
-        const value = base + i;
-        if (value > 0) {
-          sequence.push(value);
-        }
-      }
-      // Ensure we have exactly 10 values
-      while (sequence.length < 10) {
-        sequence.push(base + sequence.length);
+      // Show range around correct answer: (result-4) to (result+5)
+      const correctAnswer = num1 - num2;
+      const startValue = Math.max(1, correctAnswer - 4);
+
+      for (let i = 0; i < 10; i++) {
+        sequence.push(startValue + i);
       }
     } else {
       // Asking for minuend or subtrahend: ? - num2 = result OR num1 - ? = result
@@ -222,40 +219,43 @@ export function useGameLogic({
     let newNum2: number;
     
     // Generate appropriate numbers based on operation
+    // IMPORTANT: ALL numbers (operands AND results) must be within numberRange
     switch (selectedOp) {
       case Operation.ADDITION:
-        // For addition: operands can use full range, result naturally scales
-        newNum1 = Math.floor(Math.random() * maxNumber) + 1;
-        newNum2 = Math.floor(Math.random() * maxNumber) + 1;
+        // For addition: ensure sum (num1 + num2) is within range
+        // Strategy: Pick num1, then num2 such that sum <= maxNumber
+        newNum1 = Math.floor(Math.random() * (maxNumber - 1)) + 1; // 1 to maxNumber-1
+        const maxNum2ForAddition = maxNumber - newNum1; // Ensure sum <= maxNumber
+        newNum2 = Math.floor(Math.random() * maxNum2ForAddition) + 1; // 1 to (maxNumber - num1)
         break;
 
       case Operation.MULTIPLICATION:
-        // For multiplication: keep factors 1-10 for learning, but scale based on range
-        // This follows 1x1 trainer pedagogy (master 1-10 factors first)
-        const maxFactor = Math.min(10, maxNumber);
-        newNum1 = Math.floor(Math.random() * maxFactor) + 1;
-        newNum2 = Math.floor(Math.random() * maxFactor) + 1;
+        // For multiplication: ensure product (num1 * num2) is within range
+        // Strategy: Pick smaller factor from 1-10 (pedagogy), then ensure product <= maxNumber
+        const maxFirstFactor = Math.min(10, maxNumber);
+        newNum1 = Math.floor(Math.random() * maxFirstFactor) + 1; // 1 to min(10, maxNumber)
+        const maxSecondFactor = Math.min(10, Math.floor(maxNumber / newNum1)); // Ensure product <= maxNumber
+        newNum2 = Math.floor(Math.random() * maxSecondFactor) + 1;
         break;
 
       case Operation.SUBTRACTION:
-        // For subtraction: ensure result is positive and at least 1
-        // num1 should be larger than num2
-        newNum2 = Math.floor(Math.random() * (maxNumber - 1)) + 1; // 1 to maxNumber-1
-        newNum1 = newNum2 + Math.floor(Math.random() * (maxNumber - newNum2)) + 1; // num2+1 to maxNumber
+        // For subtraction: ensure minuend, subtrahend AND difference are all within range
+        // Strategy: Pick difference first, then subtrahend, calculate minuend
+        const difference = Math.floor(Math.random() * (maxNumber - 1)) + 1; // 1 to maxNumber-1
+        const maxSubtrahend = maxNumber - difference; // Ensure minuend = subtrahend + difference <= maxNumber
+        newNum2 = Math.floor(Math.random() * maxSubtrahend) + 1; // subtrahend
+        newNum1 = newNum2 + difference; // minuend = subtrahend + difference
         break;
 
       case Operation.DIVISION:
-        // For division: keep divisor small (1-10) for manageability
-        // Scale quotient based on range to allow results to grow
-        // This ensures dividend doesn't exceed reasonable bounds
-        const maxDivisor = Math.min(10, maxNumber);
-        newNum2 = Math.floor(Math.random() * maxDivisor) + 1; // divisor: 1-10
+        // For division: ensure dividend, divisor AND quotient are all within range
+        // Strategy: Pick divisor and quotient from range, calculate dividend
+        const maxDivisor = Math.min(10, maxNumber); // Keep divisor 1-10 for pedagogy
+        newNum2 = Math.floor(Math.random() * maxDivisor) + 1; // divisor: 1 to min(10, maxNumber)
 
-        // Calculate max quotient to keep dividend within reasonable bounds
-        // For larger ranges, cap dividend at 100 for UX (division stays learnable)
-        const maxDividend = Math.min(maxNumber * 10, 100);
-        const maxQuotient = Math.min(10, Math.floor(maxDividend / newNum2));
-        const quotient = Math.floor(Math.random() * maxQuotient) + 1;
+        // Calculate max quotient ensuring dividend = divisor × quotient <= maxNumber
+        const maxQuotient = Math.min(10, Math.floor(maxNumber / newNum2));
+        const quotient = Math.floor(Math.random() * maxQuotient) + 1; // quotient: 1 to maxQuotient
         newNum1 = newNum2 * quotient; // dividend = divisor × quotient
         break;
 
