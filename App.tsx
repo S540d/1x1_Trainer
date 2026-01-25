@@ -937,6 +937,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 24,
     alignItems: 'center',
+    justifyContent: 'space-between',
     // Multi-layer shadow for depth
     elevation: 8,
     shadowColor: '#000',
@@ -947,7 +948,7 @@ const styles = StyleSheet.create({
   questionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   questionText: {
     fontSize: 48,
@@ -969,8 +970,7 @@ const styles = StyleSheet.create({
   },
   answerArea: {
     width: '100%',
-    flex: 1,
-    justifyContent: 'flex-end',
+    flexShrink: 0,
   },
   numpad: {
     width: '100%',
