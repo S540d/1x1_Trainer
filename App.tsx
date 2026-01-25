@@ -25,7 +25,6 @@ export default function App() {
   const [aboutVisible, setAboutVisible] = useState(false);
   const [personalizeVisible, setPersonalizeVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
-  const [motivationScore, setMotivationScore] = useState(0);
 
   // Use custom hooks
   const preferences = usePreferences();
@@ -35,8 +34,7 @@ export default function App() {
     initialOperations: preferences.operations,
     initialTotalSolvedTasks: preferences.totalSolvedTasks,
     onTotalSolvedTasksChange: preferences.setTotalSolvedTasks,
-    onMotivationShow: (score: number) => {
-      setMotivationScore(score);
+    onMotivationShow: () => {
       setShowMotivation(true);
     },
     numberRange: preferences.numberRange,
@@ -559,10 +557,10 @@ export default function App() {
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.settingsMenu }]}>
             <Text style={[styles.modalTitle, { color: colors.text }]}>
-              {motivationScore < 5 ? t.motivationTitleLowScore : t.motivationTitle}
+              {t.motivationTitle}
             </Text>
             <Text style={[styles.modalText, { color: colors.text }]}>
-              {motivationScore < 5 ? t.motivationMessageLowScore : t.motivationMessage}
+              {t.motivationMessage}
             </Text>
             <TouchableOpacity
               style={styles.restartButton}

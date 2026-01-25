@@ -12,7 +12,7 @@ interface UseGameLogicProps {
   initialOperations?: Operation[]; // Optional: array of selected operations
   initialTotalSolvedTasks: number;
   onTotalSolvedTasksChange: (total: number) => void;
-  onMotivationShow: (score: number) => void;
+  onMotivationShow: () => void;
   numberRange: NumberRange;
 }
 
@@ -380,7 +380,7 @@ export function useGameLogic({
     setGameState((prev) => {
       // Show motivation message after every 10 tasks
       if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
-        onMotivationShow(prev.score);
+        onMotivationShow();
       }
       
       if (isLastTask) {

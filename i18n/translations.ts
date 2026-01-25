@@ -63,8 +63,6 @@ export interface TranslationStrings {
   // Motivation Message
   motivationTitle: string;
   motivationMessage: string;
-  motivationTitleLowScore: string;
-  motivationMessageLowScore: string;
   motivationButton: string;
 }
 
@@ -127,8 +125,6 @@ export const translations: Record<Language, TranslationStrings> = {
     // Motivation Message
     motivationTitle: 'Great Progress!',
     motivationMessage: 'You have already solved 10 tasks. Let\'s try another round!',
-    motivationTitleLowScore: 'Keep Going!',
-    motivationMessageLowScore: 'Don\'t give up! Practice makes perfect. Let\'s try again!',
     motivationButton: 'Continue',
   },
   de: {
@@ -189,8 +185,6 @@ export const translations: Record<Language, TranslationStrings> = {
     // Motivation Message
     motivationTitle: 'Toll gemacht!',
     motivationMessage: 'Du hast schon 10 Aufgaben gerechnet. Lass uns noch eine Runde versuchen!',
-    motivationTitleLowScore: 'Weiter so!',
-    motivationMessageLowScore: 'Nicht aufgeben! Übung macht den Meister. Versuchen wir es nochmal!',
     motivationButton: 'Weiter',
   },
 };

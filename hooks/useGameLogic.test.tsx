@@ -1244,7 +1244,7 @@ describe('useGameLogic Hook', () => {
       });
 
       expect(mockOnMotivationShow).toHaveBeenCalledTimes(1);
-      expect(mockOnMotivationShow).toHaveBeenCalledWith(result.current.gameState.score);
+      expect(mockOnMotivationShow).toHaveBeenCalledWith();
     });
   });
 
