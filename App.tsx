@@ -117,15 +117,17 @@ export default function App() {
             </View>
 
             {/* Personalize Button */}
-            <TouchableOpacity
-              style={styles.settingsMenuLink}
-              onPress={() => {
-                setPersonalizeVisible(true);
-                setMenuVisible(false);
-              }}
-            >
-              <Text style={styles.settingsMenuLinkText}>{t.personalize}</Text>
-            </TouchableOpacity>
+            <View style={styles.settingsSection}>
+              <TouchableOpacity
+                style={[styles.personalizeButton, { borderColor: colors.border }]}
+                onPress={() => {
+                  setPersonalizeVisible(true);
+                  setMenuVisible(false);
+                }}
+              >
+                <Text style={[styles.personalizeButtonText, { color: colors.text }]}>{t.personalize}</Text>
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.settingsDivider} />
 
@@ -818,6 +820,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#6200EE',
+  },
+  personalizeButton: {
+    width: '100%',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    alignItems: 'center',
+  },
+  personalizeButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   settingsSection: {
     paddingHorizontal: 16,
