@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- 🐛 **Layout Spacing** (Issue #58, PR #90): Improved spacing between question and input field
+  - Reduced excessive gaps on Android devices by adjusting flexbox layout
+  - Changed `questionCard` to use `justifyContent: 'space-between'`
+  - Reduced `questionRow` marginBottom from 24px to 16px
+  - Changed `answerArea` from `flex: 1` to `flexShrink: 0`
+  - Creates more balanced layout on small screens and older Android devices
+
+### Added
+- ✨ **iOS PWA Icon Support** (Issue #37, PR #91): Comprehensive iOS home screen support
+  - Added multiple apple-touch-icon links with cache-busting (180x180, 192x192, 512x512)
+  - Changed status bar style to `black-translucent` for native-like appearance
+  - Added `purpose: any maskable` to icon-180.png in manifest.json
+  - Reorganized meta tags with clear comments for better maintainability
+  - Proper icon display when PWA is added to iOS home screen
+
+### Changed
+- 🎨 **Personalize Button Style** (Issue #93, PR #94): Improved button visibility
+  - Updated Personalize button to match unselected operation button style
+  - Added oval gray border (borderRadius: 20, borderWidth: 2)
+  - Transparent background with theme-aware border color
+  - Better visual prominence and consistency with app design
+
 ## [1.1.0] - 2026-01-24
 
 ### Added
