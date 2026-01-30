@@ -92,6 +92,9 @@ jobs:
       run: |
         echo "🧹 Cleaning up sensitive files from gh-pages branch..."
 
+        # Save current working directory state
+        git stash --include-untracked || true
+
         # Checkout gh-pages branch
         git fetch origin gh-pages
         git checkout gh-pages
