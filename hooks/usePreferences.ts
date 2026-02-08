@@ -39,8 +39,7 @@ export function usePreferences() {
           // Auto-detect device language
           const detectedLang = getDeviceLanguage();
           setLanguage(detectedLang);
-          // Save detected language for consistency
-          await saveLanguage(detectedLang);
+          // Language will be saved by the auto-save effect once isLoaded is true
         }
 
         // Load theme

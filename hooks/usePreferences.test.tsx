@@ -735,35 +735,30 @@ describe('usePreferences Hook', () => {
       });
     });
 
-    it('should not trigger auto-save before isLoaded (except for initial language detection)', async () => {
-      // Track save calls before isLoaded becomes true
-      let saveLanguageCallsBeforeLoad = 0;
-      let saveThemeCallsBeforeLoad = 0;
-      let isLoadedValue = false;
-
-      mockSaveLanguage.mockImplementation(() => {
-        if (!isLoadedValue) saveLanguageCallsBeforeLoad++;
-        return Promise.resolve();
-      });
-
-      mockSaveTheme.mockImplementation(() => {
-        if (!isLoadedValue) saveThemeCallsBeforeLoad++;
-        return Promise.resolve();
-      });
-
+    it('should not trigger auto-save before isLoaded', async () => {
       const { result } = renderHook(() => usePreferences());
 
       expect(result.current.isLoaded).toBe(false);
 
+      // Verify no saves happen before isLoaded
+      expect(mockSaveLanguage).not.toHaveBeenCalled();
+      expect(mockSaveTheme).not.toHaveBeenCalled();
+      expect(mockSaveOperations).not.toHaveBeenCalled();
+
       await waitFor(() => {
-        isLoadedValue = result.current.isLoaded;
         return result.current.isLoaded === true;
       });
 
-      // saveLanguage is called once during initialization for auto-detected language
-      expect(saveLanguageCallsBeforeLoad).toBe(1);
-      // Other saves should not be triggered before isLoaded
-      expect(saveThemeCallsBeforeLoad).toBe(0);
+      // After isLoaded is true, auto-save effects should run for detected/default values
+      await waitFor(() => {
+        expect(mockSaveLanguage).toHaveBeenCalled();
+      });
+
+      // For first-time users:
+      // - Language is auto-detected and saved
+      // - Theme defaults to 'light' and is saved
+      expect(mockSaveLanguage).toHaveBeenCalledWith('en');
+      expect(mockSaveTheme).toHaveBeenCalledWith('light');
     });
   });
 

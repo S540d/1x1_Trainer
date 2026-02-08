@@ -31,7 +31,7 @@ export function getDeviceLanguage(): Language {
 
     // Default to English for all other languages
     return 'en';
-  } catch (error) {
+  } catch {
     // Default to English on error
     return 'en';
   }
