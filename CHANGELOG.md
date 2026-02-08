@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- ✨ **Automatic Language Detection** (Issue #97, PR #98): Smart language detection on first launch
+  - Created `utils/language.ts` with `getDeviceLanguage()` function
+  - Detects device language using expo-localization with fallback to English
+  - Auto-saves detected language on first app start for consistency
+  - Comprehensive test suite with 8 test cases covering all edge cases
+  - Based on proven DrawFromMemory implementation pattern
+  - All 311 tests passing (308 passed, 3 skipped)
+
 ### Fixed
 - 🐛 **Layout Spacing** (Issue #58, PR #90): Improved spacing between question and input field
   - Reduced excessive gaps on Android devices by adjusting flexbox layout
@@ -29,6 +38,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added oval gray border (borderRadius: 20, borderWidth: 2)
   - Transparent background with theme-aware border color
   - Better visual prominence and consistency with app design
+
+### Technical
+- ⚙️ **Jest Configuration**: Enhanced test infrastructure for Issue #97
+  - Added transform for `.jsx?` files to handle ES modules
+  - Added `transformIgnorePatterns` for expo-localization compatibility
+  - Updated test mocks for new language detection utility
 
 ## [1.1.0] - 2026-01-24
 

@@ -9,6 +9,13 @@ module.exports = {
         isolatedModules: true,
       },
     }],
+    '^.+\\.jsx?$': ['ts-jest', {
+      tsconfig: {
+        jsx: 'react',
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+      },
+    }],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
@@ -22,4 +29,7 @@ module.exports = {
   moduleNameMapper: {
     '^react-native$': 'react-native-web',
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(expo-localization)/)',
+  ],
 };
