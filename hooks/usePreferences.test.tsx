@@ -12,7 +12,6 @@
 
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { usePreferences } from './usePreferences';
-import * as Localization from 'expo-localization';
 import { Operation, NumberRange, Language, ThemeMode } from '../types/game';
 import {
   getLanguage,
@@ -26,6 +25,7 @@ import {
   getNumberRange,
   saveNumberRange,
 } from '../utils/storage';
+import { getDeviceLanguage } from '../utils/language';
 
 // Mock the storage module
 jest.mock('../utils/storage', () => ({
@@ -41,9 +41,9 @@ jest.mock('../utils/storage', () => ({
   saveNumberRange: jest.fn(),
 }));
 
-// Mock expo-localization - Localization.getLocales() for system language detection
-jest.mock('expo-localization', () => ({
-  getLocales: jest.fn(),
+// Mock language detection utility
+jest.mock('../utils/language', () => ({
+  getDeviceLanguage: jest.fn(),
 }));
 
 describe('usePreferences Hook', () => {
@@ -57,7 +57,7 @@ describe('usePreferences Hook', () => {
   const mockSaveTotalTasks = saveTotalTasks as jest.MockedFunction<typeof saveTotalTasks>;
   const mockGetNumberRange = getNumberRange as jest.MockedFunction<typeof getNumberRange>;
   const mockSaveNumberRange = saveNumberRange as jest.MockedFunction<typeof saveNumberRange>;
-  const mockGetLocales = Localization.getLocales as jest.MockedFunction<typeof Localization.getLocales>;
+  const mockGetDeviceLanguage = getDeviceLanguage as jest.MockedFunction<typeof getDeviceLanguage>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -67,7 +67,7 @@ describe('usePreferences Hook', () => {
     mockGetOperations.mockResolvedValue([Operation.MULTIPLICATION]);
     mockGetTotalTasks.mockResolvedValue(null);
     mockGetNumberRange.mockResolvedValue(NumberRange.RANGE_100); // Now returns RANGE_100 by default
-    mockGetLocales.mockReturnValue([{ languageCode: 'en' } as any]);
+    mockGetDeviceLanguage.mockReturnValue('en');
   });
 
   describe('Initialization and Loading', () => {
@@ -136,7 +136,7 @@ describe('usePreferences Hook', () => {
 
   describe('Language Preference Management', () => {
     it('should detect system language (en) on first run', async () => {
-      mockGetLocales.mockReturnValue([{ languageCode: 'en' } as any]);
+      mockGetDeviceLanguage.mockReturnValue('en');
       mockGetLanguage.mockResolvedValue(null);
 
       const { result } = renderHook(() => usePreferences());
@@ -146,11 +146,12 @@ describe('usePreferences Hook', () => {
       });
 
       expect(result.current.language).toBe('en');
-      expect(mockGetLocales).toHaveBeenCalled();
+      expect(mockGetDeviceLanguage).toHaveBeenCalled();
+      expect(mockSaveLanguage).toHaveBeenCalledWith('en');
     });
 
     it('should detect system language (de) on first run', async () => {
-      mockGetLocales.mockReturnValue([{ languageCode: 'de' } as any]);
+      mockGetDeviceLanguage.mockReturnValue('de');
       mockGetLanguage.mockResolvedValue(null);
 
       const { result } = renderHook(() => usePreferences());
@@ -160,10 +161,11 @@ describe('usePreferences Hook', () => {
       });
 
       expect(result.current.language).toBe('de');
+      expect(mockSaveLanguage).toHaveBeenCalledWith('de');
     });
 
     it('should default to en for unsupported language codes', async () => {
-      mockGetLocales.mockReturnValue([{ languageCode: 'fr' } as any]);
+      mockGetDeviceLanguage.mockReturnValue('en'); // getDeviceLanguage already handles fallback
       mockGetLanguage.mockResolvedValue(null);
 
       const { result } = renderHook(() => usePreferences());
@@ -733,13 +735,19 @@ describe('usePreferences Hook', () => {
       });
     });
 
-    it('should not trigger auto-save before isLoaded', async () => {
+    it('should not trigger auto-save before isLoaded (except for initial language detection)', async () => {
       // Track save calls before isLoaded becomes true
-      let saveCallsBeforeLoad = 0;
+      let saveLanguageCallsBeforeLoad = 0;
+      let saveThemeCallsBeforeLoad = 0;
       let isLoadedValue = false;
 
       mockSaveLanguage.mockImplementation(() => {
-        if (!isLoadedValue) saveCallsBeforeLoad++;
+        if (!isLoadedValue) saveLanguageCallsBeforeLoad++;
+        return Promise.resolve();
+      });
+
+      mockSaveTheme.mockImplementation(() => {
+        if (!isLoadedValue) saveThemeCallsBeforeLoad++;
         return Promise.resolve();
       });
 
@@ -752,8 +760,10 @@ describe('usePreferences Hook', () => {
         return result.current.isLoaded === true;
       });
 
-      // No save calls should have been made before isLoaded became true
-      expect(saveCallsBeforeLoad).toBe(0);
+      // saveLanguage is called once during initialization for auto-detected language
+      expect(saveLanguageCallsBeforeLoad).toBe(1);
+      // Other saves should not be triggered before isLoaded
+      expect(saveThemeCallsBeforeLoad).toBe(0);
     });
   });
 
@@ -923,7 +933,7 @@ describe('usePreferences Hook', () => {
 
   describe('Edge cases', () => {
     it('should handle missing locale data', async () => {
-      mockGetLocales.mockReturnValue([]);
+      mockGetDeviceLanguage.mockReturnValue('en'); // getDeviceLanguage handles edge cases
       mockGetLanguage.mockResolvedValue(null);
 
       const { result } = renderHook(() => usePreferences());
@@ -936,7 +946,7 @@ describe('usePreferences Hook', () => {
     });
 
     it('should handle locale without languageCode', async () => {
-      mockGetLocales.mockReturnValue([{} as any]);
+      mockGetDeviceLanguage.mockReturnValue('en'); // getDeviceLanguage handles edge cases
       mockGetLanguage.mockResolvedValue(null);
 
       const { result } = renderHook(() => usePreferences());

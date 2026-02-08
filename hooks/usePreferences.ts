@@ -4,7 +4,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import * as Localization from 'expo-localization';
 import { Language, ThemeMode, Operation, NumberRange } from '../types/game';
 import {
   getLanguage,
@@ -18,6 +17,7 @@ import {
   getNumberRange,
   saveNumberRange,
 } from '../utils/storage';
+import { getDeviceLanguage } from '../utils/language';
 
 export function usePreferences() {
   const [language, setLanguage] = useState<Language>('en');
@@ -37,9 +37,10 @@ export function usePreferences() {
           setLanguage(savedLanguage);
         } else {
           // Auto-detect device language
-          const locales = Localization.getLocales();
-          const deviceLang = locales[0]?.languageCode || 'en';
-          setLanguage(deviceLang === 'de' ? 'de' : 'en');
+          const detectedLang = getDeviceLanguage();
+          setLanguage(detectedLang);
+          // Save detected language for consistency
+          await saveLanguage(detectedLang);
         }
 
         // Load theme
