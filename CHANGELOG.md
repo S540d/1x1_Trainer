@@ -15,6 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Persistent high score across sessions
   - Full DE/EN translation support
   - 26 new tests (337 total, 334 passing, 3 skipped)
+- 🎨 **Design Modernization** (Issue #100, Phase 2): Fresh, modern color palette for light mode
+  - Replaced Material Design purple (#6200EE) with Indigo 600 (#4F46E5)
+  - Replaced teal secondary (#03DAC6) with Emerald 500 (#10B981)
+  - Updated disabled state color to Slate 400 (#94A3B8)
+  - Softer feedback colors: Indigo tint for selection, Emerald for correct, Rose for incorrect
+  - Light background with subtle Indigo tint (#F0F4FF)
+  - Updated theme tests to match new color values
 - ✨ **Automatic Language Detection** (Issue #97, PR #98): Smart language detection on first launch
   - Created `utils/language.ts` with `getDeviceLanguage()` function
   - Detects device language using expo-localization with fallback to English

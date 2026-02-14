@@ -243,8 +243,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   themeButtonActive: {
-    backgroundColor: '#6200EE',
-    borderColor: '#6200EE',
+    backgroundColor: '#4F46E5',
+    borderColor: '#4F46E5',
   },
   themeButtonText: {
     fontSize: 12,

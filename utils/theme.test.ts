@@ -67,7 +67,7 @@ describe('theme.ts - Theme Color Selection', () => {
 
     it('should have valid light mode background color', () => {
       const colors = getThemeColors(false);
-      expect(colors.background).toBe('#F8FAFC');
+      expect(colors.background).toBe('#F0F4FF');
       expect(colors.background).toMatch(/^#[0-9A-F]{6}$/i);
     });
 
@@ -80,8 +80,8 @@ describe('theme.ts - Theme Color Selection', () => {
     it('should have distinct correct and incorrect card colors', () => {
       const colors = getThemeColors(false);
       expect(colors.cardCorrect).not.toBe(colors.cardIncorrect);
-      expect(colors.cardCorrect).toBe('#D1FAE5');
-      expect(colors.cardIncorrect).toBe('#FEE2E2');
+      expect(colors.cardCorrect).toBe('#ECFDF5');
+      expect(colors.cardIncorrect).toBe('#FFF1F2');
     });
   });
 

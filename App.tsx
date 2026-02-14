@@ -51,7 +51,7 @@ export default function App() {
   // Set body background color dynamically on web
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.body.style.backgroundColor = isDarkMode ? '#0F1419' : '#F8FAFC';
+      document.body.style.backgroundColor = isDarkMode ? '#0F1419' : '#F0F4FF';
     }
   }, [isDarkMode]);
 
@@ -816,7 +816,7 @@ const styles = StyleSheet.create({
   settingsButtonText: {
     fontSize: 24,
     fontWeight: '500',
-    color: '#6200EE',
+    color: '#4F46E5',
   },
   settingsOverlay: {
     position: 'absolute',
@@ -888,7 +888,7 @@ const styles = StyleSheet.create({
   settingsMenuLinkText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6200EE',
+    color: '#4F46E5',
   },
   personalizeButton: {
     width: '100%',
@@ -938,8 +938,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   themeButtonActive: {
-    backgroundColor: '#6200EE',
-    borderColor: '#6200EE',
+    backgroundColor: '#4F46E5',
+    borderColor: '#4F46E5',
   },
   themeButtonText: {
     fontSize: 12,
@@ -965,8 +965,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   operationButtonActive: {
-    backgroundColor: '#6200EE',
-    borderColor: '#6200EE',
+    backgroundColor: '#4F46E5',
+    borderColor: '#4F46E5',
   },
   operationButtonText: {
     fontSize: 12,
@@ -1003,8 +1003,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   gameModeSettingsButtonActive: {
-    backgroundColor: '#6200EE',
-    borderColor: '#6200EE',
+    backgroundColor: '#4F46E5',
+    borderColor: '#4F46E5',
   },
   gameModeSettingsButtonText: {
     fontSize: 12,
@@ -1083,14 +1083,14 @@ const styles = StyleSheet.create({
   numpadButtonCheck: {
     flex: 1,
     height: 60,
-    backgroundColor: '#03DAC6',
+    backgroundColor: '#10B981',
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 0,
   },
   numpadButtonCheckDisabled: {
-    backgroundColor: '#B0BEC5',
+    backgroundColor: '#94A3B8',
   },
   numpadButtonCheckText: {
     fontSize: 24,
@@ -1111,16 +1111,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   choiceButtonSelected: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#EEF2FF',
+    borderColor: '#4F46E5',
   },
   choiceButtonCorrect: {
-    backgroundColor: '#E8F5E9',
-    borderColor: '#4CAF50',
+    backgroundColor: '#ECFDF5',
+    borderColor: '#10B981',
   },
   choiceButtonIncorrect: {
-    backgroundColor: '#FFEBEE',
-    borderColor: '#F44336',
+    backgroundColor: '#FFF1F2',
+    borderColor: '#EF4444',
   },
   choiceButtonText: {
     fontSize: 24,
@@ -1128,12 +1128,12 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   choiceButtonTextSelected: {
-    color: '#1976D2',
+    color: '#4338CA',
   },
   checkButton: {
     width: '100%',
     height: 60,
-    backgroundColor: '#03DAC6',
+    backgroundColor: '#10B981',
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1141,7 +1141,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   checkButtonDisabled: {
-    backgroundColor: '#B0BEC5',
+    backgroundColor: '#94A3B8',
   },
   checkButtonText: {
     fontSize: 18,
@@ -1167,16 +1167,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   sequenceButtonSelected: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#EEF2FF',
+    borderColor: '#4F46E5',
   },
   sequenceButtonCorrect: {
-    backgroundColor: '#E8F5E9',
-    borderColor: '#4CAF50',
+    backgroundColor: '#ECFDF5',
+    borderColor: '#10B981',
   },
   sequenceButtonIncorrect: {
-    backgroundColor: '#FFEBEE',
-    borderColor: '#F44336',
+    backgroundColor: '#FFF1F2',
+    borderColor: '#EF4444',
   },
   sequenceButtonText: {
     fontSize: 24,
@@ -1184,7 +1184,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   sequenceButtonTextSelected: {
-    color: '#1976D2',
+    color: '#4338CA',
   },
   modalOverlay: {
     flex: 1,
@@ -1215,7 +1215,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   restartButton: {
-    backgroundColor: '#6200EE',
+    backgroundColor: '#4F46E5',
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 28,
@@ -1232,7 +1232,7 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     flex: 1,
-    backgroundColor: '#6200EE',
+    backgroundColor: '#4F46E5',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 12,
@@ -1283,8 +1283,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rangeButtonActive: {
-    backgroundColor: '#6200EE',
-    borderColor: '#6200EE',
+    backgroundColor: '#4F46E5',
+    borderColor: '#4F46E5',
   },
   rangeButtonText: {
     fontSize: 12,
