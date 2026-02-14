@@ -84,13 +84,13 @@ export const THEME_COLORS = {
     SETTINGS_MENU: '#1A202C',
   },
   LIGHT: {
-    BACKGROUND: '#F8FAFC', // Clean, crisp off-white
+    BACKGROUND: '#F0F4FF', // Soft indigo-tinted white
     TEXT: '#0F172A', // Deep professional navy
     TEXT_SECONDARY: '#475569',
     BORDER: '#CBD5E1',
     CARD: '#FFFFFF', // Pure white cards for clean look
-    CARD_CORRECT: '#D1FAE5', // Soft mint green
-    CARD_INCORRECT: '#FEE2E2', // Soft coral red
+    CARD_CORRECT: '#ECFDF5', // Subtle emerald tint
+    CARD_INCORRECT: '#FFF1F2', // Subtle rose tint
     BUTTON_INACTIVE: '#F1F5F9', // Light slate
     BUTTON_INACTIVE_TEXT: '#475569',
     SETTINGS_OVERLAY: 'rgba(15,23,42,0.6)',
