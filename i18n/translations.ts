@@ -68,6 +68,16 @@ export interface TranslationStrings {
   motivationTitleHighScore: string;
   motivationMessageHighScore: string;
   motivationButton: string;
+  // Challenge Mode
+  challenge: string;
+  challengeInfo: string;
+  level: string;
+  lives: string;
+  highScore: string;
+  challengeOver: string;
+  challengeResult: string;
+  newHighScore: string;
+  tryAgain: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -134,6 +144,16 @@ export const translations: Record<Language, TranslationStrings> = {
     motivationTitleHighScore: 'Great!',
     motivationMessageHighScore: 'Excellent work! You have already solved 10 tasks. Let\'s try another round!',
     motivationButton: 'Continue',
+    // Challenge Mode
+    challenge: 'Challenge',
+    challengeInfo: 'Endless mode: answer until 3 mistakes. Difficulty increases!',
+    level: 'Level',
+    lives: 'Lives',
+    highScore: 'High Score',
+    challengeOver: 'Challenge Over!',
+    challengeResult: 'You reached level {level} with {score} correct answers.',
+    newHighScore: 'New High Score!',
+    tryAgain: 'Try Again',
   },
   de: {
     // Settings Menu
@@ -198,5 +218,15 @@ export const translations: Record<Language, TranslationStrings> = {
     motivationTitleHighScore: 'Super!',
     motivationMessageHighScore: 'Toll gemacht! Du hast schon 10 Aufgaben gerechnet. Lass uns noch eine Runde versuchen!',
     motivationButton: 'Weiter',
+    // Challenge Mode
+    challenge: 'Herausforderung',
+    challengeInfo: 'Endlosmodus: rechne bis 3 Fehler. Es wird immer schwieriger!',
+    level: 'Stufe',
+    lives: 'Leben',
+    highScore: 'Rekord',
+    challengeOver: 'Herausforderung vorbei!',
+    challengeResult: 'Du hast Stufe {level} erreicht mit {score} richtigen Antworten.',
+    newHighScore: 'Neuer Rekord!',
+    tryAgain: 'Nochmal',
   },
 };
