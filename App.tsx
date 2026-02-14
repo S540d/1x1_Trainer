@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 
 // Local imports
 import { Operation, AnswerMode, DifficultyMode, NumberRange, ThemeColors } from './types/game';
+import { getChallengeLevelNumber } from './utils/constants';
 import { translations } from './i18n/translations';
 import { APP_VERSION } from './utils/constants';
 import { useTheme } from './hooks/useTheme';
