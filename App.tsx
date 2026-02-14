@@ -13,9 +13,8 @@ import { StatusBar } from 'expo-status-bar';
 
 // Local imports
 import { Operation, AnswerMode, DifficultyMode, NumberRange, ThemeColors } from './types/game';
-import { getChallengeLevelNumber } from './utils/constants';
 import { translations } from './i18n/translations';
-import { APP_VERSION } from './utils/constants';
+import { APP_VERSION, CHALLENGE_MAX_LIVES } from './utils/constants';
 import { useTheme } from './hooks/useTheme';
 import { usePreferences } from './hooks/usePreferences';
 import { useGameLogic } from './hooks/useGameLogic';
@@ -89,7 +88,7 @@ export default function App() {
           <>
             <Text style={[styles.headerScore, { color: colors.text }]}>
               {Array.from({ length: game.gameState.challengeState.lives }, () => '\u2764\uFE0F').join('')}
-              {Array.from({ length: 3 - game.gameState.challengeState.lives }, () => '\uD83E\uDD0D').join('')}
+              {Array.from({ length: CHALLENGE_MAX_LIVES - game.gameState.challengeState.lives }, () => '\uD83E\uDD0D').join('')}
             </Text>
             <Text style={[styles.headerScore, { color: colors.text }]}>
               {t.level} {game.gameState.challengeState.level}

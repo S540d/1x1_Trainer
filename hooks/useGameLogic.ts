@@ -141,8 +141,8 @@ export function useGameLogic({
   onChallengeHighScoreChange,
 }: UseGameLogicProps) {
   // Helper: Get max number based on number range
-  const getMaxNumber = () => {
-    switch (numberRange) {
+  const getMaxNumber = (range: NumberRange = numberRange) => {
+    switch (range) {
       case NumberRange.RANGE_10:
         return 10;
       case NumberRange.RANGE_20:
@@ -434,15 +434,7 @@ export function useGameLogic({
       const challengeOps = level.operations
         ? new Set(level.operations)
         : gameState.selectedOperations;
-      const challengeMaxNumber = (() => {
-        switch (level.numberRange) {
-          case NumberRange.RANGE_10: return 10;
-          case NumberRange.RANGE_20: return 20;
-          case NumberRange.RANGE_50: return 50;
-          case NumberRange.RANGE_100: return 100;
-          default: return 10;
-        }
-      })();
+      const challengeMaxNumber = getMaxNumber(level.numberRange);
 
       setTimeout(() => generateQuestion(level.gameMode, challengeOps, challengeMaxNumber), 0);
       return;
