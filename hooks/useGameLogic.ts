@@ -402,7 +402,6 @@ export function useGameLogic({
         const newLevel = getChallengeLevelNumber(newScore);
         newState.challengeState = {
           ...prev.challengeState,
-          ...newState.challengeState,
           level: newLevel,
         };
       }
