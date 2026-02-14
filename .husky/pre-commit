@@ -3,7 +3,7 @@ echo "🔍 Running pre-commit checks..."
 
 # Check for console.log in staged files (exclude scripts directory)
 echo "Checking for console.log statements..."
-STAGED_FILES=$(git diff --cached --name-only | grep -E '\.(ts|tsx|js|jsx)$' | grep -v '^scripts/')
+STAGED_FILES=$(git diff --cached --name-only | grep -E '\.(ts|tsx|js|jsx)$' | grep -v '^scripts/' || true)
 if [ -n "$STAGED_FILES" ]; then
   if echo "$STAGED_FILES" | xargs grep -n "console\.log\|console\.debug" 2>/dev/null; then
     echo "❌ ERROR: Found console.log/debug in staged files!"
@@ -14,7 +14,7 @@ fi
 
 # Check for Web APIs without Platform.OS check
 echo "Checking for unsafe Web API usage..."
-STAGED_TS_FILES=$(git diff --cached --name-only | grep -E '\.(ts|tsx)$')
+STAGED_TS_FILES=$(git diff --cached --name-only | grep -E '\.(ts|tsx)$' || true)
 if [ -n "$STAGED_TS_FILES" ]; then
   if echo "$STAGED_TS_FILES" | xargs grep -n "window\." 2>/dev/null | grep -v "Platform.OS === 'web'" | grep -v "// platform-safe"; then
     echo "❌ ERROR: Found window.* without Platform.OS check!"
