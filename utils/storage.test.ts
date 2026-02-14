@@ -19,6 +19,8 @@ import {
   getTotalTasks,
   saveNumberRange,
   getNumberRange,
+  saveChallengeHighScore,
+  getChallengeHighScore,
 } from './storage';
 import { Operation, ThemeMode, Language, NumberRange } from '../types/game';
 
@@ -402,5 +404,47 @@ describe('storage.ts - Error Handling', () => {
   it('should handle removeStorageItem errors gracefully', async () => {
     await expect(removeStorageItem('test')).resolves.toBeUndefined();
     expect(consoleErrorSpy).toHaveBeenCalled();
+  });
+});
+
+describe('Challenge High Score Storage', () => {
+  let mockStore: { [key: string]: string };
+
+  beforeEach(() => {
+    mockStore = {};
+    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => {
+      return mockStore[key] || null;
+    });
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => {
+      mockStore[key] = value;
+    });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should save and retrieve challenge high score', async () => {
+    await saveChallengeHighScore(42);
+    const result = await getChallengeHighScore();
+    expect(result).toBe(42);
+  });
+
+  it('should return 0 when no high score is saved', async () => {
+    const result = await getChallengeHighScore();
+    expect(result).toBe(0);
+  });
+
+  it('should return 0 for invalid stored value', async () => {
+    mockStore['app-challenge-highscore'] = 'invalid';
+    const result = await getChallengeHighScore();
+    expect(result).toBe(0);
+  });
+
+  it('should overwrite previous high score', async () => {
+    await saveChallengeHighScore(10);
+    await saveChallengeHighScore(25);
+    const result = await getChallengeHighScore();
+    expect(result).toBe(25);
   });
 });

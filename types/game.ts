@@ -25,6 +25,7 @@ export enum AnswerMode {
 export enum DifficultyMode {
   SIMPLE = 'SIMPLE',
   CREATIVE = 'CREATIVE',
+  CHALLENGE = 'CHALLENGE',
 }
 
 export enum NumberRange {
@@ -32,6 +33,13 @@ export enum NumberRange {
   RANGE_20 = 'RANGE_20',   // 1-20
   RANGE_50 = 'RANGE_50',   // 1-50
   RANGE_100 = 'RANGE_100', // 1-100
+}
+
+export interface ChallengeState {
+  lives: number;
+  level: number;
+  errors: number;
+  highScore: number;
 }
 
 export type ThemeMode = 'light' | 'dark' | 'system';
@@ -55,6 +63,7 @@ export interface GameState {
   isAnswerChecked: boolean;
   totalSolvedTasks: number; // Track total tasks solved for motivation message
   selectedChoice: number | null; // For multiple choice and number sequence modes
+  challengeState?: ChallengeState; // Challenge mode state
 }
 
 export interface ThemeColors {

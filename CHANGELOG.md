@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- ✨ **Challenge Mode** (Issue #100): New endless game mode with progressive difficulty
+  - Play until 3 mistakes — difficulty increases every few correct answers
+  - 6 levels: starts with multiplication 1-10, progresses to mixed operations up to 100
+  - Lives display with hearts, level indicator, and score tracking
+  - Persistent high score across sessions
+  - Full DE/EN translation support
+  - 26 new tests (337 total, 334 passing, 3 skipped)
 - ✨ **Automatic Language Detection** (Issue #97, PR #98): Smart language detection on first launch
   - Created `utils/language.ts` with `getDeviceLanguage()` function
   - Detects device language using expo-localization with fallback to English

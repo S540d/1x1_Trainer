@@ -8,7 +8,8 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { generateNumberSequenceForState, useGameLogic } from './useGameLogic';
-import { Operation, GameMode, AnswerMode, DifficultyMode } from '../types/game';
+import { Operation, GameMode, AnswerMode, DifficultyMode, NumberRange } from '../types/game';
+import { getChallengeLevel, getChallengeLevelNumber, CHALLENGE_MAX_LIVES } from '../utils/constants';
 
 describe('useGameLogic - generateNumberSequenceForState', () => {
   describe('ADDITION operation', () => {
@@ -1890,5 +1891,336 @@ describe('useGameLogic Hook', () => {
       expect(result.current.gameState.selectedOperations.has(Operation.SUBTRACTION)).toBe(true);
       expect(result.current.gameState.selectedOperations.has(Operation.DIVISION)).toBe(true);
     });
+  });
+
+  describe('Challenge Mode', () => {
+    const challengeProps = {
+      ...defaultProps,
+      challengeHighScore: 0,
+      onChallengeHighScoreChange: jest.fn(),
+    };
+
+    it('should initialize challenge mode with 3 lives', () => {
+      const { result } = renderHook(() => useGameLogic(challengeProps));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      jest.runAllTimers();
+
+      expect(result.current.gameState.difficultyMode).toBe(DifficultyMode.CHALLENGE);
+      expect(result.current.gameState.challengeState).toBeDefined();
+      expect(result.current.gameState.challengeState?.lives).toBe(CHALLENGE_MAX_LIVES);
+      expect(result.current.gameState.challengeState?.level).toBe(1);
+      expect(result.current.gameState.challengeState?.errors).toBe(0);
+      expect(result.current.gameState.score).toBe(0);
+    });
+
+    it('should start challenge at level 1 with multiplication and range 10', () => {
+      const { result } = renderHook(() => useGameLogic(challengeProps));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      jest.runAllTimers();
+
+      expect(result.current.gameState.gameMode).toBe(GameMode.NORMAL);
+      expect(result.current.gameState.answerMode).toBe(AnswerMode.INPUT);
+    });
+
+    it('should lose a life on wrong answer in challenge mode', () => {
+      const { result } = renderHook(() => useGameLogic(challengeProps));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      jest.runAllTimers();
+
+      act(() => {
+        result.current.generateQuestion();
+      });
+      jest.runAllTimers();
+
+      // Enter a deliberately wrong answer
+      act(() => {
+        result.current.handleNumberClick(0);
+      });
+      act(() => {
+        result.current.checkAnswer();
+      });
+
+      expect(result.current.gameState.challengeState?.lives).toBe(2);
+      expect(result.current.gameState.challengeState?.errors).toBe(1);
+    });
+
+    it('should end game when all 3 lives are lost', () => {
+      const { result } = renderHook(() => useGameLogic(challengeProps));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      jest.runAllTimers();
+
+      // Lose 3 lives
+      for (let i = 0; i < 3; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        jest.runAllTimers();
+
+        act(() => {
+          result.current.handleNumberClick(0);
+        });
+        act(() => {
+          result.current.checkAnswer();
+        });
+
+        if (i < 2) {
+          // Not game over yet, go to next question
+          act(() => {
+            result.current.nextQuestion();
+          });
+          jest.runAllTimers();
+        }
+      }
+
+      expect(result.current.gameState.challengeState?.lives).toBe(0);
+      expect(result.current.gameState.showResult).toBe(true);
+    });
+
+    it('should not lose a life on correct answer', () => {
+      const { result } = renderHook(() => useGameLogic(challengeProps));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      jest.runAllTimers();
+
+      act(() => {
+        result.current.generateQuestion();
+      });
+      jest.runAllTimers();
+
+      // Enter the correct answer
+      const correctAnswer = result.current.getCorrectAnswer();
+      enterAnswer(result, correctAnswer);
+      act(() => {
+        result.current.checkAnswer();
+      });
+
+      expect(result.current.gameState.lastAnswerCorrect).toBe(true);
+      expect(result.current.gameState.challengeState?.lives).toBe(CHALLENGE_MAX_LIVES);
+      expect(result.current.gameState.challengeState?.errors).toBe(0);
+    });
+
+    it('should increase score on correct answer in challenge', () => {
+      const { result } = renderHook(() => useGameLogic(challengeProps));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      jest.runAllTimers();
+
+      act(() => {
+        result.current.generateQuestion();
+      });
+      jest.runAllTimers();
+
+      const correctAnswer = result.current.getCorrectAnswer();
+      enterAnswer(result, correctAnswer);
+      act(() => {
+        result.current.checkAnswer();
+      });
+
+      expect(result.current.gameState.score).toBe(1);
+    });
+
+    it('should restart challenge with fresh lives', () => {
+      const { result } = renderHook(() => useGameLogic(challengeProps));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      jest.runAllTimers();
+
+      // Lose a life
+      act(() => {
+        result.current.generateQuestion();
+      });
+      jest.runAllTimers();
+
+      act(() => {
+        result.current.handleNumberClick(0);
+      });
+      act(() => {
+        result.current.checkAnswer();
+      });
+
+      expect(result.current.gameState.challengeState?.lives).toBe(2);
+
+      // Restart
+      act(() => {
+        result.current.restartGame();
+      });
+      jest.runAllTimers();
+
+      expect(result.current.gameState.challengeState?.lives).toBe(CHALLENGE_MAX_LIVES);
+      expect(result.current.gameState.challengeState?.level).toBe(1);
+      expect(result.current.gameState.challengeState?.errors).toBe(0);
+      expect(result.current.gameState.score).toBe(0);
+    });
+
+    it('should clear challenge state when switching back to simple mode', () => {
+      const { result } = renderHook(() => useGameLogic(challengeProps));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      jest.runAllTimers();
+
+      expect(result.current.gameState.challengeState).toBeDefined();
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.SIMPLE);
+      });
+      jest.runAllTimers();
+
+      expect(result.current.gameState.challengeState).toBeUndefined();
+      expect(result.current.gameState.difficultyMode).toBe(DifficultyMode.SIMPLE);
+    });
+
+    it('should update high score when beaten in challenge', () => {
+      const mockHighScoreChange = jest.fn();
+      const { result } = renderHook(() =>
+        useGameLogic({ ...challengeProps, onChallengeHighScoreChange: mockHighScoreChange })
+      );
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      jest.runAllTimers();
+
+      // Get some correct answers first
+      for (let i = 0; i < 2; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        jest.runAllTimers();
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+
+        act(() => {
+          result.current.nextQuestion();
+        });
+        jest.runAllTimers();
+      }
+
+      expect(result.current.gameState.score).toBe(2);
+
+      // Now lose 3 lives to end the game
+      for (let i = 0; i < 3; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        jest.runAllTimers();
+
+        act(() => {
+          result.current.handleNumberClick(0);
+        });
+        act(() => {
+          result.current.checkAnswer();
+        });
+
+        if (i < 2) {
+          act(() => {
+            result.current.nextQuestion();
+          });
+          jest.runAllTimers();
+        }
+      }
+
+      expect(result.current.gameState.showResult).toBe(true);
+      expect(mockHighScoreChange).toHaveBeenCalledWith(2);
+    });
+  });
+});
+
+describe('getChallengeLevel', () => {
+  it('should return level 1 for score 0', () => {
+    const level = getChallengeLevel(0);
+    expect(level.numberRange).toBe(NumberRange.RANGE_10);
+    expect(level.gameMode).toBe(GameMode.NORMAL);
+    expect(level.operations).toEqual([Operation.MULTIPLICATION]);
+  });
+
+  it('should return level 2 for score 5', () => {
+    const level = getChallengeLevel(5);
+    expect(level.numberRange).toBe(NumberRange.RANGE_10);
+    expect(level.operations).toBeNull();
+  });
+
+  it('should return level 3 for score 10', () => {
+    const level = getChallengeLevel(10);
+    expect(level.numberRange).toBe(NumberRange.RANGE_20);
+    expect(level.gameMode).toBe(GameMode.NORMAL);
+  });
+
+  it('should return level 4 for score 15', () => {
+    const level = getChallengeLevel(15);
+    expect(level.numberRange).toBe(NumberRange.RANGE_20);
+    expect(level.gameMode).toBe(GameMode.MIXED);
+  });
+
+  it('should return level 5 for score 20', () => {
+    const level = getChallengeLevel(20);
+    expect(level.numberRange).toBe(NumberRange.RANGE_50);
+    expect(level.gameMode).toBe(GameMode.MIXED);
+  });
+
+  it('should return level 6 for score 30+', () => {
+    const level = getChallengeLevel(30);
+    expect(level.numberRange).toBe(NumberRange.RANGE_100);
+    expect(level.gameMode).toBe(GameMode.MIXED);
+  });
+
+  it('should return level 6 for very high scores', () => {
+    const level = getChallengeLevel(100);
+    expect(level.numberRange).toBe(NumberRange.RANGE_100);
+  });
+});
+
+describe('getChallengeLevelNumber', () => {
+  it('should return 1 for score 0-4', () => {
+    expect(getChallengeLevelNumber(0)).toBe(1);
+    expect(getChallengeLevelNumber(4)).toBe(1);
+  });
+
+  it('should return 2 for score 5-9', () => {
+    expect(getChallengeLevelNumber(5)).toBe(2);
+    expect(getChallengeLevelNumber(9)).toBe(2);
+  });
+
+  it('should return 3 for score 10-14', () => {
+    expect(getChallengeLevelNumber(10)).toBe(3);
+    expect(getChallengeLevelNumber(14)).toBe(3);
+  });
+
+  it('should return 4 for score 15-19', () => {
+    expect(getChallengeLevelNumber(15)).toBe(4);
+    expect(getChallengeLevelNumber(19)).toBe(4);
+  });
+
+  it('should return 5 for score 20-29', () => {
+    expect(getChallengeLevelNumber(20)).toBe(5);
+    expect(getChallengeLevelNumber(29)).toBe(5);
+  });
+
+  it('should return 6 for score 30+', () => {
+    expect(getChallengeLevelNumber(30)).toBe(6);
+    expect(getChallengeLevelNumber(50)).toBe(6);
   });
 });

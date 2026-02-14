@@ -4,8 +4,8 @@
  */
 
 import { useState, useMemo } from 'react';
-import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange } from '../types/game';
-import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER } from '../utils/constants';
+import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange, ChallengeState } from '../types/game';
+import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER, CHALLENGE_MAX_LIVES, getChallengeLevel, getChallengeLevelNumber } from '../utils/constants';
 
 interface UseGameLogicProps {
   initialOperation: Operation;
@@ -14,6 +14,8 @@ interface UseGameLogicProps {
   onTotalSolvedTasksChange: (total: number) => void;
   onMotivationShow: (score: number) => void;
   numberRange: NumberRange;
+  challengeHighScore?: number;
+  onChallengeHighScoreChange?: (score: number) => void;
 }
 
 /**
@@ -135,6 +137,8 @@ export function useGameLogic({
   onTotalSolvedTasksChange,
   onMotivationShow,
   numberRange,
+  challengeHighScore = 0,
+  onChallengeHighScoreChange,
 }: UseGameLogicProps) {
   // Helper: Get max number based on number range
   const getMaxNumber = () => {
@@ -210,39 +214,40 @@ export function useGameLogic({
   };
 
   // Generate a new question with proper number generation for each operation
-  const generateQuestion = (mode: GameMode = gameState.gameMode, operationSet: Set<Operation> = gameState.selectedOperations) => {
+  const generateQuestion = (mode: GameMode = gameState.gameMode, operationSet: Set<Operation> = gameState.selectedOperations, overrideMaxNumber?: number) => {
     // Pick a random operation from selected operations
     const operations = Array.from(operationSet);
     const selectedOp = operations[Math.floor(Math.random() * operations.length)];
-    
+
     let newNum1: number;
     let newNum2: number;
-    
+    const effectiveMaxNumber = overrideMaxNumber ?? maxNumber;
+
     // Generate appropriate numbers based on operation
     // IMPORTANT: ALL numbers (operands AND results) must be within numberRange
     switch (selectedOp) {
       case Operation.ADDITION:
         // For addition: ensure sum (num1 + num2) is within range
-        // Strategy: Pick num1, then num2 such that sum <= maxNumber
-        newNum1 = Math.floor(Math.random() * (maxNumber - 1)) + 1; // 1 to maxNumber-1
-        const maxNum2ForAddition = maxNumber - newNum1; // Ensure sum <= maxNumber
-        newNum2 = Math.floor(Math.random() * maxNum2ForAddition) + 1; // 1 to (maxNumber - num1)
+        // Strategy: Pick num1, then num2 such that sum <= effectiveMaxNumber
+        newNum1 = Math.floor(Math.random() * (effectiveMaxNumber - 1)) + 1; // 1 to effectiveMaxNumber-1
+        const maxNum2ForAddition = effectiveMaxNumber - newNum1; // Ensure sum <= effectiveMaxNumber
+        newNum2 = Math.floor(Math.random() * maxNum2ForAddition) + 1; // 1 to (effectiveMaxNumber - num1)
         break;
 
       case Operation.MULTIPLICATION:
         // For multiplication: ensure product (num1 * num2) is within range
-        // Strategy: Pick smaller factor from 1-10 (pedagogy), then ensure product <= maxNumber
-        const maxFirstFactor = Math.min(10, maxNumber);
-        newNum1 = Math.floor(Math.random() * maxFirstFactor) + 1; // 1 to min(10, maxNumber)
-        const maxSecondFactor = Math.min(10, Math.floor(maxNumber / newNum1)); // Ensure product <= maxNumber
+        // Strategy: Pick smaller factor from 1-10 (pedagogy), then ensure product <= effectiveMaxNumber
+        const maxFirstFactor = Math.min(10, effectiveMaxNumber);
+        newNum1 = Math.floor(Math.random() * maxFirstFactor) + 1; // 1 to min(10, effectiveMaxNumber)
+        const maxSecondFactor = Math.min(10, Math.floor(effectiveMaxNumber / newNum1)); // Ensure product <= effectiveMaxNumber
         newNum2 = Math.floor(Math.random() * maxSecondFactor) + 1;
         break;
 
       case Operation.SUBTRACTION:
         // For subtraction: ensure minuend, subtrahend AND difference are all within range
         // Strategy: Pick difference first, then subtrahend, calculate minuend
-        const difference = Math.floor(Math.random() * (maxNumber - 1)) + 1; // 1 to maxNumber-1
-        const maxSubtrahend = maxNumber - difference; // Ensure minuend = subtrahend + difference <= maxNumber
+        const difference = Math.floor(Math.random() * (effectiveMaxNumber - 1)) + 1; // 1 to effectiveMaxNumber-1
+        const maxSubtrahend = effectiveMaxNumber - difference; // Ensure minuend = subtrahend + difference <= effectiveMaxNumber
         newNum2 = Math.floor(Math.random() * maxSubtrahend) + 1; // subtrahend
         newNum1 = newNum2 + difference; // minuend = subtrahend + difference
         break;
@@ -250,18 +255,18 @@ export function useGameLogic({
       case Operation.DIVISION:
         // For division: ensure dividend, divisor AND quotient are all within range
         // Strategy: Pick divisor and quotient from range, calculate dividend
-        const maxDivisor = Math.min(10, maxNumber); // Keep divisor 1-10 for pedagogy
-        newNum2 = Math.floor(Math.random() * maxDivisor) + 1; // divisor: 1 to min(10, maxNumber)
+        const maxDivisor = Math.min(10, effectiveMaxNumber); // Keep divisor 1-10 for pedagogy
+        newNum2 = Math.floor(Math.random() * maxDivisor) + 1; // divisor: 1 to min(10, effectiveMaxNumber)
 
-        // Calculate max quotient ensuring dividend = divisor × quotient <= maxNumber
-        const maxQuotient = Math.min(10, Math.floor(maxNumber / newNum2));
+        // Calculate max quotient ensuring dividend = divisor × quotient <= effectiveMaxNumber
+        const maxQuotient = Math.min(10, Math.floor(effectiveMaxNumber / newNum2));
         const quotient = Math.floor(Math.random() * maxQuotient) + 1; // quotient: 1 to maxQuotient
         newNum1 = newNum2 * quotient; // dividend = divisor × quotient
         break;
 
       default:
-        newNum1 = Math.floor(Math.random() * maxNumber) + 1;
-        newNum2 = Math.floor(Math.random() * maxNumber) + 1;
+        newNum1 = Math.floor(Math.random() * effectiveMaxNumber) + 1;
+        newNum2 = Math.floor(Math.random() * effectiveMaxNumber) + 1;
     }
     
     let newQuestionPart = 2;
@@ -364,29 +369,99 @@ export function useGameLogic({
 
     const newScore = isCorrect ? gameState.score + 1 : gameState.score;
 
-    setGameState((prev) => ({
-      ...prev,
-      lastAnswerCorrect: isCorrect,
-      score: newScore,
-      isAnswerChecked: true,
-    }));
+    setGameState((prev) => {
+      const newState: GameState = {
+        ...prev,
+        lastAnswerCorrect: isCorrect,
+        score: newScore,
+        isAnswerChecked: true,
+      };
+
+      // Challenge mode: update lives on wrong answer
+      if (prev.difficultyMode === DifficultyMode.CHALLENGE && prev.challengeState && !isCorrect) {
+        const newLives = prev.challengeState.lives - 1;
+        const newErrors = prev.challengeState.errors + 1;
+        newState.challengeState = {
+          ...prev.challengeState,
+          lives: newLives,
+          errors: newErrors,
+        };
+        // Game over when no lives left
+        if (newLives <= 0) {
+          newState.showResult = true;
+          // Update high score if beaten
+          if (newScore > prev.challengeState.highScore) {
+            newState.challengeState.highScore = newScore;
+            onChallengeHighScoreChange?.(newScore);
+          }
+        }
+      }
+
+      // Challenge mode: update level on correct answer
+      if (prev.difficultyMode === DifficultyMode.CHALLENGE && prev.challengeState && isCorrect) {
+        const newLevel = getChallengeLevelNumber(newScore);
+        newState.challengeState = {
+          ...prev.challengeState,
+          level: newLevel,
+        };
+      }
+
+      return newState;
+    });
   };
 
   // Next question
   const nextQuestion = () => {
+    const isChallenge = gameState.difficultyMode === DifficultyMode.CHALLENGE;
+
+    // In challenge mode, game over is handled by checkAnswer (lives === 0)
+    if (isChallenge) {
+      // If game is already over (showResult = true from checkAnswer), don't continue
+      if (gameState.showResult) return;
+
+      const newTotalSolvedTasks = gameState.totalSolvedTasks + 1;
+
+      setGameState((prev) => ({
+        ...prev,
+        currentTask: prev.currentTask + 1,
+        totalSolvedTasks: newTotalSolvedTasks,
+      }));
+
+      onTotalSolvedTasksChange(newTotalSolvedTasks);
+
+      // Generate next question with challenge level settings
+      const level = getChallengeLevel(gameState.score);
+      const challengeOps = level.operations
+        ? new Set(level.operations)
+        : gameState.selectedOperations;
+      const challengeMaxNumber = (() => {
+        switch (level.numberRange) {
+          case NumberRange.RANGE_10: return 10;
+          case NumberRange.RANGE_20: return 20;
+          case NumberRange.RANGE_50: return 50;
+          case NumberRange.RANGE_100: return 100;
+          default: return 10;
+        }
+      })();
+
+      setTimeout(() => generateQuestion(level.gameMode, challengeOps, challengeMaxNumber), 0);
+      return;
+    }
+
+    // Normal/Creative mode: original logic
     const isLastTask = gameState.currentTask === gameState.totalTasks;
     const newTotalSolvedTasks = gameState.totalSolvedTasks + 1;
-    
+
     setGameState((prev) => {
       // Show motivation message after every 10 tasks
       if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
         onMotivationShow(prev.score);
       }
-      
+
       if (isLastTask) {
         // Last task - show results
-        return { 
-          ...prev, 
+        return {
+          ...prev,
           showResult: true,
           totalSolvedTasks: newTotalSolvedTasks,
         };
@@ -410,6 +485,28 @@ export function useGameLogic({
 
   // Restart game
   const restartGame = () => {
+    if (gameState.difficultyMode === DifficultyMode.CHALLENGE) {
+      // Restart challenge with fresh lives
+      const newChallengeState: ChallengeState = {
+        lives: CHALLENGE_MAX_LIVES,
+        level: 1,
+        errors: 0,
+        highScore: gameState.challengeState?.highScore ?? challengeHighScore,
+      };
+
+      setGameState((prev) => ({
+        ...prev,
+        score: 0,
+        currentTask: 1,
+        showResult: false,
+        challengeState: newChallengeState,
+      }));
+
+      const level1Ops = new Set([Operation.MULTIPLICATION]);
+      setTimeout(() => generateQuestion(GameMode.NORMAL, level1Ops, 10), 0);
+      return;
+    }
+
     setGameState((prev) => ({
       ...prev,
       score: 0,
@@ -490,6 +587,37 @@ export function useGameLogic({
     let newGameMode: GameMode;
     let newAnswerMode: AnswerMode;
 
+    if (newMode === DifficultyMode.CHALLENGE) {
+      // Challenge: Start at level 1 with 3 lives
+      newGameMode = GameMode.NORMAL;
+      newAnswerMode = AnswerMode.INPUT;
+
+      const initialChallengeState: ChallengeState = {
+        lives: CHALLENGE_MAX_LIVES,
+        level: 1,
+        errors: 0,
+        highScore: challengeHighScore,
+      };
+
+      setGameState((prev) => ({
+        ...prev,
+        difficultyMode: newMode,
+        gameMode: newGameMode,
+        answerMode: newAnswerMode,
+        currentTask: 1,
+        score: 0,
+        showResult: false,
+        userAnswer: '',
+        selectedChoice: null,
+        challengeState: initialChallengeState,
+      }));
+
+      // Level 1 starts with multiplication only, range 10
+      const level1Ops = new Set([Operation.MULTIPLICATION]);
+      setTimeout(() => generateQuestion(newGameMode, level1Ops, 10), 0);
+      return;
+    }
+
     if (newMode === DifficultyMode.SIMPLE) {
       // Simple: Normal tasks with keypad input
       newGameMode = GameMode.NORMAL;
@@ -511,6 +639,7 @@ export function useGameLogic({
       showResult: false,
       userAnswer: '',
       selectedChoice: null,
+      challengeState: undefined,
     }));
     setTimeout(() => generateQuestion(newGameMode), 0);
   };
