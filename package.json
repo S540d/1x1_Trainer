@@ -3,6 +3,9 @@
   "version": "1.1.0",
   "description": "Cross-platform 1x1 multiplication trainer with multiple game modes",
   "main": "index.ts",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "homepage": "https://s540d.github.io/1x1_Trainer/",
   "repository": {
     "type": "git",
