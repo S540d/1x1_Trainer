@@ -29,10 +29,10 @@ export interface ChallengeLevel {
   minScore: number;
   numberRange: NumberRange;
   gameMode: GameMode;
-  operations: Operation[];
+  operations: readonly Operation[];
 }
 
-const ALL_OPERATIONS = [Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION];
+const ALL_OPERATIONS: readonly Operation[] = Object.freeze([Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION]);
 
 export const CHALLENGE_LEVELS: ChallengeLevel[] = [
   { minScore: 0,  numberRange: NumberRange.RANGE_10,  gameMode: GameMode.NORMAL, operations: [Operation.MULTIPLICATION] },

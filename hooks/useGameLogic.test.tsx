@@ -2167,24 +2167,28 @@ describe('getChallengeLevel', () => {
     const level = getChallengeLevel(10);
     expect(level.numberRange).toBe(NumberRange.RANGE_20);
     expect(level.gameMode).toBe(GameMode.NORMAL);
+    expect(level.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION]);
   });
 
   it('should return level 4 for score 15', () => {
     const level = getChallengeLevel(15);
     expect(level.numberRange).toBe(NumberRange.RANGE_20);
     expect(level.gameMode).toBe(GameMode.MIXED);
+    expect(level.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION]);
   });
 
   it('should return level 5 for score 20', () => {
     const level = getChallengeLevel(20);
     expect(level.numberRange).toBe(NumberRange.RANGE_50);
     expect(level.gameMode).toBe(GameMode.MIXED);
+    expect(level.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION]);
   });
 
   it('should return level 6 for score 30+', () => {
     const level = getChallengeLevel(30);
     expect(level.numberRange).toBe(NumberRange.RANGE_100);
     expect(level.gameMode).toBe(GameMode.MIXED);
+    expect(level.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION]);
   });
 
   it('should return level 6 for very high scores', () => {
