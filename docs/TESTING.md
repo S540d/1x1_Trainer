@@ -234,5 +234,5 @@ Die `main` Branch hat folgende Protection Rules:
 
 ---
 
-**Zuletzt aktualisiert:** 2026-01-23
-**Version:** 1.0.14
+**Zuletzt aktualisiert:** 2026-02-15
+**Version:** 1.2.0

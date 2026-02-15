@@ -15,9 +15,9 @@
 
 ## Key Project Documents
 - [Changelog](../CHANGELOG.md) - Version history
-- [Testing Guide](../TESTING.md) - Testing workflow and environments
-- [Summary](../SUMMARY.txt) - Project overview
-- [Release Checklist](../RELEASE_CHECKLIST.md) - Release process
+- [Documentation](../docs/README.md) - Documentation index
+- [Testing Guide](../docs/TESTING.md) - Testing workflow and environments
+- [Release Checklist](../docs/RELEASE_CHECKLIST.md) - Release process
 
 ## Development Guidelines
 

@@ -1,24 +1,23 @@
 # Release Notes Template
 
-## Version 1.1.0 (Geplant)
+## Version 1.2.0 (2026-02-15)
 
 ### Für Play Store (Deutsch, max. 500 Zeichen)
 
 ```
-🎉 Neue Features in Version 1.1.0:
+🎉 Großes Update - Version 1.2.0:
 
-🎨 Verbesserte Darstellung
-• Optimierte Layouts für bessere Lesbarkeit
-• Flexiblere Anordnung der Antwortmöglichkeiten
+🏆 Herausforderungs-Modus (NEU!)
+• Endlosmodus mit steigender Schwierigkeit
+• 6 Level, 3 Leben, High Score
+• Alle Rechenarten werden automatisch aktiviert
 
-⚡ Performance
-• Schnellere Aufgaben-Generierung
-• Optimierte Berechnungen für flüssigeres Spielerlebnis
+🌐 Automatische Spracherkennung
+• App erkennt Gerätesprache (DE/EN)
 
-🔧 Verbesserungen
-• Stabilere App
-• Bessere Code-Qualität
-• Kleinere Bugfixes
+🎨 Neues Design
+• Moderne Farbpalette (Indigo/Emerald)
+• Frischeres, freundlicheres Aussehen
 
 Viel Spaß beim Üben! 🧮✨
 ```
@@ -26,20 +25,19 @@ Viel Spaß beim Üben! 🧮✨
 ### Für Play Store (Englisch, max. 500 Zeichen)
 
 ```
-🎉 What's new in version 1.1.0:
+🎉 Major Update - Version 1.2.0:
 
-🎨 Improved Display
-• Optimized layouts for better readability
-• More flexible answer arrangement
+🏆 Challenge Mode (NEW!)
+• Endless mode with progressive difficulty
+• 6 levels, 3 lives, high score tracking
+• All operations activate automatically
 
-⚡ Performance
-• Faster task generation
-• Optimized calculations for smoother experience
+🌐 Automatic Language Detection
+• App detects device language (DE/EN)
 
-🔧 Improvements
-• More stable app
-• Better code quality
-• Minor bug fixes
+🎨 Fresh Design
+• Modern color palette (Indigo/Emerald)
+• Cleaner, friendlier look
 
 Have fun practicing! 🧮✨
 ```
