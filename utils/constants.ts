@@ -29,16 +29,18 @@ export interface ChallengeLevel {
   minScore: number;
   numberRange: NumberRange;
   gameMode: GameMode;
-  operations: Operation[] | null; // null = use user's selected operations
+  operations: Operation[];
 }
+
+const ALL_OPERATIONS = [Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION];
 
 export const CHALLENGE_LEVELS: ChallengeLevel[] = [
   { minScore: 0,  numberRange: NumberRange.RANGE_10,  gameMode: GameMode.NORMAL, operations: [Operation.MULTIPLICATION] },
-  { minScore: 5,  numberRange: NumberRange.RANGE_10,  gameMode: GameMode.NORMAL, operations: null },
-  { minScore: 10, numberRange: NumberRange.RANGE_20,  gameMode: GameMode.NORMAL, operations: null },
-  { minScore: 15, numberRange: NumberRange.RANGE_20,  gameMode: GameMode.MIXED,  operations: null },
-  { minScore: 20, numberRange: NumberRange.RANGE_50,  gameMode: GameMode.MIXED,  operations: null },
-  { minScore: 30, numberRange: NumberRange.RANGE_100, gameMode: GameMode.MIXED,  operations: null },
+  { minScore: 5,  numberRange: NumberRange.RANGE_10,  gameMode: GameMode.NORMAL, operations: ALL_OPERATIONS },
+  { minScore: 10, numberRange: NumberRange.RANGE_20,  gameMode: GameMode.NORMAL, operations: ALL_OPERATIONS },
+  { minScore: 15, numberRange: NumberRange.RANGE_20,  gameMode: GameMode.MIXED,  operations: ALL_OPERATIONS },
+  { minScore: 20, numberRange: NumberRange.RANGE_50,  gameMode: GameMode.MIXED,  operations: ALL_OPERATIONS },
+  { minScore: 30, numberRange: NumberRange.RANGE_100, gameMode: GameMode.MIXED,  operations: ALL_OPERATIONS },
 ];
 
 /**

@@ -2160,7 +2160,7 @@ describe('getChallengeLevel', () => {
   it('should return level 2 for score 5', () => {
     const level = getChallengeLevel(5);
     expect(level.numberRange).toBe(NumberRange.RANGE_10);
-    expect(level.operations).toBeNull();
+    expect(level.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION]);
   });
 
   it('should return level 3 for score 10', () => {
