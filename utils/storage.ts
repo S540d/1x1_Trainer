@@ -135,6 +135,19 @@ export const getTotalTasks = async (): Promise<number | null> => {
   return null;
 };
 
+export const saveChallengeHighScore = async (score: number): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.CHALLENGE_HIGHSCORE, score.toString());
+};
+
+export const getChallengeHighScore = async (): Promise<number> => {
+  const value = await getStorageItem(STORAGE_KEYS.CHALLENGE_HIGHSCORE);
+  if (value) {
+    const parsed = parseInt(value, 10);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+  return 0;
+};
+
 export const saveNumberRange = async (range: NumberRange): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.NUMBER_RANGE, range);
 };

@@ -4,7 +4,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import * as Localization from 'expo-localization';
 import { Language, ThemeMode, Operation, NumberRange } from '../types/game';
 import {
   getLanguage,
@@ -17,7 +16,10 @@ import {
   saveTotalTasks,
   getNumberRange,
   saveNumberRange,
+  getChallengeHighScore,
+  saveChallengeHighScore,
 } from '../utils/storage';
+import { getDeviceLanguage } from '../utils/language';
 
 export function usePreferences() {
   const [language, setLanguage] = useState<Language>('en');
@@ -25,6 +27,7 @@ export function usePreferences() {
   const [operations, setOperations] = useState<Operation[]>([Operation.MULTIPLICATION]);
   const [numberRange, setNumberRange] = useState<NumberRange>(NumberRange.RANGE_100);
   const [totalSolvedTasks, setTotalSolvedTasks] = useState(0);
+  const [challengeHighScore, setChallengeHighScore] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load preferences on mount
@@ -37,9 +40,9 @@ export function usePreferences() {
           setLanguage(savedLanguage);
         } else {
           // Auto-detect device language
-          const locales = Localization.getLocales();
-          const deviceLang = locales[0]?.languageCode || 'en';
-          setLanguage(deviceLang === 'de' ? 'de' : 'en');
+          const detectedLang = getDeviceLanguage();
+          setLanguage(detectedLang);
+          // Language will be saved by the auto-save effect once isLoaded is true
         }
 
         // Load theme
@@ -61,6 +64,10 @@ export function usePreferences() {
         // Load number range (always returns a value, with migration)
         const savedNumberRange = await getNumberRange();
         setNumberRange(savedNumberRange);
+
+        // Load challenge high score
+        const savedHighScore = await getChallengeHighScore();
+        setChallengeHighScore(savedHighScore);
 
         setIsLoaded(true);
       } catch (error) {
@@ -121,6 +128,13 @@ export function usePreferences() {
     }
   }, [numberRange, isLoaded]);
 
+  // Auto-save challenge high score
+  useEffect(() => {
+    if (isLoaded) {
+      saveChallengeHighScore(challengeHighScore);
+    }
+  }, [challengeHighScore, isLoaded]);
+
   return {
     language,
     setLanguage,
@@ -136,6 +150,8 @@ export function usePreferences() {
     setNumberRange,
     totalSolvedTasks,
     setTotalSolvedTasks,
+    challengeHighScore,
+    setChallengeHighScore,
     isLoaded,
   };
 }

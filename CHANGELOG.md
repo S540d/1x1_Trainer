@@ -5,9 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.2.0] - 2026-02-15
+
+### Added
+- ✨ **Challenge Mode** (Issue #100): New endless game mode with progressive difficulty
+  - Play until 3 mistakes — difficulty increases every few correct answers
+  - 6 levels: starts with multiplication 1-10, progresses to mixed operations up to 100
+  - Lives display with hearts, level indicator, and score tracking
+  - Persistent high score across sessions
+  - Full DE/EN translation support
+  - 26 new tests (337 total, 334 passing, 3 skipped)
+- 🎨 **Design Modernization** (Issue #100, Phase 2): Fresh, modern color palette for light mode
+  - Replaced Material Design purple (#6200EE) with Indigo 600 (#4F46E5)
+  - Replaced teal secondary (#03DAC6) with Emerald 500 (#10B981)
+  - Updated disabled state color to Slate 400 (#94A3B8)
+  - Softer feedback colors: Indigo tint for selection, Emerald for correct, Rose for incorrect
+  - Light background with subtle Indigo tint (#F0F4FF)
+  - Updated theme tests to match new color values
+- ✨ **Automatic Language Detection** (Issue #97, PR #98): Smart language detection on first launch
+  - Created `utils/language.ts` with `getDeviceLanguage()` function
+  - Detects device language using expo-localization with fallback to English
+  - Auto-saves detected language on first app start for consistency
+  - Comprehensive test suite with 8 test cases covering all edge cases
+  - Based on proven DrawFromMemory implementation pattern
+  - Test suite: 337 tests (334 passed, 3 skipped)
 
 ### Fixed
+- 🐛 **Challenge Mode Operations** (Issue #104, PR #106): All operations now activate automatically in challenge mode
+  - Levels 2-6 no longer fall back to user-selected operations
+  - Operation buttons are disabled and shown as active during challenge mode
+  - Prevents user confusion from toggling operations that have no effect
 - 🐛 **Layout Spacing** (Issue #58, PR #90): Improved spacing between question and input field
   - Reduced excessive gaps on Android devices by adjusting flexbox layout
   - Changed `questionCard` to use `justifyContent: 'space-between'`
@@ -29,6 +56,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added oval gray border (borderRadius: 20, borderWidth: 2)
   - Transparent background with theme-aware border color
   - Better visual prominence and consistency with app design
+
+### Technical
+- ⚙️ **Jest Configuration**: Enhanced test infrastructure for Issue #97
+  - Added transform for `.jsx?` files to handle ES modules
+  - Added `transformIgnorePatterns` for expo-localization compatibility
+  - Updated test mocks for new language detection utility
 
 ## [1.1.0] - 2026-01-24
 

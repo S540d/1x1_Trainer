@@ -2,7 +2,9 @@
  * Application Constants for 1x1 Trainer
  */
 
-export const APP_VERSION = '1.1.0';
+import { GameMode, NumberRange, Operation } from '../types/game';
+
+export const APP_VERSION = '1.2.0';
 
 // Game Configuration
 export const TOTAL_TASKS = 10;
@@ -17,7 +19,55 @@ export const STORAGE_KEYS = {
   OPERATIONS: 'app-operations',
   TOTAL_TASKS: 'app-total-tasks',
   NUMBER_RANGE: 'app-number-range',
+  CHALLENGE_HIGHSCORE: 'app-challenge-highscore',
 } as const;
+
+// Challenge Mode Configuration
+export const CHALLENGE_MAX_LIVES = 3;
+
+export interface ChallengeLevel {
+  minScore: number;
+  numberRange: NumberRange;
+  gameMode: GameMode;
+  operations: readonly Operation[];
+}
+
+const ALL_OPERATIONS: readonly Operation[] = Object.freeze([Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION]);
+
+export const CHALLENGE_LEVELS: ChallengeLevel[] = [
+  { minScore: 0,  numberRange: NumberRange.RANGE_10,  gameMode: GameMode.NORMAL, operations: [Operation.MULTIPLICATION] },
+  { minScore: 5,  numberRange: NumberRange.RANGE_10,  gameMode: GameMode.NORMAL, operations: ALL_OPERATIONS },
+  { minScore: 10, numberRange: NumberRange.RANGE_20,  gameMode: GameMode.NORMAL, operations: ALL_OPERATIONS },
+  { minScore: 15, numberRange: NumberRange.RANGE_20,  gameMode: GameMode.MIXED,  operations: ALL_OPERATIONS },
+  { minScore: 20, numberRange: NumberRange.RANGE_50,  gameMode: GameMode.MIXED,  operations: ALL_OPERATIONS },
+  { minScore: 30, numberRange: NumberRange.RANGE_100, gameMode: GameMode.MIXED,  operations: ALL_OPERATIONS },
+];
+
+/**
+ * Get the current challenge level based on score
+ */
+export function getChallengeLevel(score: number): ChallengeLevel {
+  let level = CHALLENGE_LEVELS[0];
+  for (const l of CHALLENGE_LEVELS) {
+    if (score >= l.minScore) {
+      level = l;
+    }
+  }
+  return level;
+}
+
+/**
+ * Get the level number (1-based) for a given score
+ */
+export function getChallengeLevelNumber(score: number): number {
+  let levelNum = 1;
+  for (let i = 0; i < CHALLENGE_LEVELS.length; i++) {
+    if (score >= CHALLENGE_LEVELS[i].minScore) {
+      levelNum = i + 1;
+    }
+  }
+  return levelNum;
+}
 
 // Theme Colors - "Modern Professional" Design System
 // Inspired by contemporary design trends with clean, sophisticated tones
@@ -36,13 +86,13 @@ export const THEME_COLORS = {
     SETTINGS_MENU: '#1A202C',
   },
   LIGHT: {
-    BACKGROUND: '#F8FAFC', // Clean, crisp off-white
+    BACKGROUND: '#F0F4FF', // Soft indigo-tinted white
     TEXT: '#0F172A', // Deep professional navy
     TEXT_SECONDARY: '#475569',
     BORDER: '#CBD5E1',
     CARD: '#FFFFFF', // Pure white cards for clean look
-    CARD_CORRECT: '#D1FAE5', // Soft mint green
-    CARD_INCORRECT: '#FEE2E2', // Soft coral red
+    CARD_CORRECT: '#ECFDF5', // Subtle emerald tint
+    CARD_INCORRECT: '#FFF1F2', // Subtle rose tint
     BUTTON_INACTIVE: '#F1F5F9', // Light slate
     BUTTON_INACTIVE_TEXT: '#475569',
     SETTINGS_OVERLAY: 'rgba(15,23,42,0.6)',

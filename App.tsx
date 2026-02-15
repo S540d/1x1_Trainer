@@ -14,7 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 // Local imports
 import { Operation, AnswerMode, DifficultyMode, NumberRange, ThemeColors } from './types/game';
 import { translations } from './i18n/translations';
-import { APP_VERSION } from './utils/constants';
+import { APP_VERSION, CHALLENGE_MAX_LIVES } from './utils/constants';
 import { useTheme } from './hooks/useTheme';
 import { usePreferences } from './hooks/usePreferences';
 import { useGameLogic } from './hooks/useGameLogic';
@@ -40,6 +40,8 @@ export default function App() {
       setShowMotivation(true);
     },
     numberRange: preferences.numberRange,
+    challengeHighScore: preferences.challengeHighScore,
+    onChallengeHighScoreChange: preferences.setChallengeHighScore,
   });
 
   const t = translations[preferences.language];
@@ -48,7 +50,7 @@ export default function App() {
   // Set body background color dynamically on web
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.body.style.backgroundColor = isDarkMode ? '#0F1419' : '#F8FAFC';
+      document.body.style.backgroundColor = isDarkMode ? '#0F1419' : '#F0F4FF';
     }
   }, [isDarkMode]);
 
@@ -82,12 +84,29 @@ export default function App() {
 
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Text style={[styles.headerScore, { color: colors.text }]}>
-          {t.task}: {game.gameState.currentTask}/{game.gameState.totalTasks}
-        </Text>
-        <Text style={[styles.headerScore, { color: colors.text }]}>
-          {t.points}: <Text style={{ color: colors.text, fontWeight: 'bold' }}>{game.gameState.score}</Text>
-        </Text>
+        {game.gameState.difficultyMode === DifficultyMode.CHALLENGE && game.gameState.challengeState ? (
+          <>
+            <Text style={[styles.headerScore, { color: colors.text }]}>
+              {Array.from({ length: game.gameState.challengeState.lives }, () => '\u2764\uFE0F').join('')}
+              {Array.from({ length: CHALLENGE_MAX_LIVES - game.gameState.challengeState.lives }, () => '\uD83E\uDD0D').join('')}
+            </Text>
+            <Text style={[styles.headerScore, { color: colors.text }]}>
+              {t.level} {game.gameState.challengeState.level}
+            </Text>
+            <Text style={[styles.headerScore, { color: colors.text }]}>
+              <Text style={{ fontWeight: 'bold' }}>{game.gameState.score}</Text>
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text style={[styles.headerScore, { color: colors.text }]}>
+              {t.task}: {game.gameState.currentTask}/{game.gameState.totalTasks}
+            </Text>
+            <Text style={[styles.headerScore, { color: colors.text }]}>
+              {t.points}: <Text style={{ color: colors.text, fontWeight: 'bold' }}>{game.gameState.score}</Text>
+            </Text>
+          </>
+        )}
         <TouchableOpacity
           onPress={() => setMenuVisible(true)}
           style={styles.settingsButton}
@@ -135,78 +154,38 @@ export default function App() {
             <View style={styles.settingsSection}>
               <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.operation}</Text>
               <View style={styles.operationGrid}>
-                <TouchableOpacity
-                  style={[
-                    styles.operationButton,
-                    { borderColor: colors.border },
-                    game.gameState.selectedOperations.has(Operation.ADDITION) && styles.operationButtonActive,
-                  ]}
-                  onPress={() => game.toggleOperation(Operation.ADDITION)}
-                >
-                  <Text
-                    style={[
-                      styles.operationButtonText,
-                      { color: colors.text },
-                      game.gameState.selectedOperations.has(Operation.ADDITION) && styles.operationButtonTextActive,
-                    ]}
-                  >
-                    + {t.addition}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.operationButton,
-                    { borderColor: colors.border },
-                    game.gameState.selectedOperations.has(Operation.SUBTRACTION) && styles.operationButtonActive,
-                  ]}
-                  onPress={() => game.toggleOperation(Operation.SUBTRACTION)}
-                >
-                  <Text
-                    style={[
-                      styles.operationButtonText,
-                      { color: colors.text },
-                      game.gameState.selectedOperations.has(Operation.SUBTRACTION) && styles.operationButtonTextActive,
-                    ]}
-                  >
-                    − {t.subtraction}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.operationButton,
-                    { borderColor: colors.border },
-                    game.gameState.selectedOperations.has(Operation.MULTIPLICATION) && styles.operationButtonActive,
-                  ]}
-                  onPress={() => game.toggleOperation(Operation.MULTIPLICATION)}
-                >
-                  <Text
-                    style={[
-                      styles.operationButtonText,
-                      { color: colors.text },
-                      game.gameState.selectedOperations.has(Operation.MULTIPLICATION) && styles.operationButtonTextActive,
-                    ]}
-                  >
-                    × {t.multiplication}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.operationButton,
-                    { borderColor: colors.border },
-                    game.gameState.selectedOperations.has(Operation.DIVISION) && styles.operationButtonActive,
-                  ]}
-                  onPress={() => game.toggleOperation(Operation.DIVISION)}
-                >
-                  <Text
-                    style={[
-                      styles.operationButtonText,
-                      { color: colors.text },
-                      game.gameState.selectedOperations.has(Operation.DIVISION) && styles.operationButtonTextActive,
-                    ]}
-                  >
-                    ÷ {t.division}
-                  </Text>
-                </TouchableOpacity>
+                {([
+                  { op: Operation.ADDITION, symbol: '+', label: t.addition },
+                  { op: Operation.SUBTRACTION, symbol: '−', label: t.subtraction },
+                  { op: Operation.MULTIPLICATION, symbol: '×', label: t.multiplication },
+                  { op: Operation.DIVISION, symbol: '÷', label: t.division },
+                ] as const).map(({ op, symbol, label }) => {
+                  const isChallenge = game.gameState.difficultyMode === DifficultyMode.CHALLENGE;
+                  const isActive = isChallenge || game.gameState.selectedOperations.has(op);
+                  return (
+                    <TouchableOpacity
+                      key={op}
+                      style={[
+                        styles.operationButton,
+                        { borderColor: colors.border },
+                        isActive && styles.operationButtonActive,
+                        isChallenge && { opacity: 0.6 },
+                      ]}
+                      onPress={() => game.toggleOperation(op)}
+                      disabled={isChallenge}
+                    >
+                      <Text
+                        style={[
+                          styles.operationButtonText,
+                          { color: colors.text },
+                          isActive && styles.operationButtonTextActive,
+                        ]}
+                      >
+                        {symbol} {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
 
@@ -252,9 +231,34 @@ export default function App() {
                     {t.creativeMode}
                   </Text>
                 </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.themeButton,
+                    { borderColor: colors.border },
+                    game.gameState.difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonActive,
+                  ]}
+                  onPress={() => {
+                    game.changeDifficultyMode(DifficultyMode.CHALLENGE);
+                    setMenuVisible(false);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.themeButtonText,
+                      { color: colors.text },
+                      game.gameState.difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonTextActive,
+                    ]}
+                  >
+                    {t.challenge}
+                  </Text>
+                </TouchableOpacity>
               </View>
               <Text style={[styles.settingsModeInfo, { color: colors.textSecondary }]}>
-                {game.gameState.difficultyMode === DifficultyMode.SIMPLE ? t.simpleModeInfo : t.creativeModeInfo}
+                {game.gameState.difficultyMode === DifficultyMode.SIMPLE
+                  ? t.simpleModeInfo
+                  : game.gameState.difficultyMode === DifficultyMode.CREATIVE
+                  ? t.creativeModeInfo
+                  : t.challengeInfo}
               </Text>
             </View>
 
@@ -540,18 +544,42 @@ export default function App() {
       <Modal visible={game.gameState.showResult} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.settingsMenu }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>{t.great}</Text>
-            <Text style={[styles.modalText, { color: colors.text }]}>
-              {t.youSolved} {game.gameState.score} {t.of} {game.gameState.totalTasks} {t.tasksCorrectly}.
-            </Text>
-            <View style={styles.modalButtonRow}>
-              <TouchableOpacity style={styles.modalButton} onPress={game.restartGame}>
-                <Text style={styles.modalButtonText}>{t.newRound}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalButton} onPress={game.continueGame}>
-                <Text style={styles.modalButtonText}>{t.continueGame}</Text>
-              </TouchableOpacity>
-            </View>
+            {game.gameState.difficultyMode === DifficultyMode.CHALLENGE && game.gameState.challengeState ? (
+              <>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{t.challengeOver}</Text>
+                {game.gameState.score > 0 && game.gameState.score >= (game.gameState.challengeState.highScore) && (
+                  <Text style={[styles.newHighScoreText, { color: '#F59E0B' }]}>{t.newHighScore}</Text>
+                )}
+                <Text style={[styles.modalText, { color: colors.text }]}>
+                  {t.challengeResult
+                    .replace('{level}', String(game.gameState.challengeState.level))
+                    .replace('{score}', String(game.gameState.score))}
+                </Text>
+                {game.gameState.challengeState.highScore > 0 && (
+                  <Text style={[styles.highScoreText, { color: colors.textSecondary }]}>
+                    {t.highScore}: {game.gameState.challengeState.highScore}
+                  </Text>
+                )}
+                <TouchableOpacity style={styles.restartButton} onPress={game.restartGame}>
+                  <Text style={styles.restartButtonText}>{t.tryAgain}</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{t.great}</Text>
+                <Text style={[styles.modalText, { color: colors.text }]}>
+                  {t.youSolved} {game.gameState.score} {t.of} {game.gameState.totalTasks} {t.tasksCorrectly}.
+                </Text>
+                <View style={styles.modalButtonRow}>
+                  <TouchableOpacity style={styles.modalButton} onPress={game.restartGame}>
+                    <Text style={styles.modalButtonText}>{t.newRound}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.modalButton} onPress={game.continueGame}>
+                    <Text style={styles.modalButtonText}>{t.continueGame}</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
           </View>
         </View>
       </Modal>
@@ -747,7 +775,7 @@ const styles = StyleSheet.create({
   settingsButtonText: {
     fontSize: 24,
     fontWeight: '500',
-    color: '#6200EE',
+    color: '#4F46E5',
   },
   settingsOverlay: {
     position: 'absolute',
@@ -819,7 +847,7 @@ const styles = StyleSheet.create({
   settingsMenuLinkText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6200EE',
+    color: '#4F46E5',
   },
   personalizeButton: {
     width: '100%',
@@ -869,8 +897,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   themeButtonActive: {
-    backgroundColor: '#6200EE',
-    borderColor: '#6200EE',
+    backgroundColor: '#4F46E5',
+    borderColor: '#4F46E5',
   },
   themeButtonText: {
     fontSize: 12,
@@ -896,8 +924,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   operationButtonActive: {
-    backgroundColor: '#6200EE',
-    borderColor: '#6200EE',
+    backgroundColor: '#4F46E5',
+    borderColor: '#4F46E5',
   },
   operationButtonText: {
     fontSize: 12,
@@ -934,8 +962,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   gameModeSettingsButtonActive: {
-    backgroundColor: '#6200EE',
-    borderColor: '#6200EE',
+    backgroundColor: '#4F46E5',
+    borderColor: '#4F46E5',
   },
   gameModeSettingsButtonText: {
     fontSize: 12,
@@ -1014,14 +1042,14 @@ const styles = StyleSheet.create({
   numpadButtonCheck: {
     flex: 1,
     height: 60,
-    backgroundColor: '#03DAC6',
+    backgroundColor: '#10B981',
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 0,
   },
   numpadButtonCheckDisabled: {
-    backgroundColor: '#B0BEC5',
+    backgroundColor: '#94A3B8',
   },
   numpadButtonCheckText: {
     fontSize: 24,
@@ -1042,16 +1070,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   choiceButtonSelected: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#EEF2FF',
+    borderColor: '#4F46E5',
   },
   choiceButtonCorrect: {
-    backgroundColor: '#E8F5E9',
-    borderColor: '#4CAF50',
+    backgroundColor: '#ECFDF5',
+    borderColor: '#10B981',
   },
   choiceButtonIncorrect: {
-    backgroundColor: '#FFEBEE',
-    borderColor: '#F44336',
+    backgroundColor: '#FFF1F2',
+    borderColor: '#EF4444',
   },
   choiceButtonText: {
     fontSize: 24,
@@ -1059,12 +1087,12 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   choiceButtonTextSelected: {
-    color: '#1976D2',
+    color: '#4338CA',
   },
   checkButton: {
     width: '100%',
     height: 60,
-    backgroundColor: '#03DAC6',
+    backgroundColor: '#10B981',
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1072,7 +1100,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   checkButtonDisabled: {
-    backgroundColor: '#B0BEC5',
+    backgroundColor: '#94A3B8',
   },
   checkButtonText: {
     fontSize: 18,
@@ -1098,16 +1126,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   sequenceButtonSelected: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#EEF2FF',
+    borderColor: '#4F46E5',
   },
   sequenceButtonCorrect: {
-    backgroundColor: '#E8F5E9',
-    borderColor: '#4CAF50',
+    backgroundColor: '#ECFDF5',
+    borderColor: '#10B981',
   },
   sequenceButtonIncorrect: {
-    backgroundColor: '#FFEBEE',
-    borderColor: '#F44336',
+    backgroundColor: '#FFF1F2',
+    borderColor: '#EF4444',
   },
   sequenceButtonText: {
     fontSize: 24,
@@ -1115,7 +1143,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   sequenceButtonTextSelected: {
-    color: '#1976D2',
+    color: '#4338CA',
   },
   modalOverlay: {
     flex: 1,
@@ -1146,7 +1174,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   restartButton: {
-    backgroundColor: '#6200EE',
+    backgroundColor: '#4F46E5',
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 28,
@@ -1163,7 +1191,7 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     flex: 1,
-    backgroundColor: '#6200EE',
+    backgroundColor: '#4F46E5',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 12,
@@ -1214,8 +1242,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rangeButtonActive: {
-    backgroundColor: '#6200EE',
-    borderColor: '#6200EE',
+    backgroundColor: '#4F46E5',
+    borderColor: '#4F46E5',
   },
   rangeButtonText: {
     fontSize: 12,
@@ -1223,5 +1251,14 @@ const styles = StyleSheet.create({
   },
   rangeButtonTextActive: {
     color: '#fff',
+  },
+  newHighScoreText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  highScoreText: {
+    fontSize: 14,
+    marginBottom: 16,
   },
 });
