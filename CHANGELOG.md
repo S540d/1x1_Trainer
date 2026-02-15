@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.2.0] - 2026-02-15
 
 ### Added
 - ✨ **Challenge Mode** (Issue #100): New endless game mode with progressive difficulty
@@ -31,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - All 311 tests passing (308 passed, 3 skipped)
 
 ### Fixed
+- 🐛 **Challenge Mode Operations** (Issue #104, PR #106): All operations now activate automatically in challenge mode
+  - Levels 2-6 no longer fall back to user-selected operations
+  - Operation buttons are disabled and shown as active during challenge mode
+  - Prevents user confusion from toggling operations that have no effect
 - 🐛 **Layout Spacing** (Issue #58, PR #90): Improved spacing between question and input field
   - Reduced excessive gaps on Android devices by adjusting flexbox layout
   - Changed `questionCard` to use `justifyContent: 'space-between'`
