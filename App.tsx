@@ -154,78 +154,38 @@ export default function App() {
             <View style={styles.settingsSection}>
               <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.operation}</Text>
               <View style={styles.operationGrid}>
-                <TouchableOpacity
-                  style={[
-                    styles.operationButton,
-                    { borderColor: colors.border },
-                    game.gameState.selectedOperations.has(Operation.ADDITION) && styles.operationButtonActive,
-                  ]}
-                  onPress={() => game.toggleOperation(Operation.ADDITION)}
-                >
-                  <Text
-                    style={[
-                      styles.operationButtonText,
-                      { color: colors.text },
-                      game.gameState.selectedOperations.has(Operation.ADDITION) && styles.operationButtonTextActive,
-                    ]}
-                  >
-                    + {t.addition}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.operationButton,
-                    { borderColor: colors.border },
-                    game.gameState.selectedOperations.has(Operation.SUBTRACTION) && styles.operationButtonActive,
-                  ]}
-                  onPress={() => game.toggleOperation(Operation.SUBTRACTION)}
-                >
-                  <Text
-                    style={[
-                      styles.operationButtonText,
-                      { color: colors.text },
-                      game.gameState.selectedOperations.has(Operation.SUBTRACTION) && styles.operationButtonTextActive,
-                    ]}
-                  >
-                    − {t.subtraction}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.operationButton,
-                    { borderColor: colors.border },
-                    game.gameState.selectedOperations.has(Operation.MULTIPLICATION) && styles.operationButtonActive,
-                  ]}
-                  onPress={() => game.toggleOperation(Operation.MULTIPLICATION)}
-                >
-                  <Text
-                    style={[
-                      styles.operationButtonText,
-                      { color: colors.text },
-                      game.gameState.selectedOperations.has(Operation.MULTIPLICATION) && styles.operationButtonTextActive,
-                    ]}
-                  >
-                    × {t.multiplication}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.operationButton,
-                    { borderColor: colors.border },
-                    game.gameState.selectedOperations.has(Operation.DIVISION) && styles.operationButtonActive,
-                  ]}
-                  onPress={() => game.toggleOperation(Operation.DIVISION)}
-                >
-                  <Text
-                    style={[
-                      styles.operationButtonText,
-                      { color: colors.text },
-                      game.gameState.selectedOperations.has(Operation.DIVISION) && styles.operationButtonTextActive,
-                    ]}
-                  >
-                    ÷ {t.division}
-                  </Text>
-                </TouchableOpacity>
+                {([
+                  { op: Operation.ADDITION, symbol: '+', label: t.addition },
+                  { op: Operation.SUBTRACTION, symbol: '−', label: t.subtraction },
+                  { op: Operation.MULTIPLICATION, symbol: '×', label: t.multiplication },
+                  { op: Operation.DIVISION, symbol: '÷', label: t.division },
+                ] as const).map(({ op, symbol, label }) => {
+                  const isChallenge = game.gameState.difficultyMode === DifficultyMode.CHALLENGE;
+                  const isActive = isChallenge || game.gameState.selectedOperations.has(op);
+                  return (
+                    <TouchableOpacity
+                      key={op}
+                      style={[
+                        styles.operationButton,
+                        { borderColor: colors.border },
+                        isActive && styles.operationButtonActive,
+                        isChallenge && { opacity: 0.6 },
+                      ]}
+                      onPress={() => game.toggleOperation(op)}
+                      disabled={isChallenge}
+                    >
+                      <Text
+                        style={[
+                          styles.operationButtonText,
+                          { color: colors.text },
+                          isActive && styles.operationButtonTextActive,
+                        ]}
+                      >
+                        {symbol} {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
 

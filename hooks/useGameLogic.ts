@@ -431,9 +431,7 @@ export function useGameLogic({
 
       // Generate next question with challenge level settings
       const level = getChallengeLevel(gameState.score);
-      const challengeOps = level.operations
-        ? new Set(level.operations)
-        : gameState.selectedOperations;
+      const challengeOps = new Set(level.operations);
       const challengeMaxNumber = getMaxNumber(level.numberRange);
 
       setTimeout(() => generateQuestion(level.gameMode, challengeOps, challengeMaxNumber), 0);
