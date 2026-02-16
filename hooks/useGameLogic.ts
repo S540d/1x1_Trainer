@@ -234,14 +234,22 @@ export function useGameLogic({
         newNum2 = Math.floor(Math.random() * maxNum2ForAddition) + 1; // 1 to (effectiveMaxNumber - num1)
         break;
 
-      case Operation.MULTIPLICATION:
-        // For multiplication: ensure product (num1 * num2) is within range
-        // Strategy: Pick smaller factor from 1-10 (pedagogy), then ensure product <= effectiveMaxNumber
-        const maxFirstFactor = Math.min(10, effectiveMaxNumber);
-        newNum1 = Math.floor(Math.random() * maxFirstFactor) + 1; // 1 to min(10, effectiveMaxNumber)
-        const maxSecondFactor = Math.min(10, Math.floor(effectiveMaxNumber / newNum1)); // Ensure product <= effectiveMaxNumber
-        newNum2 = Math.floor(Math.random() * maxSecondFactor) + 1;
+      case Operation.MULTIPLICATION: {
+        // For multiplication: enumerate all valid (a,b) pairs where a,b in 1-10 and a*b <= range
+        // Then pick uniformly from all pairs for fair distribution
+        const multPairs: [number, number][] = [];
+        const maxFactor = Math.min(10, effectiveMaxNumber);
+        for (let a = 1; a <= maxFactor; a++) {
+          const maxB = Math.min(10, Math.floor(effectiveMaxNumber / a));
+          for (let b = 1; b <= maxB; b++) {
+            multPairs.push([a, b]);
+          }
+        }
+        const [mA, mB] = multPairs[Math.floor(Math.random() * multPairs.length)];
+        newNum1 = mA;
+        newNum2 = mB;
         break;
+      }
 
       case Operation.SUBTRACTION:
         // For subtraction: ensure minuend, subtrahend AND difference are all within range
@@ -252,17 +260,22 @@ export function useGameLogic({
         newNum1 = newNum2 + difference; // minuend = subtrahend + difference
         break;
 
-      case Operation.DIVISION:
-        // For division: ensure dividend, divisor AND quotient are all within range
-        // Strategy: Pick divisor and quotient from range, calculate dividend
-        const maxDivisor = Math.min(10, effectiveMaxNumber); // Keep divisor 1-10 for pedagogy
-        newNum2 = Math.floor(Math.random() * maxDivisor) + 1; // divisor: 1 to min(10, effectiveMaxNumber)
-
-        // Calculate max quotient ensuring dividend = divisor × quotient <= effectiveMaxNumber
-        const maxQuotient = Math.min(10, Math.floor(effectiveMaxNumber / newNum2));
-        const quotient = Math.floor(Math.random() * maxQuotient) + 1; // quotient: 1 to maxQuotient
-        newNum1 = newNum2 * quotient; // dividend = divisor × quotient
+      case Operation.DIVISION: {
+        // For division: enumerate all valid (divisor, quotient) pairs where both in 1-10
+        // and dividend = divisor × quotient <= range, then pick uniformly
+        const divPairs: [number, number][] = [];
+        const maxDiv = Math.min(10, effectiveMaxNumber);
+        for (let d = 1; d <= maxDiv; d++) {
+          const maxQ = Math.min(10, Math.floor(effectiveMaxNumber / d));
+          for (let q = 1; q <= maxQ; q++) {
+            divPairs.push([d, q]);
+          }
+        }
+        const [divisor, quot] = divPairs[Math.floor(Math.random() * divPairs.length)];
+        newNum1 = divisor * quot; // dividend
+        newNum2 = divisor;
         break;
+      }
 
       default:
         newNum1 = Math.floor(Math.random() * effectiveMaxNumber) + 1;
@@ -286,10 +299,10 @@ export function useGameLogic({
         break;
     }
 
-    // In CREATIVE mode (which uses MIXED), randomize answer mode each question
+    // In CREATIVE and CHALLENGE modes, randomize answer mode each question
     // NUMBER_SEQUENCE only available when asking for result (questionPart === 2)
     let newAnswerMode = gameState.answerMode;
-    if (gameState.difficultyMode === DifficultyMode.CREATIVE) {
+    if (gameState.difficultyMode === DifficultyMode.CREATIVE || gameState.difficultyMode === DifficultyMode.CHALLENGE) {
       const availableModes =
         newQuestionPart === 2
           ? [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE, AnswerMode.NUMBER_SEQUENCE]

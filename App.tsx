@@ -268,78 +268,38 @@ export default function App() {
             <View style={styles.settingsSection}>
               <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.numberRange}</Text>
               <View style={styles.numberRangeGrid}>
-                <TouchableOpacity
-                  style={[
-                    styles.rangeButton,
-                    { borderColor: colors.border },
-                    preferences.numberRange === NumberRange.RANGE_10 && styles.rangeButtonActive,
-                  ]}
-                  onPress={() => preferences.setNumberRange(NumberRange.RANGE_10)}
-                >
-                  <Text
-                    style={[
-                      styles.rangeButtonText,
-                      { color: colors.text },
-                      preferences.numberRange === NumberRange.RANGE_10 && styles.rangeButtonTextActive,
-                    ]}
-                  >
-                    {t.upTo10}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.rangeButton,
-                    { borderColor: colors.border },
-                    preferences.numberRange === NumberRange.RANGE_20 && styles.rangeButtonActive,
-                  ]}
-                  onPress={() => preferences.setNumberRange(NumberRange.RANGE_20)}
-                >
-                  <Text
-                    style={[
-                      styles.rangeButtonText,
-                      { color: colors.text },
-                      preferences.numberRange === NumberRange.RANGE_20 && styles.rangeButtonTextActive,
-                    ]}
-                  >
-                    {t.upTo20}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.rangeButton,
-                    { borderColor: colors.border },
-                    preferences.numberRange === NumberRange.RANGE_50 && styles.rangeButtonActive,
-                  ]}
-                  onPress={() => preferences.setNumberRange(NumberRange.RANGE_50)}
-                >
-                  <Text
-                    style={[
-                      styles.rangeButtonText,
-                      { color: colors.text },
-                      preferences.numberRange === NumberRange.RANGE_50 && styles.rangeButtonTextActive,
-                    ]}
-                  >
-                    {t.upTo50}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.rangeButton,
-                    { borderColor: colors.border },
-                    preferences.numberRange === NumberRange.RANGE_100 && styles.rangeButtonActive,
-                  ]}
-                  onPress={() => preferences.setNumberRange(NumberRange.RANGE_100)}
-                >
-                  <Text
-                    style={[
-                      styles.rangeButtonText,
-                      { color: colors.text },
-                      preferences.numberRange === NumberRange.RANGE_100 && styles.rangeButtonTextActive,
-                    ]}
-                  >
-                    {t.upTo100}
-                  </Text>
-                </TouchableOpacity>
+                {([
+                  { range: NumberRange.RANGE_10, label: t.upTo10 },
+                  { range: NumberRange.RANGE_20, label: t.upTo20 },
+                  { range: NumberRange.RANGE_50, label: t.upTo50 },
+                  { range: NumberRange.RANGE_100, label: t.upTo100 },
+                ] as const).map(({ range, label }) => {
+                  const isChallengeMode = game.gameState.difficultyMode === DifficultyMode.CHALLENGE;
+                  const isActive = isChallengeMode ? range === NumberRange.RANGE_100 : preferences.numberRange === range;
+                  return (
+                    <TouchableOpacity
+                      key={range}
+                      style={[
+                        styles.rangeButton,
+                        { borderColor: colors.border },
+                        isActive && styles.rangeButtonActive,
+                        isChallengeMode && { opacity: 0.6 },
+                      ]}
+                      onPress={() => preferences.setNumberRange(range)}
+                      disabled={isChallengeMode}
+                    >
+                      <Text
+                        style={[
+                          styles.rangeButtonText,
+                          { color: colors.text },
+                          isActive && styles.rangeButtonTextActive,
+                        ]}
+                      >
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
 
