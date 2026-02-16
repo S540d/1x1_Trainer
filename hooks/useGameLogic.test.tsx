@@ -637,10 +637,31 @@ describe('useGameLogic Hook', () => {
 
   // Helper to enter answer digit by digit
   const enterAnswer = (result: any, answer: number) => {
-    const answerStr = answer.toString();
-    for (const digit of answerStr) {
+    if (result.current.gameState.answerMode === AnswerMode.INPUT) {
+      const answerStr = answer.toString();
+      for (const digit of answerStr) {
+        act(() => {
+          result.current.handleNumberClick(parseInt(digit));
+        });
+      }
+    } else {
+      // MULTIPLE_CHOICE or NUMBER_SEQUENCE: select the correct value
       act(() => {
-        result.current.handleNumberClick(parseInt(digit));
+        result.current.handleChoiceClick(answer);
+      });
+    }
+  };
+
+  const enterWrongAnswer = (result: any) => {
+    const correctAnswer = result.current.getCorrectAnswer();
+    if (result.current.gameState.answerMode === AnswerMode.INPUT) {
+      act(() => {
+        result.current.handleNumberClick(0);
+      });
+    } else {
+      // Pick a wrong value (correctAnswer + 1 is never correct)
+      act(() => {
+        result.current.handleChoiceClick(correctAnswer + 1000);
       });
     }
   };
@@ -1942,9 +1963,7 @@ describe('useGameLogic Hook', () => {
       jest.runAllTimers();
 
       // Enter a deliberately wrong answer
-      act(() => {
-        result.current.handleNumberClick(0);
-      });
+      enterWrongAnswer(result);
       act(() => {
         result.current.checkAnswer();
       });
@@ -1968,9 +1987,7 @@ describe('useGameLogic Hook', () => {
         });
         jest.runAllTimers();
 
-        act(() => {
-          result.current.handleNumberClick(0);
-        });
+        enterWrongAnswer(result);
         act(() => {
           result.current.checkAnswer();
         });
@@ -2049,9 +2066,7 @@ describe('useGameLogic Hook', () => {
       });
       jest.runAllTimers();
 
-      act(() => {
-        result.current.handleNumberClick(0);
-      });
+      enterWrongAnswer(result);
       act(() => {
         result.current.checkAnswer();
       });
@@ -2128,9 +2143,7 @@ describe('useGameLogic Hook', () => {
         });
         jest.runAllTimers();
 
-        act(() => {
-          result.current.handleNumberClick(0);
-        });
+        enterWrongAnswer(result);
         act(() => {
           result.current.checkAnswer();
         });
