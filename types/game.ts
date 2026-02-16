@@ -40,6 +40,7 @@ export interface ChallengeState {
   level: number;
   errors: number;
   highScore: number;
+  isNewHighScore?: boolean;
 }
 
 export type ThemeMode = 'light' | 'dark' | 'system';
