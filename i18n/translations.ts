@@ -41,6 +41,7 @@ export interface TranslationStrings {
   version: string;
   copyright: string;
   license: string;
+  contact: string;
   // Game UI
   task: string;
   points: string;
@@ -116,7 +117,8 @@ export const translations: Record<Language, TranslationStrings> = {
     about: 'ABOUT',
     version: 'Version',
     copyright: '© 2025 Sven Strohkark',
-    license: 'License: MIT',
+    license: 'License: MIT – Free for non-commercial use',
+    contact: 'Contact: devsven@posteo.de',
     // Game UI
     task: 'Task',
     points: 'Points',
@@ -190,7 +192,8 @@ export const translations: Record<Language, TranslationStrings> = {
     about: 'ÜBER',
     version: 'Version',
     copyright: '© 2025 Sven Strohkark',
-    license: 'Lizenz: MIT',
+    license: 'Lizenz: MIT – Frei für nicht-kommerzielle Nutzung',
+    contact: 'Kontakt: devsven@posteo.de',
     // Game UI
     task: 'Aufgabe',
     points: 'Punkte',
