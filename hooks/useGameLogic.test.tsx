@@ -2201,9 +2201,7 @@ describe('useGameLogic Hook', () => {
         });
         jest.runAllTimers();
 
-        act(() => {
-          result.current.handleNumberClick(0);
-        });
+        enterWrongAnswer(result);
         act(() => {
           result.current.checkAnswer();
         });
