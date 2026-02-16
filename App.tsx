@@ -640,7 +640,13 @@ export default function App() {
               {t.version} {APP_VERSION}
             </Text>
             <Text style={[styles.aboutModalInfoText, { color: colors.textSecondary }]}>
+              {t.copyright}
+            </Text>
+            <Text style={[styles.aboutModalInfoText, { color: colors.textSecondary }]}>
               {t.license}
+            </Text>
+            <Text style={[styles.aboutModalInfoText, { color: colors.textSecondary }]}>
+              {t.contact}
             </Text>
             <TouchableOpacity
               style={styles.restartButton}
