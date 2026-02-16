@@ -116,7 +116,7 @@ export const translations: Record<Language, TranslationStrings> = {
     support: 'Support me',
     about: 'ABOUT',
     version: 'Version',
-    copyright: '© 2025 Sven Strohkark',
+    copyright: '© 2025',
     license: 'License: MIT',
     contact: 'Contact: devsven@posteo.de',
     // Game UI
@@ -191,7 +191,7 @@ export const translations: Record<Language, TranslationStrings> = {
     support: 'Support me',
     about: 'ÜBER',
     version: 'Version',
-    copyright: '© 2025 Sven Strohkark',
+    copyright: '© 2025',
     license: 'Lizenz: MIT',
     contact: 'Kontakt: devsven@posteo.de',
     // Game UI
