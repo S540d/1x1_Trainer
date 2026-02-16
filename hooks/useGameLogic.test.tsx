@@ -2145,6 +2145,67 @@ describe('useGameLogic Hook', () => {
 
       expect(result.current.gameState.showResult).toBe(true);
       expect(mockHighScoreChange).toHaveBeenCalledWith(2);
+      expect(result.current.gameState.challengeState?.isNewHighScore).toBe(true);
+    });
+
+    it('should not show new high score banner on tie', () => {
+      const mockHighScoreChange = jest.fn();
+      // Start with existing high score of 2
+      const { result } = renderHook(() =>
+        useGameLogic({ ...challengeProps, challengeHighScore: 2, onChallengeHighScoreChange: mockHighScoreChange })
+      );
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      jest.runAllTimers();
+
+      // Get 2 correct answers (matching the high score)
+      for (let i = 0; i < 2; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        jest.runAllTimers();
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+
+        act(() => {
+          result.current.nextQuestion();
+        });
+        jest.runAllTimers();
+      }
+
+      expect(result.current.gameState.score).toBe(2);
+
+      // Now lose 3 lives to end the game
+      for (let i = 0; i < 3; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        jest.runAllTimers();
+
+        act(() => {
+          result.current.handleNumberClick(0);
+        });
+        act(() => {
+          result.current.checkAnswer();
+        });
+
+        if (i < 2) {
+          act(() => {
+            result.current.nextQuestion();
+          });
+          jest.runAllTimers();
+        }
+      }
+
+      expect(result.current.gameState.showResult).toBe(true);
+      expect(result.current.gameState.challengeState?.isNewHighScore).toBeFalsy();
+      expect(mockHighScoreChange).not.toHaveBeenCalled();
     });
   });
 });

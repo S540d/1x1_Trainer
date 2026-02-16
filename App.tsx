@@ -547,7 +547,7 @@ export default function App() {
             {game.gameState.difficultyMode === DifficultyMode.CHALLENGE && game.gameState.challengeState ? (
               <>
                 <Text style={[styles.modalTitle, { color: colors.text }]}>{t.challengeOver}</Text>
-                {game.gameState.score > 0 && game.gameState.score >= (game.gameState.challengeState.highScore) && (
+                {game.gameState.challengeState.isNewHighScore && (
                   <Text style={[styles.newHighScoreText, { color: '#F59E0B' }]}>{t.newHighScore}</Text>
                 )}
                 <Text style={[styles.modalText, { color: colors.text }]}>

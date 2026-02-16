@@ -389,9 +389,10 @@ export function useGameLogic({
         // Game over when no lives left
         if (newLives <= 0) {
           newState.showResult = true;
-          // Update high score if beaten
+          // Update high score if beaten (strict greater than, not equal)
           if (newScore > prev.challengeState.highScore) {
             newState.challengeState.highScore = newScore;
+            newState.challengeState.isNewHighScore = true;
             onChallengeHighScoreChange?.(newScore);
           }
         }
@@ -482,6 +483,7 @@ export function useGameLogic({
         level: 1,
         errors: 0,
         highScore: gameState.challengeState?.highScore ?? challengeHighScore,
+        isNewHighScore: false,
       };
 
       setGameState((prev) => ({
@@ -587,6 +589,7 @@ export function useGameLogic({
         level: 1,
         errors: 0,
         highScore: challengeHighScore,
+        isNewHighScore: false,
       };
 
       setGameState((prev) => ({
