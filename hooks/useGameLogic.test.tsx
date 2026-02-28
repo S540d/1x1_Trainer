@@ -672,7 +672,9 @@ describe('useGameLogic Hook', () => {
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
     jest.useRealTimers();
   });
 
@@ -1927,7 +1929,9 @@ describe('useGameLogic Hook', () => {
       act(() => {
         result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       expect(result.current.gameState.difficultyMode).toBe(DifficultyMode.CHALLENGE);
       expect(result.current.gameState.challengeState).toBeDefined();
@@ -1943,7 +1947,9 @@ describe('useGameLogic Hook', () => {
       act(() => {
         result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       expect(result.current.gameState.gameMode).toBe(GameMode.NORMAL);
       expect(result.current.gameState.answerMode).toBe(AnswerMode.INPUT);
@@ -1955,12 +1961,16 @@ describe('useGameLogic Hook', () => {
       act(() => {
         result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       act(() => {
         result.current.generateQuestion();
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       // Enter a deliberately wrong answer
       enterWrongAnswer(result);
@@ -1978,14 +1988,18 @@ describe('useGameLogic Hook', () => {
       act(() => {
         result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       // Lose 3 lives
       for (let i = 0; i < 3; i++) {
         act(() => {
           result.current.generateQuestion();
         });
-        jest.runAllTimers();
+        act(() => {
+          jest.runAllTimers();
+        });
 
         enterWrongAnswer(result);
         act(() => {
@@ -1997,7 +2011,9 @@ describe('useGameLogic Hook', () => {
           act(() => {
             result.current.nextQuestion();
           });
-          jest.runAllTimers();
+          act(() => {
+            jest.runAllTimers();
+          });
         }
       }
 
@@ -2011,12 +2027,16 @@ describe('useGameLogic Hook', () => {
       act(() => {
         result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       act(() => {
         result.current.generateQuestion();
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       // Enter the correct answer
       const correctAnswer = result.current.getCorrectAnswer();
@@ -2036,12 +2056,16 @@ describe('useGameLogic Hook', () => {
       act(() => {
         result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       act(() => {
         result.current.generateQuestion();
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       const correctAnswer = result.current.getCorrectAnswer();
       enterAnswer(result, correctAnswer);
@@ -2058,13 +2082,17 @@ describe('useGameLogic Hook', () => {
       act(() => {
         result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       // Lose a life
       act(() => {
         result.current.generateQuestion();
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       enterWrongAnswer(result);
       act(() => {
@@ -2077,7 +2105,9 @@ describe('useGameLogic Hook', () => {
       act(() => {
         result.current.restartGame();
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       expect(result.current.gameState.challengeState?.lives).toBe(CHALLENGE_MAX_LIVES);
       expect(result.current.gameState.challengeState?.level).toBe(1);
@@ -2091,14 +2121,18 @@ describe('useGameLogic Hook', () => {
       act(() => {
         result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       expect(result.current.gameState.challengeState).toBeDefined();
 
       act(() => {
         result.current.changeDifficultyMode(DifficultyMode.SIMPLE);
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       expect(result.current.gameState.challengeState).toBeUndefined();
       expect(result.current.gameState.difficultyMode).toBe(DifficultyMode.SIMPLE);
@@ -2113,14 +2147,18 @@ describe('useGameLogic Hook', () => {
       act(() => {
         result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       // Get some correct answers first
       for (let i = 0; i < 2; i++) {
         act(() => {
           result.current.generateQuestion();
         });
-        jest.runAllTimers();
+        act(() => {
+          jest.runAllTimers();
+        });
 
         const correctAnswer = result.current.getCorrectAnswer();
         enterAnswer(result, correctAnswer);
@@ -2131,7 +2169,9 @@ describe('useGameLogic Hook', () => {
         act(() => {
           result.current.nextQuestion();
         });
-        jest.runAllTimers();
+        act(() => {
+          jest.runAllTimers();
+        });
       }
 
       expect(result.current.gameState.score).toBe(2);
@@ -2141,7 +2181,9 @@ describe('useGameLogic Hook', () => {
         act(() => {
           result.current.generateQuestion();
         });
-        jest.runAllTimers();
+        act(() => {
+          jest.runAllTimers();
+        });
 
         enterWrongAnswer(result);
         act(() => {
@@ -2152,7 +2194,9 @@ describe('useGameLogic Hook', () => {
           act(() => {
             result.current.nextQuestion();
           });
-          jest.runAllTimers();
+          act(() => {
+            jest.runAllTimers();
+          });
         }
       }
 
@@ -2171,14 +2215,18 @@ describe('useGameLogic Hook', () => {
       act(() => {
         result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
       });
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       // Get 2 correct answers (matching the high score)
       for (let i = 0; i < 2; i++) {
         act(() => {
           result.current.generateQuestion();
         });
-        jest.runAllTimers();
+        act(() => {
+          jest.runAllTimers();
+        });
 
         const correctAnswer = result.current.getCorrectAnswer();
         enterAnswer(result, correctAnswer);
@@ -2189,7 +2237,9 @@ describe('useGameLogic Hook', () => {
         act(() => {
           result.current.nextQuestion();
         });
-        jest.runAllTimers();
+        act(() => {
+          jest.runAllTimers();
+        });
       }
 
       expect(result.current.gameState.score).toBe(2);
@@ -2199,7 +2249,9 @@ describe('useGameLogic Hook', () => {
         act(() => {
           result.current.generateQuestion();
         });
-        jest.runAllTimers();
+        act(() => {
+          jest.runAllTimers();
+        });
 
         enterWrongAnswer(result);
         act(() => {
@@ -2210,7 +2262,9 @@ describe('useGameLogic Hook', () => {
           act(() => {
             result.current.nextQuestion();
           });
-          jest.runAllTimers();
+          act(() => {
+            jest.runAllTimers();
+          });
         }
       }
 
