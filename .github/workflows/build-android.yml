@@ -20,6 +20,7 @@ on:
           - none
           - patch
           - minor
+          - major
 
 # Minimal permissions - only write for committing version bump
 permissions:
@@ -65,8 +66,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          VERSION=$(node -p "require('./package.json').version")
-          git add package.json app.json utils/constants.ts
+          VERSION=$(node -e "process.stdout.write(require('./package.json').version)")
+          git add package.json app.json utils/constants.ts package-lock.json
           git commit -m "chore: bump version to $VERSION [skip ci]"
           git push
 
@@ -79,35 +80,46 @@ jobs:
           EXPO_NO_TELEMETRY: 1
 
       # -----------------------------------------------------------------------
-      # Decode Keystore from GitHub Secret
+      # Validate and Decode Keystore from GitHub Secret
       # -----------------------------------------------------------------------
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "❌ ERROR: ANDROID_KEYSTORE_BASE64 secret is not set."
+            echo "Please add the keystore as a Base64-encoded GitHub Secret."
+            echo "See docs/ANDROID_BUILD.md for setup instructions."
+            exit 1
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
           echo "ANDROID_KEYSTORE_PATH=$PWD/android/app/release.keystore" >> $GITHUB_ENV
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
       # -----------------------------------------------------------------------
       # Build AAB (production) or APK (preview)
+      # Secrets passed via ORG_GRADLE_PROJECT_ env vars (not visible in process list)
       # -----------------------------------------------------------------------
       - name: Build AAB
         if: inputs.profile == 'production'
         run: |
           cd android
-          ./gradlew bundleRelease \
-            -PANDROID_KEYSTORE_PATH=${{ env.ANDROID_KEYSTORE_PATH }} \
-            -PANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }} \
-            -PANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }} \
-            -PANDROID_STORE_PASSWORD=${{ secrets.ANDROID_STORE_PASSWORD }}
+          ./gradlew bundleRelease
+        env:
+          ORG_GRADLE_PROJECT_ANDROID_KEYSTORE_PATH: ${{ env.ANDROID_KEYSTORE_PATH }}
+          ORG_GRADLE_PROJECT_ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ORG_GRADLE_PROJECT_ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ORG_GRADLE_PROJECT_ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
 
       - name: Build APK
         if: inputs.profile == 'preview'
         run: |
           cd android
-          ./gradlew assembleRelease \
-            -PANDROID_KEYSTORE_PATH=${{ env.ANDROID_KEYSTORE_PATH }} \
-            -PANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }} \
-            -PANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }} \
-            -PANDROID_STORE_PASSWORD=${{ secrets.ANDROID_STORE_PASSWORD }}
+          ./gradlew assembleRelease
+        env:
+          ORG_GRADLE_PROJECT_ANDROID_KEYSTORE_PATH: ${{ env.ANDROID_KEYSTORE_PATH }}
+          ORG_GRADLE_PROJECT_ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ORG_GRADLE_PROJECT_ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ORG_GRADLE_PROJECT_ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
 
       # -----------------------------------------------------------------------
       # Upload Artifact
@@ -136,8 +148,8 @@ jobs:
 
       - name: Build Summary
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
+          VERSION=$(node -e "process.stdout.write(require('./package.json').version)")
+          VERSION_CODE=$(node -e "process.stdout.write(String(require('./app.json').expo.android.versionCode))")
           echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "| | |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
