@@ -8,6 +8,7 @@ import {
   Linking,
   ScrollView,
   SafeAreaView,
+  useWindowDimensions,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
@@ -46,6 +47,7 @@ export default function App() {
 
   const t = translations[preferences.language];
   const { colors, isDarkMode } = theme;
+  const { height: screenHeight } = useWindowDimensions();
 
   // Set body background color dynamically on web
   useEffect(() => {
@@ -124,7 +126,7 @@ export default function App() {
             activeOpacity={1}
             onPress={() => setMenuVisible(false)}
           />
-          <View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu }]}>
+          <View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu, maxHeight: screenHeight - 80 }]}>
             <View style={[styles.settingsMenuHeader, { borderBottomColor: colors.border }]}>
               <Text style={[styles.settingsMenuTitle, { color: colors.text }]}>Settings</Text>
               <TouchableOpacity
@@ -134,6 +136,7 @@ export default function App() {
                 <Text style={[styles.settingsMenuCloseButtonText, { color: colors.text }]}>✕</Text>
               </TouchableOpacity>
             </View>
+            <ScrollView bounces={false}>
 
             {/* Personalize Button */}
             <View style={styles.settingsSection}>
@@ -335,6 +338,7 @@ export default function App() {
                 <Text style={styles.settingsMenuLinkText}>{t.about}</Text>
               </TouchableOpacity>
             </View>
+            </ScrollView>
           </View>
         </>
       )}
