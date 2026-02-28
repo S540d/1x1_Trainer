@@ -1,6 +1,6 @@
 {
   "name": "1x1_trainer",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Cross-platform 1x1 multiplication trainer with multiple game modes",
   "main": "index.ts",
   "engines": {

@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-02-28
+
+### Fixed
+- 🐛 **Settings menu clipping on small/low-resolution screens** (Issue #116, PR #117): Settings menu no longer extends beyond the visible viewport
+  - Added `maxHeight` constraint based on screen height via `useWindowDimensions`
+  - Wrapped settings menu body in `ScrollView` so all sections remain accessible
+
 ## [1.2.0] - 2026-02-15
 
 ### Added
