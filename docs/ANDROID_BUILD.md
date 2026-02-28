@@ -12,8 +12,8 @@ Unter **Settings → Secrets and variables → Actions** folgende Secrets anlege
 |---|---|---|
 | `ANDROID_KEYSTORE_BASE64` | Keystore als Base64-String | `base64 -i release.keystore` |
 | `ANDROID_KEY_ALIAS` | Key Alias im Keystore | `upload` |
-| `ANDROID_KEY_PASSWORD` | Passwort des Keys | `secret123` |
-| `ANDROID_STORE_PASSWORD` | Passwort des Keystores | `secret123` |
+| `ANDROID_KEY_PASSWORD` | Passwort des Keys | `<your-key-password>` |
+| `ANDROID_STORE_PASSWORD` | Passwort des Keystores | `<your-keystore-password>` |
 
 #### Keystore aus EAS exportieren
 
@@ -97,17 +97,21 @@ Aktualisiert werden:
 
 ## Gradle Signing-Konfiguration
 
-Der Workflow übergibt die Keystore-Parameter via Gradle-Properties (`-P`).
+Der Workflow übergibt die Keystore-Parameter via `ORG_GRADLE_PROJECT_`-Umgebungsvariablen (sicherer als `-P` Flags, da nicht in der Prozessliste sichtbar). Gradle liest diese automatisch als Projekt-Properties.
+
 In `android/app/build.gradle` muss folgendes konfiguriert sein (wird durch `expo prebuild` generiert):
 
 ```groovy
 android {
     signingConfigs {
         release {
-            storeFile file(ANDROID_KEYSTORE_PATH)
-            keyAlias ANDROID_KEY_ALIAS
-            keyPassword ANDROID_KEY_PASSWORD
-            storePassword ANDROID_STORE_PASSWORD
+            // Read from ORG_GRADLE_PROJECT_* env vars (set by CI) or local gradle.properties
+            if (project.hasProperty('ANDROID_KEYSTORE_PATH')) {
+                storeFile file(project.property('ANDROID_KEYSTORE_PATH'))
+                keyAlias project.property('ANDROID_KEY_ALIAS')
+                keyPassword project.property('ANDROID_KEY_PASSWORD')
+                storePassword project.property('ANDROID_STORE_PASSWORD')
+            }
         }
     }
     buildTypes {
@@ -117,5 +121,7 @@ android {
     }
 }
 ```
+
+Das `hasProperty`-Guard stellt sicher, dass lokale Builds ohne CI-Signing-Parameter nicht fehlschlagen.
 
 Falls `expo prebuild` diese Konfiguration nicht automatisch erzeugt, muss sie nach dem Prebuild manuell ergänzt werden (einmalig, dann in `.gitignore`-Ausnahme aufnehmen).

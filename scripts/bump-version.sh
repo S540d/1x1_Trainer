@@ -75,11 +75,15 @@ else
   sed -i "s/export const APP_VERSION = '.*';/export const APP_VERSION = '$NEW_VERSION';/" utils/constants.ts
 fi
 
+# Sync package-lock.json version field
+npm install --package-lock-only --silent
+
 echo "✅ Version bumped to $NEW_VERSION (versionCode $NEW_VERSION_CODE)"
 echo ""
 echo "Updated files:"
 echo "  - package.json"
 echo "  - app.json"
 echo "  - utils/constants.ts"
+echo "  - package-lock.json"
 echo ""
 echo "Don't forget to update CHANGELOG.md!"
