@@ -1,0 +1,146 @@
+name: Build Android
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Build profile (production = AAB, preview = APK)'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - preview
+      bump:
+        description: 'Version bump type (none = skip bump)'
+        required: true
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - patch
+          - minor
+
+# Minimal permissions - only write for committing version bump
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: 🤖 Android Build (${{ inputs.profile }})
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # -----------------------------------------------------------------------
+      # Optional: Version bump before build
+      # -----------------------------------------------------------------------
+      - name: Bump version
+        if: inputs.bump != 'none'
+        run: |
+          chmod +x scripts/bump-version.sh
+          ./scripts/bump-version.sh ${{ inputs.bump }}
+
+      - name: Commit version bump
+        if: inputs.bump != 'none'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          VERSION=$(node -p "require('./package.json').version")
+          git add package.json app.json utils/constants.ts
+          git commit -m "chore: bump version to $VERSION [skip ci]"
+          git push
+
+      # -----------------------------------------------------------------------
+      # Expo Prebuild → generates /android directory
+      # -----------------------------------------------------------------------
+      - name: Expo Prebuild
+        run: npx expo prebuild --platform android --clean
+        env:
+          EXPO_NO_TELEMETRY: 1
+
+      # -----------------------------------------------------------------------
+      # Decode Keystore from GitHub Secret
+      # -----------------------------------------------------------------------
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
+          echo "ANDROID_KEYSTORE_PATH=$PWD/android/app/release.keystore" >> $GITHUB_ENV
+
+      # -----------------------------------------------------------------------
+      # Build AAB (production) or APK (preview)
+      # -----------------------------------------------------------------------
+      - name: Build AAB
+        if: inputs.profile == 'production'
+        run: |
+          cd android
+          ./gradlew bundleRelease \
+            -PANDROID_KEYSTORE_PATH=${{ env.ANDROID_KEYSTORE_PATH }} \
+            -PANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }} \
+            -PANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }} \
+            -PANDROID_STORE_PASSWORD=${{ secrets.ANDROID_STORE_PASSWORD }}
+
+      - name: Build APK
+        if: inputs.profile == 'preview'
+        run: |
+          cd android
+          ./gradlew assembleRelease \
+            -PANDROID_KEYSTORE_PATH=${{ env.ANDROID_KEYSTORE_PATH }} \
+            -PANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }} \
+            -PANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }} \
+            -PANDROID_STORE_PASSWORD=${{ secrets.ANDROID_STORE_PASSWORD }}
+
+      # -----------------------------------------------------------------------
+      # Upload Artifact
+      # -----------------------------------------------------------------------
+      - name: Get version
+        id: version
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
+
+      - name: Upload AAB
+        if: inputs.profile == 'production'
+        uses: actions/upload-artifact@v4
+        with:
+          name: 1x1-trainer-v${{ steps.version.outputs.version }}-release.aab
+          path: android/app/build/outputs/bundle/release/*.aab
+          retention-days: 90
+
+      - name: Upload APK
+        if: inputs.profile == 'preview'
+        uses: actions/upload-artifact@v4
+        with:
+          name: 1x1-trainer-v${{ steps.version.outputs.version }}-preview.apk
+          path: android/app/build/outputs/apk/release/*.apk
+          retention-days: 30
+
+      - name: Build Summary
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| | |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Profile** | ${{ inputs.profile }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Version** | $VERSION (versionCode $VERSION_CODE) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Download the artifact above to install or submit to Play Store." >> $GITHUB_STEP_SUMMARY
