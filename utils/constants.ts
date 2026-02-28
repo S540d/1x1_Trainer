@@ -4,7 +4,7 @@
 
 import { GameMode, NumberRange, Operation } from '../types/game';
 
-export const APP_VERSION = '1.2.0';
+export const APP_VERSION = '1.2.1';
 
 // Game Configuration
 export const TOTAL_TASKS = 10;
