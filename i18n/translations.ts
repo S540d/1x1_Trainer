@@ -38,6 +38,7 @@ export interface TranslationStrings {
   feedback: string;
   support: string;
   about: string;
+  aboutDescription: string;
   version: string;
   copyright: string;
   license: string;
@@ -115,8 +116,9 @@ export const translations: Record<Language, TranslationStrings> = {
     feedback: 'Send Feedback',
     support: 'Support me',
     about: 'ABOUT',
+    aboutDescription: 'A math trainer for children with multiple game modes.',
     version: 'Version',
-    copyright: '© 2025',
+    copyright: '© 2025 S540d',
     license: 'License: MIT',
     contact: 'Contact: devsven@posteo.de',
     // Game UI
@@ -190,8 +192,9 @@ export const translations: Record<Language, TranslationStrings> = {
     feedback: 'Feedback senden',
     support: 'Support me',
     about: 'ÜBER',
+    aboutDescription: 'Ein Rechentrainer für Kinder mit verschiedenen Spielmodi.',
     version: 'Version',
-    copyright: '© 2025',
+    copyright: '© 2025 S540d',
     license: 'Lizenz: MIT',
     contact: 'Kontakt: devsven@posteo.de',
     // Game UI
