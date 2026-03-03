@@ -15,7 +15,7 @@ import { StatusBar } from 'expo-status-bar';
 // Local imports
 import { Operation, AnswerMode, DifficultyMode, NumberRange, ThemeColors } from './types/game';
 import { translations } from './i18n/translations';
-import { APP_VERSION, CHALLENGE_MAX_LIVES } from './utils/constants';
+import { APP_VERSION, APP_NAME, CONTACT_EMAIL, CHALLENGE_MAX_LIVES } from './utils/constants';
 import { useTheme } from './hooks/useTheme';
 import { usePreferences } from './hooks/usePreferences';
 import { useGameLogic } from './hooks/useGameLogic';
@@ -313,7 +313,7 @@ export default function App() {
               <TouchableOpacity
                 style={styles.settingsMenuLinkFlex}
                 onPress={() => {
-                  Linking.openURL('mailto:devsven@posteo.de?subject=1x1 Trainer Feedback');
+                  Linking.openURL(`mailto:${CONTACT_EMAIL}?subject=1x1 Trainer Feedback`);
                   setMenuVisible(false);
                 }}
               >
@@ -601,7 +601,7 @@ export default function App() {
               </TouchableOpacity>
             </View>
             <Text style={[styles.aboutModalAppName, { color: colors.text }]}>
-              1×1 Trainer
+              {APP_NAME}
             </Text>
             <Text style={[styles.aboutModalInfoText, { color: colors.text }]}>
               {t.version} {APP_VERSION}
@@ -617,7 +617,7 @@ export default function App() {
               {t.license}
             </Text>
             <TouchableOpacity
-              onPress={() => Linking.openURL('mailto:devsven@posteo.de')}
+              onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}`)}
             >
               <Text style={[styles.aboutModalInfoText, { color: '#4F46E5' }]}>
                 {t.contact}
