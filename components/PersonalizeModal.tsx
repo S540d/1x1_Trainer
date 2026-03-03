@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 60,
     right: 16,
-    minWidth: 200,
+    left: 16,
     borderRadius: 20,
     elevation: 8,
     shadowColor: '#000',
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
   },
   settingsMenuTitle: {
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   },
   settingsSection: {
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
   },
   settingsSectionTitle: {
     fontSize: 12,
@@ -256,6 +256,6 @@ const styles = StyleSheet.create({
   settingsDivider: {
     height: 1,
     backgroundColor: 'rgba(0,0,0,0.1)',
-    marginVertical: 8,
+    marginVertical: 4,
   },
 });
