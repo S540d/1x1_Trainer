@@ -600,18 +600,29 @@ export default function App() {
                 <Text style={[styles.aboutModalCloseText, { color: colors.text }]}>✕</Text>
               </TouchableOpacity>
             </View>
+            <Text style={[styles.aboutModalAppName, { color: colors.text }]}>
+              1×1 Trainer
+            </Text>
             <Text style={[styles.aboutModalInfoText, { color: colors.text }]}>
               {t.version} {APP_VERSION}
             </Text>
+            <Text style={[styles.aboutModalInfoText, { color: colors.textSecondary }]}>
+              {t.aboutDescription}
+            </Text>
+            <View style={styles.aboutModalDivider} />
             <Text style={[styles.aboutModalInfoText, { color: colors.textSecondary }]}>
               {t.copyright}
             </Text>
             <Text style={[styles.aboutModalInfoText, { color: colors.textSecondary }]}>
               {t.license}
             </Text>
-            <Text style={[styles.aboutModalInfoText, { color: colors.textSecondary }]}>
-              {t.contact}
-            </Text>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('mailto:devsven@posteo.de')}
+            >
+              <Text style={[styles.aboutModalInfoText, { color: '#4F46E5' }]}>
+                {t.contact}
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity
               style={styles.restartButton}
               onPress={() => setAboutVisible(false)}
@@ -760,7 +771,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 60,
     right: 16,
-    minWidth: 200,
+    left: 16,
     borderRadius: 20,
     backgroundColor: '#fff',
     elevation: 8,
@@ -777,7 +788,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
   },
   settingsMenuTitle: {
@@ -834,7 +845,7 @@ const styles = StyleSheet.create({
   },
   settingsSection: {
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
   },
   settingsSectionRow: {
     flexDirection: 'row',
@@ -908,7 +919,7 @@ const styles = StyleSheet.create({
   settingsDivider: {
     height: 1,
     backgroundColor: 'rgba(0,0,0,0.1)',
-    marginVertical: 8,
+    marginVertical: 4,
   },
   settingsAboutText: {
     fontSize: 12,
@@ -1124,9 +1135,10 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     borderRadius: 24,
-    padding: 16,
+    padding: 24,
     alignItems: 'center',
-    minWidth: 280,
+    width: '85%',
+    maxWidth: 400,
     elevation: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
@@ -1189,12 +1201,23 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  aboutModalAppName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
   aboutModalInfoText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '400',
-    marginTop: 8,
-    marginBottom: 16,
-    lineHeight: 1.5,
+    marginTop: 4,
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+  aboutModalDivider: {
+    height: 1,
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    width: '100%',
+    marginVertical: 8,
   },
   numberRangeGrid: {
     flexDirection: 'row',
