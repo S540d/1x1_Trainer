@@ -96,6 +96,47 @@ jobs:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
       # -----------------------------------------------------------------------
+      # Inject signing config into build.gradle (expo prebuild doesn't add it)
+      # -----------------------------------------------------------------------
+      - name: Configure Gradle Signing
+        run: |
+          GRADLE_FILE="android/app/build.gradle"
+          if ! grep -q "ANDROID_KEYSTORE_PATH" "$GRADLE_FILE"; then
+            echo "📝 Injecting signingConfigs into build.gradle..."
+            sed -i '/android {/a\
+              signingConfigs {\
+                  release {\
+                      if (project.hasProperty('\''ANDROID_KEYSTORE_PATH'\'')) {\
+                          storeFile file(project.property('\''ANDROID_KEYSTORE_PATH'\''))\
+                          keyAlias project.property('\''ANDROID_KEY_ALIAS'\'')\
+                          keyPassword project.property('\''ANDROID_KEY_PASSWORD'\'')\
+                          storePassword project.property('\''ANDROID_STORE_PASSWORD'\'')\
+                      }\
+                  }\
+              }' "$GRADLE_FILE"
+            sed -i 's/signingConfig signingConfigs.debug/signingConfig signingConfigs.release/' "$GRADLE_FILE"
+            echo "✅ Signing config injected"
+          else
+            echo "✅ Signing config already present"
+          fi
+
+      - name: Verify Keystore Fingerprint
+        run: |
+          EXPECTED_SHA1="3F:1F:1E:16:56:BB:01:36:40:50:76:E8:44:73:9D:01:A3:B8:D4:78"
+          ACTUAL_SHA1=$(keytool -list -v -keystore android/app/release.keystore -storepass "$STORE_PASSWORD" 2>/dev/null | grep "SHA1:" | head -1 | sed 's/.*SHA1: //')
+          echo "Expected SHA1: $EXPECTED_SHA1"
+          echo "Actual SHA1:   $ACTUAL_SHA1"
+          if [ "$ACTUAL_SHA1" != "$EXPECTED_SHA1" ]; then
+            echo "❌ ERROR: Keystore SHA1 fingerprint does NOT match!"
+            echo "The ANDROID_KEYSTORE_BASE64 secret contains the wrong keystore."
+            echo "Please update the secret with the correct keystore."
+            exit 1
+          fi
+          echo "✅ Keystore fingerprint verified"
+        env:
+          STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+
+      # -----------------------------------------------------------------------
       # Build AAB (production) or APK (preview)
       # Secrets passed via ORG_GRADLE_PROJECT_ env vars (not visible in process list)
       # -----------------------------------------------------------------------
