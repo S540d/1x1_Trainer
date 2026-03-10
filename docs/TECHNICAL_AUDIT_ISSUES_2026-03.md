@@ -105,7 +105,7 @@ Audit-Snapshot vom 2026-03-10.
 
 ---
 
-## 3) Issue-Entwurf: Pflanzkallender / Pflanzkalender
+## 3) Issue-Entwurf: Pflanzkalender
 
 **Titel:** 📋 Technical Updates & Maintenance Audit - Pflanzkalender (Q1 2026)
 
