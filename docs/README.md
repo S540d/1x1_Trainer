@@ -4,6 +4,7 @@
 
 ### Release & Planung
 - **[NEXT_RELEASE.md](NEXT_RELEASE.md)** - Offene Issues und Release-Prozess
+- **[TECHNICAL_AUDIT_ISSUES_2026-03.md](TECHNICAL_AUDIT_ISSUES_2026-03.md)** - Konsolidierte Audit-Issue-Entwürfe (Eisenhauer, 1x1 Trainer, Pflanzkalender)
 - **[RELEASE_NOTES_TEMPLATE.md](RELEASE_NOTES_TEMPLATE.md)** - Vorlagen für Play Store & GitHub
 - **[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)** - Pre-Release Checkliste
 - **[../CHANGELOG.md](../CHANGELOG.md)** - Vollständiges Changelog
