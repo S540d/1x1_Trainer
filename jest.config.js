@@ -28,9 +28,8 @@ module.exports = {
   ],
   moduleNameMapper: {
     '^react-native$': 'react-native-web',
-    '^react-native-reanimated$': 'react-native-reanimated/mock',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(expo-localization|react-native-reanimated)/)',
+    'node_modules/(?!(expo-localization)/)',
   ],
 };

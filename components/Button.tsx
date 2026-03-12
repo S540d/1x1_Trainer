@@ -1,12 +1,6 @@
-import React from 'react';
-import { Text, StyleSheet, Pressable } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
+import React, { useRef } from 'react';
+import { Text, StyleSheet, Pressable, Animated } from 'react-native';
 import { ThemeColors } from '../types/game';
-import { SPRING_CONFIG } from '../utils/animations';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger';
 
@@ -33,22 +27,42 @@ export function Button({
   fullWidth = false,
   colors,
 }: ButtonProps) {
-  const scale = useSharedValue(1);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+  const scale = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
-    scale.value = withSpring(0.96, SPRING_CONFIG.PRESS);
+    Animated.spring(scale, {
+      toValue: 0.96,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1.0, SPRING_CONFIG.GENTLE);
+    Animated.spring(scale, {
+      toValue: 1.0,
+      useNativeDriver: true,
+      speed: 30,
+      bounciness: 6,
+    }).start();
   };
 
   const bg = disabled ? colors.buttonInactive : VARIANT_BG[variant];
   const isOutline = variant === 'secondary';
+
+  const labelStyle = [
+    styles.label,
+    { color: disabled ? colors.buttonInactiveText : '#FFFFFF' },
+    isOutline && !disabled && { color: colors.text },
+  ];
+
+  const viewStyle = [
+    styles.button,
+    { backgroundColor: bg },
+    isOutline && { borderWidth: 1.5, borderColor: colors.border },
+    fullWidth && styles.fullWidth,
+    disabled && styles.disabled,
+  ];
 
   return (
     <Pressable
@@ -57,25 +71,8 @@ export function Button({
       onPressOut={handlePressOut}
       disabled={disabled}
     >
-      <Animated.View
-        style={[
-          styles.button,
-          { backgroundColor: bg },
-          isOutline && { borderWidth: 1.5, borderColor: colors.border },
-          fullWidth && styles.fullWidth,
-          disabled && styles.disabled,
-          animatedStyle,
-        ]}
-      >
-        <Text
-          style={[
-            styles.label,
-            { color: disabled ? colors.buttonInactiveText : '#FFFFFF' },
-            isOutline && !disabled && { color: colors.text },
-          ]}
-        >
-          {label}
-        </Text>
+      <Animated.View style={[...viewStyle, { transform: [{ scale }] }]}>
+        <Text style={labelStyle}>{label}</Text>
       </Animated.View>
     </Pressable>
   );

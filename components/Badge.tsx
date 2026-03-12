@@ -1,13 +1,5 @@
-import React, { useEffect } from 'react';
-import { Text, StyleSheet } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSequence,
-  withTiming,
-  withSpring,
-} from 'react-native-reanimated';
-import { SPRING_CONFIG } from '../utils/animations';
+import React, { useEffect, useRef } from 'react';
+import { Text, StyleSheet, Animated } from 'react-native';
 
 type BadgeVariant = 'default' | 'success' | 'warning' | 'error';
 
@@ -25,27 +17,32 @@ const VARIANT_COLORS: Record<BadgeVariant, string> = {
 };
 
 export function Badge({ value, variant = 'default', animated = false }: BadgeProps) {
-  const scale = useSharedValue(1);
-  const prevValue = React.useRef(value);
+  const scale = useRef(new Animated.Value(1)).current;
+  const prevValue = useRef(value);
 
   useEffect(() => {
     if (animated && prevValue.current !== value) {
-      scale.value = withSequence(
-        withSpring(1.25, SPRING_CONFIG.BOUNCE),
-        withTiming(1.0, { duration: 150 })
-      );
+      Animated.sequence([
+        Animated.spring(scale, {
+          toValue: 1.25,
+          useNativeDriver: true,
+          speed: 30,
+          bounciness: 10,
+        }),
+        Animated.timing(scale, {
+          toValue: 1.0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
     prevValue.current = value;
   }, [value, animated, scale]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
   const bgColor = VARIANT_COLORS[variant];
 
   return (
-    <Animated.View style={[styles.badge, { backgroundColor: bgColor }, animatedStyle]}>
+    <Animated.View style={[styles.badge, { backgroundColor: bgColor, transform: [{ scale }] }]}>
       <Text style={styles.text}>{value}</Text>
     </Animated.View>
   );

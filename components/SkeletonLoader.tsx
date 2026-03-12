@@ -1,15 +1,6 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-  interpolateColor,
-  type SharedValue,
-} from 'react-native-reanimated';
+import React, { useEffect, useRef } from 'react';
+import { View, StyleSheet, Animated } from 'react-native';
 import { ThemeColors } from '../types/game';
-import { ANIMATION_DURATIONS } from '../utils/animations';
 
 interface SkeletonLoaderProps {
   colors: ThemeColors;
@@ -22,28 +13,36 @@ function SkeletonBlock({
 }: {
   style?: object;
   colors: ThemeColors;
-  progress: SharedValue<number>;
+  progress: Animated.Value;
 }) {
-  const animatedStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      progress.value,
-      [0, 1],
-      [colors.card, colors.border]
-    ),
-  }));
+  const backgroundColor = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [colors.card, colors.border],
+  });
 
-  return <Animated.View style={[styles.block, style, animatedStyle]} />;
+  return <Animated.View style={[styles.block, style, { backgroundColor }]} />;
 }
 
 export function SkeletonLoader({ colors }: SkeletonLoaderProps) {
-  const progress = useSharedValue(0);
+  const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    progress.value = withRepeat(
-      withTiming(1, { duration: ANIMATION_DURATIONS.SKELETON }),
-      -1,
-      true
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(progress, {
+          toValue: 1,
+          duration: 1200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(progress, {
+          toValue: 0,
+          duration: 1200,
+          useNativeDriver: false,
+        }),
+      ])
     );
+    animation.start();
+    return () => animation.stop();
   }, [progress]);
 
   return (

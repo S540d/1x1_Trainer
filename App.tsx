@@ -11,15 +11,8 @@ import {
   SafeAreaView,
   useWindowDimensions,
   AccessibilityInfo,
+  Animated,
 } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSpring,
-  withSequence,
-  runOnJS,
-} from 'react-native-reanimated';
 import { StatusBar } from 'expo-status-bar';
 
 // Local imports
@@ -31,7 +24,7 @@ import { usePreferences } from './hooks/usePreferences';
 import { useGameLogic } from './hooks/useGameLogic';
 import { PersonalizeModal } from './components/PersonalizeModal';
 import { SkeletonLoader } from './components/SkeletonLoader';
-import { ANIMATION_DURATIONS, SPRING_CONFIG } from './utils/animations';
+import { ANIMATION_DURATIONS } from './utils/animations';
 
 export default function App() {
   const [menuRendered, setMenuRendered] = useState(false);
@@ -53,10 +46,10 @@ export default function App() {
   }, []);
 
   // Animation values
-  const cardScale = useSharedValue(1);
-  const cardShakeX = useSharedValue(0);
-  const menuTranslateY = useSharedValue(-300);
-  const menuOpacity = useSharedValue(0);
+  const cardScale = useRef(new Animated.Value(1)).current;
+  const cardShakeX = useRef(new Animated.Value(0)).current;
+  const menuTranslateY = useRef(new Animated.Value(-300)).current;
+  const menuOpacity = useRef(new Animated.Value(0)).current;
 
   // Use custom hooks
   const preferences = usePreferences();
@@ -80,38 +73,59 @@ export default function App() {
   const { height: screenHeight } = useWindowDimensions();
 
   // Animated styles
-  const cardAnimatedStyle = useAnimatedStyle(() => ({
+  const cardAnimatedStyle = {
     transform: [
-      { scale: cardScale.value },
-      { translateX: cardShakeX.value },
+      { scale: cardScale },
+      { translateX: cardShakeX },
     ],
-  }));
+  };
 
-  const menuAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: menuTranslateY.value }],
-    opacity: menuOpacity.value,
-  }));
+  const menuAnimatedStyle = {
+    transform: [{ translateY: menuTranslateY }],
+    opacity: menuOpacity,
+  };
 
   const showMenu = () => {
     setMenuRendered(true);
     if (reduceMotion.current) {
-      menuTranslateY.value = 0;
-      menuOpacity.value = 1;
+      menuTranslateY.setValue(0);
+      menuOpacity.setValue(1);
     } else {
-      menuTranslateY.value = withSpring(0, SPRING_CONFIG.GENTLE);
-      menuOpacity.value = withTiming(1, { duration: ANIMATION_DURATIONS.FAST });
+      Animated.parallel([
+        Animated.spring(menuTranslateY, {
+          toValue: 0,
+          useNativeDriver: true,
+          speed: 30,
+          bounciness: 6,
+        }),
+        Animated.timing(menuOpacity, {
+          toValue: 1,
+          duration: ANIMATION_DURATIONS.FAST,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
   };
 
   const hideMenu = () => {
     if (reduceMotion.current) {
-      menuTranslateY.value = -300;
-      menuOpacity.value = 0;
+      menuTranslateY.setValue(-300);
+      menuOpacity.setValue(0);
       setMenuRendered(false);
     } else {
-      menuTranslateY.value = withTiming(-300, { duration: ANIMATION_DURATIONS.NORMAL });
-      menuOpacity.value = withTiming(0, { duration: ANIMATION_DURATIONS.NORMAL }, (finished) => {
-        if (finished) runOnJS(setMenuRendered)(false);
+      Animated.parallel([
+        Animated.timing(menuTranslateY, {
+          toValue: -300,
+          duration: ANIMATION_DURATIONS.NORMAL,
+          useNativeDriver: true,
+        }),
+        Animated.timing(menuOpacity, {
+          toValue: 0,
+          duration: ANIMATION_DURATIONS.NORMAL,
+          useNativeDriver: true,
+        }),
+      ]).start(({ finished }) => {
+        if (finished) setMenuRendered(false);
       });
     }
   };
@@ -127,24 +141,30 @@ export default function App() {
   useEffect(() => {
     if (!game.gameState.isAnswerChecked || reduceMotion.current) return;
     if (game.gameState.lastAnswerCorrect === true) {
-      cardScale.value = withSequence(
-        withSpring(1.04, SPRING_CONFIG.BOUNCE),
-        withSpring(1.0, SPRING_CONFIG.GENTLE)
-      );
+      Animated.sequence([
+        Animated.spring(cardScale, {
+          toValue: 1.04,
+          useNativeDriver: true,
+          speed: 30,
+          bounciness: 10,
+        }),
+        Animated.spring(cardScale, {
+          toValue: 1.0,
+          useNativeDriver: true,
+          speed: 30,
+          bounciness: 6,
+        }),
+      ]).start();
     } else if (game.gameState.lastAnswerCorrect === false) {
-      cardShakeX.value = withSequence(
-        withTiming(-8, { duration: 60 }),
-        withTiming(8, { duration: 60 }),
-        withTiming(-5, { duration: 60 }),
-        withTiming(5, { duration: 60 }),
-        withTiming(0, { duration: 60 })
-      );
+      Animated.sequence([
+        Animated.timing(cardShakeX, { toValue: -8, duration: 60, useNativeDriver: true }),
+        Animated.timing(cardShakeX, { toValue: 8, duration: 60, useNativeDriver: true }),
+        Animated.timing(cardShakeX, { toValue: -5, duration: 60, useNativeDriver: true }),
+        Animated.timing(cardShakeX, { toValue: 5, duration: 60, useNativeDriver: true }),
+        Animated.timing(cardShakeX, { toValue: 0, duration: 60, useNativeDriver: true }),
+      ]).start();
     }
   }, [game.gameState.isAnswerChecked, game.gameState.lastAnswerCorrect]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  if (!preferences.isLoaded) {
-    return <SkeletonLoader colors={colors} />;
-  }
 
   // Generate first question on mount
   useEffect(() => {
@@ -163,6 +183,10 @@ export default function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game.gameState.selectedOperations]);
+
+  if (!preferences.isLoaded) {
+    return <SkeletonLoader colors={colors} />;
+  }
 
   const getCardColor = () => {
     if (game.gameState.lastAnswerCorrect === true) return colors.cardCorrect;
@@ -792,24 +816,33 @@ function NumpadButton({
   colors: ThemeColors;
   reduceMotion: React.MutableRefObject<boolean>;
 }) {
-  const scale = useSharedValue(1);
+  const scale = useRef(new Animated.Value(1)).current;
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+  const handlePressIn = () => {
+    if (!reduceMotion.current) {
+      Animated.spring(scale, { toValue: 0.92, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
+    }
+  };
+
+  const handlePressOut = () => {
+    if (!reduceMotion.current) {
+      Animated.spring(scale, { toValue: 1.0, useNativeDriver: true, speed: 30, bounciness: 6 }).start();
+    }
+  };
 
   return (
     <Pressable
+      style={{ flex: 1 }}
       onPress={onPress}
-      onPressIn={() => { if (!reduceMotion.current) scale.value = withSpring(0.92, SPRING_CONFIG.PRESS); }}
-      onPressOut={() => { if (!reduceMotion.current) scale.value = withSpring(1.0, SPRING_CONFIG.GENTLE); }}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
     >
       <Animated.View
         style={[
           styles.numpadButton,
           { borderColor: isSpecial ? colors.textSecondary : colors.border },
           isSpecial && styles.numpadButtonSpecial,
-          animatedStyle,
+          { transform: [{ scale }] },
         ]}
       >
         <Text style={[styles.numpadButtonText, { color: colors.text }]}>{text}</Text>
@@ -1108,6 +1141,8 @@ const styles = StyleSheet.create({
   },
   numpadRow: {
     flexDirection: 'row',
+    alignItems: 'stretch',
+    height: 60,
     gap: 8,
     marginBottom: 8,
   },
