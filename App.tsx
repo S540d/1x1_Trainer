@@ -1,15 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
+  Pressable,
   Modal,
   Linking,
   ScrollView,
   SafeAreaView,
   useWindowDimensions,
+  AccessibilityInfo,
 } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  withSequence,
+  runOnJS,
+} from 'react-native-reanimated';
 import { StatusBar } from 'expo-status-bar';
 
 // Local imports
@@ -20,13 +30,33 @@ import { useTheme } from './hooks/useTheme';
 import { usePreferences } from './hooks/usePreferences';
 import { useGameLogic } from './hooks/useGameLogic';
 import { PersonalizeModal } from './components/PersonalizeModal';
+import { SkeletonLoader } from './components/SkeletonLoader';
+import { ANIMATION_DURATIONS, SPRING_CONFIG } from './utils/animations';
 
 export default function App() {
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [menuRendered, setMenuRendered] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
   const [personalizeVisible, setPersonalizeVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
+
+  // Reduced motion preference
+  const reduceMotion = useRef(false);
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
+      reduceMotion.current = enabled;
+    });
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', (enabled) => {
+      reduceMotion.current = enabled;
+    });
+    return () => sub.remove();
+  }, []);
+
+  // Animation values
+  const cardScale = useSharedValue(1);
+  const cardShakeX = useSharedValue(0);
+  const menuTranslateY = useSharedValue(-300);
+  const menuOpacity = useSharedValue(0);
 
   // Use custom hooks
   const preferences = usePreferences();
@@ -49,12 +79,72 @@ export default function App() {
   const { colors, isDarkMode } = theme;
   const { height: screenHeight } = useWindowDimensions();
 
+  // Animated styles
+  const cardAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { scale: cardScale.value },
+      { translateX: cardShakeX.value },
+    ],
+  }));
+
+  const menuAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: menuTranslateY.value }],
+    opacity: menuOpacity.value,
+  }));
+
+  const showMenu = () => {
+    setMenuRendered(true);
+    if (reduceMotion.current) {
+      menuTranslateY.value = 0;
+      menuOpacity.value = 1;
+    } else {
+      menuTranslateY.value = withSpring(0, SPRING_CONFIG.GENTLE);
+      menuOpacity.value = withTiming(1, { duration: ANIMATION_DURATIONS.FAST });
+    }
+  };
+
+  const hideMenu = () => {
+    if (reduceMotion.current) {
+      menuTranslateY.value = -300;
+      menuOpacity.value = 0;
+      setMenuRendered(false);
+    } else {
+      menuTranslateY.value = withTiming(-300, { duration: ANIMATION_DURATIONS.NORMAL });
+      menuOpacity.value = withTiming(0, { duration: ANIMATION_DURATIONS.NORMAL }, (finished) => {
+        if (finished) runOnJS(setMenuRendered)(false);
+      });
+    }
+  };
+
   // Set body background color dynamically on web
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.body.style.backgroundColor = isDarkMode ? '#0F1419' : '#F0F4FF';
     }
   }, [isDarkMode]);
+
+  // Card feedback animation (skipped when reduce motion is enabled)
+  useEffect(() => {
+    if (!game.gameState.isAnswerChecked || reduceMotion.current) return;
+    if (game.gameState.lastAnswerCorrect === true) {
+      cardScale.value = withSequence(
+        withSpring(1.04, SPRING_CONFIG.BOUNCE),
+        withSpring(1.0, SPRING_CONFIG.GENTLE)
+      );
+    } else if (game.gameState.lastAnswerCorrect === false) {
+      cardShakeX.value = withSequence(
+        withTiming(-8, { duration: 60 }),
+        withTiming(8, { duration: 60 }),
+        withTiming(-5, { duration: 60 }),
+        withTiming(5, { duration: 60 }),
+        withTiming(0, { duration: 60 })
+      );
+    }
+  }, [game.gameState.isAnswerChecked, game.gameState.lastAnswerCorrect]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!preferences.isLoaded) {
+    return <SkeletonLoader colors={colors} />;
+  }
 
   // Generate first question on mount
   useEffect(() => {
@@ -110,7 +200,7 @@ export default function App() {
           </>
         )}
         <TouchableOpacity
-          onPress={() => setMenuVisible(true)}
+          onPress={showMenu}
           style={styles.settingsButton}
           aria-label="Settings"
         >
@@ -119,19 +209,19 @@ export default function App() {
       </View>
 
       {/* Settings Menu */}
-      {menuVisible && (
+      {menuRendered && (
         <>
           <TouchableOpacity
             style={[styles.settingsOverlay, { backgroundColor: colors.settingsOverlay }]}
             activeOpacity={1}
-            onPress={() => setMenuVisible(false)}
+            onPress={hideMenu}
           />
-          <View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu, maxHeight: screenHeight - 80 }]}>
+          <Animated.View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu, maxHeight: screenHeight - 80 }, menuAnimatedStyle]}>
             <View style={[styles.settingsMenuHeader, { borderBottomColor: colors.border }]}>
               <Text style={[styles.settingsMenuTitle, { color: colors.text }]}>Settings</Text>
               <TouchableOpacity
                 style={styles.settingsMenuCloseButton}
-                onPress={() => setMenuVisible(false)}
+                onPress={hideMenu}
               >
                 <Text style={[styles.settingsMenuCloseButtonText, { color: colors.text }]}>✕</Text>
               </TouchableOpacity>
@@ -144,7 +234,7 @@ export default function App() {
                 style={[styles.personalizeButton, { borderColor: colors.border }]}
                 onPress={() => {
                   setPersonalizeVisible(true);
-                  setMenuVisible(false);
+                  hideMenu();
                 }}
               >
                 <Text style={[styles.personalizeButtonText, { color: colors.text }]}>{t.personalize}</Text>
@@ -242,7 +332,7 @@ export default function App() {
                   ]}
                   onPress={() => {
                     game.changeDifficultyMode(DifficultyMode.CHALLENGE);
-                    setMenuVisible(false);
+                    hideMenu();
                   }}
                 >
                   <Text
@@ -314,7 +404,7 @@ export default function App() {
                 style={styles.settingsMenuLinkFlex}
                 onPress={() => {
                   Linking.openURL(`mailto:${CONTACT_EMAIL}?subject=1x1 Trainer Feedback`);
-                  setMenuVisible(false);
+                  hideMenu();
                 }}
               >
                 <Text style={styles.settingsMenuLinkText}>{t.feedback}</Text>
@@ -323,7 +413,7 @@ export default function App() {
                 style={styles.settingsMenuLinkFlex}
                 onPress={() => {
                   Linking.openURL('https://ko-fi.com/devsven');
-                  setMenuVisible(false);
+                  hideMenu();
                 }}
               >
                 <Text style={styles.settingsMenuLinkText}>{t.support}</Text>
@@ -332,19 +422,19 @@ export default function App() {
                 style={styles.settingsMenuLinkFlex}
                 onPress={() => {
                   setAboutVisible(true);
-                  setMenuVisible(false);
+                  hideMenu();
                 }}
               >
                 <Text style={styles.settingsMenuLinkText}>{t.about}</Text>
               </TouchableOpacity>
             </View>
             </ScrollView>
-          </View>
+          </Animated.View>
         </>
       )}
 
       <View style={styles.contentArea}>
-        <View style={[styles.questionCard, { backgroundColor: getCardColor() }]}>
+        <Animated.View style={[styles.questionCard, { backgroundColor: getCardColor() }, cardAnimatedStyle]}>
           <View style={styles.questionRow}>
             {/* First number or answer box */}
             {game.gameState.questionPart === 0 ? (
@@ -419,6 +509,7 @@ export default function App() {
                 userAnswer={game.gameState.userAnswer}
                 isAnswerChecked={game.gameState.isAnswerChecked}
                 colors={colors}
+                reduceMotion={reduceMotion}
               />
             )}
 
@@ -502,7 +593,7 @@ export default function App() {
               </View>
             )}
           </View>
-        </View>
+        </Animated.View>
       </View>
 
       <Modal visible={game.gameState.showResult} transparent animationType="fade">
@@ -641,34 +732,36 @@ function Numpad({
   onCheck,
   userAnswer,
   isAnswerChecked,
-  colors
+  colors,
+  reduceMotion,
 }: {
   onNumberClick: (num: number) => void;
   onCheck: () => void;
   userAnswer: string;
   isAnswerChecked: boolean;
   colors: ThemeColors;
+  reduceMotion: React.MutableRefObject<boolean>;
 }) {
   return (
     <View style={styles.numpad}>
       <View style={styles.numpadRow}>
-        <NumpadButton text="1" onPress={() => onNumberClick(1)} colors={colors} />
-        <NumpadButton text="2" onPress={() => onNumberClick(2)} colors={colors} />
-        <NumpadButton text="3" onPress={() => onNumberClick(3)} colors={colors} />
+        <NumpadButton text="1" onPress={() => onNumberClick(1)} colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="2" onPress={() => onNumberClick(2)} colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="3" onPress={() => onNumberClick(3)} colors={colors} reduceMotion={reduceMotion} />
       </View>
       <View style={styles.numpadRow}>
-        <NumpadButton text="4" onPress={() => onNumberClick(4)} colors={colors} />
-        <NumpadButton text="5" onPress={() => onNumberClick(5)} colors={colors} />
-        <NumpadButton text="6" onPress={() => onNumberClick(6)} colors={colors} />
+        <NumpadButton text="4" onPress={() => onNumberClick(4)} colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="5" onPress={() => onNumberClick(5)} colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="6" onPress={() => onNumberClick(6)} colors={colors} reduceMotion={reduceMotion} />
       </View>
       <View style={styles.numpadRow}>
-        <NumpadButton text="7" onPress={() => onNumberClick(7)} colors={colors} />
-        <NumpadButton text="8" onPress={() => onNumberClick(8)} colors={colors} />
-        <NumpadButton text="9" onPress={() => onNumberClick(9)} colors={colors} />
+        <NumpadButton text="7" onPress={() => onNumberClick(7)} colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="8" onPress={() => onNumberClick(8)} colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="9" onPress={() => onNumberClick(9)} colors={colors} reduceMotion={reduceMotion} />
       </View>
       <View style={styles.numpadRow}>
-        <NumpadButton text="←" onPress={() => onNumberClick(-1)} isSpecial colors={colors} />
-        <NumpadButton text="0" onPress={() => onNumberClick(0)} colors={colors} />
+        <NumpadButton text="←" onPress={() => onNumberClick(-1)} isSpecial colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="0" onPress={() => onNumberClick(0)} colors={colors} reduceMotion={reduceMotion} />
         <TouchableOpacity
           style={[
             styles.numpadButtonCheck,
@@ -690,24 +783,38 @@ function NumpadButton({
   text,
   onPress,
   isSpecial = false,
-  colors
+  colors,
+  reduceMotion,
 }: {
   text: string;
   onPress: () => void;
   isSpecial?: boolean;
   colors: ThemeColors;
+  reduceMotion: React.MutableRefObject<boolean>;
 }) {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   return (
-    <TouchableOpacity
-      style={[
-        styles.numpadButton, 
-        { borderColor: isSpecial ? colors.textSecondary : colors.border },
-        isSpecial && styles.numpadButtonSpecial
-      ]}
+    <Pressable
       onPress={onPress}
+      onPressIn={() => { if (!reduceMotion.current) scale.value = withSpring(0.92, SPRING_CONFIG.PRESS); }}
+      onPressOut={() => { if (!reduceMotion.current) scale.value = withSpring(1.0, SPRING_CONFIG.GENTLE); }}
     >
-      <Text style={[styles.numpadButtonText, { color: colors.text }]}>{text}</Text>
-    </TouchableOpacity>
+      <Animated.View
+        style={[
+          styles.numpadButton,
+          { borderColor: isSpecial ? colors.textSecondary : colors.border },
+          isSpecial && styles.numpadButtonSpecial,
+          animatedStyle,
+        ]}
+      >
+        <Text style={[styles.numpadButtonText, { color: colors.text }]}>{text}</Text>
+      </Animated.View>
+    </Pressable>
   );
 }
 
