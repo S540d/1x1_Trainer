@@ -1001,8 +1001,6 @@ const styles = StyleSheet.create({
   },
   numpadRow: {
     flexDirection: 'row',
-    alignItems: 'stretch',
-    height: 60,
     gap: 8,
     marginBottom: 8,
   },
