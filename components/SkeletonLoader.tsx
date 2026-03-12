@@ -6,6 +6,7 @@ import Animated, {
   withRepeat,
   withTiming,
   interpolateColor,
+  type SharedValue,
 } from 'react-native-reanimated';
 import { ThemeColors } from '../types/game';
 import { ANIMATION_DURATIONS } from '../utils/animations';
@@ -21,7 +22,7 @@ function SkeletonBlock({
 }: {
   style?: object;
   colors: ThemeColors;
-  progress: Animated.SharedValue<number>;
+  progress: SharedValue<number>;
 }) {
   const animatedStyle = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(

@@ -71,7 +71,7 @@ export function Button({
           style={[
             styles.label,
             { color: disabled ? colors.buttonInactiveText : '#FFFFFF' },
-            isOutline && { color: colors.text },
+            isOutline && !disabled && { color: colors.text },
           ]}
         >
           {label}

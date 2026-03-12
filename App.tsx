@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,6 +10,7 @@ import {
   ScrollView,
   SafeAreaView,
   useWindowDimensions,
+  AccessibilityInfo,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -38,6 +39,18 @@ export default function App() {
   const [personalizeVisible, setPersonalizeVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
+
+  // Reduced motion preference
+  const reduceMotion = useRef(false);
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
+      reduceMotion.current = enabled;
+    });
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', (enabled) => {
+      reduceMotion.current = enabled;
+    });
+    return () => sub.remove();
+  }, []);
 
   // Animation values
   const cardScale = useSharedValue(1);
@@ -81,15 +94,26 @@ export default function App() {
 
   const showMenu = () => {
     setMenuRendered(true);
-    menuTranslateY.value = withSpring(0, SPRING_CONFIG.GENTLE);
-    menuOpacity.value = withTiming(1, { duration: ANIMATION_DURATIONS.FAST });
+    if (reduceMotion.current) {
+      menuTranslateY.value = 0;
+      menuOpacity.value = 1;
+    } else {
+      menuTranslateY.value = withSpring(0, SPRING_CONFIG.GENTLE);
+      menuOpacity.value = withTiming(1, { duration: ANIMATION_DURATIONS.FAST });
+    }
   };
 
   const hideMenu = () => {
-    menuTranslateY.value = withTiming(-300, { duration: ANIMATION_DURATIONS.NORMAL });
-    menuOpacity.value = withTiming(0, { duration: ANIMATION_DURATIONS.NORMAL }, (finished) => {
-      if (finished) runOnJS(setMenuRendered)(false);
-    });
+    if (reduceMotion.current) {
+      menuTranslateY.value = -300;
+      menuOpacity.value = 0;
+      setMenuRendered(false);
+    } else {
+      menuTranslateY.value = withTiming(-300, { duration: ANIMATION_DURATIONS.NORMAL });
+      menuOpacity.value = withTiming(0, { duration: ANIMATION_DURATIONS.NORMAL }, (finished) => {
+        if (finished) runOnJS(setMenuRendered)(false);
+      });
+    }
   };
 
   // Set body background color dynamically on web
@@ -99,9 +123,9 @@ export default function App() {
     }
   }, [isDarkMode]);
 
-  // Card feedback animation
+  // Card feedback animation (skipped when reduce motion is enabled)
   useEffect(() => {
-    if (!game.gameState.isAnswerChecked) return;
+    if (!game.gameState.isAnswerChecked || reduceMotion.current) return;
     if (game.gameState.lastAnswerCorrect === true) {
       cardScale.value = withSequence(
         withSpring(1.04, SPRING_CONFIG.BOUNCE),
@@ -485,6 +509,7 @@ export default function App() {
                 userAnswer={game.gameState.userAnswer}
                 isAnswerChecked={game.gameState.isAnswerChecked}
                 colors={colors}
+                reduceMotion={reduceMotion}
               />
             )}
 
@@ -707,34 +732,36 @@ function Numpad({
   onCheck,
   userAnswer,
   isAnswerChecked,
-  colors
+  colors,
+  reduceMotion,
 }: {
   onNumberClick: (num: number) => void;
   onCheck: () => void;
   userAnswer: string;
   isAnswerChecked: boolean;
   colors: ThemeColors;
+  reduceMotion: React.MutableRefObject<boolean>;
 }) {
   return (
     <View style={styles.numpad}>
       <View style={styles.numpadRow}>
-        <NumpadButton text="1" onPress={() => onNumberClick(1)} colors={colors} />
-        <NumpadButton text="2" onPress={() => onNumberClick(2)} colors={colors} />
-        <NumpadButton text="3" onPress={() => onNumberClick(3)} colors={colors} />
+        <NumpadButton text="1" onPress={() => onNumberClick(1)} colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="2" onPress={() => onNumberClick(2)} colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="3" onPress={() => onNumberClick(3)} colors={colors} reduceMotion={reduceMotion} />
       </View>
       <View style={styles.numpadRow}>
-        <NumpadButton text="4" onPress={() => onNumberClick(4)} colors={colors} />
-        <NumpadButton text="5" onPress={() => onNumberClick(5)} colors={colors} />
-        <NumpadButton text="6" onPress={() => onNumberClick(6)} colors={colors} />
+        <NumpadButton text="4" onPress={() => onNumberClick(4)} colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="5" onPress={() => onNumberClick(5)} colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="6" onPress={() => onNumberClick(6)} colors={colors} reduceMotion={reduceMotion} />
       </View>
       <View style={styles.numpadRow}>
-        <NumpadButton text="7" onPress={() => onNumberClick(7)} colors={colors} />
-        <NumpadButton text="8" onPress={() => onNumberClick(8)} colors={colors} />
-        <NumpadButton text="9" onPress={() => onNumberClick(9)} colors={colors} />
+        <NumpadButton text="7" onPress={() => onNumberClick(7)} colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="8" onPress={() => onNumberClick(8)} colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="9" onPress={() => onNumberClick(9)} colors={colors} reduceMotion={reduceMotion} />
       </View>
       <View style={styles.numpadRow}>
-        <NumpadButton text="←" onPress={() => onNumberClick(-1)} isSpecial colors={colors} />
-        <NumpadButton text="0" onPress={() => onNumberClick(0)} colors={colors} />
+        <NumpadButton text="←" onPress={() => onNumberClick(-1)} isSpecial colors={colors} reduceMotion={reduceMotion} />
+        <NumpadButton text="0" onPress={() => onNumberClick(0)} colors={colors} reduceMotion={reduceMotion} />
         <TouchableOpacity
           style={[
             styles.numpadButtonCheck,
@@ -756,12 +783,14 @@ function NumpadButton({
   text,
   onPress,
   isSpecial = false,
-  colors
+  colors,
+  reduceMotion,
 }: {
   text: string;
   onPress: () => void;
   isSpecial?: boolean;
   colors: ThemeColors;
+  reduceMotion: React.MutableRefObject<boolean>;
 }) {
   const scale = useSharedValue(1);
 
@@ -772,8 +801,8 @@ function NumpadButton({
   return (
     <Pressable
       onPress={onPress}
-      onPressIn={() => { scale.value = withSpring(0.92, SPRING_CONFIG.PRESS); }}
-      onPressOut={() => { scale.value = withSpring(1.0, SPRING_CONFIG.GENTLE); }}
+      onPressIn={() => { if (!reduceMotion.current) scale.value = withSpring(0.92, SPRING_CONFIG.PRESS); }}
+      onPressOut={() => { if (!reduceMotion.current) scale.value = withSpring(1.0, SPRING_CONFIG.GENTLE); }}
     >
       <Animated.View
         style={[

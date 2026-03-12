@@ -7,7 +7,6 @@ import Animated, {
   withTiming,
   withSpring,
 } from 'react-native-reanimated';
-import { ThemeColors } from '../types/game';
 import { SPRING_CONFIG } from '../utils/animations';
 
 type BadgeVariant = 'default' | 'success' | 'warning' | 'error';
@@ -15,7 +14,6 @@ type BadgeVariant = 'default' | 'success' | 'warning' | 'error';
 interface BadgeProps {
   value: string | number;
   variant?: BadgeVariant;
-  colors: ThemeColors;
   animated?: boolean;
 }
 
@@ -26,7 +24,7 @@ const VARIANT_COLORS: Record<BadgeVariant, string> = {
   error: '#EF4444',
 };
 
-export function Badge({ value, variant = 'default', colors, animated = false }: BadgeProps) {
+export function Badge({ value, variant = 'default', animated = false }: BadgeProps) {
   const scale = useSharedValue(1);
   const prevValue = React.useRef(value);
 
@@ -48,7 +46,7 @@ export function Badge({ value, variant = 'default', colors, animated = false }: 
 
   return (
     <Animated.View style={[styles.badge, { backgroundColor: bgColor }, animatedStyle]}>
-      <Text style={[styles.text, { color: colors.text }]}>{value}</Text>
+      <Text style={styles.text}>{value}</Text>
     </Animated.View>
   );
 }
