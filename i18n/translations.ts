@@ -80,6 +80,8 @@ export interface TranslationStrings {
   challengeResult: string;
   newHighScore: string;
   tryAgain: string;
+  settings: string;
+  ok: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -158,6 +160,8 @@ export const translations: Record<Language, TranslationStrings> = {
     challengeResult: 'You reached level {level} with {score} correct answers.',
     newHighScore: 'New High Score!',
     tryAgain: 'Try Again',
+    settings: 'Settings',
+    ok: 'OK',
   },
   de: {
     // Settings Menu
@@ -234,5 +238,7 @@ export const translations: Record<Language, TranslationStrings> = {
     challengeResult: 'Du hast Stufe {level} erreicht mit {score} richtigen Antworten.',
     newHighScore: 'Neuer Rekord!',
     tryAgain: 'Nochmal',
+    settings: 'Einstellungen',
+    ok: 'OK',
   },
 };
