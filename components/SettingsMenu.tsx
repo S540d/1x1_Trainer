@@ -52,6 +52,7 @@ interface SettingsMenuProps {
     feedback: string;
     support: string;
     about: string;
+    settings: string;
   };
 }
 
@@ -79,7 +80,7 @@ export function SettingsMenu({
       />
       <Animated.View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu, maxHeight: screenHeight - 80 }, menuAnimatedStyle]}>
         <View style={[styles.settingsMenuHeader, { borderBottomColor: colors.border }]}>
-          <Text style={[styles.settingsMenuTitle, { color: colors.text }]}>Settings</Text>
+          <Text style={[styles.settingsMenuTitle, { color: colors.text }]}>{t.settings}</Text>
           <TouchableOpacity
             style={styles.settingsMenuCloseButton}
             onPress={onHideMenu}
@@ -334,7 +335,6 @@ const styles = StyleSheet.create({
   settingsMenuCloseButtonText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#000',
   },
   settingsMenuLinkFlex: {
     flex: 1,

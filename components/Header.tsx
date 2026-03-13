@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
   },
   headerScore: {
     fontSize: 18,
-    color: '#000',
   },
   settingsButton: {
     padding: 8,

@@ -278,7 +278,6 @@ const styles = StyleSheet.create({
   choiceButtonText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#000',
   },
   choiceButtonTextSelected: {
     color: '#4338CA',
@@ -334,7 +333,6 @@ const styles = StyleSheet.create({
   sequenceButtonText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#000',
   },
   sequenceButtonTextSelected: {
     color: '#4338CA',

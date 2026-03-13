@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { ThemeColors } from '../types/game';
 import { APP_VERSION, APP_NAME, CONTACT_EMAIL } from '../utils/constants';
+import { modalStyles } from '../styles/modalStyles';
 
 interface AboutModalProps {
   visible: boolean;
@@ -21,16 +22,17 @@ interface AboutModalProps {
     copyright: string;
     license: string;
     contact: string;
+    ok: string;
   };
 }
 
 export function AboutModal({ visible, onClose, colors, t }: AboutModalProps) {
   return (
     <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.modalOverlay}>
-        <View style={[styles.modalContent, { backgroundColor: colors.settingsMenu }]}>
+      <View style={modalStyles.overlay}>
+        <View style={[modalStyles.content, { backgroundColor: colors.settingsMenu }]}>
           <View style={styles.aboutModalHeader}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>{t.about}</Text>
+            <Text style={[modalStyles.title, { color: colors.text }]}>{t.about}</Text>
             <TouchableOpacity
               style={styles.aboutModalCloseButton}
               onPress={onClose}
@@ -62,10 +64,10 @@ export function AboutModal({ visible, onClose, colors, t }: AboutModalProps) {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.restartButton}
+            style={modalStyles.primaryButton}
             onPress={onClose}
           >
-            <Text style={styles.restartButtonText}>OK</Text>
+            <Text style={modalStyles.primaryButtonText}>{t.ok}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -74,41 +76,6 @@ export function AboutModal({ visible, onClose, colors, t }: AboutModalProps) {
 }
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 24,
-    padding: 24,
-    alignItems: 'center',
-    width: '85%',
-    maxWidth: 400,
-    elevation: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 16,
-  },
-  restartButton: {
-    backgroundColor: '#4F46E5',
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 28,
-  },
-  restartButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   aboutModalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
