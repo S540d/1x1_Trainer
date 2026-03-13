@@ -57,7 +57,7 @@ export function AboutModal({ visible, onClose, colors, t }: AboutModalProps) {
             {t.license}
           </Text>
           <TouchableOpacity
-            onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}`)}
+            onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}`).catch(() => {})}
           >
             <Text style={[styles.aboutModalInfoText, { color: '#4F46E5' }]}>
               {t.contact}

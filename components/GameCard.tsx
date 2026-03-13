@@ -124,7 +124,7 @@ export function GameCard({
             <View style={styles.choicesContainer}>
               {multipleChoices.map((choice, index) => (
                 <TouchableOpacity
-                  key={index}
+                  key={`${index}-${choice}`}
                   style={[
                     styles.choiceButton,
                     { borderColor: colors.border },
@@ -164,7 +164,7 @@ export function GameCard({
               <ScrollView style={styles.sequenceScroll}>
                 {numberSequence.map((num, index) => (
                   <TouchableOpacity
-                    key={index}
+                    key={`${index}-${num}`}
                     style={[
                       styles.sequenceButton,
                       { borderColor: colors.border },

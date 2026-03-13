@@ -262,7 +262,7 @@ export function SettingsMenu({
           <TouchableOpacity
             style={styles.settingsMenuLinkFlex}
             onPress={() => {
-              Linking.openURL(`mailto:${CONTACT_EMAIL}?subject=1x1 Trainer Feedback`);
+              Linking.openURL(`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('1x1 Trainer Feedback')}`).catch(() => {});
               onHideMenu();
             }}
           >
@@ -271,7 +271,7 @@ export function SettingsMenu({
           <TouchableOpacity
             style={styles.settingsMenuLinkFlex}
             onPress={() => {
-              Linking.openURL('https://ko-fi.com/devsven');
+              Linking.openURL('https://ko-fi.com/devsven').catch(() => {});
               onHideMenu();
             }}
           >
