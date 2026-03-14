@@ -58,11 +58,11 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'normal',
   },
   chipTextActive: {
     color: '#FFFFFF',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   chipTextSm: {
     fontSize: 12,

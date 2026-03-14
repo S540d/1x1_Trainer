@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   },
   settingsButtonText: {
     fontSize: 24,
-    fontWeight: '500',
+    fontWeight: 'normal',
     color: '#4F46E5',
   },
 });
