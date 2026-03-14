@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   },
   settingsMenuTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   settingsMenuCloseButton: {
     padding: 12,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
   settingsSectionTitle: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: 'bold',
     marginBottom: 8,
     textTransform: 'uppercase',
   },
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   },
   themeButtonText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   themeButtonTextActive: {
     color: '#fff',

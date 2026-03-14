@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   },
   settingsMenuTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   settingsMenuCloseButton: {
     padding: 12,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   },
   settingsMenuLinkText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#4F46E5',
   },
   personalizeButton: {
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
   },
   personalizeButtonText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   settingsSection: {
     paddingHorizontal: 16,
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
   },
   settingsSectionTitle: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#999',
     marginBottom: 8,
     textTransform: 'uppercase',
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   },
   themeButtonText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#333',
   },
   themeButtonTextActive: {
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
   },
   operationButtonText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#333',
   },
   operationButtonTextActive: {
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
   },
   rangeButtonText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   rangeButtonTextActive: {
     color: '#fff',
