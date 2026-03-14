@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-03-14
+
+### Added
+- ✨ **App.tsx Refactoring** (PR #136): App.tsx von 1.399 auf 232 Zeilen reduziert (83% weniger)
+  - 7 Komponenten extrahiert: `Header`, `SettingsMenu`, `GameCard`, `Numpad`, `ResultModal`, `MotivationModal`, `AboutModal`
+  - Gemeinsame Modal-Styles in `styles/modalStyles.ts`
+  - i18n: `settings` und `ok` Keys hinzugefügt
+- ✨ **Animations-Infrastruktur**: `Animated` core aus react-native (web-kompatibel, Reanimated entfernt)
+  - `utils/animations.ts` als zentrale Animation-Utilities
+- ✨ **UI-Primitives** angelegt: `Chip.tsx`, `Badge.tsx`, `Button.tsx`, `SkeletonLoader.tsx`
+- ✨ **Build Workflow**: Version-Bump Default auf `patch` gesetzt mit Warnung
+
+### Fixed
+- 🐛 **Numpad row height alignment**: Konsistente Höhe aller Numpad-Reihen
+- 🐛 **Copilot Review Fixes**: URL-Encoding, Linking Error-Handling, stabile React-Keys
+
+## [1.2.2] - 2026-03-13
+
+### Fixed
+- 🐛 **Copilot Review**: URL-Encoding, Error-Handling bei externen Links, stabile React-Keys in Listen
+
 ## [1.2.1] - 2026-02-28
 
 ### Fixed
