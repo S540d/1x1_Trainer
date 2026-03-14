@@ -12,15 +12,15 @@ on:
           - production
           - preview
       bump:
-        description: 'Version bump type (none = skip bump)'
+        description: 'Version bump type ⚠️ Default is patch – set none only if already bumped!'
         required: true
-        default: 'none'
+        default: 'patch'
         type: choice
         options:
-          - none
           - patch
           - minor
           - major
+          - none
 
 # Minimal permissions - only write for committing version bump
 permissions:
