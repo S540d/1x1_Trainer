@@ -164,28 +164,30 @@ export function GameCard({
           {gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && (
             <View style={styles.sequenceContainer}>
               <ScrollView style={styles.sequenceScroll}>
-                {numberSequence.map((num, index) => (
-                  <TouchableOpacity
-                    key={`${index}-${num}`}
-                    style={[
-                      styles.sequenceButton,
-                      { borderColor: colors.border },
-                      gameState.selectedChoice === num && styles.sequenceButtonSelected,
-                      gameState.isAnswerChecked && num === getCorrectAnswer() && styles.sequenceButtonCorrect,
-                      gameState.isAnswerChecked && gameState.selectedChoice === num && num !== getCorrectAnswer() && styles.sequenceButtonIncorrect,
-                    ]}
-                    onPress={() => onChoiceClick(num)}
-                    disabled={gameState.isAnswerChecked}
-                  >
-                    <Text style={[
-                      styles.sequenceButtonText,
-                      { color: colors.text },
-                      gameState.selectedChoice === num && styles.sequenceButtonTextSelected,
-                    ]}>
-                      {num}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                <View style={styles.sequenceGrid}>
+                  {numberSequence.map((num, index) => (
+                    <TouchableOpacity
+                      key={`${index}-${num}`}
+                      style={[
+                        styles.sequenceButton,
+                        { borderColor: colors.border },
+                        gameState.selectedChoice === num && styles.sequenceButtonSelected,
+                        gameState.isAnswerChecked && num === getCorrectAnswer() && styles.sequenceButtonCorrect,
+                        gameState.isAnswerChecked && gameState.selectedChoice === num && num !== getCorrectAnswer() && styles.sequenceButtonIncorrect,
+                      ]}
+                      onPress={() => onChoiceClick(num)}
+                      disabled={gameState.isAnswerChecked}
+                    >
+                      <Text style={[
+                        styles.sequenceButtonText,
+                        { color: colors.text },
+                        gameState.selectedChoice === num && styles.sequenceButtonTextSelected,
+                      ]}>
+                        {num}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </ScrollView>
               <TouchableOpacity
                 style={[
@@ -319,11 +321,16 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 12,
   },
+  sequenceGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
   sequenceButton: {
-    width: '100%',
-    height: 60,
+    width: '48%',
+    height: 48,
     backgroundColor: 'transparent',
-    borderRadius: 20,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
