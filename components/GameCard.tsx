@@ -122,28 +122,30 @@ export function GameCard({
 
           {gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && (
             <View style={styles.choicesContainer}>
-              {multipleChoices.map((choice, index) => (
-                <TouchableOpacity
-                  key={`${index}-${choice}`}
-                  style={[
-                    styles.choiceButton,
-                    { borderColor: colors.border },
-                    gameState.selectedChoice === choice && styles.choiceButtonSelected,
-                    gameState.isAnswerChecked && choice === getCorrectAnswer() && styles.choiceButtonCorrect,
-                    gameState.isAnswerChecked && gameState.selectedChoice === choice && choice !== getCorrectAnswer() && styles.choiceButtonIncorrect,
-                  ]}
-                  onPress={() => onChoiceClick(choice)}
-                  disabled={gameState.isAnswerChecked}
-                >
-                  <Text style={[
-                    styles.choiceButtonText,
-                    { color: colors.text },
-                    gameState.selectedChoice === choice && styles.choiceButtonTextSelected,
-                  ]}>
-                    {choice}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              <ScrollView style={styles.choicesScroll}>
+                {multipleChoices.map((choice, index) => (
+                  <TouchableOpacity
+                    key={`${index}-${choice}`}
+                    style={[
+                      styles.choiceButton,
+                      { borderColor: colors.border },
+                      gameState.selectedChoice === choice && styles.choiceButtonSelected,
+                      gameState.isAnswerChecked && choice === getCorrectAnswer() && styles.choiceButtonCorrect,
+                      gameState.isAnswerChecked && gameState.selectedChoice === choice && choice !== getCorrectAnswer() && styles.choiceButtonIncorrect,
+                    ]}
+                    onPress={() => onChoiceClick(choice)}
+                    disabled={gameState.isAnswerChecked}
+                  >
+                    <Text style={[
+                      styles.choiceButtonText,
+                      { color: colors.text },
+                      gameState.selectedChoice === choice && styles.choiceButtonTextSelected,
+                    ]}>
+                      {choice}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
               <TouchableOpacity
                 style={[
                   styles.checkButton,
@@ -249,11 +251,17 @@ const styles = StyleSheet.create({
   },
   answerArea: {
     width: '100%',
-    flexShrink: 0,
+    flex: 1,
+    minHeight: 0,
   },
   choicesContainer: {
     width: '100%',
-    gap: 12,
+    flex: 1,
+    flexDirection: 'column',
+  },
+  choicesScroll: {
+    flex: 1,
+    marginBottom: 12,
   },
   choiceButton: {
     width: '100%',
@@ -262,6 +270,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 8,
     borderWidth: 2,
   },
   choiceButtonSelected: {
@@ -307,6 +316,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   sequenceScroll: {
+    flex: 1,
     marginBottom: 12,
   },
   sequenceButton: {
