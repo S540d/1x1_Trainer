@@ -16,7 +16,13 @@ import {
   supportsMatchMedia,
   getSystemDarkModePreference,
   addSystemThemeChangeListener,
+  Storage,
+  assertWebAPI,
+  safeWebAPI,
 } from './platform';
+
+// Define __DEV__ global (set by React Native runtime, not available in Jest by default)
+(global as any).__DEV__ = true;
 
 // Mock react-native Platform
 jest.mock('react-native', () => ({
@@ -258,5 +264,83 @@ describe('platform.ts - Theme Change Listener', () => {
     expect(() => cleanup()).not.toThrow();
 
     consoleWarnSpy.mockRestore();
+  });
+});
+
+describe('platform.ts - Storage (Web/localStorage paths)', () => {
+  let originalLocalStorage: Storage; // platform-safe
+
+  beforeEach(() => {
+    originalLocalStorage = window.localStorage; // platform-safe
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, 'localStorage', { // platform-safe
+      value: originalLocalStorage,
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  it('getItem should use localStorage on web', async () => {
+    const mockGetItem = jest.fn().mockReturnValue('stored-value');
+    Object.defineProperty(window, 'localStorage', { // platform-safe
+      value: { getItem: mockGetItem, setItem: jest.fn(), removeItem: jest.fn() },
+      writable: true,
+      configurable: true,
+    });
+
+    const result = await Storage.getItem('my-key');
+    expect(result).toBe('stored-value');
+    expect(mockGetItem).toHaveBeenCalledWith('my-key');
+  });
+
+  it('setItem should use localStorage on web', async () => {
+    const mockSetItem = jest.fn();
+    Object.defineProperty(window, 'localStorage', { // platform-safe
+      value: { getItem: jest.fn(), setItem: mockSetItem, removeItem: jest.fn() },
+      writable: true,
+      configurable: true,
+    });
+
+    await Storage.setItem('my-key', 'my-value');
+    expect(mockSetItem).toHaveBeenCalledWith('my-key', 'my-value');
+  });
+
+  it('removeItem should use localStorage on web', async () => {
+    const mockRemoveItem = jest.fn();
+    Object.defineProperty(window, 'localStorage', { // platform-safe
+      value: { getItem: jest.fn(), setItem: jest.fn(), removeItem: mockRemoveItem },
+      writable: true,
+      configurable: true,
+    });
+
+    await Storage.removeItem('my-key');
+    expect(mockRemoveItem).toHaveBeenCalledWith('my-key');
+  });
+});
+
+describe('platform.ts - assertWebAPI (web)', () => {
+  it('should not throw on web platform', () => {
+    expect(() => assertWebAPI('localStorage')).not.toThrow();
+  });
+});
+
+describe('platform.ts - safeWebAPI (web)', () => {
+  it('should execute callback on web', () => {
+    const result = safeWebAPI(() => 'web-result', 'fallback');
+    expect(result).toBe('web-result');
+  });
+
+  it('should return fallback when callback throws on web', () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    const result = safeWebAPI(() => {
+      throw new Error('API failed');
+    }, 'fallback');
+
+    expect(result).toBe('fallback');
+
+    errorSpy.mockRestore();
   });
 });
