@@ -58,7 +58,7 @@ const defaultProps = {
   onChoiceClick: jest.fn(),
   onCheck: jest.fn(),
   onNext: jest.fn(),
-  t: { nextQuestion: 'Nächste Aufgabe', check: 'Prüfen' },
+  t: { nextQuestion: 'Weiter →', check: 'Prüfen' },
 };
 
 describe('GameCard - Button accessibility', () => {
@@ -115,8 +115,8 @@ describe('GameCard - Button accessibility', () => {
         <GameCard {...defaultProps} gameState={checkedState} />
       );
 
-      expect(getByText('Nächste Aufgabe')).toBeTruthy();
-      fireEvent.click(getByText('Nächste Aufgabe'));
+      expect(getByText('Weiter →')).toBeTruthy();
+      fireEvent.click(getByText('Weiter →'));
       expect(defaultProps.onNext).toHaveBeenCalled();
     });
 
@@ -195,8 +195,8 @@ describe('GameCard - Button accessibility', () => {
         <GameCard {...defaultProps} gameState={checkedState} onNext={onNext} />
       );
 
-      expect(getByText('Nächste Aufgabe')).toBeTruthy();
-      fireEvent.click(getByText('Nächste Aufgabe'));
+      expect(getByText('Weiter →')).toBeTruthy();
+      fireEvent.click(getByText('Weiter →'));
       expect(onNext).toHaveBeenCalled();
     });
 
