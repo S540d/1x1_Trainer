@@ -75,9 +75,9 @@ Validation rules enforced by Husky (`.husky/pre-commit`):
 - After deployment, an empty commit triggers GitHub Pages rebuild (required for subdirectories)
 
 ### Test Coverage (Current)
-- **Total Tests:** 337 (334 passing, 3 skipped)
+- **Total Tests:** 358 (358 passing, 3 skipped)
 - **Coverage:** ~90%
-- **Test Files:** 8 suites
+- **Test Files:** 9 suites
   - `useGameLogic.test.tsx` - 90.58% coverage (includes 26 challenge mode tests)
   - `usePreferences.test.tsx` - 100% coverage
   - `useTheme.test.ts` - 100% coverage
@@ -86,6 +86,7 @@ Validation rules enforced by Husky (`.husky/pre-commit`):
   - `platform.test.ts` - 55.76% coverage
   - `language.test.ts` - 100% coverage
   - `useGameLogic.numberRange.test.tsx` - Coverage included
+  - `GameCard.test.tsx` - GameCard component tests (23 tests)
 
 ## Critical Areas
 
@@ -94,7 +95,7 @@ Validation rules enforced by Husky (`.husky/pre-commit`):
    - Validates answers across all game modes
    - Tracks score and streaks
    - **Challenge Mode:** Lives system, level progression via `getChallengeLevel()`, high score tracking
-   - **NUMBER_SEQUENCE Logic:** Critical! When asking for factors/operands (questionPart 0/1), shows 1-10. When asking for result (questionPart 2), shows appropriate range/multiples.
+   - **NUMBER_SEQUENCE Logic:** Only available when `questionPart === 2` (asking for result) in Creative/Challenge modes. Shows appropriate range/multiples. Rendered as 2-column grid in GameCard.
    - `getMaxNumber(range?)` accepts optional NumberRange parameter for challenge mode
    - Don't modify without extensive testing - 90.58% test coverage
 
@@ -177,6 +178,11 @@ cd dist && npx http-server -p 8080
 - Keyboard input handling
 - Storage API differences
 
+### Button Consistency
+- All answer modes use unified check/next pattern: "Prüfen"/"Check" → "Weiter →"/"Next →"
+- Numpad uses symbols: ✓ → → (compact equivalent)
+- Translation key `nextQuestion` controls the "next" button text in MC/NS modes
+
 ### Jest & Testing
 - expo-localization requires special handling as ES module
 - Mock expo-localization before imports in test files
@@ -217,7 +223,9 @@ utils/
 └── calculations.ts      # Game calculations
 
 components/
-└── PersonalizeModal.tsx  # Settings/personalization modal
+├── GameCard.tsx           # Game card with all answer modes (INPUT, MC, NUMBER_SEQUENCE)
+├── Numpad.tsx             # Numeric keypad for INPUT mode
+└── PersonalizeModal.tsx   # Settings/personalization modal
 
 public/
 ├── manifest.json        # PWA manifest
