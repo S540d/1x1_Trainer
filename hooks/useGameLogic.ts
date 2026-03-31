@@ -300,10 +300,13 @@ export function useGameLogic({
     }
 
     // In CREATIVE and CHALLENGE modes, randomize answer mode each question
-    // NUMBER_SEQUENCE temporarily disabled (known issues)
+    // NUMBER_SEQUENCE only available when asking for result (questionPart === 2)
     let newAnswerMode = gameState.answerMode;
     if (gameState.difficultyMode === DifficultyMode.CREATIVE || gameState.difficultyMode === DifficultyMode.CHALLENGE) {
-      const availableModes = [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE];
+      const availableModes =
+        newQuestionPart === 2
+          ? [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE, AnswerMode.NUMBER_SEQUENCE]
+          : [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE];
       newAnswerMode = availableModes[Math.floor(Math.random() * availableModes.length)];
     }
 
@@ -628,7 +631,7 @@ export function useGameLogic({
     } else {
       // Creative: Mixed tasks with random answer mode
       newGameMode = GameMode.MIXED;
-      const answerModes = [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE];
+      const answerModes = [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE, AnswerMode.NUMBER_SEQUENCE];
       newAnswerMode = answerModes[Math.floor(Math.random() * answerModes.length)];
     }
 
