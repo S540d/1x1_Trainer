@@ -44,4 +44,42 @@ if git diff --cached --name-only | grep -E "(package\.json|app\.json|App\.tsx|bu
   fi
 fi
 
+# Check for sensitive account identifiers being (re-)introduced
+echo "Checking for sensitive account identifiers..."
+STAGED_ALL=$(git diff --cached --name-only || true)
+
+# app.json: EAS projectId, owner, and personal package names must not be re-added
+if echo "$STAGED_ALL" | grep -q "app\.json"; then
+  STAGED_APPJSON_NEW=$(git diff --cached app.json | grep "^+" | grep -v "^+++" || true)
+  if echo "$STAGED_APPJSON_NEW" | grep -qE '"projectId"|"owner"\s*:'; then
+    echo "❌ ERROR: app.json enthält account-spezifische EAS-Daten (projectId/owner)!"
+    echo "Diese Felder lokal halten und zur Build-Zeit per Umgebungsvariable injizieren."
+    echo "Siehe Issue #150."
+    exit 1
+  fi
+  if echo "$STAGED_APPJSON_NEW" | grep -qE '"(package|bundleIdentifier)"\s*:\s*"com\.sven'; then
+    echo "❌ ERROR: app.json enthält persönliche Store-Package-Namen (com.sven...)!"
+    echo "Persönliche Identifikatoren lokal halten. Siehe Issue #150."
+    exit 1
+  fi
+fi
+
+# Workflow files: SHA1 signing fingerprint must not be hardcoded
+if echo "$STAGED_ALL" | grep -qE "\.github/workflows/"; then
+  STAGED_WORKFLOW_NEW=$(git diff --cached -- .github/workflows/ | grep "^+" | grep -v "^+++" || true)
+  if echo "$STAGED_WORKFLOW_NEW" | grep -qiE "EXPECTED_SHA1\s*=|SHA1\s*=\s*['\"][0-9A-F:]{2}"; then
+    echo "❌ ERROR: Hardcoded SHA1-Signing-Fingerabdruck in Workflow-Datei!"
+    echo "Als GitHub Secret auslagern (z.B. ANDROID_KEY_SHA1). Siehe Issue #150."
+    exit 1
+  fi
+fi
+
+# Internal docs: warn (not block) when being staged
+for internal_doc in "docs/ANDROID_BUILD.md" "docs/RELEASE_CHECKLIST.md" "scripts/setup-twa-step1.sh" ".claude/CLAUDE.md"; do
+  if echo "$STAGED_ALL" | grep -qF "$internal_doc"; then
+    echo "⚠️  WARNUNG: Interne Datei wird committed: $internal_doc"
+    echo "   Prüfe, ob diese Datei im öffentlichen Repo sein soll (Issue #150)."
+  fi
+done
+
 echo "✅ Pre-commit checks passed!"
