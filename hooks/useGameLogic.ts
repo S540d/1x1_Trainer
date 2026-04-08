@@ -630,8 +630,10 @@ export function useGameLogic({
       newAnswerMode = AnswerMode.INPUT;
     } else {
       // Creative: Mixed tasks with random answer mode
+      // NUMBER_SEQUENCE excluded here since questionPart isn't known yet;
+      // generateQuestion() will pick a valid mode (incl. NUMBER_SEQUENCE for questionPart === 2).
       newGameMode = GameMode.MIXED;
-      const answerModes = [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE, AnswerMode.NUMBER_SEQUENCE];
+      const answerModes = [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE];
       newAnswerMode = answerModes[Math.floor(Math.random() * answerModes.length)];
     }
 
