@@ -1106,6 +1106,54 @@ describe('useGameLogic Hook', () => {
 
       expect(result.current.gameState.isAnswerChecked).toBe(false);
     });
+
+    it('should exclude NUMBER_SEQUENCE from answerMode when questionPart is 0 (CREATIVE)', () => {
+      jest.spyOn(Math, 'random').mockReturnValue(0); // forces questionPart=0 in MIXED, lowest answerMode index
+      const { result } = renderHook(() => useGameLogic(defaultProps));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CREATIVE);
+        jest.runAllTimers();
+      });
+
+      // With questionPart=0, NUMBER_SEQUENCE must not be selected
+      expect(result.current.gameState.questionPart).toBe(0);
+      expect(result.current.gameState.answerMode).not.toBe(AnswerMode.NUMBER_SEQUENCE);
+      jest.restoreAllMocks();
+    });
+
+    it('should exclude NUMBER_SEQUENCE from answerMode when questionPart is 1 (CREATIVE)', () => {
+      // Math.random() returning ~0.34 → Math.floor(0.34 * 3) = 1 → questionPart=1
+      jest.spyOn(Math, 'random').mockReturnValue(0.34);
+      const { result } = renderHook(() => useGameLogic(defaultProps));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CREATIVE);
+        jest.runAllTimers();
+      });
+
+      expect(result.current.gameState.questionPart).toBe(1);
+      expect(result.current.gameState.answerMode).not.toBe(AnswerMode.NUMBER_SEQUENCE);
+      jest.restoreAllMocks();
+    });
+
+    it('should allow NUMBER_SEQUENCE as answerMode when questionPart is 2 (CREATIVE)', () => {
+      // Math.random() returning ~0.67 → Math.floor(0.67 * 3) = 2 → questionPart=2
+      // Then for answerMode selection from 3 modes, ~0.67 → index 2 → NUMBER_SEQUENCE
+      const mockRandom = jest.spyOn(Math, 'random').mockReturnValue(0.67);
+      const { result } = renderHook(() => useGameLogic(defaultProps));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CREATIVE);
+        jest.runAllTimers();
+      });
+
+      expect(result.current.gameState.questionPart).toBe(2);
+      // With questionPart=2, all three modes including NUMBER_SEQUENCE are valid
+      const validModes = [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE, AnswerMode.NUMBER_SEQUENCE];
+      expect(validModes).toContain(result.current.gameState.answerMode);
+      mockRandom.mockRestore();
+    });
   });
 
   describe('generateMultipleChoices', () => {
@@ -1586,15 +1634,31 @@ describe('useGameLogic Hook', () => {
       expect(result.current.gameState.gameMode).toBe(GameMode.MIXED);
     });
 
-    it('should set random answerMode for CREATIVE difficulty', () => {
+    it('should set random answerMode for CREATIVE difficulty (excluding NUMBER_SEQUENCE initially)', () => {
       const { result } = renderHook(() => useGameLogic(defaultProps));
 
       act(() => {
         result.current.changeDifficultyMode(DifficultyMode.CREATIVE);
       });
 
-      const validAnswerModes = [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE, AnswerMode.NUMBER_SEQUENCE];
+      // NUMBER_SEQUENCE must NOT be set as initial mode because questionPart is unknown at this point.
+      // generateQuestion() will pick a valid mode (including NUMBER_SEQUENCE when questionPart === 2).
+      const validAnswerModes = [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE];
       expect(validAnswerModes).toContain(result.current.gameState.answerMode);
+      expect(result.current.gameState.answerMode).not.toBe(AnswerMode.NUMBER_SEQUENCE);
+    });
+
+    it('should never select NUMBER_SEQUENCE as initial answerMode in CREATIVE (all Math.random values)', () => {
+      // Test exhaustively: for any Math.random() value, initial mode must not be NUMBER_SEQUENCE
+      for (let i = 0; i < 20; i++) {
+        jest.spyOn(Math, 'random').mockReturnValueOnce(i / 20);
+        const { result } = renderHook(() => useGameLogic(defaultProps));
+        act(() => {
+          result.current.changeDifficultyMode(DifficultyMode.CREATIVE);
+        });
+        expect(result.current.gameState.answerMode).not.toBe(AnswerMode.NUMBER_SEQUENCE);
+      }
+      jest.restoreAllMocks();
     });
 
     it('should reset currentTask and score', () => {
