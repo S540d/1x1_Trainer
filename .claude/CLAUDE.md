@@ -75,10 +75,10 @@ Validation rules enforced by Husky (`.husky/pre-commit`):
 - After deployment, an empty commit triggers GitHub Pages rebuild (required for subdirectories)
 
 ### Test Coverage (Current)
-- **Total Tests:** 358 (358 passing, 3 skipped)
+- **Total Tests:** 365 (362 passing, 3 skipped)
 - **Coverage:** ~90%
 - **Test Files:** 9 suites
-  - `useGameLogic.test.tsx` - 90.58% coverage (includes 26 challenge mode tests)
+  - `useGameLogic.test.tsx` - ~90% coverage (includes 26 challenge mode tests + 4 NUMBER_SEQUENCE gating tests)
   - `usePreferences.test.tsx` - 100% coverage
   - `useTheme.test.ts` - 100% coverage
   - `storage.test.ts` - 96.66% coverage
@@ -95,9 +95,9 @@ Validation rules enforced by Husky (`.husky/pre-commit`):
    - Validates answers across all game modes
    - Tracks score and streaks
    - **Challenge Mode:** Lives system, level progression via `getChallengeLevel()`, high score tracking
-   - **NUMBER_SEQUENCE Logic:** Only available when `questionPart === 2` (asking for result) in Creative/Challenge modes. Shows appropriate range/multiples. Rendered as 2-column grid in GameCard.
+   - **NUMBER_SEQUENCE Logic:** Only available when `questionPart === 2` (asking for result). `generateQuestion()` gates it — only includes NUMBER_SEQUENCE in `availableModes` when `newQuestionPart === 2`. `changeDifficultyMode(CREATIVE)` intentionally excludes NUMBER_SEQUENCE from the initial mode (questionPart unknown at that point); `generateQuestion()` picks the correct mode once questionPart is set.
    - `getMaxNumber(range?)` accepts optional NumberRange parameter for challenge mode
-   - Don't modify without extensive testing - 90.58% test coverage
+   - Don't modify without extensive testing - ~90% test coverage
 
 2. **PWA Configuration (public/):**
    - `manifest.json` - PWA manifest
