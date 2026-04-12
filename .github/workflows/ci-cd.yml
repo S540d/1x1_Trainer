@@ -202,6 +202,64 @@ jobs:
 
           echo "✅ No obvious secrets found"
 
+      - name: Check for account-specific identifiers (Issue #150)
+        run: |
+          echo "Checking for account-specific identifiers..."
+          FOUND=0
+
+          # app.json: EAS projectId must not be committed
+          if grep -q '"projectId"' app.json 2>/dev/null; then
+            echo "❌ app.json enthält 'projectId' (EAS Account-Verknüpfung)"
+            echo "   → Lokal halten, zur Build-Zeit per Umgebungsvariable injizieren"
+            FOUND=1
+          fi
+
+          # app.json: owner field must not be committed
+          if grep -q '"owner"\s*:' app.json 2>/dev/null; then
+            echo "❌ app.json enthält 'owner' (persönlicher Expo-Account)"
+            echo "   → Lokal halten, zur Build-Zeit per Umgebungsvariable injizieren"
+            FOUND=1
+          fi
+
+          # app.json: personal package names must not be committed
+          if grep -qE '"(package|bundleIdentifier)"\s*:\s*"com\.sven' app.json 2>/dev/null; then
+            echo "❌ app.json enthält persönliche Store-Package-Namen (com.sven...)"
+            echo "   → Lokal halten, nicht im öffentlichen Repo"
+            FOUND=1
+          fi
+
+          # Workflow files: hardcoded SHA1 signing fingerprint
+          if grep -rqiE "EXPECTED_SHA1\s*=|SHA1\s*=\s*['\"][0-9A-F:]{2}" .github/workflows/ 2>/dev/null; then
+            echo "❌ Hardcoded SHA1-Signing-Fingerabdruck in Workflow-Datei gefunden"
+            echo "   → Als GitHub Secret auslagern (ANDROID_KEY_SHA1)"
+            FOUND=1
+          fi
+
+          # Internal docs must not be in the repo
+          for internal_doc in "docs/ANDROID_BUILD.md" "docs/RELEASE_CHECKLIST.md" "scripts/setup-twa-step1.sh"; do
+            if [ -f "$internal_doc" ]; then
+              echo "❌ Interne Datei im Repo: $internal_doc"
+              echo "   → Lokal halten, aus Repo entfernen und in .gitignore eintragen"
+              FOUND=1
+            fi
+          done
+
+          # .claude/ directory must not be in the repo
+          if [ -d ".claude" ]; then
+            echo "❌ .claude/ Verzeichnis ist im Repo (AI-Tool-Konfiguration)"
+            echo "   → Lokal halten, in .gitignore eintragen (Issue #150)"
+            FOUND=1
+          fi
+
+          if [ "$FOUND" -eq 1 ]; then
+            echo ""
+            echo "Bereinigung erforderlich – siehe Issue #150:"
+            echo "https://github.com/S540d/1x1_Trainer/issues/150"
+            exit 1
+          fi
+
+          echo "✅ Keine account-spezifischen Identifier gefunden"
+
   # ============================================================================
   # JOB 5: Release Readiness Report
   # ============================================================================

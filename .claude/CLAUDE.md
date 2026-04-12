@@ -55,8 +55,19 @@ Validation rules enforced by Husky (`.husky/pre-commit`):
 1. **No console.log/debug** (except in scripts/)
 2. **Platform-safe Web API usage** (window.*, localStorage.*)
 3. **Version consistency** (package.json vs app.json)
+4. **Sensitive account identifiers** – prüft staged Diff (nur `+`-Zeilen):
+   - `app.json`: blockiert `projectId`, `owner`-Feld, `com.sven*` Package-Namen
+   - Workflow-Dateien: blockiert hardcodierte SHA1-Signing-Fingerabdrücke
+   - Interne Docs (`docs/ANDROID_BUILD.md`, `docs/RELEASE_CHECKLIST.md`, `scripts/setup-twa-step1.sh`, `.claude/CLAUDE.md`): **Warnung** (nicht blockierend)
 
 **Note:** grep pipes use `|| true` to prevent false failures under `set -e` when no TS/JS files are staged.
+
+### CI Privacy-Check (GitHub Actions)
+Der `security` Job in `.github/workflows/ci-cd.yml` enthält den Step **"Check for account-specific identifiers"**:
+- Prüft den **vollständigen Repo-Zustand** (nicht nur den Diff)
+- **Blockiert PRs** solange sensitive Daten im Repo vorhanden sind (Issue #150)
+- Geprüfte Patterns: `projectId`/`owner` in app.json, `com.sven*` Package-Namen, SHA1-Fingerabdrücke in Workflows, interne Docs, `.claude/` Verzeichnis
+- Wird grün, sobald Issue #150 vollständig umgesetzt ist
 
 #### Testing & Environments (3-Tier Workflow)
 | Environment | URL | Branch | Purpose |
