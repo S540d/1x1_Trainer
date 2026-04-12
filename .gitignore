@@ -63,3 +63,9 @@ test-results/
 
 # Test coverage
 coverage/
+
+# Local-only files (not for public repo — Issue #150)
+.claude/
+docs/ANDROID_BUILD.md
+docs/RELEASE_CHECKLIST.md
+scripts/setup-twa-step1.sh

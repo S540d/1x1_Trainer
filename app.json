@@ -13,15 +13,13 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.sven4321.trainer1x1"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.sven4321.trainer1x1",
       "versionCode": 22,
       "jsEngine": "hermes",
       "edgeToEdgeEnabled": true,
@@ -49,12 +47,6 @@
       "bundler": "metro",
       "baseUrl": "/1x1_Trainer"
     },
-    "extra": {
-      "eas": {
-        "projectId": "91fd28a6-8da1-4b9b-a8bc-a2b48b70cc33"
-      }
-    },
-    "owner": "devsven",
     "plugins": [
       "expo-localization"
     ]
