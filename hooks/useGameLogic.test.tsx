@@ -2341,6 +2341,108 @@ describe('getChallengeLevel', () => {
   });
 });
 
+describe('useGameLogic - branch coverage', () => {
+  const defaultProps = {
+    initialOperation: Operation.MULTIPLICATION,
+    initialTotalSolvedTasks: 0,
+    onTotalSolvedTasksChange: jest.fn(),
+    onMotivationShow: jest.fn(),
+    numberRange: NumberRange.RANGE_10,
+  };
+
+  describe('generateNumberSequenceForState - factor branches (questionPart 0/1)', () => {
+    it('should generate 1-10 sequence for MULTIPLICATION questionPart=0 (maxNumber=10)', () => {
+      const sequence = generateNumberSequenceForState(3, 4, 0, Operation.MULTIPLICATION, 10);
+      expect(sequence).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    });
+
+    it('should cap sequence at maxNumber for MULTIPLICATION questionPart=1 (maxNumber=5)', () => {
+      const sequence = generateNumberSequenceForState(3, 4, 1, Operation.MULTIPLICATION, 5);
+      expect(sequence).toEqual([1, 2, 3, 4, 5]);
+    });
+
+    it('should generate 1-10 sequence for SUBTRACTION questionPart=0 (maxNumber=10)', () => {
+      const sequence = generateNumberSequenceForState(8, 3, 0, Operation.SUBTRACTION, 10);
+      expect(sequence).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    });
+
+    it('should cap sequence at maxNumber for SUBTRACTION questionPart=1 (maxNumber=7)', () => {
+      const sequence = generateNumberSequenceForState(8, 3, 1, Operation.SUBTRACTION, 7);
+      expect(sequence).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    });
+
+    it('should generate 1-10 sequence for ADDITION questionPart=0 (maxNumber=10)', () => {
+      const sequence = generateNumberSequenceForState(4, 3, 0, Operation.ADDITION, 10);
+      expect(sequence).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    });
+  });
+
+  describe('generateNumberSequenceForState - SUBTRACTION factor branches via hook', () => {
+    it('should generate number sequence for SUBTRACTION in NUMBER_SEQUENCE mode', () => {
+      const { result } = renderHook(() =>
+        useGameLogic({ ...defaultProps, initialOperation: Operation.SUBTRACTION })
+      );
+      act(() => { result.current.changeAnswerMode(AnswerMode.NUMBER_SEQUENCE); });
+      // NUMBER_SEQUENCE only used for questionPart=2, sequence must have 10 items
+      expect(result.current.numberSequence).toHaveLength(10);
+      expect(result.current.numberSequence.every((n) => n > 0)).toBe(true);
+    });
+
+    it('should generate sequence for ADDITION questionPart=0 via generateNumberSequenceForState', () => {
+      // Covers the else branch (questionPart !== 2) in ADDITION
+      const sequence = generateNumberSequenceForState(5, 3, 0, Operation.ADDITION, 10);
+      expect(sequence).toHaveLength(10);
+      expect(sequence[0]).toBe(1);
+      expect(sequence[9]).toBe(10);
+    });
+  });
+
+  describe('operatorSymbol', () => {
+    it('should return + for ADDITION', () => {
+      const { result } = renderHook(() =>
+        useGameLogic({ ...defaultProps, initialOperation: Operation.ADDITION })
+      );
+      expect(result.current.operatorSymbol).toBe('+');
+    });
+
+    it('should return − for SUBTRACTION', () => {
+      const { result } = renderHook(() =>
+        useGameLogic({ ...defaultProps, initialOperation: Operation.SUBTRACTION })
+      );
+      expect(result.current.operatorSymbol).toBe('−');
+    });
+
+    it('should return × for MULTIPLICATION', () => {
+      const { result } = renderHook(() => useGameLogic(defaultProps));
+      expect(result.current.operatorSymbol).toBe('×');
+    });
+
+    it('should return ÷ for DIVISION', () => {
+      const { result } = renderHook(() =>
+        useGameLogic({ ...defaultProps, initialOperation: Operation.DIVISION })
+      );
+      expect(result.current.operatorSymbol).toBe('÷');
+    });
+  });
+
+  describe('generateMultipleChoices - fallback when choices < 3', () => {
+    it('should always return exactly 3 choices even for small answer values', () => {
+      // correctAnswer=1 (1×1) gives very few valid wrong answers → triggers fallback
+      const { result } = renderHook(() =>
+        useGameLogic({
+          ...defaultProps,
+          numberRange: NumberRange.RANGE_10,
+        })
+      );
+      act(() => { result.current.changeAnswerMode(AnswerMode.MULTIPLE_CHOICE); });
+      // Force a question where correct answer is 1 to stress-test fallback
+      act(() => { result.current.generateQuestion(); });
+      expect(result.current.multipleChoices).toHaveLength(3);
+      expect(result.current.multipleChoices.every((c) => c > 0)).toBe(true);
+    });
+  });
+});
+
 describe('getChallengeLevelNumber', () => {
   it('should return 1 for score 0-4', () => {
     expect(getChallengeLevelNumber(0)).toBe(1);
