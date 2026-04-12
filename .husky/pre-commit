@@ -51,7 +51,7 @@ STAGED_ALL=$(git diff --cached --name-only || true)
 # app.json: EAS projectId, owner, and personal package names must not be re-added
 if echo "$STAGED_ALL" | grep -q "app\.json"; then
   STAGED_APPJSON_NEW=$(git diff --cached app.json | grep "^+" | grep -v "^+++" || true)
-  if echo "$STAGED_APPJSON_NEW" | grep -qE '"projectId"|"owner"\s*:'; then
+  if echo "$STAGED_APPJSON_NEW" | grep -qE '"(projectId|owner)"\s*:'; then
     echo "❌ ERROR: app.json enthält account-spezifische EAS-Daten (projectId/owner)!"
     echo "Diese Felder lokal halten und zur Build-Zeit per Umgebungsvariable injizieren."
     echo "Siehe Issue #150."
@@ -67,7 +67,7 @@ fi
 # Workflow files: SHA1 signing fingerprint must not be hardcoded
 if echo "$STAGED_ALL" | grep -qE "\.github/workflows/"; then
   STAGED_WORKFLOW_NEW=$(git diff --cached -- .github/workflows/ | grep "^+" | grep -v "^+++" || true)
-  if echo "$STAGED_WORKFLOW_NEW" | grep -qiE "EXPECTED_SHA1\s*=|SHA1\s*=\s*['\"][0-9A-F:]{2}"; then
+  if echo "$STAGED_WORKFLOW_NEW" | grep -vE '\$\{\{|\$[A-Z_]+' | grep -qiE "([0-9A-Fa-f]{2}:){19}[0-9A-Fa-f]{2}"; then
     echo "❌ ERROR: Hardcoded SHA1-Signing-Fingerabdruck in Workflow-Datei!"
     echo "Als GitHub Secret auslagern (z.B. ANDROID_KEY_SHA1). Siehe Issue #150."
     exit 1
