@@ -228,8 +228,8 @@ jobs:
             FOUND=1
           fi
 
-          # Workflow files: hardcoded SHA1 signing fingerprint
-          if grep -rqiE "EXPECTED_SHA1\s*=|SHA1\s*=\s*['\"][0-9A-F:]{2}" .github/workflows/ 2>/dev/null; then
+          # Workflow files: hardcoded SHA1 signing fingerprint (full 20-byte pattern, exclude secret refs)
+          if grep -riE "([0-9A-Fa-f]{2}:){19}[0-9A-Fa-f]{2}" .github/workflows/ 2>/dev/null | grep -qvE '\$\{\{|\$[A-Z_]+'; then
             echo "❌ Hardcoded SHA1-Signing-Fingerabdruck in Workflow-Datei gefunden"
             echo "   → Als GitHub Secret auslagern (ANDROID_KEY_SHA1)"
             FOUND=1
