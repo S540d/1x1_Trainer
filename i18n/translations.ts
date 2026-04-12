@@ -134,7 +134,7 @@ export const translations: Record<Language, TranslationStrings> = {
     mixedMode: 'Mixed',
     // Buttons
     check: 'Check',
-    nextQuestion: 'Next Question',
+    nextQuestion: 'Next →',
     playAgain: 'Play Again',
     newRound: 'New Round',
     continueGame: 'Continue',
@@ -212,7 +212,7 @@ export const translations: Record<Language, TranslationStrings> = {
     mixedMode: 'Gemischt',
     // Buttons
     check: 'Prüfen',
-    nextQuestion: 'Nächste Frage',
+    nextQuestion: 'Weiter →',
     playAgain: 'Nochmal spielen',
     newRound: 'Neue Runde',
     continueGame: 'Fortsetzen',
