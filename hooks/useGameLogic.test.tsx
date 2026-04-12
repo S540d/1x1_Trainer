@@ -2377,23 +2377,13 @@ describe('useGameLogic - branch coverage', () => {
     });
   });
 
-  describe('generateNumberSequenceForState - SUBTRACTION factor branches via hook', () => {
-    it('should generate number sequence for SUBTRACTION in NUMBER_SEQUENCE mode', () => {
-      const { result } = renderHook(() =>
-        useGameLogic({ ...defaultProps, initialOperation: Operation.SUBTRACTION })
-      );
-      act(() => { result.current.changeAnswerMode(AnswerMode.NUMBER_SEQUENCE); });
-      // NUMBER_SEQUENCE only used for questionPart=2, sequence must have 10 items
-      expect(result.current.numberSequence).toHaveLength(10);
-      expect(result.current.numberSequence.every((n) => n > 0)).toBe(true);
-    });
-
-    it('should generate sequence for ADDITION questionPart=0 via generateNumberSequenceForState', () => {
-      // Covers the else branch (questionPart !== 2) in ADDITION
-      const sequence = generateNumberSequenceForState(5, 3, 0, Operation.ADDITION, 10);
+  describe('generateNumberSequenceForState - SUBTRACTION result (questionPart=2)', () => {
+    it('should generate range around correct answer for SUBTRACTION questionPart=2', () => {
+      // num1=8, num2=3 → result=5 → sequence starts at max(1, 5-4)=1
+      const sequence = generateNumberSequenceForState(8, 3, 2, Operation.SUBTRACTION, 10);
       expect(sequence).toHaveLength(10);
-      expect(sequence[0]).toBe(1);
-      expect(sequence[9]).toBe(10);
+      expect(sequence).toContain(5); // correct answer
+      expect(sequence[0]).toBe(1);   // max(1, 5-4)
     });
   });
 
@@ -2426,19 +2416,34 @@ describe('useGameLogic - branch coverage', () => {
   });
 
   describe('generateMultipleChoices - fallback when choices < 3', () => {
-    it('should always return exactly 3 choices even for small answer values', () => {
-      // correctAnswer=1 (1×1) gives very few valid wrong answers → triggers fallback
-      const { result } = renderHook(() =>
-        useGameLogic({
-          ...defaultProps,
-          numberRange: NumberRange.RANGE_10,
-        })
-      );
-      act(() => { result.current.changeAnswerMode(AnswerMode.MULTIPLE_CHOICE); });
-      // Force a question where correct answer is 1 to stress-test fallback
-      act(() => { result.current.generateQuestion(); });
-      expect(result.current.multipleChoices).toHaveLength(3);
-      expect(result.current.multipleChoices.every((c) => c > 0)).toBe(true);
+    it('should use fallback values to reach exactly 3 choices when random generation fails', () => {
+      // Math.random() === 0 deterministically produces 1×1=1 and repeated
+      // invalid/duplicate wrong answers, forcing the fallback branch.
+      const randomSpy = jest.spyOn(Math, 'random').mockImplementation(() => 0);
+
+      try {
+        const { result } = renderHook(() =>
+          useGameLogic({
+            ...defaultProps,
+            initialOperation: Operation.MULTIPLICATION,
+            numberRange: NumberRange.RANGE_10,
+          })
+        );
+
+        act(() => {
+          result.current.changeAnswerMode(AnswerMode.MULTIPLE_CHOICE);
+        });
+
+        act(() => {
+          result.current.generateQuestion();
+        });
+
+        const sortedChoices = [...result.current.multipleChoices].sort((a, b) => a - b);
+        expect(sortedChoices).toEqual([1, 2, 3]);
+        expect(result.current.multipleChoices).toHaveLength(3);
+      } finally {
+        randomSpy.mockRestore();
+      }
     });
   });
 });
