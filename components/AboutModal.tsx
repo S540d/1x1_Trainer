@@ -10,6 +10,7 @@ import {
 import { ThemeColors } from '../types/game';
 import { APP_VERSION, APP_NAME, CONTACT_EMAIL } from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
+import { Button } from './Button';
 
 interface AboutModalProps {
   visible: boolean;
@@ -63,12 +64,7 @@ export function AboutModal({ visible, onClose, colors, t }: AboutModalProps) {
               {t.contact}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={modalStyles.primaryButton}
-            onPress={onClose}
-          >
-            <Text style={modalStyles.primaryButtonText}>{t.ok}</Text>
-          </TouchableOpacity>
+          <Button label={t.ok} onPress={onClose} variant="primary" fullWidth colors={colors} />
         </View>
       </View>
     </Modal>

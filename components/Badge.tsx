@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Text, StyleSheet, Animated } from 'react-native';
+import { prefersReducedMotion } from '../utils/animations';
 
 type BadgeVariant = 'default' | 'success' | 'warning' | 'error';
 
@@ -21,7 +22,7 @@ export function Badge({ value, variant = 'default', animated = false }: BadgePro
   const prevValue = useRef(value);
 
   useEffect(() => {
-    if (animated && prevValue.current !== value) {
+    if (animated && prevValue.current !== value && !prefersReducedMotion()) {
       Animated.sequence([
         Animated.spring(scale, {
           toValue: 1.25,

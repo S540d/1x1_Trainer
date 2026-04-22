@@ -2,11 +2,11 @@ import React from 'react';
 import {
   Text,
   View,
-  TouchableOpacity,
   Modal,
 } from 'react-native';
 import { ThemeColors } from '../types/game';
 import { modalStyles } from '../styles/modalStyles';
+import { Button } from './Button';
 
 interface MotivationModalProps {
   visible: boolean;
@@ -43,12 +43,7 @@ export function MotivationModal({ visible, onClose, colors, score, t }: Motivati
               ? t.motivationMessageMediumScore
               : t.motivationMessageHighScore}
           </Text>
-          <TouchableOpacity
-            style={modalStyles.primaryButton}
-            onPress={onClose}
-          >
-            <Text style={modalStyles.primaryButtonText}>{t.motivationButton}</Text>
-          </TouchableOpacity>
+          <Button label={t.motivationButton} onPress={onClose} variant="primary" fullWidth colors={colors} />
         </View>
       </View>
     </Modal>

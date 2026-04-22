@@ -3,11 +3,11 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
   Modal,
 } from 'react-native';
 import { ThemeColors, DifficultyMode, ChallengeState } from '../types/game';
 import { modalStyles } from '../styles/modalStyles';
+import { Button } from './Button';
 
 interface ResultModalProps {
   visible: boolean;
@@ -64,9 +64,7 @@ export function ResultModal({
                   {t.highScore}: {challengeState.highScore}
                 </Text>
               )}
-              <TouchableOpacity style={modalStyles.primaryButton} onPress={onRestart}>
-                <Text style={modalStyles.primaryButtonText}>{t.tryAgain}</Text>
-              </TouchableOpacity>
+              <Button label={t.tryAgain} onPress={onRestart} variant="primary" fullWidth colors={colors} />
             </>
           ) : (
             <>
@@ -75,12 +73,12 @@ export function ResultModal({
                 {t.youSolved} {score} {t.of} {totalTasks} {t.tasksCorrectly}.
               </Text>
               <View style={styles.modalButtonRow}>
-                <TouchableOpacity style={styles.modalButton} onPress={onRestart}>
-                  <Text style={modalStyles.primaryButtonText}>{t.newRound}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.modalButton} onPress={onContinue}>
-                  <Text style={modalStyles.primaryButtonText}>{t.continueGame}</Text>
-                </TouchableOpacity>
+                <View style={styles.modalButtonWrap}>
+                  <Button label={t.newRound} onPress={onRestart} variant="primary" fullWidth colors={colors} />
+                </View>
+                <View style={styles.modalButtonWrap}>
+                  <Button label={t.continueGame} onPress={onContinue} variant="secondary" fullWidth colors={colors} />
+                </View>
               </View>
             </>
           )}
@@ -96,13 +94,8 @@ const styles = StyleSheet.create({
     gap: 12,
     width: '100%',
   },
-  modalButton: {
+  modalButtonWrap: {
     flex: 1,
-    backgroundColor: '#4F46E5',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
   },
   newHighScoreText: {
     fontSize: 20,

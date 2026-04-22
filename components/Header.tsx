@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { ThemeColors, DifficultyMode, ChallengeState } from '../types/game';
 import { CHALLENGE_MAX_LIVES } from '../utils/constants';
+import { Badge } from './Badge';
 
 interface HeaderProps {
   colors: ThemeColors;
@@ -44,9 +45,7 @@ export function Header({
           <Text style={[styles.headerScore, { color: colors.text }]}>
             {t.level} {challengeState.level}
           </Text>
-          <Text style={[styles.headerScore, { color: colors.text }]}>
-            <Text style={{ fontWeight: 'bold' }}>{score}</Text>
-          </Text>
+          <Badge value={score} variant="default" animated />
         </>
       ) : (
         <>
