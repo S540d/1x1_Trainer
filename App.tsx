@@ -3,7 +3,6 @@ import {
   StyleSheet,
   SafeAreaView,
   useWindowDimensions,
-  AccessibilityInfo,
   Animated,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
@@ -21,7 +20,7 @@ import { GameCard } from './components/GameCard';
 import { ResultModal } from './components/ResultModal';
 import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
-import { ANIMATION_DURATIONS } from './utils/animations';
+import { ANIMATION_DURATIONS, initReducedMotionListener } from './utils/animations';
 
 export default function App() {
   const [menuRendered, setMenuRendered] = useState(false);
@@ -30,16 +29,10 @@ export default function App() {
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
 
-  // Reduced motion preference
+  // Reduced motion preference — centralized in utils/animations.ts
   const reduceMotion = useRef(false);
   useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
-      reduceMotion.current = enabled;
-    });
-    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', (enabled) => {
-      reduceMotion.current = enabled;
-    });
-    return () => sub.remove();
+    return initReducedMotionListener();
   }, []);
 
   // Animation values

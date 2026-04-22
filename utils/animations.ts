@@ -7,16 +7,33 @@ export const ANIMATION_DURATIONS = {
   SKELETON: 1200,
 } as const;
 
-let _reducedMotion = false;
+// Default true: never animate before the system preference is known.
+let _reducedMotion = true;
+let _subscription: { remove(): void } | null = null;
 
-// Read the current system preference once and subscribe to changes.
-AccessibilityInfo.isReduceMotionEnabled().then((value) => {
-  _reducedMotion = value;
-});
-if (Platform.OS !== 'web') {
-  AccessibilityInfo.addEventListener('reduceMotionChanged', (value) => {
+/**
+ * Initializes reduced-motion tracking. Call once from App startup and use the
+ * returned cleanup function in the unmount effect. Replaces any previous
+ * subscription so it is safe to call multiple times (e.g. fast refresh).
+ */
+export function initReducedMotionListener(): () => void {
+  AccessibilityInfo.isReduceMotionEnabled().then((value) => {
     _reducedMotion = value;
   });
+
+  _subscription?.remove();
+  _subscription = null;
+
+  if (Platform.OS !== 'web') {
+    _subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', (value) => {
+      _reducedMotion = value;
+    });
+  }
+
+  return () => {
+    _subscription?.remove();
+    _subscription = null;
+  };
 }
 
 /** Returns true when the user has requested reduced motion. */
