@@ -13,6 +13,7 @@ expo-env.d.ts
 .kotlin/
 *.orig.*
 *.jks
+*.keystore
 *.p8
 *.p12
 *.key
@@ -69,3 +70,6 @@ coverage/
 docs/ANDROID_BUILD.md
 docs/RELEASE_CHECKLIST.md
 scripts/setup-twa-step1.sh
+
+# Private documentation (local only — Issue #152)
+docs/private/
