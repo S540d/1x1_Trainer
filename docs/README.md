@@ -16,11 +16,6 @@
 ### Rechtliches
 - **[../PRIVACY_POLICY.md](../PRIVACY_POLICY.md)** - Datenschutzerklärung
 
-## Archiv
-
-Ältere Dokumente und abgeschlossene Themen:
-- **[archive/](archive/)** - Postmortems, alte Release Notes, PWA-Reports
-
 ## Links
 - [GitHub Repository](https://github.com/S540d/1x1_Trainer)
 - [Play Store](https://play.google.com/store/apps/details?id=com.sven4321.trainer1x1)

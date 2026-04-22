@@ -82,4 +82,17 @@ for internal_doc in "docs/ANDROID_BUILD.md" "docs/RELEASE_CHECKLIST.md" "scripts
   fi
 done
 
+# Block commits of docs/private/ files (Issue #152)
+if echo "$STAGED_ALL" | grep -q "^docs/private/"; then
+  echo "❌ ERROR: Dateien aus docs/private/ dürfen nicht committed werden!"
+  echo "   docs/private/ ist ausschließlich lokal — nicht für das öffentliche Repo."
+  exit 1
+fi
+
+# Block keystore files
+if echo "$STAGED_ALL" | grep -qE "\.(keystore|jks)$"; then
+  echo "❌ ERROR: Keystore-Datei darf nicht committed werden!"
+  exit 1
+fi
+
 echo "✅ Pre-commit checks passed!"
