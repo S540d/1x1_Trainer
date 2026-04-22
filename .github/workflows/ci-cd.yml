@@ -314,7 +314,10 @@ jobs:
           if ! grep -q "\.jks" .gitignore; then
             echo "❌ .gitignore missing *.jks"; exit 1
           fi
-          echo "✅ Keystore patterns are gitignored"
+          if ! grep -q "\.keystore" .gitignore; then
+            echo "❌ .gitignore missing *.keystore"; exit 1
+          fi
+          echo "✅ .gitignore covers *.jks and *.keystore"
 
       - name: Scan for hardcoded keystore passwords
         run: |
@@ -331,7 +334,7 @@ jobs:
   release-checklist:
     name: 📋 Release Readiness Report
     runs-on: ubuntu-latest
-    needs: [code-quality, build-web, platform-checks]
+    needs: [code-quality, build-web, platform-checks, security, docs-privacy, keystore-secrets]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
