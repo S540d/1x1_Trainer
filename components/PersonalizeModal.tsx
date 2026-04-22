@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { ThemeColors, Language, ThemeMode } from '../types/game';
 import { translations } from '../i18n/translations';
+import { Chip } from './Chip';
 
 interface PersonalizeModalProps {
   visible: boolean;
@@ -18,11 +19,6 @@ interface PersonalizeModalProps {
   onThemeModeChange: (mode: ThemeMode) => void;
 }
 
-/**
- * Personalize Modal for personal preferences
- * Separate modal similar to EnergyPriceGermany's CustomizeModal
- * Contains: Language and Appearance (Theme)
- */
 export function PersonalizeModal({
   visible,
   onClose,
@@ -38,135 +34,67 @@ export function PersonalizeModal({
 
   return (
     <>
-      {/* Overlay */}
       <TouchableOpacity
         style={[styles.settingsOverlay, { backgroundColor: colors.settingsOverlay }]}
         activeOpacity={1}
         onPress={onClose}
       />
 
-      {/* Modal Panel */}
       <View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu }]}>
-        {/* Header */}
         <View style={[styles.settingsMenuHeader, { borderBottomColor: colors.border }]}>
           <Text style={[styles.settingsMenuTitle, { color: colors.text }]}>
             {t.personalize}
           </Text>
-          <TouchableOpacity
-            style={styles.settingsMenuCloseButton}
-            onPress={onClose}
-          >
+          <TouchableOpacity style={styles.settingsMenuCloseButton} onPress={onClose}>
             <Text style={[styles.settingsMenuCloseButtonText, { color: colors.text }]}>✕</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Appearance Settings */}
         <View style={styles.settingsSection}>
           <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
             {t.appearance}
           </Text>
-          <View style={styles.themeToggle}>
-            <TouchableOpacity
-              style={[
-                styles.themeButton,
-                { borderColor: colors.border },
-                themeMode === 'light' && styles.themeButtonActive,
-              ]}
+          <View style={styles.chipRow}>
+            <Chip
+              label={t.light}
+              active={themeMode === 'light'}
               onPress={() => onThemeModeChange('light')}
-            >
-              <Text
-                style={[
-                  styles.themeButtonText,
-                  { color: colors.text },
-                  themeMode === 'light' && styles.themeButtonTextActive,
-                ]}
-              >
-                {t.light}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.themeButton,
-                { borderColor: colors.border },
-                themeMode === 'dark' && styles.themeButtonActive,
-              ]}
+              colors={colors}
+            />
+            <Chip
+              label={t.dark}
+              active={themeMode === 'dark'}
               onPress={() => onThemeModeChange('dark')}
-            >
-              <Text
-                style={[
-                  styles.themeButtonText,
-                  { color: colors.text },
-                  themeMode === 'dark' && styles.themeButtonTextActive,
-                ]}
-              >
-                {t.dark}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.themeButton,
-                { borderColor: colors.border },
-                themeMode === 'system' && styles.themeButtonActive,
-              ]}
+              colors={colors}
+            />
+            <Chip
+              label={t.system}
+              active={themeMode === 'system'}
               onPress={() => onThemeModeChange('system')}
-            >
-              <Text
-                style={[
-                  styles.themeButtonText,
-                  { color: colors.text },
-                  themeMode === 'system' && styles.themeButtonTextActive,
-                ]}
-              >
-                {t.system}
-              </Text>
-            </TouchableOpacity>
+              colors={colors}
+            />
           </View>
         </View>
 
         <View style={styles.settingsDivider} />
 
-        {/* Language Settings */}
         <View style={styles.settingsSection}>
           <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
             {t.language}
           </Text>
-          <View style={styles.themeToggle}>
-            <TouchableOpacity
-              style={[
-                styles.themeButton,
-                { borderColor: colors.border },
-                language === 'en' && styles.themeButtonActive,
-              ]}
+          <View style={styles.chipRow}>
+            <Chip
+              label={t.english}
+              active={language === 'en'}
               onPress={() => onLanguageChange('en')}
-            >
-              <Text
-                style={[
-                  styles.themeButtonText,
-                  { color: colors.text },
-                  language === 'en' && styles.themeButtonTextActive,
-                ]}
-              >
-                {t.english}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.themeButton,
-                { borderColor: colors.border },
-                language === 'de' && styles.themeButtonActive,
-              ]}
+              colors={colors}
+            />
+            <Chip
+              label={t.german}
+              active={language === 'de'}
               onPress={() => onLanguageChange('de')}
-            >
-              <Text
-                style={[
-                  styles.themeButtonText,
-                  { color: colors.text },
-                  language === 'de' && styles.themeButtonTextActive,
-                ]}
-              >
-                {t.german}
-              </Text>
-            </TouchableOpacity>
+              colors={colors}
+            />
           </View>
         </View>
       </View>
@@ -199,7 +127,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   settingsMenuHeader: {
-    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -229,29 +156,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textTransform: 'uppercase',
   },
-  themeToggle: {
+  chipRow: {
     flexDirection: 'row',
     gap: 8,
-  },
-  themeButton: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    alignItems: 'center',
-  },
-  themeButtonActive: {
-    backgroundColor: '#4F46E5',
-    borderColor: '#4F46E5',
-  },
-  themeButtonText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  themeButtonTextActive: {
-    color: '#fff',
   },
   settingsDivider: {
     height: 1,

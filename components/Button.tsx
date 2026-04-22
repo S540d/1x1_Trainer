@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Text, StyleSheet, Pressable, Animated } from 'react-native';
 import { ThemeColors } from '../types/game';
+import { prefersReducedMotion } from '../utils/animations';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger';
 
@@ -30,6 +31,7 @@ export function Button({
   const scale = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
+    if (prefersReducedMotion()) return;
     Animated.spring(scale, {
       toValue: 0.96,
       useNativeDriver: true,
@@ -39,6 +41,7 @@ export function Button({
   };
 
   const handlePressOut = () => {
+    if (prefersReducedMotion()) return;
     Animated.spring(scale, {
       toValue: 1.0,
       useNativeDriver: true,
