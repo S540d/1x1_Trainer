@@ -101,3 +101,31 @@ export const THEME_COLORS = {
     SETTINGS_MENU: '#FFFFFF',
   },
 } as const;
+
+export const DESIGN_TOKENS = {
+  GRADIENT_PRIMARY:        ['#667eea', '#764ba2'] as const,
+  GRADIENT_CORRECT:        ['#43e97b', '#38f9d7'] as const,
+  GRADIENT_INCORRECT:      ['#f857a6', '#ff5858'] as const,
+  GRADIENT_GOLD:           ['#f9d423', '#ff4e50'] as const,
+
+  NUMPAD_CARD_BG:          '#ffffff',
+  NUMPAD_BUTTON_BG:        '#f7f8ff',
+  NUMPAD_BACKSPACE_BG:     '#f0f4ff',
+  NUMPAD_ICON_COLOR:       '#764ba2',
+  NUMPAD_BORDER_RADIUS:    28,
+  NUMPAD_BUTTON_RADIUS:    16,
+
+  CHOICE_BUTTON_BG:        '#f7f8ff',
+  CHOICE_SELECTED_BG:      '#EEF2FF',
+  CHOICE_SELECTED_BORDER:  '#667eea',
+  CHOICE_CORRECT_BG:       '#ECFDF5',
+  CHOICE_CORRECT_BORDER:   '#43e97b',
+  CHOICE_INCORRECT_BG:     '#FFF1F2',
+  CHOICE_INCORRECT_BORDER: '#f857a6',
+
+  DOT_ACTIVE_COLOR:        '#764ba2',
+  DOT_INACTIVE_COLOR:      '#CBD5E1',
+
+  FONT_UI:                 'Nunito_700Bold',
+  FONT_NUMBER:             'Baloo2_700Bold',
+} as const;

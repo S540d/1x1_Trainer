@@ -6,6 +6,17 @@ import {
   Animated,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
+import {
+  Nunito_400Regular,
+  Nunito_700Bold,
+  Nunito_800ExtraBold,
+  Nunito_900Black,
+} from '@expo-google-fonts/nunito';
+import {
+  Baloo2_700Bold,
+  Baloo2_800ExtraBold,
+} from '@expo-google-fonts/baloo-2';
 
 // Local imports
 import { translations } from './i18n/translations';
@@ -20,9 +31,19 @@ import { GameCard } from './components/GameCard';
 import { ResultModal } from './components/ResultModal';
 import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
+import { FloatingStars } from './components/FloatingStars';
 import { ANIMATION_DURATIONS, initReducedMotionListener } from './utils/animations';
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Nunito_400Regular,
+    Nunito_700Bold,
+    Nunito_800ExtraBold,
+    Nunito_900Black,
+    Baloo2_700Bold,
+    Baloo2_800ExtraBold,
+  });
+
   const [menuRendered, setMenuRendered] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
   const [personalizeVisible, setPersonalizeVisible] = useState(false);
@@ -173,13 +194,14 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game.gameState.selectedOperations]);
 
-  if (!preferences.isLoaded) {
+  if (!preferences.isLoaded || !fontsLoaded) {
     return <SkeletonLoader colors={colors} />;
   }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style={isDarkMode ? 'light' : 'dark'} />
+      <FloatingStars />
 
       <Header
         colors={colors}

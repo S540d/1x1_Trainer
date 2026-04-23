@@ -7,8 +7,11 @@ import {
   ScrollView,
   Animated,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors, Operation, AnswerMode, GameState } from '../types/game';
+import { DESIGN_TOKENS } from '../utils/constants';
 import { Numpad } from './Numpad';
+import { ProgressDots } from './ProgressDots';
 
 interface GameCardProps {
   gameState: GameState;
@@ -46,10 +49,10 @@ export function GameCard({
   onNext,
   t,
 }: GameCardProps) {
-  const getCardColor = () => {
-    if (gameState.lastAnswerCorrect === true) return colors.cardCorrect;
-    if (gameState.lastAnswerCorrect === false) return colors.cardIncorrect;
-    return colors.card;
+  const getGradientColors = (): readonly [string, string] => {
+    if (gameState.lastAnswerCorrect === true) return DESIGN_TOKENS.GRADIENT_CORRECT;
+    if (gameState.lastAnswerCorrect === false) return DESIGN_TOKENS.GRADIENT_INCORRECT;
+    return DESIGN_TOKENS.GRADIENT_PRIMARY;
   };
 
   const getResult = () => {
@@ -60,152 +63,167 @@ export function GameCard({
   };
 
   const renderAnswerBox = () => (
-    <View style={[styles.answerBox, { backgroundColor: colors.background }]}>
-      <Text style={[styles.answerText, { color: colors.text }, gameState.userAnswer === '' && styles.answerPlaceholder]}>
+    <View style={styles.answerBox}>
+      <Text style={[styles.answerText, gameState.userAnswer === '' && styles.answerPlaceholder]}>
         {gameState.userAnswer || '?'}
       </Text>
     </View>
   );
 
   const renderNumber = (value: number) => (
-    <Text style={[styles.questionText, { color: colors.text }]}>{value}</Text>
+    <Text style={styles.questionText}>{value}</Text>
   );
 
   const renderQuestionMark = () => (
-    <Text style={[styles.questionText, { color: colors.text }]}>?</Text>
+    <Text style={styles.questionText}>?</Text>
   );
 
   return (
     <View style={styles.contentArea}>
-      <Animated.View style={[styles.questionCard, { backgroundColor: getCardColor() }, cardAnimatedStyle]}>
-        <View style={styles.questionRow}>
-          {/* First number or answer box */}
-          {gameState.questionPart === 0 ? (
-            gameState.answerMode === AnswerMode.INPUT ? renderAnswerBox() : renderQuestionMark()
-          ) : (
-            renderNumber(gameState.num1)
-          )}
+      <Animated.View style={[styles.cardWrapper, cardAnimatedStyle]}>
+        <LinearGradient
+          colors={getGradientColors()}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.questionCard}
+        >
+          <View style={styles.questionRow}>
+            {gameState.questionPart === 0 ? (
+              gameState.answerMode === AnswerMode.INPUT ? renderAnswerBox() : renderQuestionMark()
+            ) : (
+              renderNumber(gameState.num1)
+            )}
 
-          {/* Operator */}
-          <Text style={[styles.questionText, { color: colors.text }]}> {operatorSymbol} </Text>
+            <Text style={styles.questionText}> {operatorSymbol} </Text>
 
-          {/* Second number or answer box */}
-          {gameState.questionPart === 1 ? (
-            gameState.answerMode === AnswerMode.INPUT ? renderAnswerBox() : renderQuestionMark()
-          ) : (
-            renderNumber(gameState.num2)
-          )}
+            {gameState.questionPart === 1 ? (
+              gameState.answerMode === AnswerMode.INPUT ? renderAnswerBox() : renderQuestionMark()
+            ) : (
+              renderNumber(gameState.num2)
+            )}
 
-          {/* Equals sign */}
-          <Text style={[styles.questionText, { color: colors.text }]}> = </Text>
+            <Text style={styles.questionText}> = </Text>
 
-          {/* Result or answer box */}
-          {gameState.questionPart === 2 ? (
-            gameState.answerMode === AnswerMode.INPUT ? renderAnswerBox() : renderQuestionMark()
-          ) : (
-            <Text style={[styles.questionText, { color: colors.text }]}>{getResult()}</Text>
-          )}
-        </View>
+            {gameState.questionPart === 2 ? (
+              gameState.answerMode === AnswerMode.INPUT ? renderAnswerBox() : renderQuestionMark()
+            ) : (
+              <Text style={styles.questionText}>{getResult()}</Text>
+            )}
+          </View>
 
-        {/* Answer Input Area */}
-        <View style={styles.answerArea}>
-          {gameState.answerMode === AnswerMode.INPUT && (
-            <Numpad
-              onNumberClick={onNumberClick}
-              onCheck={gameState.isAnswerChecked ? onNext : onCheck}
-              userAnswer={gameState.userAnswer}
-              isAnswerChecked={gameState.isAnswerChecked}
-              colors={colors}
-              reduceMotion={reduceMotion}
-            />
-          )}
+          <View style={styles.answerArea}>
+            {gameState.answerMode === AnswerMode.INPUT && (
+              <Numpad
+                onNumberClick={onNumberClick}
+                onCheck={gameState.isAnswerChecked ? onNext : onCheck}
+                userAnswer={gameState.userAnswer}
+                isAnswerChecked={gameState.isAnswerChecked}
+                colors={colors}
+                reduceMotion={reduceMotion}
+              />
+            )}
 
-          {gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && (
-            <View style={styles.choicesContainer}>
-              <ScrollView style={styles.choicesScroll}>
-                {multipleChoices.map((choice, index) => (
-                  <TouchableOpacity
-                    key={`${index}-${choice}`}
-                    style={[
-                      styles.choiceButton,
-                      { borderColor: colors.border },
-                      gameState.selectedChoice === choice && styles.choiceButtonSelected,
-                      gameState.isAnswerChecked && choice === getCorrectAnswer() && styles.choiceButtonCorrect,
-                      gameState.isAnswerChecked && gameState.selectedChoice === choice && choice !== getCorrectAnswer() && styles.choiceButtonIncorrect,
-                    ]}
-                    onPress={() => onChoiceClick(choice)}
-                    disabled={gameState.isAnswerChecked}
-                  >
-                    <Text style={[
-                      styles.choiceButtonText,
-                      { color: colors.text },
-                      gameState.selectedChoice === choice && styles.choiceButtonTextSelected,
-                    ]}>
-                      {choice}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-              <TouchableOpacity
-                style={[
-                  styles.checkButton,
-                  (gameState.selectedChoice === null && !gameState.isAnswerChecked) && styles.checkButtonDisabled,
-                ]}
-                onPress={gameState.isAnswerChecked ? onNext : onCheck}
-                disabled={gameState.selectedChoice === null && !gameState.isAnswerChecked}
-              >
-                <Text style={styles.checkButtonText}>
-                  {gameState.isAnswerChecked ? t.nextQuestion : t.check}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && (
-            <View style={styles.sequenceContainer}>
-              <ScrollView style={styles.sequenceScroll}>
-                <View style={styles.sequenceGrid}>
-                  {numberSequence.map((num, index) => (
+            {gameState.answerMode === AnswerMode.MULTIPLE_CHOICE && (
+              <View style={styles.choicesContainer}>
+                <ScrollView style={styles.choicesScroll}>
+                  {multipleChoices.map((choice, index) => (
                     <TouchableOpacity
-                      key={`${index}-${num}`}
+                      key={`${index}-${choice}`}
                       style={[
-                        styles.sequenceButton,
-                        { borderColor: colors.border },
-                        gameState.selectedChoice === num && styles.sequenceButtonSelected,
-                        gameState.isAnswerChecked && num === getCorrectAnswer() && styles.sequenceButtonCorrect,
-                        gameState.isAnswerChecked && gameState.selectedChoice === num && num !== getCorrectAnswer() && styles.sequenceButtonIncorrect,
+                        styles.choiceButton,
+                        gameState.selectedChoice === choice && styles.choiceButtonSelected,
+                        gameState.isAnswerChecked && choice === getCorrectAnswer() && styles.choiceButtonCorrect,
+                        gameState.isAnswerChecked && gameState.selectedChoice === choice && choice !== getCorrectAnswer() && styles.choiceButtonIncorrect,
                       ]}
-                      onPress={() => onChoiceClick(num)}
+                      onPress={() => onChoiceClick(choice)}
                       disabled={gameState.isAnswerChecked}
                     >
                       <Text style={[
-                        styles.sequenceButtonText,
-                        { color: colors.text },
-                        gameState.selectedChoice === num && styles.sequenceButtonTextSelected,
+                        styles.choiceButtonText,
+                        gameState.selectedChoice === choice && styles.choiceButtonTextSelected,
                       ]}>
-                        {num}
+                        {choice}
                       </Text>
                     </TouchableOpacity>
                   ))}
-                </View>
-              </ScrollView>
-              <TouchableOpacity
-                style={[
-                  styles.checkButton,
-                  (gameState.selectedChoice === null && !gameState.isAnswerChecked) && styles.checkButtonDisabled,
-                ]}
-                onPress={gameState.isAnswerChecked ? onNext : onCheck}
-                disabled={gameState.selectedChoice === null && !gameState.isAnswerChecked}
-              >
-                <Text style={styles.checkButtonText}>
-                  {gameState.isAnswerChecked ? t.nextQuestion : t.check}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
+                </ScrollView>
+                <GradientCheckButton
+                  label={gameState.isAnswerChecked ? t.nextQuestion : t.check}
+                  onPress={gameState.isAnswerChecked ? onNext : onCheck}
+                  disabled={gameState.selectedChoice === null && !gameState.isAnswerChecked}
+                />
+              </View>
+            )}
+
+            {gameState.answerMode === AnswerMode.NUMBER_SEQUENCE && (
+              <View style={styles.sequenceContainer}>
+                <ScrollView style={styles.sequenceScroll}>
+                  <View style={styles.sequenceGrid}>
+                    {numberSequence.map((num, index) => (
+                      <TouchableOpacity
+                        key={`${index}-${num}`}
+                        style={[
+                          styles.sequenceButton,
+                          gameState.selectedChoice === num && styles.sequenceButtonSelected,
+                          gameState.isAnswerChecked && num === getCorrectAnswer() && styles.sequenceButtonCorrect,
+                          gameState.isAnswerChecked && gameState.selectedChoice === num && num !== getCorrectAnswer() && styles.sequenceButtonIncorrect,
+                        ]}
+                        onPress={() => onChoiceClick(num)}
+                        disabled={gameState.isAnswerChecked}
+                      >
+                        <Text style={[
+                          styles.sequenceButtonText,
+                          gameState.selectedChoice === num && styles.sequenceButtonTextSelected,
+                        ]}>
+                          {num}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+                <GradientCheckButton
+                  label={gameState.isAnswerChecked ? t.nextQuestion : t.check}
+                  onPress={gameState.isAnswerChecked ? onNext : onCheck}
+                  disabled={gameState.selectedChoice === null && !gameState.isAnswerChecked}
+                />
+              </View>
+            )}
+          </View>
+        </LinearGradient>
       </Animated.View>
+
+      <ProgressDots current={gameState.currentTask - 1} total={gameState.totalTasks} />
     </View>
+  );
+}
+
+function GradientCheckButton({
+  label,
+  onPress,
+  disabled,
+}: {
+  label: string;
+  onPress: () => void;
+  disabled: boolean;
+}) {
+  if (disabled) {
+    return (
+      <View style={[styles.checkButton, styles.checkButtonDisabled]}>
+        <Text style={styles.checkButtonText}>{label}</Text>
+      </View>
+    );
+  }
+  return (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
+      <LinearGradient
+        colors={DESIGN_TOKENS.GRADIENT_PRIMARY}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.checkButton}
+      >
+        <Text style={styles.checkButtonText}>{label}</Text>
+      </LinearGradient>
+    </TouchableOpacity>
   );
 }
 
@@ -213,6 +231,17 @@ const styles = StyleSheet.create({
   contentArea: {
     flex: 1,
     padding: 16,
+    gap: 4,
+  },
+  cardWrapper: {
+    flex: 1,
+    borderRadius: 24,
+    overflow: 'hidden',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
   },
   questionCard: {
     flex: 1,
@@ -222,34 +251,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 16,
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
   },
   questionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 0,
   },
   questionText: {
     fontSize: 48,
     fontWeight: 'bold',
+    color: '#fff',
+    fontFamily: 'Baloo2_700Bold',
   },
   answerBox: {
     width: 120,
     height: 60,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.3)',
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },
   answerText: {
-    fontSize: 24,
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    fontFamily: 'Baloo2_700Bold',
   },
   answerPlaceholder: {
-    color: '#999',
+    color: 'rgba(255,255,255,0.6)',
   },
   answerArea: {
     width: '100%',
@@ -268,37 +296,40 @@ const styles = StyleSheet.create({
   choiceButton: {
     width: '100%',
     height: 60,
-    backgroundColor: 'transparent',
-    borderRadius: 20,
+    backgroundColor: DESIGN_TOKENS.CHOICE_BUTTON_BG,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
-    borderWidth: 2,
   },
   choiceButtonSelected: {
-    backgroundColor: '#EEF2FF',
-    borderColor: '#4F46E5',
+    backgroundColor: DESIGN_TOKENS.CHOICE_SELECTED_BG,
+    borderWidth: 2,
+    borderColor: DESIGN_TOKENS.CHOICE_SELECTED_BORDER,
   },
   choiceButtonCorrect: {
-    backgroundColor: '#ECFDF5',
-    borderColor: '#10B981',
+    backgroundColor: DESIGN_TOKENS.CHOICE_CORRECT_BG,
+    borderWidth: 2,
+    borderColor: DESIGN_TOKENS.CHOICE_CORRECT_BORDER,
   },
   choiceButtonIncorrect: {
-    backgroundColor: '#FFF1F2',
-    borderColor: '#EF4444',
+    backgroundColor: DESIGN_TOKENS.CHOICE_INCORRECT_BG,
+    borderWidth: 2,
+    borderColor: DESIGN_TOKENS.CHOICE_INCORRECT_BORDER,
   },
   choiceButtonText: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#333',
+    fontFamily: 'Baloo2_700Bold',
   },
   choiceButtonTextSelected: {
-    color: '#4338CA',
+    color: '#667eea',
   },
   checkButton: {
     width: '100%',
-    height: 60,
-    backgroundColor: '#10B981',
-    borderRadius: 28,
+    height: 56,
+    borderRadius: DESIGN_TOKENS.NUMPAD_BORDER_RADIUS,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
@@ -310,7 +341,7 @@ const styles = StyleSheet.create({
   checkButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#fff',
   },
   sequenceContainer: {
     width: '100%',
@@ -329,30 +360,34 @@ const styles = StyleSheet.create({
   sequenceButton: {
     width: '48%',
     height: 48,
-    backgroundColor: 'transparent',
+    backgroundColor: DESIGN_TOKENS.CHOICE_BUTTON_BG,
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
-    borderWidth: 2,
   },
   sequenceButtonSelected: {
-    backgroundColor: '#EEF2FF',
-    borderColor: '#4F46E5',
+    backgroundColor: DESIGN_TOKENS.CHOICE_SELECTED_BG,
+    borderWidth: 2,
+    borderColor: DESIGN_TOKENS.CHOICE_SELECTED_BORDER,
   },
   sequenceButtonCorrect: {
-    backgroundColor: '#ECFDF5',
-    borderColor: '#10B981',
+    backgroundColor: DESIGN_TOKENS.CHOICE_CORRECT_BG,
+    borderWidth: 2,
+    borderColor: DESIGN_TOKENS.CHOICE_CORRECT_BORDER,
   },
   sequenceButtonIncorrect: {
-    backgroundColor: '#FFF1F2',
-    borderColor: '#EF4444',
+    backgroundColor: DESIGN_TOKENS.CHOICE_INCORRECT_BG,
+    borderWidth: 2,
+    borderColor: DESIGN_TOKENS.CHOICE_INCORRECT_BORDER,
   },
   sequenceButtonText: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#333',
+    fontFamily: 'Baloo2_700Bold',
   },
   sequenceButtonTextSelected: {
-    color: '#4338CA',
+    color: '#667eea',
   },
 });

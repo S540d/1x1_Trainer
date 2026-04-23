@@ -5,9 +5,11 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors, DifficultyMode, ChallengeState } from '../types/game';
-import { CHALLENGE_MAX_LIVES } from '../utils/constants';
+import { CHALLENGE_MAX_LIVES, DESIGN_TOKENS } from '../utils/constants';
 import { Badge } from './Badge';
+import { ProgressBar } from './ProgressBar';
 
 interface HeaderProps {
   colors: ThemeColors;
@@ -35,12 +37,12 @@ export function Header({
   t,
 }: HeaderProps) {
   return (
-    <View style={[styles.header, { borderBottomColor: colors.border }]}>
+    <View style={styles.header}>
       {difficultyMode === DifficultyMode.CHALLENGE && challengeState ? (
         <>
           <Text style={[styles.headerScore, { color: colors.text }]}>
-            {Array.from({ length: challengeState.lives }, () => '\u2764\uFE0F').join('')}
-            {Array.from({ length: CHALLENGE_MAX_LIVES - challengeState.lives }, () => '\uD83E\uDD0D').join('')}
+            {Array.from({ length: challengeState.lives }, () => '❤️').join('')}
+            {Array.from({ length: CHALLENGE_MAX_LIVES - challengeState.lives }, () => '🤍').join('')}
           </Text>
           <Text style={[styles.headerScore, { color: colors.text }]}>
             {t.level} {challengeState.level}
@@ -49,12 +51,20 @@ export function Header({
         </>
       ) : (
         <>
-          <Text style={[styles.headerScore, { color: colors.text }]}>
-            {t.task}: {currentTask}/{totalTasks}
-          </Text>
-          <Text style={[styles.headerScore, { color: colors.text }]}>
-            {t.points}: <Text style={{ color: colors.text, fontWeight: 'bold' }}>{score}</Text>
-          </Text>
+          <View style={styles.progressContainer}>
+            <ProgressBar current={currentTask - 1} total={totalTasks} />
+            <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>
+              {currentTask}/{totalTasks}
+            </Text>
+          </View>
+          <LinearGradient
+            colors={DESIGN_TOKENS.GRADIENT_GOLD}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.scoreBadge}
+          >
+            <Text style={styles.scoreBadgeText}>⭐ {score}</Text>
+          </LinearGradient>
         </>
       )}
       <TouchableOpacity
@@ -74,12 +84,35 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    paddingVertical: 12,
+    gap: 8,
   },
   headerScore: {
     fontSize: 18,
+  },
+  progressContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  progressLabel: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    minWidth: 36,
+    textAlign: 'right',
+  },
+  scoreBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scoreBadgeText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
   },
   settingsButton: {
     padding: 8,
@@ -91,6 +124,5 @@ const styles = StyleSheet.create({
   settingsButtonText: {
     fontSize: 24,
     fontWeight: 'normal',
-    color: '#4F46E5',
   },
 });

@@ -64,7 +64,8 @@
       "baseUrl": "/1x1_Trainer"
     },
     "plugins": [
-      "expo-localization"
+      "expo-localization",
+      "expo-font"
     ]
   }
 }
