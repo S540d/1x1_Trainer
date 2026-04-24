@@ -28,8 +28,12 @@ module.exports = {
   ],
   moduleNameMapper: {
     '^react-native$': 'react-native-web',
+    '^expo-linear-gradient$': '<rootDir>/__mocks__/expo-linear-gradient.js',
+    '^expo-font$': '<rootDir>/__mocks__/expo-font.js',
+    '^expo-status-bar$': '<rootDir>/__mocks__/expo-status-bar.js',
+    '^@expo-google-fonts/(.*)$': '<rootDir>/__mocks__/@expo-google-fonts.js',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(expo-localization)/)',
+    'node_modules/(?!(expo-localization|expo-linear-gradient|expo-font|expo-status-bar|@expo-google-fonts)/)',
   ],
 };
