@@ -217,6 +217,7 @@ export default function App() {
       {menuRendered && (
         <SettingsMenu
           colors={colors}
+          isDarkMode={isDarkMode}
           screenHeight={screenHeight}
           menuAnimatedStyle={menuAnimatedStyle}
           difficultyMode={game.gameState.difficultyMode}

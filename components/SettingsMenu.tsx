@@ -14,6 +14,7 @@ import { CONTACT_EMAIL, DESIGN_TOKENS } from '../utils/constants';
 
 interface SettingsMenuProps {
   colors: ThemeColors;
+  isDarkMode: boolean;
   screenHeight: number;
   menuAnimatedStyle: {
     transform: { translateY: Animated.Value }[];
@@ -59,6 +60,7 @@ interface SettingsMenuProps {
 
 export function SettingsMenu({
   colors,
+  isDarkMode,
   screenHeight,
   menuAnimatedStyle,
   difficultyMode,
@@ -72,6 +74,11 @@ export function SettingsMenu({
   onOpenAbout,
   t,
 }: SettingsMenuProps) {
+  const buttonBg = isDarkMode ? '#2D3748' : '#f7f8ff';
+  const buttonBorder = isDarkMode ? '#4A5568' : '#dde3ff';
+  const buttonText = isDarkMode ? '#E8EAED' : '#2d2b55';
+  const sectionTitle = isDarkMode ? '#9b8ecf' : '#9b8ecf';
+  const modeInfo = isDarkMode ? '#9b8ecf' : '#9b8ecf';
   return (
     <>
       <TouchableOpacity
@@ -79,7 +86,7 @@ export function SettingsMenu({
         activeOpacity={1}
         onPress={onHideMenu}
       />
-      <Animated.View style={[styles.settingsMenu, { maxHeight: screenHeight - 80 }, menuAnimatedStyle]}>
+      <Animated.View style={[styles.settingsMenu, { maxHeight: screenHeight - 80, backgroundColor: colors.settingsMenu }, menuAnimatedStyle]}>
         <LinearGradient
           colors={DESIGN_TOKENS.GRADIENT_PRIMARY}
           start={{ x: 0, y: 0 }}
@@ -110,7 +117,7 @@ export function SettingsMenu({
 
         {/* Operation Settings */}
         <View style={styles.settingsSection}>
-          <Text style={styles.settingsSectionTitle}>{t.operation}</Text>
+          <Text style={[styles.settingsSectionTitle, { color: sectionTitle }]}>{t.operation}</Text>
           <View style={styles.operationGrid}>
             {([
               { op: Operation.ADDITION, symbol: '+', label: t.addition },
@@ -125,13 +132,14 @@ export function SettingsMenu({
                   key={op}
                   style={[
                     styles.operationButton,
+                    { backgroundColor: buttonBg, borderColor: buttonBorder },
                     isActive && styles.operationButtonActive,
                     isChallenge && { opacity: 0.6 },
                   ]}
                   onPress={() => onToggleOperation(op)}
                   disabled={isChallenge}
                 >
-                  <Text style={[styles.operationButtonText, isActive && styles.operationButtonTextActive]}>
+                  <Text style={[styles.operationButtonText, { color: buttonText }, isActive && styles.operationButtonTextActive]}>
                     {symbol} {label}
                   </Text>
                 </TouchableOpacity>
@@ -144,37 +152,37 @@ export function SettingsMenu({
 
         {/* Difficulty Mode Settings */}
         <View style={styles.settingsSection}>
-          <Text style={styles.settingsSectionTitle}>{t.difficultyMode}</Text>
+          <Text style={[styles.settingsSectionTitle, { color: sectionTitle }]}>{t.difficultyMode}</Text>
           <View style={styles.themeToggle}>
             <TouchableOpacity
-              style={[styles.themeButton, difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonActive]}
+              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonActive]}
               onPress={() => onChangeDifficultyMode(DifficultyMode.SIMPLE)}
             >
-              <Text style={[styles.themeButtonText, difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonTextActive]}>
+              <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonTextActive]}>
                 {t.simpleMode}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.themeButton, difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonActive]}
+              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonActive]}
               onPress={() => onChangeDifficultyMode(DifficultyMode.CREATIVE)}
             >
-              <Text style={[styles.themeButtonText, difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonTextActive]}>
+              <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonTextActive]}>
                 {t.creativeMode}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.themeButton, difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonActive]}
+              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonActive]}
               onPress={() => {
                 onChangeDifficultyMode(DifficultyMode.CHALLENGE);
                 onHideMenu();
               }}
             >
-              <Text style={[styles.themeButtonText, difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonTextActive]}>
+              <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonTextActive]}>
                 {t.challenge}
               </Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.settingsModeInfo}>
+          <Text style={[styles.settingsModeInfo, { color: modeInfo }]}>
             {difficultyMode === DifficultyMode.SIMPLE
               ? t.simpleModeInfo
               : difficultyMode === DifficultyMode.CREATIVE
@@ -187,7 +195,7 @@ export function SettingsMenu({
 
         {/* Number Range Settings */}
         <View style={styles.settingsSection}>
-          <Text style={styles.settingsSectionTitle}>{t.numberRange}</Text>
+          <Text style={[styles.settingsSectionTitle, { color: sectionTitle }]}>{t.numberRange}</Text>
           <View style={styles.numberRangeGrid}>
             {([
               { range: NumberRange.RANGE_10, label: t.upTo10 },
@@ -202,13 +210,14 @@ export function SettingsMenu({
                   key={range}
                   style={[
                     styles.rangeButton,
+                    { backgroundColor: buttonBg, borderColor: buttonBorder },
                     isActive && styles.rangeButtonActive,
                     isChallengeMode && { opacity: 0.6 },
                   ]}
                   onPress={() => onSetNumberRange(range)}
                   disabled={isChallengeMode}
                 >
-                  <Text style={[styles.rangeButtonText, isActive && styles.rangeButtonTextActive]}>
+                  <Text style={[styles.rangeButtonText, { color: buttonText }, isActive && styles.rangeButtonTextActive]}>
                     {label}
                   </Text>
                 </TouchableOpacity>
@@ -270,7 +279,6 @@ const styles = StyleSheet.create({
     right: 16,
     left: 16,
     borderRadius: DESIGN_TOKENS.NUMPAD_BORDER_RADIUS,
-    backgroundColor: '#fff',
     elevation: 12,
     shadowColor: '#667eea',
     shadowOffset: { width: 0, height: 4 },

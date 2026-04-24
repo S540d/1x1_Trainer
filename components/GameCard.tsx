@@ -119,6 +119,8 @@ export function GameCard({
                 userAnswer={gameState.userAnswer}
                 isAnswerChecked={gameState.isAnswerChecked}
                 reduceMotion={reduceMotion}
+                checkLabel={t.check}
+                nextLabel={t.nextQuestion}
               />
             )}
 
