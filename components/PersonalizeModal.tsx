@@ -5,8 +5,10 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors, Language, ThemeMode } from '../types/game';
 import { translations } from '../i18n/translations';
+import { DESIGN_TOKENS } from '../utils/constants';
 import { Chip } from './Chip';
 
 interface PersonalizeModalProps {
@@ -40,18 +42,21 @@ export function PersonalizeModal({
         onPress={onClose}
       />
 
-      <View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu }]}>
-        <View style={[styles.settingsMenuHeader, { borderBottomColor: colors.border }]}>
-          <Text style={[styles.settingsMenuTitle, { color: colors.text }]}>
-            {t.personalize}
-          </Text>
+      <View style={styles.settingsMenu}>
+        <LinearGradient
+          colors={DESIGN_TOKENS.GRADIENT_PRIMARY}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.settingsMenuHeader}
+        >
+          <Text style={styles.settingsMenuTitle}>{t.personalize}</Text>
           <TouchableOpacity style={styles.settingsMenuCloseButton} onPress={onClose}>
-            <Text style={[styles.settingsMenuCloseButtonText, { color: colors.text }]}>✕</Text>
+            <Text style={styles.settingsMenuCloseButtonText}>✕</Text>
           </TouchableOpacity>
-        </View>
+        </LinearGradient>
 
         <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
+          <Text style={styles.settingsSectionTitle}>
             {t.appearance}
           </Text>
           <View style={styles.chipRow}>
@@ -79,7 +84,7 @@ export function PersonalizeModal({
         <View style={styles.settingsDivider} />
 
         <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
+          <Text style={styles.settingsSectionTitle}>
             {t.language}
           </Text>
           <View style={styles.chipRow}>
@@ -109,7 +114,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.45)',
     zIndex: 999,
   },
   settingsMenu: {
@@ -117,12 +122,13 @@ const styles = StyleSheet.create({
     top: 60,
     right: 16,
     left: 16,
-    borderRadius: 20,
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    borderRadius: DESIGN_TOKENS.NUMPAD_BORDER_RADIUS,
+    backgroundColor: '#fff',
+    elevation: 12,
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
     zIndex: 1000,
     overflow: 'hidden',
   },
@@ -130,31 +136,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
   },
   settingsMenuTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: DESIGN_TOKENS.FONT_NUMBER,
+    color: '#fff',
+    letterSpacing: 0.3,
   },
   settingsMenuCloseButton: {
-    padding: 12,
+    padding: 8,
     alignItems: 'flex-end',
   },
   settingsMenuCloseButtonText: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: '#fff',
   },
   settingsSection: {
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
   settingsSectionTitle: {
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: 11,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: '#9b8ecf',
     marginBottom: 8,
     textTransform: 'uppercase',
+    letterSpacing: 0.08,
   },
   chipRow: {
     flexDirection: 'row',
@@ -162,7 +172,7 @@ const styles = StyleSheet.create({
   },
   settingsDivider: {
     height: 1,
-    backgroundColor: 'rgba(0,0,0,0.1)',
-    marginVertical: 4,
+    backgroundColor: 'rgba(102,126,234,0.1)',
+    marginVertical: 2,
   },
 });
