@@ -8,7 +8,6 @@ import {
   Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ThemeColors } from '../types/game';
 import { DESIGN_TOKENS } from '../utils/constants';
 
 interface NumpadProps {
@@ -16,7 +15,6 @@ interface NumpadProps {
   onCheck: () => void;
   userAnswer: string;
   isAnswerChecked: boolean;
-  colors: ThemeColors;
   reduceMotion: React.MutableRefObject<boolean>;
 }
 
@@ -25,7 +23,6 @@ export function Numpad({
   onCheck,
   userAnswer,
   isAnswerChecked,
-  colors,
   reduceMotion,
 }: NumpadProps) {
   const canCheck = userAnswer !== '' || isAnswerChecked;
@@ -46,7 +43,7 @@ export function Numpad({
       pulseAnim.setValue(1);
     }
     return () => { pulseLoop.current?.stop(); };
-  }, [canCheck, reduceMotion]);
+  }, [canCheck, reduceMotion, pulseAnim, pulseLoop]);
 
   return (
     <View style={styles.card}>

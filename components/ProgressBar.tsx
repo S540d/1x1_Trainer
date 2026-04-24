@@ -18,7 +18,7 @@ export function ProgressBar({ current, total }: ProgressBarProps) {
       duration: 300,
       useNativeDriver: false,
     }).start();
-  }, [current, total]);
+  }, [current, total, widthAnim]);
 
   return (
     <View style={styles.track}>

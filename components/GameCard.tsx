@@ -118,7 +118,6 @@ export function GameCard({
                 onCheck={gameState.isAnswerChecked ? onNext : onCheck}
                 userAnswer={gameState.userAnswer}
                 isAnswerChecked={gameState.isAnswerChecked}
-                colors={colors}
                 reduceMotion={reduceMotion}
               />
             )}
