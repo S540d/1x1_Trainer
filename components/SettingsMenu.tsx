@@ -8,8 +8,9 @@ import {
   Linking,
   Animated,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors, Operation, DifficultyMode, NumberRange } from '../types/game';
-import { CONTACT_EMAIL } from '../utils/constants';
+import { CONTACT_EMAIL, DESIGN_TOKENS } from '../utils/constants';
 
 interface SettingsMenuProps {
   colors: ThemeColors;
@@ -78,25 +79,30 @@ export function SettingsMenu({
         activeOpacity={1}
         onPress={onHideMenu}
       />
-      <Animated.View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu, maxHeight: screenHeight - 80 }, menuAnimatedStyle]}>
-        <View style={[styles.settingsMenuHeader, { borderBottomColor: colors.border }]}>
-          <Text style={[styles.settingsMenuTitle, { color: colors.text }]}>{t.settings}</Text>
+      <Animated.View style={[styles.settingsMenu, { maxHeight: screenHeight - 80 }, menuAnimatedStyle]}>
+        <LinearGradient
+          colors={DESIGN_TOKENS.GRADIENT_PRIMARY}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.settingsMenuHeader}
+        >
+          <Text style={styles.settingsMenuTitle}>{t.settings}</Text>
           <TouchableOpacity
             style={styles.settingsMenuCloseButton}
             onPress={onHideMenu}
           >
-            <Text style={[styles.settingsMenuCloseButtonText, { color: colors.text }]}>✕</Text>
+            <Text style={styles.settingsMenuCloseButtonText}>✕</Text>
           </TouchableOpacity>
-        </View>
+        </LinearGradient>
         <ScrollView bounces={false}>
 
         {/* Personalize Button */}
         <View style={styles.settingsSection}>
           <TouchableOpacity
-            style={[styles.personalizeButton, { borderColor: colors.border }]}
+            style={styles.personalizeButton}
             onPress={onOpenPersonalize}
           >
-            <Text style={[styles.personalizeButtonText, { color: colors.text }]}>{t.personalize}</Text>
+            <Text style={styles.personalizeButtonText}>{t.personalize}</Text>
           </TouchableOpacity>
         </View>
 
@@ -104,7 +110,7 @@ export function SettingsMenu({
 
         {/* Operation Settings */}
         <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.operation}</Text>
+          <Text style={styles.settingsSectionTitle}>{t.operation}</Text>
           <View style={styles.operationGrid}>
             {([
               { op: Operation.ADDITION, symbol: '+', label: t.addition },
@@ -119,20 +125,13 @@ export function SettingsMenu({
                   key={op}
                   style={[
                     styles.operationButton,
-                    { borderColor: colors.border },
                     isActive && styles.operationButtonActive,
                     isChallenge && { opacity: 0.6 },
                   ]}
                   onPress={() => onToggleOperation(op)}
                   disabled={isChallenge}
                 >
-                  <Text
-                    style={[
-                      styles.operationButtonText,
-                      { color: colors.text },
-                      isActive && styles.operationButtonTextActive,
-                    ]}
-                  >
+                  <Text style={[styles.operationButtonText, isActive && styles.operationButtonTextActive]}>
                     {symbol} {label}
                   </Text>
                 </TouchableOpacity>
@@ -145,67 +144,37 @@ export function SettingsMenu({
 
         {/* Difficulty Mode Settings */}
         <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.difficultyMode}</Text>
+          <Text style={styles.settingsSectionTitle}>{t.difficultyMode}</Text>
           <View style={styles.themeToggle}>
             <TouchableOpacity
-              style={[
-                styles.themeButton,
-                { borderColor: colors.border },
-                difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonActive,
-              ]}
+              style={[styles.themeButton, difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonActive]}
               onPress={() => onChangeDifficultyMode(DifficultyMode.SIMPLE)}
             >
-              <Text
-                style={[
-                  styles.themeButtonText,
-                  { color: colors.text },
-                  difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonTextActive,
-                ]}
-              >
+              <Text style={[styles.themeButtonText, difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonTextActive]}>
                 {t.simpleMode}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.themeButton,
-                { borderColor: colors.border },
-                difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonActive,
-              ]}
+              style={[styles.themeButton, difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonActive]}
               onPress={() => onChangeDifficultyMode(DifficultyMode.CREATIVE)}
             >
-              <Text
-                style={[
-                  styles.themeButtonText,
-                  { color: colors.text },
-                  difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonTextActive,
-                ]}
-              >
+              <Text style={[styles.themeButtonText, difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonTextActive]}>
                 {t.creativeMode}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.themeButton,
-                { borderColor: colors.border },
-                difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonActive,
-              ]}
+              style={[styles.themeButton, difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonActive]}
               onPress={() => {
                 onChangeDifficultyMode(DifficultyMode.CHALLENGE);
                 onHideMenu();
               }}
             >
-              <Text
-                style={[
-                  styles.themeButtonText,
-                  { color: colors.text },
-                  difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonTextActive,
-                ]}
-              >
+              <Text style={[styles.themeButtonText, difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonTextActive]}>
                 {t.challenge}
               </Text>
             </TouchableOpacity>
           </View>
-          <Text style={[styles.settingsModeInfo, { color: colors.textSecondary }]}>
+          <Text style={styles.settingsModeInfo}>
             {difficultyMode === DifficultyMode.SIMPLE
               ? t.simpleModeInfo
               : difficultyMode === DifficultyMode.CREATIVE
@@ -218,7 +187,7 @@ export function SettingsMenu({
 
         {/* Number Range Settings */}
         <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>{t.numberRange}</Text>
+          <Text style={styles.settingsSectionTitle}>{t.numberRange}</Text>
           <View style={styles.numberRangeGrid}>
             {([
               { range: NumberRange.RANGE_10, label: t.upTo10 },
@@ -233,20 +202,13 @@ export function SettingsMenu({
                   key={range}
                   style={[
                     styles.rangeButton,
-                    { borderColor: colors.border },
                     isActive && styles.rangeButtonActive,
                     isChallengeMode && { opacity: 0.6 },
                   ]}
                   onPress={() => onSetNumberRange(range)}
                   disabled={isChallengeMode}
                 >
-                  <Text
-                    style={[
-                      styles.rangeButtonText,
-                      { color: colors.text },
-                      isActive && styles.rangeButtonTextActive,
-                    ]}
-                  >
+                  <Text style={[styles.rangeButtonText, isActive && styles.rangeButtonTextActive]}>
                     {label}
                   </Text>
                 </TouchableOpacity>
@@ -290,6 +252,8 @@ export function SettingsMenu({
   );
 }
 
+const ACTIVE_COLOR = DESIGN_TOKENS.GRADIENT_PRIMARY[0]; // #667eea
+
 const styles = StyleSheet.create({
   settingsOverlay: {
     position: 'absolute',
@@ -297,7 +261,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.45)',
     zIndex: 999,
   },
   settingsMenu: {
@@ -305,36 +269,37 @@ const styles = StyleSheet.create({
     top: 60,
     right: 16,
     left: 16,
-    borderRadius: 20,
+    borderRadius: DESIGN_TOKENS.NUMPAD_BORDER_RADIUS,
     backgroundColor: '#fff',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    elevation: 12,
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
     zIndex: 1000,
     overflow: 'hidden',
   },
   settingsMenuHeader: {
-    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
   },
   settingsMenuTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: DESIGN_TOKENS.FONT_NUMBER,
+    color: '#fff',
+    letterSpacing: 0.3,
   },
   settingsMenuCloseButton: {
-    padding: 12,
+    padding: 8,
     alignItems: 'flex-end',
   },
   settingsMenuCloseButtonText: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: '#fff',
   },
   settingsMenuLinkFlex: {
     flex: 1,
@@ -342,25 +307,27 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)',
+    borderTopColor: 'rgba(102,126,234,0.12)',
   },
   settingsMenuLinkText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#4F46E5',
+    fontSize: 13,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: ACTIVE_COLOR,
   },
   personalizeButton: {
     width: '100%',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 20,
+    borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
     backgroundColor: 'transparent',
     borderWidth: 2,
+    borderColor: ACTIVE_COLOR,
     alignItems: 'center',
   },
   personalizeButtonText: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: ACTIVE_COLOR,
   },
   settingsSection: {
     paddingHorizontal: 16,
@@ -371,22 +338,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   settingsSectionTitle: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#999',
+    fontSize: 11,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: '#9b8ecf',
     marginBottom: 8,
     textTransform: 'uppercase',
+    letterSpacing: 0.08,
   },
   settingsModeInfo: {
     fontSize: 11,
-    color: '#999',
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: '#9b8ecf',
     marginTop: 8,
     fontStyle: 'italic',
   },
   settingsDivider: {
     height: 1,
-    backgroundColor: 'rgba(0,0,0,0.1)',
-    marginVertical: 4,
+    backgroundColor: 'rgba(102,126,234,0.1)',
+    marginVertical: 2,
   },
   themeToggle: {
     flexDirection: 'row',
@@ -396,19 +365,20 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 20,
-    backgroundColor: 'transparent',
+    borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
+    backgroundColor: '#f7f8ff',
     borderWidth: 2,
+    borderColor: '#dde3ff',
     alignItems: 'center',
   },
   themeButtonActive: {
-    backgroundColor: '#4F46E5',
-    borderColor: '#4F46E5',
+    backgroundColor: ACTIVE_COLOR,
+    borderColor: ACTIVE_COLOR,
   },
   themeButtonText: {
     fontSize: 12,
-    fontWeight: 'bold',
-    color: '#333',
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: '#2d2b55',
   },
   themeButtonTextActive: {
     color: '#fff',
@@ -423,19 +393,20 @@ const styles = StyleSheet.create({
     minWidth: '45%',
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 20,
-    backgroundColor: 'transparent',
+    borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
+    backgroundColor: '#f7f8ff',
     borderWidth: 2,
+    borderColor: '#dde3ff',
     alignItems: 'center',
   },
   operationButtonActive: {
-    backgroundColor: '#4F46E5',
-    borderColor: '#4F46E5',
+    backgroundColor: ACTIVE_COLOR,
+    borderColor: ACTIVE_COLOR,
   },
   operationButtonText: {
     fontSize: 12,
-    fontWeight: 'bold',
-    color: '#333',
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: '#2d2b55',
   },
   operationButtonTextActive: {
     color: '#fff',
@@ -450,18 +421,20 @@ const styles = StyleSheet.create({
     minWidth: '45%',
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 20,
-    backgroundColor: 'transparent',
+    borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
+    backgroundColor: '#f7f8ff',
     borderWidth: 2,
+    borderColor: '#dde3ff',
     alignItems: 'center',
   },
   rangeButtonActive: {
-    backgroundColor: '#4F46E5',
-    borderColor: '#4F46E5',
+    backgroundColor: ACTIVE_COLOR,
+    borderColor: ACTIVE_COLOR,
   },
   rangeButtonText: {
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: '#2d2b55',
   },
   rangeButtonTextActive: {
     color: '#fff',

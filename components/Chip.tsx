@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { ThemeColors } from '../types/game';
+import { DESIGN_TOKENS } from '../utils/constants';
 
 interface ChipProps {
   label: string;
@@ -38,19 +39,23 @@ export function Chip({ label, active, onPress, colors, disabled = false, size = 
   );
 }
 
+const ACTIVE_COLOR = DESIGN_TOKENS.GRADIENT_PRIMARY[0]; // #667eea
+
 const styles = StyleSheet.create({
   chip: {
     flex: 1,
     paddingVertical: 8,
     paddingHorizontal: 10,
-    borderRadius: 12,
-    borderWidth: 1.5,
+    borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
+    borderWidth: 2,
+    borderColor: '#dde3ff',
+    backgroundColor: '#f7f8ff',
     alignItems: 'center',
     justifyContent: 'center',
   },
   chipActive: {
-    backgroundColor: '#4F46E5',
-    borderColor: '#4F46E5',
+    backgroundColor: ACTIVE_COLOR,
+    borderColor: ACTIVE_COLOR,
   },
   chipSm: {
     paddingVertical: 6,
@@ -58,11 +63,12 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontSize: 14,
-    fontWeight: 'normal',
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: '#2d2b55',
   },
   chipTextActive: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    color: '#fff',
+    fontFamily: DESIGN_TOKENS.FONT_UI,
   },
   chipTextSm: {
     fontSize: 12,
