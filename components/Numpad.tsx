@@ -16,6 +16,8 @@ interface NumpadProps {
   userAnswer: string;
   isAnswerChecked: boolean;
   reduceMotion: React.MutableRefObject<boolean>;
+  checkLabel: string;
+  nextLabel: string;
 }
 
 export function Numpad({
@@ -24,6 +26,8 @@ export function Numpad({
   userAnswer,
   isAnswerChecked,
   reduceMotion,
+  checkLabel,
+  nextLabel,
 }: NumpadProps) {
   const canCheck = userAnswer !== '' || isAnswerChecked;
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -81,13 +85,13 @@ export function Numpad({
                   style={styles.checkButton}
                 >
                   <Text style={styles.checkButtonText}>
-                    {isAnswerChecked ? '→' : '✓'}
+                    {isAnswerChecked ? nextLabel : checkLabel}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
             ) : (
               <View style={[styles.checkButton, styles.checkButtonDisabled]}>
-                <Text style={styles.checkButtonText}>✓</Text>
+                <Text style={styles.checkButtonText}>{checkLabel}</Text>
               </View>
             )}
           </Animated.View>
@@ -197,7 +201,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#94A3B8',
   },
   checkButtonText: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
   },
