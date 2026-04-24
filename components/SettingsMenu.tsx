@@ -14,7 +14,6 @@ import { CONTACT_EMAIL, DESIGN_TOKENS } from '../utils/constants';
 
 interface SettingsMenuProps {
   colors: ThemeColors;
-  isDarkMode: boolean;
   screenHeight: number;
   menuAnimatedStyle: {
     transform: { translateY: Animated.Value }[];
@@ -60,7 +59,6 @@ interface SettingsMenuProps {
 
 export function SettingsMenu({
   colors,
-  isDarkMode,
   screenHeight,
   menuAnimatedStyle,
   difficultyMode,
@@ -74,11 +72,11 @@ export function SettingsMenu({
   onOpenAbout,
   t,
 }: SettingsMenuProps) {
-  const buttonBg = isDarkMode ? '#2D3748' : '#f7f8ff';
-  const buttonBorder = isDarkMode ? '#4A5568' : '#dde3ff';
-  const buttonText = isDarkMode ? '#E8EAED' : '#2d2b55';
-  const sectionTitle = isDarkMode ? '#9b8ecf' : '#9b8ecf';
-  const modeInfo = isDarkMode ? '#9b8ecf' : '#9b8ecf';
+  const buttonBg = colors.buttonInactive;
+  const buttonBorder = colors.border;
+  const buttonText = colors.buttonInactiveText;
+  const sectionTitle = colors.textSecondary;
+  const modeInfo = colors.textSecondary;
   return (
     <>
       <TouchableOpacity
