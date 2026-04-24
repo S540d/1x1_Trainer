@@ -22,7 +22,6 @@ interface GameCardProps {
   operatorSymbol: string;
   multipleChoices: number[];
   numberSequence: number[];
-  reduceMotion: React.MutableRefObject<boolean>;
   getCorrectAnswer: () => number;
   onNumberClick: (num: number) => void;
   onChoiceClick: (choice: number) => void;
@@ -31,6 +30,7 @@ interface GameCardProps {
   t: {
     nextQuestion: string;
     check: string;
+    encouragement: string;
   };
 }
 
@@ -41,7 +41,6 @@ export function GameCard({
   operatorSymbol,
   multipleChoices,
   numberSequence,
-  reduceMotion,
   getCorrectAnswer,
   onNumberClick,
   onChoiceClick,
@@ -118,9 +117,9 @@ export function GameCard({
                 onCheck={gameState.isAnswerChecked ? onNext : onCheck}
                 userAnswer={gameState.userAnswer}
                 isAnswerChecked={gameState.isAnswerChecked}
-                reduceMotion={reduceMotion}
                 checkLabel={t.check}
                 nextLabel={t.nextQuestion}
+                encouragement={t.encouragement}
               />
             )}
 

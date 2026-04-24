@@ -32,7 +32,7 @@ import { ResultModal } from './components/ResultModal';
 import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
 import { FloatingStars } from './components/FloatingStars';
-import { ANIMATION_DURATIONS, initReducedMotionListener } from './utils/animations';
+import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -51,7 +51,6 @@ export default function App() {
   const [motivationScore, setMotivationScore] = useState(0);
 
   // Reduced motion preference — centralized in utils/animations.ts
-  const reduceMotion = useRef(false);
   useEffect(() => {
     return initReducedMotionListener();
   }, []);
@@ -98,7 +97,7 @@ export default function App() {
 
   const showMenu = () => {
     setMenuRendered(true);
-    if (reduceMotion.current) {
+    if (prefersReducedMotion()) {
       menuTranslateY.setValue(0);
       menuOpacity.setValue(1);
     } else {
@@ -119,7 +118,7 @@ export default function App() {
   };
 
   const hideMenu = () => {
-    if (reduceMotion.current) {
+    if (prefersReducedMotion()) {
       menuTranslateY.setValue(-300);
       menuOpacity.setValue(0);
       setMenuRendered(false);
@@ -150,7 +149,7 @@ export default function App() {
 
   // Card feedback animation (skipped when reduce motion is enabled)
   useEffect(() => {
-    if (!game.gameState.isAnswerChecked || reduceMotion.current) return;
+    if (!game.gameState.isAnswerChecked || prefersReducedMotion()) return;
     if (game.gameState.lastAnswerCorrect === true) {
       Animated.sequence([
         Animated.spring(cardScale, {
@@ -245,7 +244,6 @@ export default function App() {
         operatorSymbol={game.operatorSymbol}
         multipleChoices={game.multipleChoices}
         numberSequence={game.numberSequence}
-        reduceMotion={reduceMotion}
         getCorrectAnswer={game.getCorrectAnswer}
         onNumberClick={game.handleNumberClick}
         onChoiceClick={game.handleChoiceClick}

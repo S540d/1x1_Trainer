@@ -226,13 +226,14 @@ export function useGameLogic({
     // Generate appropriate numbers based on operation
     // IMPORTANT: ALL numbers (operands AND results) must be within numberRange
     switch (selectedOp) {
-      case Operation.ADDITION:
+      case Operation.ADDITION: {
         // For addition: ensure sum (num1 + num2) is within range
         // Strategy: Pick num1, then num2 such that sum <= effectiveMaxNumber
         newNum1 = Math.floor(Math.random() * (effectiveMaxNumber - 1)) + 1; // 1 to effectiveMaxNumber-1
         const maxNum2ForAddition = effectiveMaxNumber - newNum1; // Ensure sum <= effectiveMaxNumber
         newNum2 = Math.floor(Math.random() * maxNum2ForAddition) + 1; // 1 to (effectiveMaxNumber - num1)
         break;
+      }
 
       case Operation.MULTIPLICATION: {
         // For multiplication: enumerate all valid (a,b) pairs where a,b in 1-10 and a*b <= range
@@ -251,7 +252,7 @@ export function useGameLogic({
         break;
       }
 
-      case Operation.SUBTRACTION:
+      case Operation.SUBTRACTION: {
         // For subtraction: ensure minuend, subtrahend AND difference are all within range
         // Strategy: Pick difference first, then subtrahend, calculate minuend
         const difference = Math.floor(Math.random() * (effectiveMaxNumber - 1)) + 1; // 1 to effectiveMaxNumber-1
@@ -259,6 +260,7 @@ export function useGameLogic({
         newNum2 = Math.floor(Math.random() * maxSubtrahend) + 1; // subtrahend
         newNum1 = newNum2 + difference; // minuend = subtrahend + difference
         break;
+      }
 
       case Operation.DIVISION: {
         // For division: enumerate all valid (divisor, quotient) pairs where both in 1-10

@@ -42,7 +42,7 @@ export function PersonalizeModal({
         onPress={onClose}
       />
 
-      <View style={styles.settingsMenu}>
+      <View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu }]}>
         <LinearGradient
           colors={DESIGN_TOKENS.GRADIENT_PRIMARY}
           start={{ x: 0, y: 0 }}
@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
     right: 16,
     left: 16,
     borderRadius: DESIGN_TOKENS.NUMPAD_BORDER_RADIUS,
-    backgroundColor: '#fff',
     elevation: 12,
     shadowColor: '#667eea',
     shadowOffset: { width: 0, height: 4 },
