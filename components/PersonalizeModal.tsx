@@ -42,7 +42,7 @@ export function PersonalizeModal({
         onPress={onClose}
       />
 
-      <View style={styles.settingsMenu}>
+      <View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu }]}>
         <LinearGradient
           colors={DESIGN_TOKENS.GRADIENT_PRIMARY}
           start={{ x: 0, y: 0 }}
@@ -56,7 +56,7 @@ export function PersonalizeModal({
         </LinearGradient>
 
         <View style={styles.settingsSection}>
-          <Text style={styles.settingsSectionTitle}>
+          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
             {t.appearance}
           </Text>
           <View style={styles.chipRow}>
@@ -81,10 +81,10 @@ export function PersonalizeModal({
           </View>
         </View>
 
-        <View style={styles.settingsDivider} />
+        <View style={[styles.settingsDivider, { backgroundColor: colors.border }]} />
 
         <View style={styles.settingsSection}>
-          <Text style={styles.settingsSectionTitle}>
+          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
             {t.language}
           </Text>
           <View style={styles.chipRow}>
@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
     right: 16,
     left: 16,
     borderRadius: DESIGN_TOKENS.NUMPAD_BORDER_RADIUS,
-    backgroundColor: '#fff',
     elevation: 12,
     shadowColor: '#667eea',
     shadowOffset: { width: 0, height: 4 },
@@ -161,7 +160,6 @@ const styles = StyleSheet.create({
   settingsSectionTitle: {
     fontSize: 11,
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    color: '#9b8ecf',
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.08,
@@ -172,7 +170,6 @@ const styles = StyleSheet.create({
   },
   settingsDivider: {
     height: 1,
-    backgroundColor: 'rgba(102,126,234,0.1)',
     marginVertical: 2,
   },
 });
