@@ -56,7 +56,7 @@ export function PersonalizeModal({
         </LinearGradient>
 
         <View style={styles.settingsSection}>
-          <Text style={styles.settingsSectionTitle}>
+          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
             {t.appearance}
           </Text>
           <View style={styles.chipRow}>
@@ -81,10 +81,10 @@ export function PersonalizeModal({
           </View>
         </View>
 
-        <View style={styles.settingsDivider} />
+        <View style={[styles.settingsDivider, { backgroundColor: colors.border }]} />
 
         <View style={styles.settingsSection}>
-          <Text style={styles.settingsSectionTitle}>
+          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
             {t.language}
           </Text>
           <View style={styles.chipRow}>
@@ -160,7 +160,6 @@ const styles = StyleSheet.create({
   settingsSectionTitle: {
     fontSize: 11,
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    color: '#9b8ecf',
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.08,
@@ -171,7 +170,6 @@ const styles = StyleSheet.create({
   },
   settingsDivider: {
     height: 1,
-    backgroundColor: 'rgba(102,126,234,0.1)',
     marginVertical: 2,
   },
 });
