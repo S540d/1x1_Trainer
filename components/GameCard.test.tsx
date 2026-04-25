@@ -52,13 +52,12 @@ const defaultProps = {
   operatorSymbol: '×',
   multipleChoices: [10, 12, 14, 16],
   numberSequence: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
-  reduceMotion: { current: true },
   getCorrectAnswer: () => 12,
   onNumberClick: jest.fn(),
   onChoiceClick: jest.fn(),
   onCheck: jest.fn(),
   onNext: jest.fn(),
-  t: { nextQuestion: 'Weiter →', check: 'Prüfen' },
+  t: { nextQuestion: 'Weiter →', check: 'Prüfen', encouragement: 'Du schaffst das! 💪' },
 };
 
 describe('GameCard - Button accessibility', () => {

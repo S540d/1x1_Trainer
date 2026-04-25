@@ -58,6 +58,7 @@ export interface TranslationStrings {
   playAgain: string;
   newRound: string;
   continueGame: string;
+  encouragement: string; // Motivational text shown below the numpad during input
   // Results Modal
   great: string;
   youSolved: string;
@@ -162,6 +163,7 @@ export const translations: Record<Language, TranslationStrings> = {
     tryAgain: 'Try Again',
     settings: 'Settings',
     ok: 'OK',
+    encouragement: 'You can do it! 💪',
   },
   de: {
     // Settings Menu
@@ -240,5 +242,6 @@ export const translations: Record<Language, TranslationStrings> = {
     tryAgain: 'Nochmal',
     settings: 'Einstellungen',
     ok: 'OK',
+    encouragement: 'Du schaffst das! 💪',
   },
 };

@@ -9,15 +9,16 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { DESIGN_TOKENS } from '../utils/constants';
+import { prefersReducedMotion } from '../utils/animations';
 
 interface NumpadProps {
   onNumberClick: (num: number) => void;
   onCheck: () => void;
   userAnswer: string;
   isAnswerChecked: boolean;
-  reduceMotion: React.MutableRefObject<boolean>;
   checkLabel: string;
   nextLabel: string;
+  encouragement: string;
 }
 
 export function Numpad({
@@ -25,16 +26,16 @@ export function Numpad({
   onCheck,
   userAnswer,
   isAnswerChecked,
-  reduceMotion,
   checkLabel,
   nextLabel,
+  encouragement,
 }: NumpadProps) {
   const canCheck = userAnswer !== '' || isAnswerChecked;
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const pulseLoop = useRef<Animated.CompositeAnimation | null>(null);
 
   useEffect(() => {
-    if (canCheck && !reduceMotion.current) {
+    if (canCheck && !prefersReducedMotion()) {
       pulseLoop.current = Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, { toValue: 1.06, duration: 600, useNativeDriver: true }),
@@ -47,34 +48,33 @@ export function Numpad({
       pulseAnim.setValue(1);
     }
     return () => { pulseLoop.current?.stop(); };
-  }, [canCheck, reduceMotion, pulseAnim, pulseLoop]);
+  }, [canCheck, pulseAnim, pulseLoop]);
 
   return (
     <View style={styles.card}>
       <View style={styles.numpad}>
         <View style={styles.numpadRow}>
-          <NumpadButton text="1" onPress={() => onNumberClick(1)} reduceMotion={reduceMotion} />
-          <NumpadButton text="2" onPress={() => onNumberClick(2)} reduceMotion={reduceMotion} />
-          <NumpadButton text="3" onPress={() => onNumberClick(3)} reduceMotion={reduceMotion} />
+          <NumpadButton text="1" onPress={() => onNumberClick(1)} />
+          <NumpadButton text="2" onPress={() => onNumberClick(2)} />
+          <NumpadButton text="3" onPress={() => onNumberClick(3)} />
         </View>
         <View style={styles.numpadRow}>
-          <NumpadButton text="4" onPress={() => onNumberClick(4)} reduceMotion={reduceMotion} />
-          <NumpadButton text="5" onPress={() => onNumberClick(5)} reduceMotion={reduceMotion} />
-          <NumpadButton text="6" onPress={() => onNumberClick(6)} reduceMotion={reduceMotion} />
+          <NumpadButton text="4" onPress={() => onNumberClick(4)} />
+          <NumpadButton text="5" onPress={() => onNumberClick(5)} />
+          <NumpadButton text="6" onPress={() => onNumberClick(6)} />
         </View>
         <View style={styles.numpadRow}>
-          <NumpadButton text="7" onPress={() => onNumberClick(7)} reduceMotion={reduceMotion} />
-          <NumpadButton text="8" onPress={() => onNumberClick(8)} reduceMotion={reduceMotion} />
-          <NumpadButton text="9" onPress={() => onNumberClick(9)} reduceMotion={reduceMotion} />
+          <NumpadButton text="7" onPress={() => onNumberClick(7)} />
+          <NumpadButton text="8" onPress={() => onNumberClick(8)} />
+          <NumpadButton text="9" onPress={() => onNumberClick(9)} />
         </View>
         <View style={styles.numpadRow}>
           <NumpadButton
             text="⌫"
             onPress={() => onNumberClick(-1)}
             isBackspace
-            reduceMotion={reduceMotion}
           />
-          <NumpadButton text="0" onPress={() => onNumberClick(0)} reduceMotion={reduceMotion} />
+          <NumpadButton text="0" onPress={() => onNumberClick(0)} />
           <Animated.View style={[{ flex: 1 }, { transform: [{ scale: pulseAnim }] }]}>
             {canCheck ? (
               <TouchableOpacity onPress={onCheck} activeOpacity={0.85} style={{ flex: 1 }}>
@@ -97,7 +97,7 @@ export function Numpad({
           </Animated.View>
         </View>
       </View>
-      <Text style={styles.motivationText}>Du schaffst das! 💪</Text>
+      <Text style={styles.motivationText}>{encouragement}</Text>
     </View>
   );
 }
@@ -106,23 +106,21 @@ function NumpadButton({
   text,
   onPress,
   isBackspace = false,
-  reduceMotion,
 }: {
   text: string;
   onPress: () => void;
   isBackspace?: boolean;
-  reduceMotion: React.MutableRefObject<boolean>;
 }) {
   const scale = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
-    if (!reduceMotion.current) {
+    if (!prefersReducedMotion()) {
       Animated.spring(scale, { toValue: 0.92, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
     }
   };
 
   const handlePressOut = () => {
-    if (!reduceMotion.current) {
+    if (!prefersReducedMotion()) {
       Animated.spring(scale, { toValue: 1.0, useNativeDriver: true, speed: 30, bounciness: 6 }).start();
     }
   };
