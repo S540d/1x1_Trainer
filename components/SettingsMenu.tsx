@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   },
   settingsMenuTitle: {
     fontSize: 18,
-    fontFamily: DESIGN_TOKENS.FONT_NUMBER,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
     color: '#fff',
     letterSpacing: 0.3,
   },
