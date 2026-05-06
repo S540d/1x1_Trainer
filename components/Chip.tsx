@@ -17,7 +17,7 @@ export function Chip({ label, active, onPress, colors, disabled = false, size = 
     <TouchableOpacity
       style={[
         styles.chip,
-        { borderColor: colors.border },
+        { backgroundColor: colors.buttonInactive, borderColor: colors.border },
         active && styles.chipActive,
         disabled && { opacity: 0.6 },
         size === 'sm' && styles.chipSm,
@@ -28,7 +28,7 @@ export function Chip({ label, active, onPress, colors, disabled = false, size = 
       <Text
         style={[
           styles.chipText,
-          { color: colors.text },
+          { color: colors.buttonInactiveText },
           active && styles.chipTextActive,
           size === 'sm' && styles.chipTextSm,
         ]}
@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
     borderWidth: 2,
     borderColor: '#dde3ff',
-    backgroundColor: '#f7f8ff',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -64,7 +63,6 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 14,
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    color: '#2d2b55',
   },
   chipTextActive: {
     color: '#fff',
