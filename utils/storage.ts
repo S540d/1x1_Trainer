@@ -6,7 +6,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from './constants';
-import { ThemeMode, Language, Operation, NumberRange } from '../types/game';
+import { ThemeMode, Language, Operation, NumberRange, SessionRecord } from '../types/game';
 
 /**
  * Get a value from storage (platform-safe)
@@ -146,6 +146,31 @@ export const getChallengeHighScore = async (): Promise<number> => {
     return isNaN(parsed) ? 0 : parsed;
   }
   return 0;
+};
+
+const FOUR_WEEKS_MS = 28 * 24 * 60 * 60 * 1000;
+
+export const saveSessionRecord = async (record: SessionRecord): Promise<void> => {
+  const records = await getSessionRecords();
+  const now = Date.now();
+  const pruned = records.filter(r => now - r.timestamp < FOUR_WEEKS_MS);
+  pruned.push(record);
+  await setStorageItem(STORAGE_KEYS.PARENT_STATS, JSON.stringify(pruned));
+};
+
+export const getSessionRecords = async (): Promise<SessionRecord[]> => {
+  const value = await getStorageItem(STORAGE_KEYS.PARENT_STATS);
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+    const now = Date.now();
+    return parsed.filter(
+      (r: SessionRecord) => r && typeof r.timestamp === 'number' && now - r.timestamp < FOUR_WEEKS_MS
+    );
+  } catch {
+    return [];
+  }
 };
 
 export const saveNumberRange = async (range: NumberRange): Promise<void> => {

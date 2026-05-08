@@ -83,6 +83,16 @@ export interface TranslationStrings {
   tryAgain: string;
   settings: string;
   ok: string;
+  // Parent Dashboard
+  parentDashboard: string;
+  parentDashboardSubtitle: string;
+  parentNoData: string;
+  parentSessions: string;
+  parentAvgError: string;
+  parentToday: string;
+  parentYesterday: string;
+  parentCorrect: string;
+  parentErrors: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -164,6 +174,16 @@ export const translations: Record<Language, TranslationStrings> = {
     settings: 'Settings',
     ok: 'OK',
     encouragement: 'You can do it! 💪',
+    // Parent Dashboard
+    parentDashboard: 'Parent Dashboard',
+    parentDashboardSubtitle: 'Last 4 weeks · tap ✕ to close',
+    parentNoData: 'No sessions recorded yet. Play a few rounds first!',
+    parentSessions: 'Sessions (7 days)',
+    parentAvgError: 'Avg. Error Rate',
+    parentToday: 'Today',
+    parentYesterday: 'Yesterday',
+    parentCorrect: 'Correct',
+    parentErrors: 'Errors',
   },
   de: {
     // Settings Menu
@@ -243,5 +263,15 @@ export const translations: Record<Language, TranslationStrings> = {
     settings: 'Einstellungen',
     ok: 'OK',
     encouragement: 'Du schaffst das! 💪',
+    // Parent Dashboard
+    parentDashboard: 'Eltern-Dashboard',
+    parentDashboardSubtitle: 'Letzte 4 Wochen · ✕ zum Schließen',
+    parentNoData: 'Noch keine Einheiten gespeichert. Spielt zuerst ein paar Runden!',
+    parentSessions: 'Einheiten (7 Tage)',
+    parentAvgError: 'Ø Fehlerquote',
+    parentToday: 'Heute',
+    parentYesterday: 'Gestern',
+    parentCorrect: 'Richtig',
+    parentErrors: 'Fehler',
   },
 };
