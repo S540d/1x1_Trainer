@@ -107,8 +107,8 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const recentRecords = records.filter(r => r.timestamp >= sevenDaysAgo);
   const avgErrorRate =
-    records.length > 0
-      ? records.reduce((sum, r) => sum + r.errorRate, 0) / records.length
+    recentRecords.length > 0
+      ? recentRecords.reduce((sum, r) => sum + r.errorRate, 0) / recentRecords.length
       : null;
 
   const getDayLabel = (key: string) => {

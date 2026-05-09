@@ -150,13 +150,25 @@ export const getChallengeHighScore = async (): Promise<number> => {
 
 const FOUR_WEEKS_MS = 28 * 24 * 60 * 60 * 1000;
 
-export const saveSessionRecord = async (record: SessionRecord): Promise<void> => {
-  const records = await getSessionRecords();
-  const now = Date.now();
-  const pruned = records.filter(r => now - r.timestamp < FOUR_WEEKS_MS);
-  pruned.push(record);
-  await setStorageItem(STORAGE_KEYS.PARENT_STATS, JSON.stringify(pruned));
-};
+function isValidSessionRecord(r: unknown): r is SessionRecord {
+  if (!r || typeof r !== 'object') return false;
+  const obj = r as Record<string, unknown>;
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.timestamp === 'number' &&
+    Array.isArray(obj.operations) &&
+    typeof obj.totalTasks === 'number' &&
+    typeof obj.correctTasks === 'number' &&
+    typeof obj.errors === 'number' &&
+    typeof obj.errorRate === 'number' &&
+    typeof obj.difficultyMode === 'string' &&
+    typeof obj.numberRange === 'string'
+  );
+}
+
+function pruneOldRecords(records: SessionRecord[], now: number): SessionRecord[] {
+  return records.filter(r => now - r.timestamp < FOUR_WEEKS_MS);
+}
 
 export const getSessionRecords = async (): Promise<SessionRecord[]> => {
   const value = await getStorageItem(STORAGE_KEYS.PARENT_STATS);
@@ -164,13 +176,16 @@ export const getSessionRecords = async (): Promise<SessionRecord[]> => {
   try {
     const parsed = JSON.parse(value);
     if (!Array.isArray(parsed)) return [];
-    const now = Date.now();
-    return parsed.filter(
-      (r: SessionRecord) => r && typeof r.timestamp === 'number' && now - r.timestamp < FOUR_WEEKS_MS
-    );
+    return pruneOldRecords(parsed.filter(isValidSessionRecord), Date.now());
   } catch {
     return [];
   }
+};
+
+export const saveSessionRecord = async (record: SessionRecord): Promise<void> => {
+  const records = await getSessionRecords();
+  records.push(record);
+  await setStorageItem(STORAGE_KEYS.PARENT_STATS, JSON.stringify(records));
 };
 
 export const saveNumberRange = async (range: NumberRange): Promise<void> => {

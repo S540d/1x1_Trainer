@@ -187,6 +187,10 @@ export function useGameLogic({
   const fireSessionComplete = (finalScore: number, totalTasks: number, selectedOperations: Set<Operation>) => {
     if (!onSessionComplete) return;
     const errors = totalTasks - finalScore;
+    const effectiveRange =
+      gameState.difficultyMode === DifficultyMode.CHALLENGE
+        ? getChallengeLevel(finalScore).numberRange
+        : numberRange;
     const record: SessionRecord = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       timestamp: Date.now(),
@@ -196,7 +200,7 @@ export function useGameLogic({
       errors,
       errorRate: totalTasks > 0 ? errors / totalTasks : 0,
       difficultyMode: gameState.difficultyMode,
-      numberRange,
+      numberRange: effectiveRange,
     };
     onSessionComplete(record);
   };
