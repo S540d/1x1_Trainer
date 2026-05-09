@@ -21,8 +21,10 @@ import {
   getNumberRange,
   saveChallengeHighScore,
   getChallengeHighScore,
+  saveSessionRecord,
+  getSessionRecords,
 } from './storage';
-import { Operation, ThemeMode, Language, NumberRange } from '../types/game';
+import { Operation, ThemeMode, Language, NumberRange, DifficultyMode, SessionRecord } from '../types/game';
 
 // Mock react-native Platform
 jest.mock('react-native', () => ({
@@ -446,5 +448,92 @@ describe('Challenge High Score Storage', () => {
     await saveChallengeHighScore(25);
     const result = await getChallengeHighScore();
     expect(result).toBe(25);
+  });
+});
+
+describe('Session Records Storage', () => {
+  let mockStore: { [key: string]: string };
+
+  const makeRecord = (overrides: Partial<SessionRecord> = {}): SessionRecord => ({
+    id: 'test-id',
+    timestamp: Date.now(),
+    operations: [Operation.MULTIPLICATION],
+    totalTasks: 10,
+    correctTasks: 8,
+    errors: 2,
+    errorRate: 0.2,
+    difficultyMode: DifficultyMode.SIMPLE,
+    numberRange: NumberRange.RANGE_10,
+    ...overrides,
+  });
+
+  beforeEach(() => {
+    mockStore = {};
+    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => { mockStore[key] = value; });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should return empty array when no records stored', async () => {
+    const result = await getSessionRecords();
+    expect(result).toEqual([]);
+  });
+
+  it('should save and retrieve a session record', async () => {
+    const record = makeRecord({ id: 'abc' });
+    await saveSessionRecord(record);
+    const result = await getSessionRecords();
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe('abc');
+    expect(result[0].correctTasks).toBe(8);
+    expect(result[0].errorRate).toBe(0.2);
+  });
+
+  it('should accumulate multiple records', async () => {
+    await saveSessionRecord(makeRecord({ id: 'r1' }));
+    await saveSessionRecord(makeRecord({ id: 'r2' }));
+    const result = await getSessionRecords();
+    expect(result).toHaveLength(2);
+  });
+
+  it('should prune records older than 28 days', async () => {
+    const old = makeRecord({ id: 'old', timestamp: Date.now() - 29 * 24 * 60 * 60 * 1000 });
+    const fresh = makeRecord({ id: 'fresh', timestamp: Date.now() });
+    mockStore['app-parent-stats'] = JSON.stringify([old, fresh]);
+    const result = await getSessionRecords();
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe('fresh');
+  });
+
+  it('should filter out malformed entries missing operations', async () => {
+    const bad = { id: 'bad', timestamp: Date.now(), totalTasks: 10 };
+    const good = makeRecord({ id: 'good' });
+    mockStore['app-parent-stats'] = JSON.stringify([bad, good]);
+    const result = await getSessionRecords();
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe('good');
+  });
+
+  it('should return empty array for corrupted JSON', async () => {
+    mockStore['app-parent-stats'] = '{not valid json}';
+    const result = await getSessionRecords();
+    expect(result).toEqual([]);
+  });
+
+  it('should return empty array when stored value is not an array', async () => {
+    mockStore['app-parent-stats'] = '{"id":"x"}';
+    const result = await getSessionRecords();
+    expect(result).toEqual([]);
+  });
+
+  it('should correctly compute error rate in saved record', async () => {
+    const record = makeRecord({ totalTasks: 10, correctTasks: 7, errors: 3, errorRate: 0.3 });
+    await saveSessionRecord(record);
+    const [retrieved] = await getSessionRecords();
+    expect(retrieved.errorRate).toBe(0.3);
+    expect(retrieved.errors).toBe(3);
   });
 });

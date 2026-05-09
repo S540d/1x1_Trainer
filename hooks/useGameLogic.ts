@@ -4,15 +4,16 @@
  */
 
 import { useState, useMemo } from 'react';
-import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange, ChallengeState } from '../types/game';
+import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange, ChallengeState, SessionRecord } from '../types/game';
 import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER, CHALLENGE_MAX_LIVES, getChallengeLevel, getChallengeLevelNumber } from '../utils/constants';
 
 interface UseGameLogicProps {
   initialOperation: Operation;
-  initialOperations?: Operation[]; // Optional: array of selected operations
+  initialOperations?: Operation[];
   initialTotalSolvedTasks: number;
   onTotalSolvedTasksChange: (total: number) => void;
   onMotivationShow: (score: number) => void;
+  onSessionComplete?: (record: SessionRecord) => void;
   numberRange: NumberRange;
   challengeHighScore?: number;
   onChallengeHighScoreChange?: (score: number) => void;
@@ -136,6 +137,7 @@ export function useGameLogic({
   initialTotalSolvedTasks,
   onTotalSolvedTasksChange,
   onMotivationShow,
+  onSessionComplete,
   numberRange,
   challengeHighScore = 0,
   onChallengeHighScoreChange,
@@ -181,6 +183,27 @@ export function useGameLogic({
     totalSolvedTasks: initialTotalSolvedTasks,
     selectedChoice: null,
   });
+
+  const fireSessionComplete = (finalScore: number, totalTasks: number, selectedOperations: Set<Operation>) => {
+    if (!onSessionComplete) return;
+    const errors = totalTasks - finalScore;
+    const effectiveRange =
+      gameState.difficultyMode === DifficultyMode.CHALLENGE
+        ? getChallengeLevel(finalScore).numberRange
+        : numberRange;
+    const record: SessionRecord = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      timestamp: Date.now(),
+      operations: Array.from(selectedOperations),
+      totalTasks,
+      correctTasks: finalScore,
+      errors,
+      errorRate: totalTasks > 0 ? errors / totalTasks : 0,
+      difficultyMode: gameState.difficultyMode,
+      numberRange: effectiveRange,
+    };
+    onSessionComplete(record);
+  };
 
   // Helper: Get correct answer for current question
   const getCorrectAnswer = () => {
@@ -383,6 +406,14 @@ export function useGameLogic({
     }
 
     const newScore = isCorrect ? gameState.score + 1 : gameState.score;
+    const challengeGameOver =
+      gameState.difficultyMode === DifficultyMode.CHALLENGE &&
+      gameState.challengeState !== undefined &&
+      !isCorrect &&
+      gameState.challengeState.lives - 1 <= 0;
+    if (challengeGameOver) {
+      fireSessionComplete(newScore, gameState.currentTask, gameState.selectedOperations);
+    }
 
     setGameState((prev) => {
       const newState: GameState = {
@@ -458,6 +489,10 @@ export function useGameLogic({
     const isLastTask = gameState.currentTask === gameState.totalTasks;
     const newTotalSolvedTasks = gameState.totalSolvedTasks + 1;
 
+    if (isLastTask) {
+      fireSessionComplete(gameState.score, gameState.totalTasks, gameState.selectedOperations);
+    }
+
     setGameState((prev) => {
       // Show motivation message after every 10 tasks
       if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
@@ -465,7 +500,6 @@ export function useGameLogic({
       }
 
       if (isLastTask) {
-        // Last task - show results
         return {
           ...prev,
           showResult: true,

@@ -67,6 +67,18 @@ export interface GameState {
   challengeState?: ChallengeState; // Challenge mode state
 }
 
+export interface SessionRecord {
+  id: string;
+  timestamp: number;
+  operations: Operation[];
+  totalTasks: number;
+  correctTasks: number;
+  errors: number;
+  errorRate: number;
+  difficultyMode: DifficultyMode;
+  numberRange: NumberRange;
+}
+
 export interface ThemeColors {
   background: string;
   text: string;
