@@ -137,7 +137,7 @@ npm run test:coverage # Coverage
 
 - `SessionRecord` wird nach jeder Runde (Normal, Kreativ, Challenge) gespeichert
 - Challenge-Sessions: `operations` kommt aus `getChallengeLevel(score).operations`, nicht aus `selectedOperations`
-- `getSessionRecords()` prunet automatisch Einträge älter als 28 Tage und schreibt zurück
+- `getSessionRecords()` bereinigt automatisch Einträge älter als 28 Tage und schreibt zurück
 - `FOUR_WEEKS_MS` ist in `utils/storage.ts` exportiert — nicht duplizieren
 - `isValidSessionRecord` validiert alle Felder gegen Enum-Werte
 
