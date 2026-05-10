@@ -631,6 +631,7 @@ describe('useGameLogic Hook', () => {
   const defaultProps = {
     initialOperation: Operation.MULTIPLICATION,
     initialTotalSolvedTasks: 0,
+    numberRange: NumberRange.RANGE_10,
     onTotalSolvedTasksChange: mockOnTotalSolvedTasksChange,
     onMotivationShow: mockOnMotivationShow,
   };
