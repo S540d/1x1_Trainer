@@ -30,7 +30,7 @@ describe('Number Range Invariant Tests', () => {
           const { result } = renderHook(() =>
             useGameLogic({
               initialOperation: Operation.ADDITION,
-              initialOperations: new Set([Operation.ADDITION]),
+              initialOperations: [Operation.ADDITION],
               initialTotalSolvedTasks: 0,
               onTotalSolvedTasksChange: jest.fn(),
               onMotivationShow: jest.fn(),
@@ -64,7 +64,7 @@ describe('Number Range Invariant Tests', () => {
           const { result } = renderHook(() =>
             useGameLogic({
               initialOperation: Operation.SUBTRACTION,
-              initialOperations: new Set([Operation.SUBTRACTION]),
+              initialOperations: [Operation.SUBTRACTION],
               initialTotalSolvedTasks: 0,
               onTotalSolvedTasksChange: jest.fn(),
               onMotivationShow: jest.fn(),
@@ -100,7 +100,7 @@ describe('Number Range Invariant Tests', () => {
           const { result } = renderHook(() =>
             useGameLogic({
               initialOperation: Operation.MULTIPLICATION,
-              initialOperations: new Set([Operation.MULTIPLICATION]),
+              initialOperations: [Operation.MULTIPLICATION],
               initialTotalSolvedTasks: 0,
               onTotalSolvedTasksChange: jest.fn(),
               onMotivationShow: jest.fn(),
@@ -133,7 +133,7 @@ describe('Number Range Invariant Tests', () => {
           const { result } = renderHook(() =>
             useGameLogic({
               initialOperation: Operation.DIVISION,
-              initialOperations: new Set([Operation.DIVISION]),
+              initialOperations: [Operation.DIVISION],
               initialTotalSolvedTasks: 0,
               onTotalSolvedTasksChange: jest.fn(),
               onMotivationShow: jest.fn(),
@@ -323,7 +323,7 @@ describe('Number Range Invariant Tests', () => {
         const { result } = renderHook(() =>
           useGameLogic({
             initialOperation: operation,
-            initialOperations: new Set([operation]),
+            initialOperations: [operation],
             initialTotalSolvedTasks: 0,
             onTotalSolvedTasksChange: jest.fn(),
             onMotivationShow: jest.fn(),

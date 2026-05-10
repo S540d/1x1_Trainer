@@ -6,7 +6,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from './constants';
-import { ThemeMode, Language, Operation, NumberRange, SessionRecord } from '../types/game';
+import { ThemeMode, Language, Operation, NumberRange, DifficultyMode, SessionRecord } from '../types/game';
 
 /**
  * Get a value from storage (platform-safe)
@@ -148,7 +148,11 @@ export const getChallengeHighScore = async (): Promise<number> => {
   return 0;
 };
 
-const FOUR_WEEKS_MS = 28 * 24 * 60 * 60 * 1000;
+export const FOUR_WEEKS_MS = 28 * 24 * 60 * 60 * 1000;
+
+const VALID_OPERATIONS = new Set<string>(Object.values(Operation));
+const VALID_DIFFICULTY_MODES = new Set<string>(Object.values(DifficultyMode));
+const VALID_NUMBER_RANGES = new Set<string>(Object.values(NumberRange));
 
 function isValidSessionRecord(r: unknown): r is SessionRecord {
   if (!r || typeof r !== 'object') return false;
@@ -157,12 +161,13 @@ function isValidSessionRecord(r: unknown): r is SessionRecord {
     typeof obj.id === 'string' &&
     typeof obj.timestamp === 'number' &&
     Array.isArray(obj.operations) &&
+    obj.operations.every((op: unknown) => typeof op === 'string' && VALID_OPERATIONS.has(op)) &&
     typeof obj.totalTasks === 'number' &&
     typeof obj.correctTasks === 'number' &&
     typeof obj.errors === 'number' &&
     typeof obj.errorRate === 'number' &&
-    typeof obj.difficultyMode === 'string' &&
-    typeof obj.numberRange === 'string'
+    typeof obj.difficultyMode === 'string' && VALID_DIFFICULTY_MODES.has(obj.difficultyMode) &&
+    typeof obj.numberRange === 'string' && VALID_NUMBER_RANGES.has(obj.numberRange)
   );
 }
 
@@ -176,7 +181,12 @@ export const getSessionRecords = async (): Promise<SessionRecord[]> => {
   try {
     const parsed = JSON.parse(value);
     if (!Array.isArray(parsed)) return [];
-    return pruneOldRecords(parsed.filter(isValidSessionRecord), Date.now());
+    const valid = parsed.filter(isValidSessionRecord);
+    const pruned = pruneOldRecords(valid, Date.now());
+    if (pruned.length < valid.length) {
+      await setStorageItem(STORAGE_KEYS.PARENT_STATS, JSON.stringify(pruned));
+    }
+    return pruned;
   } catch {
     return [];
   }

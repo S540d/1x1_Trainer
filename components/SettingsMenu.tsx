@@ -52,6 +52,7 @@ interface SettingsMenuProps {
     upTo100: string;
     personalize: string;
     parentDashboard: string;
+    parentDashboardMenu: string;
     feedback: string;
     support: string;
     about: string;
@@ -108,7 +109,7 @@ export function SettingsMenu({
         <View style={[styles.settingsSection, styles.topButtonsSection]}>
           <TouchableOpacity
             style={styles.personalizeButton}
-            onPress={onOpenPersonalize}
+            onPress={() => { onOpenPersonalize(); onHideMenu(); }}
           >
             <Text style={styles.personalizeButtonText}>{t.personalize}</Text>
           </TouchableOpacity>
@@ -116,7 +117,7 @@ export function SettingsMenu({
             style={styles.personalizeButton}
             onPress={() => { onOpenParentDashboard(); onHideMenu(); }}
           >
-            <Text style={styles.personalizeButtonText}>{t.parentDashboard}</Text>
+            <Text style={styles.personalizeButtonText}>{t.parentDashboardMenu}</Text>
           </TouchableOpacity>
         </View>
 

@@ -412,7 +412,8 @@ export function useGameLogic({
       !isCorrect &&
       gameState.challengeState.lives - 1 <= 0;
     if (challengeGameOver) {
-      fireSessionComplete(newScore, gameState.currentTask, gameState.selectedOperations);
+      const challengeOps = new Set<Operation>(getChallengeLevel(newScore).operations);
+      fireSessionComplete(newScore, gameState.currentTask, challengeOps);
     }
 
     setGameState((prev) => {
