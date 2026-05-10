@@ -529,7 +529,7 @@ describe('Session Records Storage', () => {
     expect(result).toEqual([]);
   });
 
-  it('should correctly compute error rate in saved record', async () => {
+  it('should persist and return the provided errorRate unchanged', async () => {
     const record = makeRecord({ totalTasks: 10, correctTasks: 7, errors: 3, errorRate: 0.3 });
     await saveSessionRecord(record);
     const [retrieved] = await getSessionRecords();
