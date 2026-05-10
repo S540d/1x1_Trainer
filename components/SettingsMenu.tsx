@@ -109,7 +109,7 @@ export function SettingsMenu({
         <View style={[styles.settingsSection, styles.topButtonsSection]}>
           <TouchableOpacity
             style={styles.personalizeButton}
-            onPress={onOpenPersonalize}
+            onPress={() => { onOpenPersonalize(); onHideMenu(); }}
           >
             <Text style={styles.personalizeButtonText}>{t.personalize}</Text>
           </TouchableOpacity>

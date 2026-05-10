@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { ThemeColors, SessionRecord, Operation, DifficultyMode } from '../types/game';
-import { getSessionRecords } from '../utils/storage';
+import { getSessionRecords, FOUR_WEEKS_MS } from '../utils/storage';
 import { DESIGN_TOKENS } from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
 
@@ -104,8 +104,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
 
   const grouped = groupByDay(records);
 
-  const fourWeeksAgo = Date.now() - 28 * 24 * 60 * 60 * 1000;
-  const recentRecords = records.filter(r => r.timestamp >= fourWeeksAgo);
+  const recentRecords = records.filter(r => Date.now() - r.timestamp < FOUR_WEEKS_MS);
   const avgErrorRate =
     recentRecords.length > 0
       ? recentRecords.reduce((sum, r) => sum + r.errorRate, 0) / recentRecords.length
