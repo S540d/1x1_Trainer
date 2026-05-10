@@ -24,7 +24,7 @@ describe('prefersReducedMotion', () => {
 
   beforeEach(() => {
     mockIsReduceMotionEnabled = jest.spyOn(AccessibilityInfo, 'isReduceMotionEnabled');
-    mockAddEventListener = jest.spyOn(AccessibilityInfo, 'addEventListener').mockReturnValue({ remove: jest.fn() });
+    mockAddEventListener = jest.spyOn(AccessibilityInfo, 'addEventListener').mockReturnValue({ remove: jest.fn() } as any);
   });
 
   afterEach(() => {

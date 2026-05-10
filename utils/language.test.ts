@@ -45,7 +45,7 @@ describe('getDeviceLanguage', () => {
   });
 
   it('should fallback to English when no locale is available', () => {
-    mockGetLocales.mockReturnValue([]);
+    mockGetLocales.mockReturnValue([] as any);
     expect(getDeviceLanguage()).toBe('en');
   });
 
