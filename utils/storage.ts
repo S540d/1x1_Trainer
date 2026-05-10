@@ -148,7 +148,7 @@ export const getChallengeHighScore = async (): Promise<number> => {
   return 0;
 };
 
-const FOUR_WEEKS_MS = 28 * 24 * 60 * 60 * 1000;
+export const FOUR_WEEKS_MS = 28 * 24 * 60 * 60 * 1000;
 
 const VALID_OPERATIONS = new Set<string>(Object.values(Operation));
 const VALID_DIFFICULTY_MODES = new Set<string>(Object.values(DifficultyMode));
@@ -181,7 +181,12 @@ export const getSessionRecords = async (): Promise<SessionRecord[]> => {
   try {
     const parsed = JSON.parse(value);
     if (!Array.isArray(parsed)) return [];
-    return pruneOldRecords(parsed.filter(isValidSessionRecord), Date.now());
+    const valid = parsed.filter(isValidSessionRecord);
+    const pruned = pruneOldRecords(valid, Date.now());
+    if (pruned.length < valid.length) {
+      await setStorageItem(STORAGE_KEYS.PARENT_STATS, JSON.stringify(pruned));
+    }
+    return pruned;
   } catch {
     return [];
   }

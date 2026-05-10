@@ -49,7 +49,7 @@ Schließt Issue #169 – Eltern-Dashboard
 - `utils/constants.ts`: Storage-Key `app-parent-stats` ergänzt
 - `utils/storage.ts`: `saveSessionRecord()` + `getSessionRecords()` – Einträge älter als 28 Tage werden automatisch bereinigt
 - `hooks/useGameLogic.ts`: Optionaler `onSessionComplete`-Callback; wird nach jeder Runde (Normal, Kreativ, Challenge) aufgerufen – außerhalb des `setGameState`-Updaters
-- `components/ParentDashboard.tsx`: Neues Modal – Sitzungsliste nach Tag gruppiert, Fehlerquote farbcodiert (grün ≤10%, gelb ≤30%, rot >30%), 7-Tage-Zusammenfassung, Challenge-Badge ⚡
+- `components/ParentDashboard.tsx`: Neues Modal – Sitzungsliste nach Tag gruppiert, Fehlerquote farbcodiert (grün ≤10%, gelb ≤30%, rot >30%), 28-Tage-Zusammenfassung, Challenge-Badge ⚡
 - `components/SettingsMenu.tsx`: „Eltern-Dashboard"-Button neben „Personalisieren"; neues Prop `onOpenParentDashboard`
 - `i18n/translations.ts`: 10 neue Keys (DE/EN) – `parentDashboard`, `parentDashboardSubtitle`, `parentNoData`, `parentSessions`, `parentAvgError`, `parentToday`, `parentYesterday`, `parentCorrect`, `parentErrors`
 - `App.tsx`: `saveSessionRecord` in `onSessionComplete`; `parentDashboardVisible`-State; `<ParentDashboard>`-Einbindung

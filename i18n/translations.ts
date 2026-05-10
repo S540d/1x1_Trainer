@@ -85,6 +85,7 @@ export interface TranslationStrings {
   ok: string;
   // Parent Dashboard
   parentDashboard: string;
+  parentDashboardMenu: string;
   parentDashboardSubtitle: string;
   parentNoData: string;
   parentSessions: string;
@@ -176,9 +177,10 @@ export const translations: Record<Language, TranslationStrings> = {
     encouragement: 'You can do it! 💪',
     // Parent Dashboard
     parentDashboard: 'Parent Dashboard',
+    parentDashboardMenu: 'Parent Dashboard (Beta)',
     parentDashboardSubtitle: 'Last 4 weeks · tap ✕ to close',
     parentNoData: 'No sessions recorded yet. Play a few rounds first!',
-    parentSessions: 'Sessions (7 days)',
+    parentSessions: 'Sessions (4 weeks)',
     parentAvgError: 'Avg. Error Rate',
     parentToday: 'Today',
     parentYesterday: 'Yesterday',
@@ -265,9 +267,10 @@ export const translations: Record<Language, TranslationStrings> = {
     encouragement: 'Du schaffst das! 💪',
     // Parent Dashboard
     parentDashboard: 'Eltern-Dashboard',
+    parentDashboardMenu: 'Eltern-Dashboard (Beta)',
     parentDashboardSubtitle: 'Letzte 4 Wochen · ✕ zum Schließen',
     parentNoData: 'Noch keine Einheiten gespeichert. Spielt zuerst ein paar Runden!',
-    parentSessions: 'Einheiten (7 Tage)',
+    parentSessions: 'Einheiten (4 Wochen)',
     parentAvgError: 'Ø Fehlerquote',
     parentToday: 'Heute',
     parentYesterday: 'Gestern',
