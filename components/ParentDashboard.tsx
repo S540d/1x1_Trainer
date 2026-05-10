@@ -104,8 +104,8 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
 
   const grouped = groupByDay(records);
 
-  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  const recentRecords = records.filter(r => r.timestamp >= sevenDaysAgo);
+  const fourWeeksAgo = Date.now() - 28 * 24 * 60 * 60 * 1000;
+  const recentRecords = records.filter(r => r.timestamp >= fourWeeksAgo);
   const avgErrorRate =
     recentRecords.length > 0
       ? recentRecords.reduce((sum, r) => sum + r.errorRate, 0) / recentRecords.length
@@ -124,7 +124,12 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           {/* Header */}
           <View style={styles.header}>
             <View>
-              <Text style={[styles.title, { color: colors.text }]}>{t.parentDashboard}</Text>
+              <View style={styles.titleRow}>
+                <Text style={[styles.title, { color: colors.text }]}>{t.parentDashboard}</Text>
+                <View style={styles.betaBadge}>
+                  <Text style={styles.betaText}>BETA</Text>
+                </View>
+              </View>
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{t.parentDashboardSubtitle}</Text>
             </View>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
@@ -218,9 +223,26 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 14,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   title: {
     fontSize: 18,
     fontFamily: DESIGN_TOKENS.FONT_UI,
+  },
+  betaBadge: {
+    backgroundColor: '#F59E0B22',
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  betaText: {
+    fontSize: 10,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: '#F59E0B',
+    letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 11,
