@@ -30,6 +30,7 @@ interface SettingsMenuProps {
   onHideMenu: () => void;
   onOpenPersonalize: () => void;
   onOpenAbout: () => void;
+  onOpenParentDashboard: () => void;
   // Translations
   t: {
     operation: string;
@@ -50,6 +51,8 @@ interface SettingsMenuProps {
     upTo50: string;
     upTo100: string;
     personalize: string;
+    parentDashboard: string;
+    parentDashboardMenu: string;
     feedback: string;
     support: string;
     about: string;
@@ -70,6 +73,7 @@ export function SettingsMenu({
   onHideMenu,
   onOpenPersonalize,
   onOpenAbout,
+  onOpenParentDashboard,
   t,
 }: SettingsMenuProps) {
   const buttonBg = colors.buttonInactive;
@@ -102,12 +106,18 @@ export function SettingsMenu({
         <ScrollView bounces={false}>
 
         {/* Personalize Button */}
-        <View style={styles.settingsSection}>
+        <View style={[styles.settingsSection, styles.topButtonsSection]}>
           <TouchableOpacity
             style={styles.personalizeButton}
-            onPress={onOpenPersonalize}
+            onPress={() => { onOpenPersonalize(); onHideMenu(); }}
           >
             <Text style={styles.personalizeButtonText}>{t.personalize}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.personalizeButton}
+            onPress={() => { onOpenParentDashboard(); onHideMenu(); }}
+          >
+            <Text style={styles.personalizeButtonText}>{t.parentDashboardMenu}</Text>
           </TouchableOpacity>
         </View>
 
@@ -319,6 +329,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: DESIGN_TOKENS.FONT_UI,
     color: ACTIVE_COLOR,
+  },
+  topButtonsSection: {
+    gap: 8,
   },
   personalizeButton: {
     width: '100%',

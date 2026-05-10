@@ -31,7 +31,10 @@ import { GameCard } from './components/GameCard';
 import { ResultModal } from './components/ResultModal';
 import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
+import { ParentDashboard } from './components/ParentDashboard';
 import { FloatingStars } from './components/FloatingStars';
+import { saveSessionRecord } from './utils/storage';
+import { SessionRecord } from './types/game';
 import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
 
 export default function App() {
@@ -47,6 +50,7 @@ export default function App() {
   const [menuRendered, setMenuRendered] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
   const [personalizeVisible, setPersonalizeVisible] = useState(false);
+  const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
 
@@ -72,6 +76,9 @@ export default function App() {
     onMotivationShow: (score: number) => {
       setMotivationScore(score);
       setShowMotivation(true);
+    },
+    onSessionComplete: (record: SessionRecord) => {
+      saveSessionRecord(record);
     },
     numberRange: preferences.numberRange,
     challengeHighScore: preferences.challengeHighScore,
@@ -233,6 +240,7 @@ export default function App() {
             setAboutVisible(true);
             hideMenu();
           }}
+          onOpenParentDashboard={() => setParentDashboardVisible(true)}
           t={t}
         />
       )}
@@ -285,6 +293,13 @@ export default function App() {
       <AboutModal
         visible={aboutVisible}
         onClose={() => setAboutVisible(false)}
+        colors={colors}
+        t={t}
+      />
+
+      <ParentDashboard
+        visible={parentDashboardVisible}
+        onClose={() => setParentDashboardVisible(false)}
         colors={colors}
         t={t}
       />
