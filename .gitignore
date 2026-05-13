@@ -73,3 +73,13 @@ scripts/setup-twa-step1.sh
 
 # Private documentation (local only — Issue #152)
 docs/private/
+
+# Play Store / Marketing assets (local only — not for public repo)
+public/Gemini_Generated_Image_*
+public/Vorstellungsgrafik*.png
+public/1x1 Trainer.png
+public/1x1_trainer_graphic.*
+public/screenshot*.png
+public/screenshot2.png
+public/favicon-new.png
+playstore-screenshots/
