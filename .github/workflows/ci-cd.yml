@@ -324,9 +324,14 @@ jobs:
 
       - name: Scan for hardcoded keystore passwords
         run: |
+          # GitHub-Actions-Expression-Start ($ + doppelte Mustache) muss in einer
+          # Variable versteckt werden, sonst versucht der Workflow-Parser, den
+          # 'run:'-Block als Expression zu lexen und der gesamte Workflow startet
+          # nicht (0s-Startup-Failure, keine Jobs).
+          GHA_EXPR_START='${'"{"
           if grep -rEi "keystorePassword\s*=\s*['\"][^'\"]+['\"]|keyPassword\s*=\s*['\"][^'\"]+['\"]|storePassword\s*=\s*['\"][^'\"]+['\"]" . \
               --include="*.gradle" --include="*.gradle.kts" --include="*.yml" --include="*.yaml" 2>/dev/null \
-              | grep -qv "\${{"; then
+              | grep -qvF "$GHA_EXPR_START"; then
             echo "❌ Hardcoded keystore password found! Use GitHub Secrets instead."; exit 1
           fi
           echo "✅ No hardcoded keystore passwords"
