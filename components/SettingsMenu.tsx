@@ -32,6 +32,7 @@ interface SettingsMenuProps {
   onOpenPersonalize: () => void;
   onOpenAbout: () => void;
   onOpenParentDashboard: () => void;
+  onOpenBadges: () => void;
   // Translations
   t: {
     operation: string;
@@ -56,6 +57,7 @@ interface SettingsMenuProps {
     personalize: string;
     parentDashboard: string;
     parentDashboardMenu: string;
+    badgesMenu: string;
     feedback: string;
     support: string;
     about: string;
@@ -78,6 +80,7 @@ export function SettingsMenu({
   onOpenPersonalize,
   onOpenAbout,
   onOpenParentDashboard,
+  onOpenBadges,
   t,
 }: SettingsMenuProps) {
   const buttonBg = colors.buttonInactive;
@@ -122,6 +125,12 @@ export function SettingsMenu({
             onPress={() => { onOpenParentDashboard(); onHideMenu(); }}
           >
             <Text style={styles.personalizeButtonText}>{t.parentDashboardMenu}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.personalizeButton}
+            onPress={() => { onOpenBadges(); onHideMenu(); }}
+          >
+            <Text style={styles.personalizeButtonText}>{t.badgesMenu}</Text>
           </TouchableOpacity>
         </View>
 

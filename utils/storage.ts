@@ -271,6 +271,57 @@ export const getWeakTasks = (stats: TaskStat[], minAttempts = 3, minErrorRate = 
     });
 };
 
+// Badge storage – maps badgeId → unlock timestamp
+export type BadgeStore = Record<string, number>;
+
+export const getBadges = async (): Promise<BadgeStore> => {
+  const value = await getStorageItem(STORAGE_KEYS.BADGES);
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value);
+    if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+      const validated: BadgeStore = {};
+      for (const [key, val] of Object.entries(parsed)) {
+        if (typeof val === 'number' && Number.isFinite(val)) {
+          validated[key] = val;
+        }
+      }
+      return validated;
+    }
+  } catch { /* ignore */ }
+  return {};
+};
+
+export const saveBadges = async (badges: BadgeStore): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.BADGES, JSON.stringify(badges));
+};
+
+// Persistent streak counter – decoupled from the 28-day session record window
+export interface StreakData {
+  currentStreak: number;
+  lastPlayedDay: string; // YYYY-MM-DD
+}
+
+export const getStreakData = async (): Promise<StreakData> => {
+  const value = await getStorageItem(STORAGE_KEYS.STREAK);
+  if (!value) return { currentStreak: 0, lastPlayedDay: '' };
+  try {
+    const parsed = JSON.parse(value);
+    if (
+      typeof parsed === 'object' && parsed !== null &&
+      typeof parsed.currentStreak === 'number' &&
+      typeof parsed.lastPlayedDay === 'string'
+    ) {
+      return parsed as StreakData;
+    }
+  } catch { /* ignore */ }
+  return { currentStreak: 0, lastPlayedDay: '' };
+};
+
+export const saveStreakData = async (data: StreakData): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.STREAK, JSON.stringify(data));
+};
+
 export const saveNumberRange = async (range: NumberRange): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.NUMBER_RANGE, range);
 };
