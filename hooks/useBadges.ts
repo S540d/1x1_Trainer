@@ -5,7 +5,16 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { SessionRecord, Operation, DifficultyMode, NumberRange } from '../types/game';
-import { getBadges, saveBadges, getSessionRecords, getChallengeHighScore, BadgeStore } from '../utils/storage';
+import {
+  getBadges,
+  saveBadges,
+  getSessionRecords,
+  getChallengeHighScore,
+  getStreakData,
+  saveStreakData,
+  BadgeStore,
+  StreakData,
+} from '../utils/storage';
 import { getChallengeLevelNumber } from '../utils/constants';
 
 // --- pure badge-condition logic (exported for unit tests) ---
@@ -57,18 +66,21 @@ export function hasAllOperationsPerfect(records: SessionRecord[]): boolean {
   );
 }
 
+// streakDays is optional: if provided it overrides the in-records computation,
+// allowing the persistent streak counter to bypass the 28-day session record prune limit.
 export function computeNewlyUnlocked(
   record: SessionRecord,
   allRecords: SessionRecord[],
   challengeHighScore: number,
   existing: BadgeStore,
+  streakDays?: number,
 ): string[] {
   const result: string[] = [];
   const unlock = (id: string) => {
     if (!existing[id]) result.push(id);
   };
 
-  const streak = getStreakDays(allRecords);
+  const streak = streakDays ?? getStreakDays(allRecords);
   if (streak >= 3)  unlock('streak_3');
   if (streak >= 7)  unlock('streak_7');
   if (streak >= 30) unlock('streak_30');
@@ -91,6 +103,26 @@ export function computeNewlyUnlocked(
   return result;
 }
 
+function todayISODate(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+}
+
+function yesterdayISODate(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+}
+
+export function advanceStreak(current: StreakData): StreakData {
+  const today = todayISODate();
+  if (current.lastPlayedDay === today) return current;
+  if (current.lastPlayedDay === yesterdayISODate()) {
+    return { currentStreak: current.currentStreak + 1, lastPlayedDay: today };
+  }
+  return { currentStreak: 1, lastPlayedDay: today };
+}
+
 // --- hook ---
 
 export function useBadges() {
@@ -106,13 +138,23 @@ export function useBadges() {
   }, []);
 
   const checkAndUnlock = useCallback(async (record: SessionRecord) => {
-    const [existing, allRecords, challengeHighScore] = await Promise.all([
+    const [existing, allRecords, challengeHighScore, streakData] = await Promise.all([
       getBadges(),
       getSessionRecords(),
       getChallengeHighScore(),
+      getStreakData(),
     ]);
 
-    const newIds = computeNewlyUnlocked(record, allRecords, challengeHighScore, existing);
+    const updatedStreak = advanceStreak(streakData);
+    await saveStreakData(updatedStreak);
+
+    const newIds = computeNewlyUnlocked(
+      record,
+      allRecords,
+      challengeHighScore,
+      existing,
+      updatedStreak.currentStreak,
+    );
     if (newIds.length === 0) return;
 
     const now = Date.now();

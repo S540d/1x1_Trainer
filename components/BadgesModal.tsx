@@ -7,7 +7,7 @@ import {
   Modal,
   ScrollView,
 } from 'react-native';
-import { ThemeColors } from '../types/game';
+import { ThemeColors, Language } from '../types/game';
 import { BADGE_DEFINITIONS, BadgeCategory, DESIGN_TOKENS } from '../utils/constants';
 import { BadgeStore } from '../utils/storage';
 import { modalStyles } from '../styles/modalStyles';
@@ -17,6 +17,7 @@ interface BadgesModalProps {
   onClose: () => void;
   colors: ThemeColors;
   badges: BadgeStore;
+  language: Language;
   t: {
     badges: string;
     badgesSubtitle: string;
@@ -98,12 +99,20 @@ function getCategoryLabel(cat: BadgeCategory, t: BadgesModalProps['t']): string 
   return map[cat];
 }
 
-function formatUnlockDate(ts: number): string {
-  const d = new Date(ts);
-  return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear()}`;
+function formatUnlockDate(ts: number, language: Language): string {
+  try {
+    return new Intl.DateTimeFormat(language === 'de' ? 'de-DE' : 'en-US', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(new Date(ts));
+  } catch {
+    const d = new Date(ts);
+    return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear()}`;
+  }
 }
 
-export function BadgesModal({ visible, onClose, colors, badges, t }: BadgesModalProps) {
+export function BadgesModal({ visible, onClose, colors, badges, language, t }: BadgesModalProps) {
   const unlockedCount = Object.keys(badges).length;
   const totalCount = BADGE_DEFINITIONS.length;
 
@@ -166,7 +175,7 @@ export function BadgesModal({ visible, onClose, colors, badges, t }: BadgesModal
                           </Text>
                           {isUnlocked && (
                             <Text style={styles.unlockedDate}>
-                              {t.badgeUnlockedOn} {formatUnlockDate(unlockedAt)}
+                              {t.badgeUnlockedOn} {formatUnlockDate(unlockedAt, language)}
                             </Text>
                           )}
                         </View>

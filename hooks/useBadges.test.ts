@@ -1,4 +1,4 @@
-import { getStreakDays, countPerfectSessions, hasAllOperationsPerfect, computeNewlyUnlocked } from './useBadges';
+import { getStreakDays, countPerfectSessions, hasAllOperationsPerfect, computeNewlyUnlocked, advanceStreak } from './useBadges';
 import { DifficultyMode, NumberRange, Operation } from '../types/game';
 import type { SessionRecord } from '../types/game';
 import type { BadgeStore } from '../utils/storage';
@@ -158,14 +158,53 @@ describe('computeNewlyUnlocked', () => {
     expect(ids).not.toContain('range_100');
   });
 
-  it('unlocks streak_3 after 3 consecutive days', () => {
-    const records = [
-      makeRecord({ timestamp: daysAgo(0) }),
-      makeRecord({ timestamp: daysAgo(1) }),
-      makeRecord({ timestamp: daysAgo(2) }),
-    ];
-    const ids = computeNewlyUnlocked(records[0], records, 0, existing);
+  it('unlocks streak_3 after 3 consecutive days (via persisted streak)', () => {
+    const record = makeRecord({ timestamp: daysAgo(0) });
+    const ids = computeNewlyUnlocked(record, [record], 0, existing, 3);
     expect(ids).toContain('streak_3');
     expect(ids).not.toContain('streak_7');
+  });
+
+  it('unlocks streak_30 when persisted streak is 30 (bypasses 28-day prune)', () => {
+    const record = makeRecord({ timestamp: daysAgo(0) });
+    const ids = computeNewlyUnlocked(record, [record], 0, existing, 30);
+    expect(ids).toContain('streak_3');
+    expect(ids).toContain('streak_7');
+    expect(ids).toContain('streak_30');
+  });
+});
+
+describe('advanceStreak', () => {
+  function isoToday(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+  }
+  function isoYesterday(): string {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+  }
+
+  it('starts streak at 1 on first ever play', () => {
+    const result = advanceStreak({ currentStreak: 0, lastPlayedDay: '' });
+    expect(result.currentStreak).toBe(1);
+    expect(result.lastPlayedDay).toBe(isoToday());
+  });
+
+  it('does not increase streak when called twice on same day', () => {
+    const today = isoToday();
+    const result = advanceStreak({ currentStreak: 5, lastPlayedDay: today });
+    expect(result.currentStreak).toBe(5);
+  });
+
+  it('increments streak on consecutive day', () => {
+    const result = advanceStreak({ currentStreak: 4, lastPlayedDay: isoYesterday() });
+    expect(result.currentStreak).toBe(5);
+    expect(result.lastPlayedDay).toBe(isoToday());
+  });
+
+  it('resets streak to 1 after a gap', () => {
+    const result = advanceStreak({ currentStreak: 10, lastPlayedDay: '2020-01-01' });
+    expect(result.currentStreak).toBe(1);
   });
 });

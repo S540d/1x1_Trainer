@@ -88,9 +88,9 @@ export default function App() {
       setShowMotivation(true);
     },
     onSessionComplete: (record: SessionRecord) => {
-      saveSessionRecord(record).then(() => {
-        badgeSystem.checkAndUnlock(record);
-      });
+      saveSessionRecord(record)
+        .then(() => badgeSystem.checkAndUnlock(record))
+        .catch((err) => console.error('Session save / badge unlock failed:', err));
     },
     taskStats,
     onTaskResult: (num1: number, num2: number, operation: Operation, isCorrect: boolean) => {
@@ -345,6 +345,7 @@ export default function App() {
         onClose={() => setBadgesVisible(false)}
         colors={colors}
         badges={badgeSystem.badges}
+        language={preferences.language}
         t={t}
       />
 

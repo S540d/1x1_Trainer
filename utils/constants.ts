@@ -25,6 +25,7 @@ export const STORAGE_KEYS = {
   PARENT_STATS: 'app-parent-stats',
   TASK_STATS: 'app-task-stats',
   BADGES: 'app-badges',
+  STREAK: 'app-streak',
 } as const;
 
 export type BadgeCategory = 'streak' | 'performance' | 'challenge' | 'explorer';

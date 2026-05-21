@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { BADGE_DEFINITIONS, DESIGN_TOKENS } from '../utils/constants';
-import { ANIMATION_DURATIONS } from '../utils/animations';
-import { prefersReducedMotion } from '../utils/animations';
+import { ANIMATION_DURATIONS, prefersReducedMotion } from '../utils/animations';
 
 interface BadgeUnlockToastProps {
   badgeIds: string[];
@@ -18,6 +17,10 @@ export function BadgeUnlockToast({ badgeIds, onDone, badgeNewUnlockedLabel }: Ba
 
   useEffect(() => {
     if (badgeIds.length === 0) return;
+
+    // Always reset to initial hidden state so repeated toasts animate correctly
+    opacity.setValue(0);
+    translateY.setValue(40);
 
     const reduced = prefersReducedMotion();
 
@@ -58,8 +61,7 @@ export function BadgeUnlockToast({ badgeIds, onDone, badgeNewUnlockedLabel }: Ba
     }, DISPLAY_DURATION);
 
     return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [badgeIds]);
+  }, [badgeIds, onDone, opacity, translateY]);
 
   if (badgeIds.length === 0) return null;
 
@@ -75,7 +77,7 @@ export function BadgeUnlockToast({ badgeIds, onDone, badgeNewUnlockedLabel }: Ba
       <Text style={styles.icon}>{icon}</Text>
       <View style={styles.textGroup}>
         <Text style={styles.label}>{badgeNewUnlockedLabel}</Text>
-        <Text style={styles.extra}>{extra || ''}</Text>
+        {extra ? <Text style={styles.extra}>{extra}</Text> : null}
       </View>
     </Animated.View>
   );
