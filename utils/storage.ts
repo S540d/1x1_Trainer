@@ -271,6 +271,25 @@ export const getWeakTasks = (stats: TaskStat[], minAttempts = 3, minErrorRate = 
     });
 };
 
+// Badge storage – maps badgeId → unlock timestamp
+export type BadgeStore = Record<string, number>;
+
+export const getBadges = async (): Promise<BadgeStore> => {
+  const value = await getStorageItem(STORAGE_KEYS.BADGES);
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value);
+    if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+      return parsed as BadgeStore;
+    }
+  } catch { /* ignore */ }
+  return {};
+};
+
+export const saveBadges = async (badges: BadgeStore): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.BADGES, JSON.stringify(badges));
+};
+
 export const saveNumberRange = async (range: NumberRange): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.NUMBER_RANGE, range);
 };

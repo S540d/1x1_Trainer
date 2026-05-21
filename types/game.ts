@@ -89,6 +89,11 @@ export interface SessionRecord {
   numberRange: NumberRange;
 }
 
+export interface AchievementBadge {
+  id: string;
+  unlockedAt: number;
+}
+
 export interface ThemeColors {
   background: string;
   text: string;

@@ -98,6 +98,39 @@ export interface TranslationStrings {
   parentErrors: string;
   parentWeakTasks: string;
   parentWeakTasksEmpty: string;
+  // Badges
+  badges: string;
+  badgesMenu: string;
+  badgesSubtitle: string;
+  badgeLocked: string;
+  badgeUnlockedOn: string;
+  badgeCategoryStreak: string;
+  badgeCategoryPerformance: string;
+  badgeCategoryChallenge: string;
+  badgeCategoryExplorer: string;
+  badgeStreak3Name: string;
+  badgeStreak7Name: string;
+  badgeStreak30Name: string;
+  badgePerfect1Name: string;
+  badgePerfect5Name: string;
+  badgeAllOpsName: string;
+  badgeChallengeLevel3Name: string;
+  badgeChallengeLevel6Name: string;
+  badgeChallengeNoErrorsName: string;
+  badgeRange100Name: string;
+  badgeCreativeModeName: string;
+  badgeStreak3Desc: string;
+  badgeStreak7Desc: string;
+  badgeStreak30Desc: string;
+  badgePerfect1Desc: string;
+  badgePerfect5Desc: string;
+  badgeAllOpsDesc: string;
+  badgeChallengeLevel3Desc: string;
+  badgeChallengeLevel6Desc: string;
+  badgeChallengeNoErrorsDesc: string;
+  badgeRange100Desc: string;
+  badgeCreativeModeDesc: string;
+  badgeNewUnlocked: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -194,6 +227,39 @@ export const translations: Record<Language, TranslationStrings> = {
     parentErrors: 'Errors',
     parentWeakTasks: 'Weak Areas (Top 5)',
     parentWeakTasksEmpty: 'No weak areas identified yet.',
+    // Badges
+    badges: 'Achievements',
+    badgesMenu: 'Achievements',
+    badgesSubtitle: 'Collect badges by reaching milestones',
+    badgeLocked: 'Locked',
+    badgeUnlockedOn: 'Unlocked',
+    badgeCategoryStreak: 'Streaks',
+    badgeCategoryPerformance: 'Performance',
+    badgeCategoryChallenge: 'Challenge',
+    badgeCategoryExplorer: 'Explorer',
+    badgeStreak3Name: 'On Fire!',
+    badgeStreak7Name: 'Hot Streak',
+    badgeStreak30Name: 'Unstoppable',
+    badgePerfect1Name: 'Perfectionist',
+    badgePerfect5Name: 'Star Player',
+    badgeAllOpsName: 'All-Rounder',
+    badgeChallengeLevel3Name: 'Rising Star',
+    badgeChallengeLevel6Name: 'Champion',
+    badgeChallengeNoErrorsName: 'Flawless',
+    badgeRange100Name: 'Big Numbers',
+    badgeCreativeModeName: 'Creative Mind',
+    badgeStreak3Desc: 'Played 3 days in a row',
+    badgeStreak7Desc: 'Played 7 days in a row',
+    badgeStreak30Desc: 'Played 30 days in a row',
+    badgePerfect1Desc: 'First perfect round (10/10)',
+    badgePerfect5Desc: '5 perfect rounds',
+    badgeAllOpsDesc: 'Perfect round with all 4 operations',
+    badgeChallengeLevel3Desc: 'Reached Challenge Level 3',
+    badgeChallengeLevel6Desc: 'Reached Challenge Level 6',
+    badgeChallengeNoErrorsDesc: 'Completed a challenge without errors',
+    badgeRange100Desc: 'Played with numbers up to 100',
+    badgeCreativeModeDesc: 'Played in Creative Mode',
+    badgeNewUnlocked: 'New badge unlocked!',
   },
   de: {
     // Settings Menu
@@ -288,5 +354,38 @@ export const translations: Record<Language, TranslationStrings> = {
     parentErrors: 'Fehler',
     parentWeakTasks: 'Schwachstellen (Top 5)',
     parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
+    // Badges
+    badges: 'Abzeichen',
+    badgesMenu: 'Abzeichen',
+    badgesSubtitle: 'Sammle Abzeichen durch Meilensteine',
+    badgeLocked: 'Gesperrt',
+    badgeUnlockedOn: 'Freigeschaltet',
+    badgeCategoryStreak: 'Serien',
+    badgeCategoryPerformance: 'Leistung',
+    badgeCategoryChallenge: 'Herausforderung',
+    badgeCategoryExplorer: 'Entdecker',
+    badgeStreak3Name: 'Auf Kurs!',
+    badgeStreak7Name: 'Heiße Serie',
+    badgeStreak30Name: 'Unaufhaltsam',
+    badgePerfect1Name: 'Perfektionist',
+    badgePerfect5Name: 'Superstar',
+    badgeAllOpsName: 'Allrounder',
+    badgeChallengeLevel3Name: 'Aufsteiger',
+    badgeChallengeLevel6Name: 'Champion',
+    badgeChallengeNoErrorsName: 'Fehlerlos',
+    badgeRange100Name: 'Große Zahlen',
+    badgeCreativeModeName: 'Kreativkopf',
+    badgeStreak3Desc: '3 Tage in Folge gespielt',
+    badgeStreak7Desc: '7 Tage in Folge gespielt',
+    badgeStreak30Desc: '30 Tage in Folge gespielt',
+    badgePerfect1Desc: 'Erste perfekte Runde (10/10)',
+    badgePerfect5Desc: '5 perfekte Runden',
+    badgeAllOpsDesc: 'Perfekte Runde mit allen 4 Rechenarten',
+    badgeChallengeLevel3Desc: 'Herausforderung Stufe 3 erreicht',
+    badgeChallengeLevel6Desc: 'Herausforderung Stufe 6 erreicht',
+    badgeChallengeNoErrorsDesc: 'Herausforderung ohne Fehler abgeschlossen',
+    badgeRange100Desc: 'Mit Zahlen bis 100 gespielt',
+    badgeCreativeModeDesc: 'Im Kreativmodus gespielt',
+    badgeNewUnlocked: 'Neues Abzeichen freigeschaltet!',
   },
 };

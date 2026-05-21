@@ -32,9 +32,12 @@ import { ResultModal } from './components/ResultModal';
 import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
 import { ParentDashboard } from './components/ParentDashboard';
+import { BadgesModal } from './components/BadgesModal';
+import { BadgeUnlockToast } from './components/BadgeUnlockToast';
 import { FloatingStars } from './components/FloatingStars';
 import { saveSessionRecord, recordTaskResult, getTaskStats, getWeakTasks } from './utils/storage';
 import { SessionRecord, TaskStat, Operation } from './types/game';
+import { useBadges } from './hooks/useBadges';
 import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
 
 export default function App() {
@@ -51,6 +54,7 @@ export default function App() {
   const [aboutVisible, setAboutVisible] = useState(false);
   const [personalizeVisible, setPersonalizeVisible] = useState(false);
   const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
+  const [badgesVisible, setBadgesVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
   const [taskStats, setTaskStats] = useState<TaskStat[]>([]);
@@ -73,6 +77,7 @@ export default function App() {
   // Use custom hooks
   const preferences = usePreferences();
   const theme = useTheme(preferences.themeMode);
+  const badgeSystem = useBadges();
   const game = useGameLogic({
     initialOperation: preferences.operation,
     initialOperations: preferences.operations,
@@ -83,7 +88,9 @@ export default function App() {
       setShowMotivation(true);
     },
     onSessionComplete: (record: SessionRecord) => {
-      saveSessionRecord(record);
+      saveSessionRecord(record).then(() => {
+        badgeSystem.checkAndUnlock(record);
+      });
     },
     taskStats,
     onTaskResult: (num1: number, num2: number, operation: Operation, isCorrect: boolean) => {
@@ -269,6 +276,7 @@ export default function App() {
             hideMenu();
           }}
           onOpenParentDashboard={() => setParentDashboardVisible(true)}
+          onOpenBadges={() => setBadgesVisible(true)}
           t={t}
         />
       )}
@@ -330,6 +338,20 @@ export default function App() {
         onClose={() => setParentDashboardVisible(false)}
         colors={colors}
         t={t}
+      />
+
+      <BadgesModal
+        visible={badgesVisible}
+        onClose={() => setBadgesVisible(false)}
+        colors={colors}
+        badges={badgeSystem.badges}
+        t={t}
+      />
+
+      <BadgeUnlockToast
+        badgeIds={badgeSystem.newlyUnlocked}
+        onDone={badgeSystem.clearNewlyUnlocked}
+        badgeNewUnlockedLabel={t.badgeNewUnlocked}
       />
     </SafeAreaView>
   );
