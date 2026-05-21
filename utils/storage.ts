@@ -227,29 +227,34 @@ export const saveTaskStats = async (stats: TaskStat[]): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.TASK_STATS, JSON.stringify(stats));
 };
 
+let taskStatsQueue: Promise<void> = Promise.resolve();
+
 export const recordTaskResult = async (
   num1: number,
   num2: number,
   operation: Operation,
   isCorrect: boolean,
 ): Promise<void> => {
-  const stats = await getTaskStats();
-  const existing = stats.find(s => s.num1 === num1 && s.num2 === num2 && s.operation === operation);
-  if (existing) {
-    if (isCorrect) existing.correctCount++;
-    else existing.errorCount++;
-    existing.lastSeen = new Date().toISOString();
-  } else {
-    stats.push({
-      num1,
-      num2,
-      operation,
-      correctCount: isCorrect ? 1 : 0,
-      errorCount: isCorrect ? 0 : 1,
-      lastSeen: new Date().toISOString(),
-    });
-  }
-  await saveTaskStats(stats);
+  taskStatsQueue = taskStatsQueue.then(async () => {
+    const stats = await getTaskStats();
+    const existing = stats.find(s => s.num1 === num1 && s.num2 === num2 && s.operation === operation);
+    if (existing) {
+      if (isCorrect) existing.correctCount++;
+      else existing.errorCount++;
+      existing.lastSeen = new Date().toISOString();
+    } else {
+      stats.push({
+        num1,
+        num2,
+        operation,
+        correctCount: isCorrect ? 1 : 0,
+        errorCount: isCorrect ? 0 : 1,
+        lastSeen: new Date().toISOString(),
+      });
+    }
+    await saveTaskStats(stats);
+  });
+  return taskStatsQueue;
 };
 
 export const getWeakTasks = (stats: TaskStat[], minAttempts = 3, minErrorRate = 0.3): TaskStat[] => {

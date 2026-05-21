@@ -87,9 +87,25 @@ export default function App() {
     },
     taskStats,
     onTaskResult: (num1: number, num2: number, operation: Operation, isCorrect: boolean) => {
-      recordTaskResult(num1, num2, operation, isCorrect).then(() => {
-        getTaskStats().then(setTaskStats);
+      setTaskStats(prev => {
+        const idx = prev.findIndex(s => s.num1 === num1 && s.num2 === num2 && s.operation === operation);
+        if (idx >= 0) {
+          const updated = { ...prev[idx] };
+          if (isCorrect) updated.correctCount++;
+          else updated.errorCount++;
+          updated.lastSeen = new Date().toISOString();
+          const next = [...prev];
+          next[idx] = updated;
+          return next;
+        }
+        return [...prev, {
+          num1, num2, operation,
+          correctCount: isCorrect ? 1 : 0,
+          errorCount: isCorrect ? 0 : 1,
+          lastSeen: new Date().toISOString(),
+        }];
       });
+      recordTaskResult(num1, num2, operation, isCorrect);
     },
     numberRange: preferences.numberRange,
     challengeHighScore: preferences.challengeHighScore,

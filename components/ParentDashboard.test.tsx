@@ -123,6 +123,34 @@ describe('ParentDashboard', () => {
       <ParentDashboard visible={false} onClose={jest.fn()} colors={colors} t={t} />
     );
     expect(mockGetSessionRecords).not.toHaveBeenCalled();
+    expect(mockGetTaskStats).not.toHaveBeenCalled();
+  });
+
+  it('does not show weak tasks section when no weak stats', async () => {
+    mockGetSessionRecords.mockResolvedValue([makeRecord()]);
+    // Stats exist but error rate is only 20% → not weak
+    mockGetTaskStats.mockResolvedValue([
+      { num1: 3, num2: 4, operation: 'MULTIPLICATION', correctCount: 8, errorCount: 2, lastSeen: new Date().toISOString() },
+    ]);
+    const { queryByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => expect(mockGetTaskStats).toHaveBeenCalled());
+    expect(queryByText(t.parentWeakTasks)).toBeNull();
+  });
+
+  it('shows weak task row when a task has high error rate', async () => {
+    mockGetSessionRecords.mockResolvedValue([makeRecord()]);
+    mockGetTaskStats.mockResolvedValue([
+      { num1: 7, num2: 8, operation: 'MULTIPLICATION', correctCount: 0, errorCount: 3, lastSeen: new Date().toISOString() },
+    ]);
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => {
+      expect(getByText(t.parentWeakTasks)).toBeTruthy();
+      expect(getByText('7 × 8')).toBeTruthy();
+    });
   });
 
   it('calls onClose when OK button is pressed', async () => {

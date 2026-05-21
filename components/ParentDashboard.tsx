@@ -162,7 +162,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           )}
 
           {/* Weak Tasks Section */}
-          {!loading && records.length > 0 && (
+          {!loading && weakTasks.length > 0 && (
             <View style={[styles.weakSection, { borderColor: colors.border }]}>
               <Text style={[styles.weakTitle, { color: colors.textSecondary }]}>{t.parentWeakTasks}</Text>
               {weakTasks.length === 0 ? (

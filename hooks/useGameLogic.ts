@@ -255,9 +255,15 @@ export function useGameLogic({
     // In PRACTICE mode: 75% chance to pick a weak task
     let selectedOp: Operation;
     if (effectiveDifficulty === DifficultyMode.PRACTICE) {
+      const maxNum = effectiveMaxNumber;
       const weak = taskStatsRef.current.filter(s => {
         const total = s.correctCount + s.errorCount;
-        return total >= 3 && s.errorCount / total > 0.3 && operationSet.has(s.operation);
+        if (total < 3 || s.errorCount / total <= 0.3) return false;
+        if (!operationSet.has(s.operation)) return false;
+        // Ensure stored task numbers are valid for current range
+        if (s.operation === Operation.ADDITION) return s.num1 + s.num2 <= maxNum;
+        if (s.operation === Operation.MULTIPLICATION) return s.num1 * s.num2 <= maxNum;
+        return s.num1 <= maxNum && s.num2 <= maxNum;
       });
       if (weak.length > 0 && Math.random() < 0.75) {
         const task = weak[Math.floor(Math.random() * weak.length)];
