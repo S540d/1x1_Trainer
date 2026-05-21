@@ -8,10 +8,12 @@ import { FOUR_WEEKS_MS } from '../utils/storage';
 jest.mock('../utils/storage', () => ({
   ...jest.requireActual('../utils/storage'),
   getSessionRecords: jest.fn(),
+  getTaskStats: jest.fn(),
 }));
 
-import { getSessionRecords } from '../utils/storage';
+import { getSessionRecords, getTaskStats } from '../utils/storage';
 const mockGetSessionRecords = getSessionRecords as jest.Mock;
+const mockGetTaskStats = getTaskStats as jest.Mock;
 
 const t = {
   parentDashboard: 'Eltern-Dashboard',
@@ -23,6 +25,8 @@ const t = {
   parentYesterday: 'Gestern',
   parentCorrect: 'Richtig',
   parentErrors: 'Fehler',
+  parentWeakTasks: 'Schwachstellen (Top 5)',
+  parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
   ok: 'OK',
 };
 
@@ -45,6 +49,8 @@ describe('ParentDashboard', () => {
   beforeEach(() => {
     mockGetSessionRecords.mockClear();
     mockGetSessionRecords.mockResolvedValue([]);
+    mockGetTaskStats.mockClear();
+    mockGetTaskStats.mockResolvedValue([]);
   });
 
   it('shows empty state when no records', async () => {
@@ -117,6 +123,34 @@ describe('ParentDashboard', () => {
       <ParentDashboard visible={false} onClose={jest.fn()} colors={colors} t={t} />
     );
     expect(mockGetSessionRecords).not.toHaveBeenCalled();
+    expect(mockGetTaskStats).not.toHaveBeenCalled();
+  });
+
+  it('does not show weak tasks section when no weak stats', async () => {
+    mockGetSessionRecords.mockResolvedValue([makeRecord()]);
+    // Stats exist but error rate is only 20% → not weak
+    mockGetTaskStats.mockResolvedValue([
+      { num1: 3, num2: 4, operation: 'MULTIPLICATION', correctCount: 8, errorCount: 2, lastSeen: new Date().toISOString() },
+    ]);
+    const { queryByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => expect(mockGetTaskStats).toHaveBeenCalled());
+    expect(queryByText(t.parentWeakTasks)).toBeNull();
+  });
+
+  it('shows weak task row when a task has high error rate', async () => {
+    mockGetSessionRecords.mockResolvedValue([makeRecord()]);
+    mockGetTaskStats.mockResolvedValue([
+      { num1: 7, num2: 8, operation: 'MULTIPLICATION', correctCount: 0, errorCount: 3, lastSeen: new Date().toISOString() },
+    ]);
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => {
+      expect(getByText(t.parentWeakTasks)).toBeTruthy();
+      expect(getByText('7 × 8')).toBeTruthy();
+    });
   });
 
   it('calls onClose when OK button is pressed', async () => {

@@ -23,6 +23,7 @@ interface SettingsMenuProps {
   difficultyMode: DifficultyMode;
   selectedOperations: Set<Operation>;
   numberRange: NumberRange;
+  weakTaskCount?: number;
   // Actions
   onToggleOperation: (op: Operation) => void;
   onChangeDifficultyMode: (mode: DifficultyMode) => void;
@@ -41,9 +42,11 @@ interface SettingsMenuProps {
     difficultyMode: string;
     simpleMode: string;
     creativeMode: string;
+    practiceMode: string;
     challenge: string;
     simpleModeInfo: string;
     creativeModeInfo: string;
+    practiceModeInfo: string;
     challengeInfo: string;
     numberRange: string;
     upTo10: string;
@@ -67,6 +70,7 @@ export function SettingsMenu({
   difficultyMode,
   selectedOperations,
   numberRange,
+  weakTaskCount,
   onToggleOperation,
   onChangeDifficultyMode,
   onSetNumberRange,
@@ -161,7 +165,7 @@ export function SettingsMenu({
         {/* Difficulty Mode Settings */}
         <View style={styles.settingsSection}>
           <Text style={[styles.settingsSectionTitle, { color: sectionTitle }]}>{t.difficultyMode}</Text>
-          <View style={styles.themeToggle}>
+          <View style={styles.difficultyGrid}>
             <TouchableOpacity
               style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonActive]}
               onPress={() => onChangeDifficultyMode(DifficultyMode.SIMPLE)}
@@ -189,12 +193,22 @@ export function SettingsMenu({
                 {t.challenge}
               </Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.PRACTICE && styles.themeButtonActive]}
+              onPress={() => onChangeDifficultyMode(DifficultyMode.PRACTICE)}
+            >
+              <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.PRACTICE && styles.themeButtonTextActive]}>
+                {t.practiceMode}{weakTaskCount !== undefined && weakTaskCount > 0 ? ` (${weakTaskCount})` : ''}
+              </Text>
+            </TouchableOpacity>
           </View>
           <Text style={[styles.settingsModeInfo, { color: modeInfo }]}>
             {difficultyMode === DifficultyMode.SIMPLE
               ? t.simpleModeInfo
               : difficultyMode === DifficultyMode.CREATIVE
               ? t.creativeModeInfo
+              : difficultyMode === DifficultyMode.PRACTICE
+              ? t.practiceModeInfo
               : t.challengeInfo}
           </Text>
         </View>
@@ -378,6 +392,11 @@ const styles = StyleSheet.create({
   },
   themeToggle: {
     flexDirection: 'row',
+    gap: 8,
+  },
+  difficultyGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   themeButton: {

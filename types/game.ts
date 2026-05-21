@@ -26,6 +26,7 @@ export enum DifficultyMode {
   SIMPLE = 'SIMPLE',
   CREATIVE = 'CREATIVE',
   CHALLENGE = 'CHALLENGE',
+  PRACTICE = 'PRACTICE',
 }
 
 export enum NumberRange {
@@ -65,6 +66,15 @@ export interface GameState {
   totalSolvedTasks: number; // Track total tasks solved for motivation message
   selectedChoice: number | null; // For multiple choice and number sequence modes
   challengeState?: ChallengeState; // Challenge mode state
+}
+
+export interface TaskStat {
+  num1: number;
+  num2: number;
+  operation: Operation;
+  correctCount: number;
+  errorCount: number;
+  lastSeen: string; // ISO date
 }
 
 export interface SessionRecord {
