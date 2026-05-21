@@ -8,10 +8,12 @@ import { FOUR_WEEKS_MS } from '../utils/storage';
 jest.mock('../utils/storage', () => ({
   ...jest.requireActual('../utils/storage'),
   getSessionRecords: jest.fn(),
+  getTaskStats: jest.fn(),
 }));
 
-import { getSessionRecords } from '../utils/storage';
+import { getSessionRecords, getTaskStats } from '../utils/storage';
 const mockGetSessionRecords = getSessionRecords as jest.Mock;
+const mockGetTaskStats = getTaskStats as jest.Mock;
 
 const t = {
   parentDashboard: 'Eltern-Dashboard',
@@ -23,6 +25,8 @@ const t = {
   parentYesterday: 'Gestern',
   parentCorrect: 'Richtig',
   parentErrors: 'Fehler',
+  parentWeakTasks: 'Schwachstellen (Top 5)',
+  parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
   ok: 'OK',
 };
 
@@ -45,6 +49,8 @@ describe('ParentDashboard', () => {
   beforeEach(() => {
     mockGetSessionRecords.mockClear();
     mockGetSessionRecords.mockResolvedValue([]);
+    mockGetTaskStats.mockClear();
+    mockGetTaskStats.mockResolvedValue([]);
   });
 
   it('shows empty state when no records', async () => {

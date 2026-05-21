@@ -33,8 +33,8 @@ import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
 import { ParentDashboard } from './components/ParentDashboard';
 import { FloatingStars } from './components/FloatingStars';
-import { saveSessionRecord } from './utils/storage';
-import { SessionRecord } from './types/game';
+import { saveSessionRecord, recordTaskResult, getTaskStats, getWeakTasks } from './utils/storage';
+import { SessionRecord, TaskStat, Operation } from './types/game';
 import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
 
 export default function App() {
@@ -53,10 +53,15 @@ export default function App() {
   const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
+  const [taskStats, setTaskStats] = useState<TaskStat[]>([]);
 
   // Reduced motion preference — centralized in utils/animations.ts
   useEffect(() => {
     return initReducedMotionListener();
+  }, []);
+
+  useEffect(() => {
+    getTaskStats().then(setTaskStats);
   }, []);
 
   // Animation values
@@ -79,6 +84,12 @@ export default function App() {
     },
     onSessionComplete: (record: SessionRecord) => {
       saveSessionRecord(record);
+    },
+    taskStats,
+    onTaskResult: (num1: number, num2: number, operation: Operation, isCorrect: boolean) => {
+      recordTaskResult(num1, num2, operation, isCorrect).then(() => {
+        getTaskStats().then(setTaskStats);
+      });
     },
     numberRange: preferences.numberRange,
     challengeHighScore: preferences.challengeHighScore,
@@ -228,6 +239,7 @@ export default function App() {
           difficultyMode={game.gameState.difficultyMode}
           selectedOperations={game.gameState.selectedOperations}
           numberRange={preferences.numberRange}
+          weakTaskCount={getWeakTasks(taskStats, 3, 0.3).length}
           onToggleOperation={game.toggleOperation}
           onChangeDifficultyMode={game.changeDifficultyMode}
           onSetNumberRange={preferences.setNumberRange}

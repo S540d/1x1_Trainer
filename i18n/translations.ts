@@ -17,8 +17,10 @@ export interface TranslationStrings {
   difficultyMode: string;
   simpleMode: string;
   creativeMode: string;
+  practiceMode: string;
   simpleModeInfo: string;
   creativeModeInfo: string;
+  practiceModeInfo: string;
   gameMode: string;
   operation: string;
   addition: string;
@@ -94,6 +96,8 @@ export interface TranslationStrings {
   parentYesterday: string;
   parentCorrect: string;
   parentErrors: string;
+  parentWeakTasks: string;
+  parentWeakTasksEmpty: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -109,8 +113,10 @@ export const translations: Record<Language, TranslationStrings> = {
     difficultyMode: 'DIFFICULTY',
     simpleMode: 'Simple',
     creativeMode: 'Creative',
+    practiceMode: 'Practice',
     simpleModeInfo: 'Enter the result via keypad',
     creativeModeInfo: 'Random input methods and question types',
+    practiceModeInfo: 'Practicing your difficult tasks right now!',
     gameMode: 'GAME MODE',
     operation: 'OPERATION',
     addition: 'Addition',
@@ -186,6 +192,8 @@ export const translations: Record<Language, TranslationStrings> = {
     parentYesterday: 'Yesterday',
     parentCorrect: 'Correct',
     parentErrors: 'Errors',
+    parentWeakTasks: 'Weak Areas (Top 5)',
+    parentWeakTasksEmpty: 'No weak areas identified yet.',
   },
   de: {
     // Settings Menu
@@ -199,8 +207,10 @@ export const translations: Record<Language, TranslationStrings> = {
     difficultyMode: 'SCHWIERIGKEIT',
     simpleMode: 'Einfach',
     creativeMode: 'Kreativ',
+    practiceMode: 'Übung',
     simpleModeInfo: 'Das Ergebnis wird über die Tastatur eingegeben',
     creativeModeInfo: 'Zufällige Eingabemethoden und Fragetypen',
+    practiceModeInfo: 'Du übst gerade deine schwierigen Aufgaben!',
     gameMode: 'SPIELMODUS',
     operation: 'RECHENART',
     addition: 'Addition',
@@ -276,5 +286,7 @@ export const translations: Record<Language, TranslationStrings> = {
     parentYesterday: 'Gestern',
     parentCorrect: 'Richtig',
     parentErrors: 'Fehler',
+    parentWeakTasks: 'Schwachstellen (Top 5)',
+    parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
   },
 };
