@@ -33,8 +33,8 @@ import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
 import { ParentDashboard } from './components/ParentDashboard';
 import { FloatingStars } from './components/FloatingStars';
-import { saveSessionRecord } from './utils/storage';
-import { SessionRecord } from './types/game';
+import { saveSessionRecord, updateTaskStat, getWeakTasks } from './utils/storage';
+import { SessionRecord, TaskStat, Operation } from './types/game';
 import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
 
 export default function App() {
@@ -49,6 +49,7 @@ export default function App() {
 
   const [menuRendered, setMenuRendered] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
+  const [weakTasks, setWeakTasks] = useState<TaskStat[]>([]);
   const [personalizeVisible, setPersonalizeVisible] = useState(false);
   const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
@@ -57,6 +58,10 @@ export default function App() {
   // Reduced motion preference — centralized in utils/animations.ts
   useEffect(() => {
     return initReducedMotionListener();
+  }, []);
+
+  useEffect(() => {
+    getWeakTasks().then(setWeakTasks);
   }, []);
 
   // Animation values
@@ -80,6 +85,12 @@ export default function App() {
     onSessionComplete: (record: SessionRecord) => {
       saveSessionRecord(record);
     },
+    onTaskResult: (num1: number, num2: number, operation: Operation, isCorrect: boolean) => {
+      updateTaskStat(num1, num2, operation, isCorrect).then(() =>
+        getWeakTasks().then(setWeakTasks),
+      );
+    },
+    weakTasks,
     numberRange: preferences.numberRange,
     challengeHighScore: preferences.challengeHighScore,
     onChallengeHighScoreChange: preferences.setChallengeHighScore,

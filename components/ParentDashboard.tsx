@@ -8,8 +8,8 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { ThemeColors, SessionRecord, Operation, DifficultyMode } from '../types/game';
-import { getSessionRecords, FOUR_WEEKS_MS } from '../utils/storage';
+import { ThemeColors, SessionRecord, Operation, DifficultyMode, TaskStat } from '../types/game';
+import { getSessionRecords, getWeakTasks, FOUR_WEEKS_MS } from '../utils/storage';
 import { DESIGN_TOKENS } from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
 
@@ -34,6 +34,8 @@ interface ParentDashboardProps {
     parentYesterday: string;
     parentCorrect: string;
     parentErrors: string;
+    parentWeakTasksTitle: string;
+    parentWeakTasksEmpty: string;
     ok: string;
   };
 }
@@ -90,13 +92,15 @@ function errorRateColor(rate: number): string {
 
 export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboardProps) {
   const [records, setRecords] = useState<SessionRecord[]>([]);
+  const [weakTasks, setWeakTasks] = useState<TaskStat[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (visible) {
       setLoading(true);
-      getSessionRecords().then((data) => {
+      Promise.all([getSessionRecords(), getWeakTasks()]).then(([data, weak]) => {
         setRecords(data);
+        setWeakTasks(weak.slice(0, 5));
         setLoading(false);
       });
     }
@@ -189,6 +193,35 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
                 </View>
               ))}
             </ScrollView>
+          )}
+
+          {/* Weak tasks section */}
+          {!loading && (
+            <View style={[styles.weakSection, { borderColor: colors.border }]}>
+              <Text style={[styles.weakTitle, { color: colors.text }]}>{t.parentWeakTasksTitle}</Text>
+              {weakTasks.length === 0 ? (
+                <Text style={[styles.weakEmpty, { color: colors.textSecondary }]}>{t.parentWeakTasksEmpty}</Text>
+              ) : (
+                weakTasks.map((s, i) => {
+                  const total = s.correctCount + s.errorCount;
+                  const rate = s.errorCount / total;
+                  const label = `${s.num1} ${OP_SYMBOL[s.operation]} ${s.num2}`;
+                  return (
+                    <View key={i} style={styles.weakRow}>
+                      <Text style={[styles.weakTask, { color: colors.text }]}>{label}</Text>
+                      <View style={[styles.errorBadge, { backgroundColor: errorRateColor(rate) + '22' }]}>
+                        <Text style={[styles.errorBadgeText, { color: errorRateColor(rate) }]}>
+                          {Math.round(rate * 100)}%
+                        </Text>
+                      </View>
+                      <Text style={[styles.weakAttempts, { color: colors.textSecondary }]}>
+                        {s.errorCount}/{total}
+                      </Text>
+                    </View>
+                  );
+                })
+              )}
+            </View>
           )}
 
           {/* Close button */}
@@ -343,6 +376,42 @@ const styles = StyleSheet.create({
   },
   challengeBadge: {
     fontSize: 13,
+  },
+  weakSection: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+  },
+  weakTitle: {
+    fontSize: 12,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 8,
+  },
+  weakEmpty: {
+    fontSize: 12,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    textAlign: 'center',
+    paddingVertical: 4,
+  },
+  weakRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+    gap: 8,
+  },
+  weakTask: {
+    fontSize: 15,
+    fontFamily: DESIGN_TOKENS.FONT_NUMBER,
+    flex: 1,
+  },
+  weakAttempts: {
+    fontSize: 11,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    minWidth: 32,
+    textAlign: 'right',
   },
   closeBtn: {
     backgroundColor: ACTIVE_COLOR,

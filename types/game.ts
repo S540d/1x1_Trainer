@@ -26,6 +26,7 @@ export enum DifficultyMode {
   SIMPLE = 'SIMPLE',
   CREATIVE = 'CREATIVE',
   CHALLENGE = 'CHALLENGE',
+  PRACTICE = 'PRACTICE',
 }
 
 export enum NumberRange {
@@ -77,6 +78,15 @@ export interface SessionRecord {
   errorRate: number;
   difficultyMode: DifficultyMode;
   numberRange: NumberRange;
+}
+
+export interface TaskStat {
+  num1: number;
+  num2: number;
+  operation: Operation;
+  correctCount: number;
+  errorCount: number;
+  lastSeen: string; // ISO date
 }
 
 export interface ThemeColors {

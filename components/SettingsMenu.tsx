@@ -41,9 +41,11 @@ interface SettingsMenuProps {
     difficultyMode: string;
     simpleMode: string;
     creativeMode: string;
+    practiceMode: string;
     challenge: string;
     simpleModeInfo: string;
     creativeModeInfo: string;
+    practiceModeInfo: string;
     challengeInfo: string;
     numberRange: string;
     upTo10: string;
@@ -189,12 +191,22 @@ export function SettingsMenu({
                 {t.challenge}
               </Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.PRACTICE && styles.themeButtonActive]}
+              onPress={() => onChangeDifficultyMode(DifficultyMode.PRACTICE)}
+            >
+              <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.PRACTICE && styles.themeButtonTextActive]}>
+                {t.practiceMode}
+              </Text>
+            </TouchableOpacity>
           </View>
           <Text style={[styles.settingsModeInfo, { color: modeInfo }]}>
             {difficultyMode === DifficultyMode.SIMPLE
               ? t.simpleModeInfo
               : difficultyMode === DifficultyMode.CREATIVE
               ? t.creativeModeInfo
+              : difficultyMode === DifficultyMode.PRACTICE
+              ? t.practiceModeInfo
               : t.challengeInfo}
           </Text>
         </View>

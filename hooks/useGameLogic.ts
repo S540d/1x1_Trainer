@@ -4,7 +4,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange, ChallengeState, SessionRecord } from '../types/game';
+import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange, ChallengeState, SessionRecord, TaskStat } from '../types/game';
 import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER, CHALLENGE_MAX_LIVES, getChallengeLevel, getChallengeLevelNumber } from '../utils/constants';
 
 interface UseGameLogicProps {
@@ -14,6 +14,8 @@ interface UseGameLogicProps {
   onTotalSolvedTasksChange: (total: number) => void;
   onMotivationShow: (score: number) => void;
   onSessionComplete?: (record: SessionRecord) => void;
+  onTaskResult?: (num1: number, num2: number, operation: Operation, isCorrect: boolean) => void;
+  weakTasks?: TaskStat[];
   numberRange: NumberRange;
   challengeHighScore?: number;
   onChallengeHighScoreChange?: (score: number) => void;
@@ -138,6 +140,8 @@ export function useGameLogic({
   onTotalSolvedTasksChange,
   onMotivationShow,
   onSessionComplete,
+  onTaskResult,
+  weakTasks = [],
   numberRange,
   challengeHighScore = 0,
   onChallengeHighScoreChange,
@@ -159,6 +163,23 @@ export function useGameLogic({
   };
 
   const maxNumber = getMaxNumber();
+
+  // Build a weighted task pool for practice mode: weak tasks appear 3×, rest 1×
+  const buildPracticePool = (operationSet: Set<Operation>): Array<{ num1: number; num2: number; operation: Operation }> => {
+    const pool: Array<{ num1: number; num2: number; operation: Operation }> = [];
+    const relevantWeak = weakTasks.filter(s => operationSet.has(s.operation));
+    for (const s of relevantWeak) {
+      pool.push(s, s, s); // weight 3×
+    }
+    // Always add at least 10 random pairs so the pool is never empty
+    const ops = Array.from(operationSet);
+    for (let i = 0; i < 10; i++) {
+      const op = ops[Math.floor(Math.random() * ops.length)];
+      pool.push({ num1: Math.floor(Math.random() * maxNumber) + 1, num2: Math.floor(Math.random() * maxNumber) + 1, operation: op });
+    }
+    return pool;
+  };
+
   // Use initialOperations if provided, otherwise fallback to single initialOperation
   const selectedOps = initialOperations && initialOperations.length > 0
     ? initialOperations
@@ -238,6 +259,25 @@ export function useGameLogic({
 
   // Generate a new question with proper number generation for each operation
   const generateQuestion = (mode: GameMode = gameState.gameMode, operationSet: Set<Operation> = gameState.selectedOperations, overrideMaxNumber?: number) => {
+    // Practice mode: pick from weighted pool
+    if (gameState.difficultyMode === DifficultyMode.PRACTICE) {
+      const pool = buildPracticePool(operationSet);
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      setGameState((prev) => ({
+        ...prev,
+        num1: pick.num1,
+        num2: pick.num2,
+        operation: pick.operation,
+        userAnswer: '',
+        questionPart: 2,
+        answerMode: AnswerMode.INPUT,
+        lastAnswerCorrect: null,
+        isAnswerChecked: false,
+        selectedChoice: null,
+      }));
+      return;
+    }
+
     // Pick a random operation from selected operations
     const operations = Array.from(operationSet);
     const selectedOp = operations[Math.floor(Math.random() * operations.length)];
@@ -404,6 +444,8 @@ export function useGameLogic({
     } else {
       isCorrect = gameState.selectedChoice === correctAnswer;
     }
+
+    onTaskResult?.(gameState.num1, gameState.num2, gameState.operation, isCorrect);
 
     const newScore = isCorrect ? gameState.score + 1 : gameState.score;
     const challengeGameOver =
@@ -658,6 +700,25 @@ export function useGameLogic({
       // Level 1 starts with multiplication only, range 10
       const level1Ops = new Set([Operation.MULTIPLICATION]);
       setTimeout(() => generateQuestion(newGameMode, level1Ops, 10), 0);
+      return;
+    }
+
+    if (newMode === DifficultyMode.PRACTICE) {
+      newGameMode = GameMode.NORMAL;
+      newAnswerMode = AnswerMode.INPUT;
+      setGameState((prev) => ({
+        ...prev,
+        difficultyMode: newMode,
+        gameMode: newGameMode,
+        answerMode: newAnswerMode,
+        currentTask: 1,
+        score: 0,
+        showResult: false,
+        userAnswer: '',
+        selectedChoice: null,
+        challengeState: undefined,
+      }));
+      setTimeout(() => generateQuestion(newGameMode), 0);
       return;
     }
 

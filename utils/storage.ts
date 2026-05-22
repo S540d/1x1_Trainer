@@ -6,7 +6,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from './constants';
-import { ThemeMode, Language, Operation, NumberRange, DifficultyMode, SessionRecord } from '../types/game';
+import { ThemeMode, Language, Operation, NumberRange, DifficultyMode, SessionRecord, TaskStat } from '../types/game';
 
 /**
  * Get a value from storage (platform-safe)
@@ -196,6 +196,82 @@ export const saveSessionRecord = async (record: SessionRecord): Promise<void> =>
   const records = await getSessionRecords();
   records.push(record);
   await setStorageItem(STORAGE_KEYS.PARENT_STATS, JSON.stringify(records));
+};
+
+function isValidTaskStat(r: unknown): r is TaskStat {
+  if (!r || typeof r !== 'object') return false;
+  const obj = r as Record<string, unknown>;
+  return (
+    typeof obj.num1 === 'number' &&
+    typeof obj.num2 === 'number' &&
+    typeof obj.operation === 'string' && VALID_OPERATIONS.has(obj.operation) &&
+    typeof obj.correctCount === 'number' &&
+    typeof obj.errorCount === 'number' &&
+    typeof obj.lastSeen === 'string'
+  );
+}
+
+function taskStatKey(num1: number, num2: number, operation: Operation): string {
+  return `${num1}:${num2}:${operation}`;
+}
+
+export const getTaskStats = async (): Promise<TaskStat[]> => {
+  const value = await getStorageItem(STORAGE_KEYS.TASK_STATS);
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isValidTaskStat);
+  } catch {
+    return [];
+  }
+};
+
+export const updateTaskStat = async (
+  num1: number,
+  num2: number,
+  operation: Operation,
+  isCorrect: boolean,
+): Promise<void> => {
+  const stats = await getTaskStats();
+  const key = taskStatKey(num1, num2, operation);
+  const idx = stats.findIndex(s => taskStatKey(s.num1, s.num2, s.operation) === key);
+  const now = new Date().toISOString();
+  if (idx >= 0) {
+    stats[idx] = {
+      ...stats[idx],
+      correctCount: stats[idx].correctCount + (isCorrect ? 1 : 0),
+      errorCount: stats[idx].errorCount + (isCorrect ? 0 : 1),
+      lastSeen: now,
+    };
+  } else {
+    stats.push({
+      num1,
+      num2,
+      operation,
+      correctCount: isCorrect ? 1 : 0,
+      errorCount: isCorrect ? 0 : 1,
+      lastSeen: now,
+    });
+  }
+  await setStorageItem(STORAGE_KEYS.TASK_STATS, JSON.stringify(stats));
+};
+
+export const PRACTICE_MIN_ATTEMPTS = 3;
+export const PRACTICE_ERROR_THRESHOLD = 0.3;
+
+export const getWeakTasks = async (): Promise<TaskStat[]> => {
+  const stats = await getTaskStats();
+  return stats
+    .filter(s => {
+      const total = s.correctCount + s.errorCount;
+      return total >= PRACTICE_MIN_ATTEMPTS && s.errorCount / total > PRACTICE_ERROR_THRESHOLD;
+    })
+    .sort((a, b) => {
+      const rateA = a.errorCount / (a.correctCount + a.errorCount);
+      const rateB = b.errorCount / (b.correctCount + b.errorCount);
+      return rateB - rateA;
+    });
 };
 
 export const saveNumberRange = async (range: NumberRange): Promise<void> => {

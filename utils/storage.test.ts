@@ -23,6 +23,11 @@ import {
   getChallengeHighScore,
   saveSessionRecord,
   getSessionRecords,
+  getTaskStats,
+  updateTaskStat,
+  getWeakTasks,
+  PRACTICE_MIN_ATTEMPTS,
+  PRACTICE_ERROR_THRESHOLD,
 } from './storage';
 import { Operation, ThemeMode, Language, NumberRange, DifficultyMode, SessionRecord } from '../types/game';
 
@@ -535,5 +540,103 @@ describe('Session Records Storage', () => {
     const [retrieved] = await getSessionRecords();
     expect(retrieved.errorRate).toBe(0.3);
     expect(retrieved.errors).toBe(3);
+  });
+});
+
+describe('TaskStat Storage', () => {
+  let mockStore: { [key: string]: string };
+
+  beforeEach(() => {
+    mockStore = {};
+    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => { mockStore[key] = value; });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should return empty array when no stats exist', async () => {
+    const result = await getTaskStats();
+    expect(result).toEqual([]);
+  });
+
+  it('should create a new stat entry on first answer', async () => {
+    await updateTaskStat(7, 8, Operation.MULTIPLICATION, false);
+    const stats = await getTaskStats();
+    expect(stats).toHaveLength(1);
+    expect(stats[0]).toMatchObject({ num1: 7, num2: 8, operation: Operation.MULTIPLICATION, correctCount: 0, errorCount: 1 });
+  });
+
+  it('should increment correctCount on correct answer', async () => {
+    await updateTaskStat(3, 4, Operation.ADDITION, true);
+    await updateTaskStat(3, 4, Operation.ADDITION, true);
+    const stats = await getTaskStats();
+    expect(stats[0].correctCount).toBe(2);
+    expect(stats[0].errorCount).toBe(0);
+  });
+
+  it('should track different tasks separately', async () => {
+    await updateTaskStat(3, 4, Operation.MULTIPLICATION, true);
+    await updateTaskStat(5, 6, Operation.MULTIPLICATION, false);
+    const stats = await getTaskStats();
+    expect(stats).toHaveLength(2);
+  });
+
+  it('should treat same numbers with different operations as different tasks', async () => {
+    await updateTaskStat(3, 4, Operation.MULTIPLICATION, false);
+    await updateTaskStat(3, 4, Operation.ADDITION, false);
+    const stats = await getTaskStats();
+    expect(stats).toHaveLength(2);
+  });
+
+  it('should return empty weak tasks list when no tasks qualify', async () => {
+    await updateTaskStat(1, 2, Operation.MULTIPLICATION, true);
+    await updateTaskStat(1, 2, Operation.MULTIPLICATION, true);
+    const weak = await getWeakTasks();
+    expect(weak).toEqual([]);
+  });
+
+  it(`should return weak task when error rate > ${PRACTICE_ERROR_THRESHOLD} after >= ${PRACTICE_MIN_ATTEMPTS} attempts`, async () => {
+    // 2 errors, 1 correct = 66% error rate, 3 attempts
+    await updateTaskStat(7, 8, Operation.MULTIPLICATION, false);
+    await updateTaskStat(7, 8, Operation.MULTIPLICATION, false);
+    await updateTaskStat(7, 8, Operation.MULTIPLICATION, true);
+    const weak = await getWeakTasks();
+    expect(weak).toHaveLength(1);
+    expect(weak[0]).toMatchObject({ num1: 7, num2: 8, operation: Operation.MULTIPLICATION });
+  });
+
+  it('should not return task with insufficient attempts as weak', async () => {
+    await updateTaskStat(9, 6, Operation.MULTIPLICATION, false);
+    await updateTaskStat(9, 6, Operation.MULTIPLICATION, false);
+    const weak = await getWeakTasks();
+    expect(weak).toHaveLength(0);
+  });
+
+  it('should sort weak tasks by error rate descending', async () => {
+    // Task A: 3/4 error rate
+    for (let i = 0; i < 3; i++) await updateTaskStat(7, 8, Operation.MULTIPLICATION, false);
+    await updateTaskStat(7, 8, Operation.MULTIPLICATION, true);
+    // Task B: 2/4 error rate (exactly at threshold, not weak)
+    for (let i = 0; i < 2; i++) await updateTaskStat(6, 9, Operation.MULTIPLICATION, false);
+    for (let i = 0; i < 2; i++) await updateTaskStat(6, 9, Operation.MULTIPLICATION, true);
+    // Task C: 4/5 error rate
+    for (let i = 0; i < 4; i++) await updateTaskStat(3, 7, Operation.MULTIPLICATION, false);
+    await updateTaskStat(3, 7, Operation.MULTIPLICATION, true);
+
+    const weak = await getWeakTasks();
+    expect(weak.length).toBeGreaterThanOrEqual(2);
+    const rateOf = (s: typeof weak[0]) => s.errorCount / (s.correctCount + s.errorCount);
+    expect(rateOf(weak[0])).toBeGreaterThanOrEqual(rateOf(weak[1]));
+  });
+
+  it('should filter out malformed task stat entries', async () => {
+    const bad = { num1: 'x', num2: 8, operation: 'INVALID', correctCount: 1, errorCount: 1, lastSeen: '' };
+    const good = { num1: 7, num2: 8, operation: Operation.MULTIPLICATION, correctCount: 0, errorCount: 3, lastSeen: new Date().toISOString() };
+    mockStore['app-task-stats'] = JSON.stringify([bad, good]);
+    const stats = await getTaskStats();
+    expect(stats).toHaveLength(1);
+    expect(stats[0].num1).toBe(7);
   });
 });
