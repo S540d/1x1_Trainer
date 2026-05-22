@@ -164,18 +164,61 @@ export function useGameLogic({
 
   const maxNumber = getMaxNumber();
 
-  // Build a weighted task pool for practice mode: weak tasks appear 3×, rest 1×
+  // Generate a valid (num1, num2) pair for the given operation, respecting maxNumber constraints
+  const generateValidPair = (op: Operation, max: number): { num1: number; num2: number } => {
+    switch (op) {
+      case Operation.ADDITION: {
+        const n1 = Math.floor(Math.random() * (max - 1)) + 1;
+        const n2 = Math.floor(Math.random() * (max - n1)) + 1;
+        return { num1: n1, num2: n2 };
+      }
+      case Operation.MULTIPLICATION: {
+        const maxFactor = Math.min(10, max);
+        const pairs: [number, number][] = [];
+        for (let a = 1; a <= maxFactor; a++) {
+          for (let b = 1; b <= Math.min(10, Math.floor(max / a)); b++) {
+            pairs.push([a, b]);
+          }
+        }
+        const [a, b] = pairs[Math.floor(Math.random() * pairs.length)];
+        return { num1: a, num2: b };
+      }
+      case Operation.SUBTRACTION: {
+        const diff = Math.floor(Math.random() * (max - 1)) + 1;
+        const sub = Math.floor(Math.random() * (max - diff)) + 1;
+        return { num1: sub + diff, num2: sub };
+      }
+      case Operation.DIVISION: {
+        const maxDiv = Math.min(10, max);
+        const pairs: [number, number][] = [];
+        for (let d = 1; d <= maxDiv; d++) {
+          for (let q = 1; q <= Math.min(10, Math.floor(max / d)); q++) {
+            pairs.push([d, q]);
+          }
+        }
+        const [d, q] = pairs[Math.floor(Math.random() * pairs.length)];
+        return { num1: d * q, num2: d };
+      }
+      default: {
+        const n = Math.floor(Math.random() * max) + 1;
+        return { num1: n, num2: n };
+      }
+    }
+  };
+
+  // Build a weighted task pool for practice mode: weak tasks appear 3×, filler tasks use valid per-operation pairs
   const buildPracticePool = (operationSet: Set<Operation>): Array<{ num1: number; num2: number; operation: Operation }> => {
     const pool: Array<{ num1: number; num2: number; operation: Operation }> = [];
+    const ops = Array.from(operationSet);
     const relevantWeak = weakTasks.filter(s => operationSet.has(s.operation));
     for (const s of relevantWeak) {
       pool.push(s, s, s); // weight 3×
     }
-    // Always add at least 10 random pairs so the pool is never empty
-    const ops = Array.from(operationSet);
+    // Add 10 valid filler tasks so the pool is never empty
     for (let i = 0; i < 10; i++) {
       const op = ops[Math.floor(Math.random() * ops.length)];
-      pool.push({ num1: Math.floor(Math.random() * maxNumber) + 1, num2: Math.floor(Math.random() * maxNumber) + 1, operation: op });
+      const { num1, num2 } = generateValidPair(op, maxNumber);
+      pool.push({ num1, num2, operation: op });
     }
     return pool;
   };
@@ -258,9 +301,10 @@ export function useGameLogic({
   };
 
   // Generate a new question with proper number generation for each operation
-  const generateQuestion = (mode: GameMode = gameState.gameMode, operationSet: Set<Operation> = gameState.selectedOperations, overrideMaxNumber?: number) => {
+  const generateQuestion = (mode: GameMode = gameState.gameMode, operationSet: Set<Operation> = gameState.selectedOperations, overrideMaxNumber?: number, overrideDifficultyMode?: DifficultyMode) => {
+    const effectiveDifficulty = overrideDifficultyMode ?? gameState.difficultyMode;
     // Practice mode: pick from weighted pool
-    if (gameState.difficultyMode === DifficultyMode.PRACTICE) {
+    if (effectiveDifficulty === DifficultyMode.PRACTICE) {
       const pool = buildPracticePool(operationSet);
       const pick = pool[Math.floor(Math.random() * pool.length)];
       setGameState((prev) => ({
@@ -367,7 +411,7 @@ export function useGameLogic({
     // In CREATIVE and CHALLENGE modes, randomize answer mode each question
     // NUMBER_SEQUENCE only available when asking for result (questionPart === 2)
     let newAnswerMode = gameState.answerMode;
-    if (gameState.difficultyMode === DifficultyMode.CREATIVE || gameState.difficultyMode === DifficultyMode.CHALLENGE) {
+    if (effectiveDifficulty === DifficultyMode.CREATIVE || effectiveDifficulty === DifficultyMode.CHALLENGE) {
       const availableModes =
         newQuestionPart === 2
           ? [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE, AnswerMode.NUMBER_SEQUENCE]
@@ -718,7 +762,7 @@ export function useGameLogic({
         selectedChoice: null,
         challengeState: undefined,
       }));
-      setTimeout(() => generateQuestion(newGameMode), 0);
+      setTimeout(() => generateQuestion(newGameMode, gameState.selectedOperations, undefined, DifficultyMode.PRACTICE), 0);
       return;
     }
 

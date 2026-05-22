@@ -33,7 +33,7 @@ import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
 import { ParentDashboard } from './components/ParentDashboard';
 import { FloatingStars } from './components/FloatingStars';
-import { saveSessionRecord, updateTaskStat, getWeakTasks } from './utils/storage';
+import { saveSessionRecord, updateTaskStat, getWeakTasks, computeWeakTasks } from './utils/storage';
 import { SessionRecord, TaskStat, Operation } from './types/game';
 import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
 
@@ -86,8 +86,8 @@ export default function App() {
       saveSessionRecord(record);
     },
     onTaskResult: (num1: number, num2: number, operation: Operation, isCorrect: boolean) => {
-      updateTaskStat(num1, num2, operation, isCorrect).then(() =>
-        getWeakTasks().then(setWeakTasks),
+      updateTaskStat(num1, num2, operation, isCorrect).then(stats =>
+        setWeakTasks(computeWeakTasks(stats)),
       );
     },
     weakTasks,

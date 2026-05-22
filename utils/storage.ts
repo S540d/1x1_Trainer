@@ -227,41 +227,47 @@ export const getTaskStats = async (): Promise<TaskStat[]> => {
   }
 };
 
-export const updateTaskStat = async (
+// Serialize writes to prevent lost updates when answers arrive in quick succession
+let _writeQueue: Promise<TaskStat[]> = Promise.resolve([]);
+
+export const updateTaskStat = (
   num1: number,
   num2: number,
   operation: Operation,
   isCorrect: boolean,
-): Promise<void> => {
-  const stats = await getTaskStats();
-  const key = taskStatKey(num1, num2, operation);
-  const idx = stats.findIndex(s => taskStatKey(s.num1, s.num2, s.operation) === key);
-  const now = new Date().toISOString();
-  if (idx >= 0) {
-    stats[idx] = {
-      ...stats[idx],
-      correctCount: stats[idx].correctCount + (isCorrect ? 1 : 0),
-      errorCount: stats[idx].errorCount + (isCorrect ? 0 : 1),
-      lastSeen: now,
-    };
-  } else {
-    stats.push({
-      num1,
-      num2,
-      operation,
-      correctCount: isCorrect ? 1 : 0,
-      errorCount: isCorrect ? 0 : 1,
-      lastSeen: now,
-    });
-  }
-  await setStorageItem(STORAGE_KEYS.TASK_STATS, JSON.stringify(stats));
+): Promise<TaskStat[]> => {
+  _writeQueue = _writeQueue.then(async () => {
+    const stats = await getTaskStats();
+    const key = taskStatKey(num1, num2, operation);
+    const idx = stats.findIndex(s => taskStatKey(s.num1, s.num2, s.operation) === key);
+    const now = new Date().toISOString();
+    if (idx >= 0) {
+      stats[idx] = {
+        ...stats[idx],
+        correctCount: stats[idx].correctCount + (isCorrect ? 1 : 0),
+        errorCount: stats[idx].errorCount + (isCorrect ? 0 : 1),
+        lastSeen: now,
+      };
+    } else {
+      stats.push({
+        num1,
+        num2,
+        operation,
+        correctCount: isCorrect ? 1 : 0,
+        errorCount: isCorrect ? 0 : 1,
+        lastSeen: now,
+      });
+    }
+    await setStorageItem(STORAGE_KEYS.TASK_STATS, JSON.stringify(stats));
+    return stats;
+  });
+  return _writeQueue;
 };
 
 export const PRACTICE_MIN_ATTEMPTS = 3;
 export const PRACTICE_ERROR_THRESHOLD = 0.3;
 
-export const getWeakTasks = async (): Promise<TaskStat[]> => {
-  const stats = await getTaskStats();
+export function computeWeakTasks(stats: TaskStat[]): TaskStat[] {
   return stats
     .filter(s => {
       const total = s.correctCount + s.errorCount;
@@ -272,6 +278,10 @@ export const getWeakTasks = async (): Promise<TaskStat[]> => {
       const rateB = b.errorCount / (b.correctCount + b.errorCount);
       return rateB - rateA;
     });
+}
+
+export const getWeakTasks = async (): Promise<TaskStat[]> => {
+  return computeWeakTasks(await getTaskStats());
 };
 
 export const saveNumberRange = async (range: NumberRange): Promise<void> => {
