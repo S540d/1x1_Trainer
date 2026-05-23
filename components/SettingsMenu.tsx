@@ -32,6 +32,7 @@ interface SettingsMenuProps {
   onOpenPersonalize: () => void;
   onOpenAbout: () => void;
   onOpenParentDashboard: () => void;
+  onResetOnboarding: () => void;
   onOpenBadges: () => void;
   // Translations
   t: {
@@ -62,6 +63,7 @@ interface SettingsMenuProps {
     support: string;
     about: string;
     settings: string;
+    resetOnboarding: string;
   };
 }
 
@@ -80,6 +82,7 @@ export function SettingsMenu({
   onOpenPersonalize,
   onOpenAbout,
   onOpenParentDashboard,
+  onResetOnboarding,
   onOpenBadges,
   t,
 }: SettingsMenuProps) {
@@ -286,6 +289,14 @@ export function SettingsMenu({
             <Text style={styles.settingsMenuLinkText}>{t.about}</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Reset Onboarding */}
+        <TouchableOpacity
+          style={[styles.settingsSection, styles.resetOnboardingButton]}
+          onPress={() => { onResetOnboarding(); onHideMenu(); }}
+        >
+          <Text style={styles.resetOnboardingText}>{t.resetOnboarding}</Text>
+        </TouchableOpacity>
         </ScrollView>
       </Animated.View>
     </>
@@ -485,5 +496,16 @@ const styles = StyleSheet.create({
   },
   rangeButtonTextActive: {
     color: '#fff',
+  },
+  resetOnboardingButton: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(102,126,234,0.1)',
+  },
+  resetOnboardingText: {
+    fontSize: 12,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: 'rgba(102,126,234,0.6)',
   },
 });

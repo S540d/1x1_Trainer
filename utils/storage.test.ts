@@ -23,6 +23,9 @@ import {
   getChallengeHighScore,
   saveSessionRecord,
   getSessionRecords,
+  getOnboardingDone,
+  setOnboardingDone,
+  resetOnboarding,
   getTaskStats,
   saveTaskStats,
   recordTaskResult,
@@ -643,5 +646,41 @@ describe('getWeakTasks', () => {
     const stats = [makeStat(7, 8, 1, 1)]; // 50% error, 2 attempts
     expect(getWeakTasks(stats, 2, 0.4)).toHaveLength(1);
     expect(getWeakTasks(stats, 3, 0.4)).toHaveLength(0);
+  });
+});
+
+describe('storage.ts - Onboarding helpers', () => {
+  let mockStore: { [key: string]: string };
+
+  beforeEach(() => {
+    mockStore = {};
+    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => { mockStore[key] = value; });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('getOnboardingDone returns false when key is absent', async () => {
+    expect(await getOnboardingDone()).toBe(false);
+  });
+
+  it('getOnboardingDone returns false when value is "pending"', async () => {
+    mockStore['app-onboarding-done'] = 'pending';
+    expect(await getOnboardingDone()).toBe(false);
+  });
+
+  it('setOnboardingDone persists true and getOnboardingDone returns true', async () => {
+    await setOnboardingDone();
+    expect(mockStore['app-onboarding-done']).toBe('true');
+    expect(await getOnboardingDone()).toBe(true);
+  });
+
+  it('resetOnboarding stores "pending" so getOnboardingDone returns false', async () => {
+    await setOnboardingDone();
+    await resetOnboarding();
+    expect(mockStore['app-onboarding-done']).toBe('pending');
+    expect(await getOnboardingDone()).toBe(false);
   });
 });

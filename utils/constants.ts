@@ -23,6 +23,7 @@ export const STORAGE_KEYS = {
   NUMBER_RANGE: 'app-number-range',
   CHALLENGE_HIGHSCORE: 'app-challenge-highscore',
   PARENT_STATS: 'app-parent-stats',
+  ONBOARDING_DONE: 'app-onboarding-done',
   TASK_STATS: 'app-task-stats',
   BADGES: 'app-badges',
   STREAK: 'app-streak',

@@ -132,6 +132,21 @@ export interface TranslationStrings {
   badgeRange100Desc: string;
   badgeCreativeModeDesc: string;
   badgeNewUnlocked: string;
+  // Onboarding
+  onboardingWelcomeTitle: string;
+  onboardingWelcomeBody: string;
+  onboardingDemoTitle: string;
+  onboardingDemoTooltip: string;
+  onboardingSettingsTitle: string;
+  onboardingSettingsBody: string;
+  onboardingReadyTitle: string;
+  onboardingReadyBody: string;
+  onboardingDemoRetry: string;
+  onboardingSettingsLabel: string;
+  onboardingNext: string;
+  onboardingStart: string;
+  onboardingSkip: string;
+  resetOnboarding: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -262,6 +277,21 @@ export const translations: Record<Language, TranslationStrings> = {
     badgeRange100Desc: 'Played with numbers up to 100',
     badgeCreativeModeDesc: 'Played in Creative Mode',
     badgeNewUnlocked: 'New badge unlocked!',
+    // Onboarding
+    onboardingWelcomeTitle: 'Welcome to 1×1 Trainer!',
+    onboardingWelcomeBody: 'Practice multiplication, division, addition and subtraction — fun and easy!',
+    onboardingDemoTitle: 'Try it out!',
+    onboardingDemoTooltip: 'Enter your answer here',
+    onboardingSettingsTitle: 'Everything Adjustable',
+    onboardingSettingsBody: 'Tap the menu button to change the operation, difficulty and number range.',
+    onboardingReadyTitle: "You're ready!",
+    onboardingReadyBody: 'Have fun practicing!',
+    onboardingDemoRetry: 'Not quite — try again!',
+    onboardingSettingsLabel: '↑ Settings',
+    onboardingNext: 'Next',
+    onboardingStart: 'Start',
+    onboardingSkip: 'Skip',
+    resetOnboarding: 'Restart tutorial',
   },
   de: {
     // Settings Menu
@@ -390,5 +420,20 @@ export const translations: Record<Language, TranslationStrings> = {
     badgeRange100Desc: 'Mit Zahlen bis 100 gespielt',
     badgeCreativeModeDesc: 'Im Kreativmodus gespielt',
     badgeNewUnlocked: 'Neues Abzeichen freigeschaltet!',
+    // Onboarding
+    onboardingWelcomeTitle: 'Willkommen beim 1×1 Trainer!',
+    onboardingWelcomeBody: 'Übe Multiplikation, Division, Addition und Subtraktion – Spaß und einfach!',
+    onboardingDemoTitle: 'Probiere es aus!',
+    onboardingDemoTooltip: 'Gib deine Antwort hier ein',
+    onboardingSettingsTitle: 'Alles einstellbar',
+    onboardingSettingsBody: 'Tippe auf den Menü-Button, um Rechenart, Schwierigkeit und Zahlenbereich zu ändern.',
+    onboardingReadyTitle: 'Du bist bereit!',
+    onboardingReadyBody: 'Viel Spaß beim Üben!',
+    onboardingDemoRetry: 'Nicht ganz – tippe nochmal!',
+    onboardingSettingsLabel: '↑ Einstellungen',
+    onboardingNext: 'Weiter',
+    onboardingStart: 'Loslegen',
+    onboardingSkip: 'Überspringen',
+    resetOnboarding: 'Tutorial zurücksetzen',
   },
 };
