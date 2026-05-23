@@ -4,6 +4,10 @@ import {
   SafeAreaView,
   useWindowDimensions,
   Animated,
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
@@ -33,8 +37,8 @@ import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
 import { ParentDashboard } from './components/ParentDashboard';
 import { FloatingStars } from './components/FloatingStars';
-import { saveSessionRecord } from './utils/storage';
-import { SessionRecord } from './types/game';
+import { saveSessionRecord, getStreakData, updateStreakAfterSession, getLocalDateString } from './utils/storage';
+import { SessionRecord, StreakData } from './types/game';
 import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
 
 export default function App() {
@@ -53,6 +57,8 @@ export default function App() {
   const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
+  const [streakData, setStreakData] = useState<StreakData>({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  const [streakWarningVisible, setStreakWarningVisible] = useState(false);
 
   // Reduced motion preference — centralized in utils/animations.ts
   useEffect(() => {
@@ -79,6 +85,7 @@ export default function App() {
     },
     onSessionComplete: (record: SessionRecord) => {
       saveSessionRecord(record);
+      updateStreakAfterSession().then(setStreakData);
     },
     numberRange: preferences.numberRange,
     challengeHighScore: preferences.challengeHighScore,
@@ -154,6 +161,20 @@ export default function App() {
     }
   }, [isDarkMode]);
 
+  // Load streak data and show warning when appropriate
+  useEffect(() => {
+    getStreakData().then((data) => {
+      setStreakData(data);
+      const now = new Date();
+      const isEvening = now.getHours() >= 20;
+      const hasStreakToProtect = data.currentStreak > 0;
+      const hasNotPlayedToday = data.lastPlayedDate !== getLocalDateString();
+      if (isEvening && hasStreakToProtect && hasNotPlayedToday) {
+        setStreakWarningVisible(true);
+      }
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Card feedback animation (skipped when reduce motion is enabled)
   useEffect(() => {
     if (!game.gameState.isAnswerChecked || prefersReducedMotion()) return;
@@ -216,6 +237,7 @@ export default function App() {
         score={game.gameState.score}
         currentTask={game.gameState.currentTask}
         totalTasks={game.gameState.totalTasks}
+        currentStreak={streakData.currentStreak}
         onShowMenu={showMenu}
         t={t}
       />
@@ -303,6 +325,24 @@ export default function App() {
         colors={colors}
         t={t}
       />
+
+      <Modal visible={streakWarningVisible} transparent animationType="fade">
+        <View style={styles.streakOverlay}>
+          <View style={[styles.streakWarningCard, { backgroundColor: colors.settingsMenu }]}>
+            <Text style={styles.streakWarningEmoji}>🔥</Text>
+            <Text style={[styles.streakWarningTitle, { color: colors.text }]}>{t.streakWarningTitle}</Text>
+            <Text style={[styles.streakWarningMessage, { color: colors.textSecondary }]}>
+              {t.streakWarningMessage.replace('{days}', String(streakData.currentStreak))}
+            </Text>
+            <TouchableOpacity
+              style={styles.streakWarningButton}
+              onPress={() => setStreakWarningVisible(false)}
+            >
+              <Text style={styles.streakWarningButtonText}>{t.streakWarningButton}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -310,5 +350,50 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  streakOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  streakWarningCard: {
+    borderRadius: 24,
+    padding: 28,
+    width: '80%',
+    maxWidth: 340,
+    alignItems: 'center',
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+  },
+  streakWarningEmoji: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
+  streakWarningTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  streakWarningMessage: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  streakWarningButton: {
+    backgroundColor: '#F59E0B',
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+  },
+  streakWarningButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: 'bold',
   },
 });

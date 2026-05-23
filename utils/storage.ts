@@ -6,7 +6,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from './constants';
-import { ThemeMode, Language, Operation, NumberRange, DifficultyMode, SessionRecord } from '../types/game';
+import { ThemeMode, Language, Operation, NumberRange, DifficultyMode, SessionRecord, StreakData } from '../types/game';
 
 /**
  * Get a value from storage (platform-safe)
@@ -196,6 +196,62 @@ export const saveSessionRecord = async (record: SessionRecord): Promise<void> =>
   const records = await getSessionRecords();
   records.push(record);
   await setStorageItem(STORAGE_KEYS.PARENT_STATS, JSON.stringify(records));
+};
+
+// Streak storage helpers
+
+export function getLocalDateString(date?: Date): string {
+  const d = date ?? new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+export const getStreakData = async (): Promise<StreakData> => {
+  const value = await getStorageItem(STORAGE_KEYS.STREAK);
+  if (!value) return { currentStreak: 0, lastPlayedDate: '', longestStreak: 0 };
+  try {
+    const parsed = JSON.parse(value);
+    if (
+      typeof parsed.currentStreak === 'number' &&
+      typeof parsed.lastPlayedDate === 'string' &&
+      typeof parsed.longestStreak === 'number'
+    ) {
+      return parsed as StreakData;
+    }
+  } catch {
+    // fall through
+  }
+  return { currentStreak: 0, lastPlayedDate: '', longestStreak: 0 };
+};
+
+export const saveStreakData = async (data: StreakData): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.STREAK, JSON.stringify(data));
+};
+
+export const updateStreakAfterSession = async (): Promise<StreakData> => {
+  const today = getLocalDateString();
+  const data = await getStreakData();
+
+  if (data.lastPlayedDate === today) {
+    return data;
+  }
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = getLocalDateString(yesterday);
+
+  const newStreak = data.lastPlayedDate === yesterdayStr ? data.currentStreak + 1 : 1;
+
+  const updated: StreakData = {
+    currentStreak: newStreak,
+    lastPlayedDate: today,
+    longestStreak: Math.max(newStreak, data.longestStreak),
+  };
+
+  await saveStreakData(updated);
+  return updated;
 };
 
 export const saveNumberRange = async (range: NumberRange): Promise<void> => {

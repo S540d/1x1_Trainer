@@ -8,8 +8,8 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { ThemeColors, SessionRecord, Operation, DifficultyMode } from '../types/game';
-import { getSessionRecords, FOUR_WEEKS_MS } from '../utils/storage';
+import { ThemeColors, SessionRecord, Operation, DifficultyMode, StreakData } from '../types/game';
+import { getSessionRecords, getStreakData, FOUR_WEEKS_MS } from '../utils/storage';
 import { DESIGN_TOKENS } from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
 
@@ -34,6 +34,9 @@ interface ParentDashboardProps {
     parentYesterday: string;
     parentCorrect: string;
     parentErrors: string;
+    parentCurrentStreak: string;
+    parentLongestStreak: string;
+    parentStreakDays: string;
     ok: string;
   };
 }
@@ -90,13 +93,15 @@ function errorRateColor(rate: number): string {
 
 export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboardProps) {
   const [records, setRecords] = useState<SessionRecord[]>([]);
+  const [streak, setStreak] = useState<StreakData>({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (visible) {
       setLoading(true);
-      getSessionRecords().then((data) => {
+      Promise.all([getSessionRecords(), getStreakData()]).then(([data, streakData]) => {
         setRecords(data);
+        setStreak(streakData);
         setLoading(false);
       });
     }
@@ -137,13 +142,15 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           </View>
 
           {/* Summary bar */}
-          {records.length > 0 && (
+          {(records.length > 0 || streak.currentStreak > 0) && (
             <View style={[styles.summaryBar, { borderColor: colors.border }]}>
-              <View style={styles.summaryItem}>
-                <Text style={[styles.summaryValue, { color: colors.text }]}>{recentRecords.length}</Text>
-                <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentSessions}</Text>
-              </View>
-              {avgErrorRate !== null && (
+              {records.length > 0 && (
+                <View style={styles.summaryItem}>
+                  <Text style={[styles.summaryValue, { color: colors.text }]}>{recentRecords.length}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentSessions}</Text>
+                </View>
+              )}
+              {records.length > 0 && avgErrorRate !== null && (
                 <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
               )}
               {avgErrorRate !== null && (
@@ -152,6 +159,24 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
                     {Math.round(avgErrorRate * 100)}%
                   </Text>
                   <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentAvgError}</Text>
+                </View>
+              )}
+              {streak.currentStreak > 0 && (
+                <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
+              )}
+              {streak.currentStreak > 0 && (
+                <View style={styles.summaryItem}>
+                  <Text style={[styles.summaryValue, { color: '#F59E0B' }]}>🔥 {streak.currentStreak}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentCurrentStreak}</Text>
+                </View>
+              )}
+              {streak.longestStreak > 0 && (
+                <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
+              )}
+              {streak.longestStreak > 0 && (
+                <View style={styles.summaryItem}>
+                  <Text style={[styles.summaryValue, { color: colors.text }]}>{streak.longestStreak}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentLongestStreak}</Text>
                 </View>
               )}
             </View>

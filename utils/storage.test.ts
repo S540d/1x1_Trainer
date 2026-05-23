@@ -23,8 +23,12 @@ import {
   getChallengeHighScore,
   saveSessionRecord,
   getSessionRecords,
+  getStreakData,
+  saveStreakData,
+  updateStreakAfterSession,
+  getLocalDateString,
 } from './storage';
-import { Operation, ThemeMode, Language, NumberRange, DifficultyMode, SessionRecord } from '../types/game';
+import { Operation, ThemeMode, Language, NumberRange, DifficultyMode, SessionRecord, StreakData } from '../types/game';
 
 // Mock react-native Platform
 jest.mock('react-native', () => ({
@@ -535,5 +539,160 @@ describe('Session Records Storage', () => {
     const [retrieved] = await getSessionRecords();
     expect(retrieved.errorRate).toBe(0.3);
     expect(retrieved.errors).toBe(3);
+  });
+});
+
+describe('getLocalDateString()', () => {
+  it('should return YYYY-MM-DD format for today', () => {
+    const result = getLocalDateString();
+    expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('should return YYYY-MM-DD for a given date', () => {
+    const d = new Date(2024, 0, 5); // Jan 5, 2024
+    expect(getLocalDateString(d)).toBe('2024-01-05');
+  });
+
+  it('should pad month and day with leading zeros', () => {
+    const d = new Date(2024, 2, 9); // Mar 9, 2024
+    expect(getLocalDateString(d)).toBe('2024-03-09');
+  });
+});
+
+describe('Streak Storage', () => {
+  let mockStore: { [key: string]: string };
+
+  beforeEach(() => {
+    mockStore = {};
+    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => { mockStore[key] = value; });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should return default streak when nothing is stored', async () => {
+    const result = await getStreakData();
+    expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  });
+
+  it('should save and retrieve streak data', async () => {
+    const data: StreakData = { currentStreak: 5, lastPlayedDate: '2024-01-10', longestStreak: 7 };
+    await saveStreakData(data);
+    const result = await getStreakData();
+    expect(result).toEqual(data);
+  });
+
+  it('should return default for corrupted streak data', async () => {
+    mockStore['app-streak'] = '{invalid json}';
+    const result = await getStreakData();
+    expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  });
+
+  it('should return default for streak data with wrong types', async () => {
+    mockStore['app-streak'] = JSON.stringify({ currentStreak: 'five', lastPlayedDate: 123, longestStreak: null });
+    const result = await getStreakData();
+    expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  });
+});
+
+describe('updateStreakAfterSession()', () => {
+  let mockStore: { [key: string]: string };
+
+  beforeEach(() => {
+    mockStore = {};
+    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => { mockStore[key] = value; });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    jest.useRealTimers();
+  });
+
+  it('should start streak at 1 for first session', async () => {
+    const result = await updateStreakAfterSession();
+    expect(result.currentStreak).toBe(1);
+    expect(result.lastPlayedDate).toBe(getLocalDateString());
+    expect(result.longestStreak).toBe(1);
+  });
+
+  it('should not change streak when already played today', async () => {
+    const today = getLocalDateString();
+    mockStore['app-streak'] = JSON.stringify({ currentStreak: 3, lastPlayedDate: today, longestStreak: 5 });
+    const result = await updateStreakAfterSession();
+    expect(result.currentStreak).toBe(3);
+    expect(result.longestStreak).toBe(5);
+  });
+
+  it('should increment streak for consecutive day', async () => {
+    jest.useFakeTimers();
+    const today = new Date(2024, 5, 15); // Jun 15
+    jest.setSystemTime(today);
+
+    const yesterday = new Date(2024, 5, 14);
+    mockStore['app-streak'] = JSON.stringify({
+      currentStreak: 4,
+      lastPlayedDate: getLocalDateString(yesterday),
+      longestStreak: 4,
+    });
+
+    const result = await updateStreakAfterSession();
+    expect(result.currentStreak).toBe(5);
+    expect(result.longestStreak).toBe(5);
+    expect(result.lastPlayedDate).toBe('2024-06-15');
+  });
+
+  it('should reset streak to 1 after a gap', async () => {
+    jest.useFakeTimers();
+    const today = new Date(2024, 5, 15);
+    jest.setSystemTime(today);
+
+    const twoDaysAgo = new Date(2024, 5, 13);
+    mockStore['app-streak'] = JSON.stringify({
+      currentStreak: 10,
+      lastPlayedDate: getLocalDateString(twoDaysAgo),
+      longestStreak: 10,
+    });
+
+    const result = await updateStreakAfterSession();
+    expect(result.currentStreak).toBe(1);
+    expect(result.longestStreak).toBe(10); // longestStreak preserved
+    expect(result.lastPlayedDate).toBe('2024-06-15');
+  });
+
+  it('should update longestStreak when new streak exceeds it', async () => {
+    jest.useFakeTimers();
+    const today = new Date(2024, 5, 15);
+    jest.setSystemTime(today);
+
+    const yesterday = new Date(2024, 5, 14);
+    mockStore['app-streak'] = JSON.stringify({
+      currentStreak: 7,
+      lastPlayedDate: getLocalDateString(yesterday),
+      longestStreak: 7,
+    });
+
+    const result = await updateStreakAfterSession();
+    expect(result.currentStreak).toBe(8);
+    expect(result.longestStreak).toBe(8);
+  });
+
+  it('should not decrease longestStreak after reset', async () => {
+    jest.useFakeTimers();
+    const today = new Date(2024, 5, 15);
+    jest.setSystemTime(today);
+
+    const threeDaysAgo = new Date(2024, 5, 12);
+    mockStore['app-streak'] = JSON.stringify({
+      currentStreak: 3,
+      lastPlayedDate: getLocalDateString(threeDaysAgo),
+      longestStreak: 15,
+    });
+
+    const result = await updateStreakAfterSession();
+    expect(result.currentStreak).toBe(1);
+    expect(result.longestStreak).toBe(15);
   });
 });

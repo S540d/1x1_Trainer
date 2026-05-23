@@ -23,6 +23,7 @@ export const STORAGE_KEYS = {
   NUMBER_RANGE: 'app-number-range',
   CHALLENGE_HIGHSCORE: 'app-challenge-highscore',
   PARENT_STATS: 'app-parent-stats',
+  STREAK: 'app-streak',
 } as const;
 
 // Challenge Mode Configuration

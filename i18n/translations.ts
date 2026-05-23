@@ -94,6 +94,12 @@ export interface TranslationStrings {
   parentYesterday: string;
   parentCorrect: string;
   parentErrors: string;
+  parentCurrentStreak: string;
+  parentLongestStreak: string;
+  parentStreakDays: string;
+  streakWarningTitle: string;
+  streakWarningMessage: string;
+  streakWarningButton: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -186,6 +192,12 @@ export const translations: Record<Language, TranslationStrings> = {
     parentYesterday: 'Yesterday',
     parentCorrect: 'Correct',
     parentErrors: 'Errors',
+    parentCurrentStreak: 'Current Streak',
+    parentLongestStreak: 'Longest Streak',
+    parentStreakDays: 'Days',
+    streakWarningTitle: 'Don\'t break your streak!',
+    streakWarningMessage: 'Play a quick round today to keep your streak going!',
+    streakWarningButton: 'Let\'s go!',
   },
   de: {
     // Settings Menu
@@ -276,5 +288,11 @@ export const translations: Record<Language, TranslationStrings> = {
     parentYesterday: 'Gestern',
     parentCorrect: 'Richtig',
     parentErrors: 'Fehler',
+    parentCurrentStreak: 'Aktueller Streak',
+    parentLongestStreak: 'Längster Streak',
+    parentStreakDays: 'Tage',
+    streakWarningTitle: 'Brich deinen Streak nicht!',
+    streakWarningMessage: 'Spiel heute eine Runde, um deinen Streak zu halten!',
+    streakWarningButton: 'Los geht\'s!',
   },
 };
