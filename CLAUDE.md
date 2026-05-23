@@ -78,11 +78,11 @@ npm run test:coverage # Coverage
 
 ---
 
-## Aktueller Stand (2026-05-21)
+## Aktueller Stand (2026-05-23)
 
 - Version: **1.3.5** / versionCode 24
-- Tests: 427 passed, 3 skipped, 13/13 Suites grün
-- Branches: `testing` vorn (`851f4fd`); `staging` und `main` noch auf `1b551ea`
+- Tests: 451 passed, 3 skipped, 14/14 Suites grün
+- Branches: `testing` vorn (`3435d57`); `staging` und `main` noch auf `1b551ea`
 - Offene Issues: #165, #160, #156, #146, #131, #100, #96
 - Security: 21 Vulnerabilities (alle über Expo-Tooling, build-time) → Issue #146
 
@@ -90,11 +90,11 @@ npm run test:coverage # Coverage
 
 | PR  | Was |
 |-----|-----|
+| #195 | CI: Jest-Test-Job zu ci-cd.yml hinzufügen (läuft jetzt automatisch bei PRs) |
+| #184 | Achievement & Badge System |
 | #192 | Adaptives Lernen – Übungsmodus (PRACTICE) mit Schwachstellen-Fokus (Issue #188) |
 | #183 | CI/CD ci-cd.yml-Startup-Failure beheben (Issue #152-Regression) |
 | #177 | TypeScript-Fixes + isValidSessionRecord Enum-Validierung + Challenge-Ops Fix |
-| #175 | Eltern-Dashboard Beta-Badge + 28-Tage Fix + Copilot-Review-Fixes |
-| #174 | Eltern-Dashboard (SessionRecord, ParentDashboard-Modal, Storage, i18n) |
 
 ---
 
@@ -104,7 +104,7 @@ npm run test:coverage # Coverage
 |-------|--------|
 | `utils/constants.ts` | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS |
 | `utils/theme.ts` | `getThemeColors(isDarkMode)` |
-| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats`, `FOUR_WEEKS_MS` |
+| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `updateTaskStat` / `getTaskStats` / `getWeakTasks`, `FOUR_WEEKS_MS` |
 | `utils/animations.ts` | `prefersReducedMotion()` — liest Accessibility-Einstellung |
 | `types/game.ts` | ThemeColors, GameState, Enums, SessionRecord |
 | `i18n/translations.ts` | DE/EN Übersetzungen, `TranslationStrings`-Interface |
@@ -143,13 +143,14 @@ npm run test:coverage # Coverage
 
 ## Adaptives Lernen / Übungsmodus (PRACTICE) — Hinweise
 
-- `TaskStat` (`types/game.ts`): pro konkreter Aufgabe (num1/num2/operation) correctCount + errorCount
+- `TaskStat` (`types/game.ts`): pro konkreter Aufgabe (num1/num2/operation) correctCount + errorCount + lastSeen
 - Storage Key: `app-task-stats` (separater Key, unabhängig von Session-Records)
-- `recordTaskResult()` in `utils/storage.ts`: schreibt mit Promise-Queue (Race-Condition-sicher)
-- In App.tsx wird `taskStats` State in-memory optimistisch aktualisiert und gleichzeitig im Background persistiert
+- `updateTaskStat()` in `utils/storage.ts`: Race-Condition-sicher via Promise-Queue
+- In App.tsx wird `taskStats` als Ref gehalten und per `useEffect` aktualisiert
 - `DifficultyMode.PRACTICE`: 75% Chance schwache Aufgabe (Fehlerrate >30%, ≥3 Versuche), 25% zufällig; Aufgaben werden nach `effectiveMaxNumber` gefiltert (range-sicher)
-- `getWeakTasks()` in `utils/storage.ts`: filtert + sortiert nach Fehlerrate absteigend
+- `getWeakTasks(stats)` in `utils/storage.ts`: reine Funktion, filtert + sortiert nach Fehlerrate absteigend
 - ParentDashboard zeigt Top-5-Schwachstellen — unabhängig von vorhandenen Session-Records
+- CI: `npm test --ci` läuft jetzt automatisch bei jedem PR (`.github/workflows/ci-cd.yml`, Job `test`)
 
 ---
 
