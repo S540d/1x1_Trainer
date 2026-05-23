@@ -35,7 +35,7 @@ import { AboutModal } from './components/AboutModal';
 import { ParentDashboard } from './components/ParentDashboard';
 import { OnboardingModal } from './components/OnboardingModal';
 import { FloatingStars } from './components/FloatingStars';
-import { saveSessionRecord, getOnboardingShown, setOnboardingShown, resetOnboarding, getStorageItem } from './utils/storage';
+import { saveSessionRecord, getOnboardingDone, setOnboardingDone, resetOnboarding, getStorageItem } from './utils/storage';
 import { SessionRecord } from './types/game';
 import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
 
@@ -190,9 +190,9 @@ export default function App() {
   useEffect(() => {
     if (!preferences.isLoaded) return;
     (async () => {
-      const shown = await getOnboardingShown();
+      const shown = await getOnboardingDone();
       if (shown) return;
-      const rawValue = await getStorageItem(STORAGE_KEYS.ONBOARDING_SHOWN);
+      const rawValue = await getStorageItem(STORAGE_KEYS.ONBOARDING_DONE);
       if (rawValue === 'pending') {
         // Explicit reset → always show onboarding
         setOnboardingVisible(true);
@@ -201,7 +201,7 @@ export default function App() {
       // rawValue is null → first launch: migrate existing users silently
       const existingLanguage = await getStorageItem(STORAGE_KEYS.LANGUAGE);
       if (existingLanguage) {
-        await setOnboardingShown();
+        await setOnboardingDone();
       } else {
         setOnboardingVisible(true);
       }
@@ -337,7 +337,7 @@ export default function App() {
       <OnboardingModal
         visible={onboardingVisible}
         onFinish={async () => {
-          await setOnboardingShown();
+          await setOnboardingDone();
           setOnboardingVisible(false);
         }}
         colors={colors}

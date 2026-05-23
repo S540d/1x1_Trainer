@@ -11,6 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors } from '../types/game';
 import { modalStyles } from '../styles/modalStyles';
 import { DESIGN_TOKENS } from '../utils/constants';
+import { prefersReducedMotion } from '../utils/animations';
 
 interface OnboardingModalProps {
   visible: boolean;
@@ -25,6 +26,8 @@ interface OnboardingModalProps {
     onboardingSettingsBody: string;
     onboardingReadyTitle: string;
     onboardingReadyBody: string;
+    onboardingDemoRetry: string;
+    onboardingSettingsLabel: string;
     onboardingNext: string;
     onboardingStart: string;
     onboardingSkip: string;
@@ -61,13 +64,17 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
     if (demoAnswer !== null) return;
     setDemoAnswer(choice);
     if (choice !== DEMO_CORRECT) {
+      if (prefersReducedMotion()) {
+        setDemoAnswer(null);
+        return;
+      }
       Animated.sequence([
         Animated.timing(shakeAnim, { toValue: -8, duration: 60, useNativeDriver: true }),
         Animated.timing(shakeAnim, { toValue: 8, duration: 60, useNativeDriver: true }),
         Animated.timing(shakeAnim, { toValue: -5, duration: 60, useNativeDriver: true }),
         Animated.timing(shakeAnim, { toValue: 5, duration: 60, useNativeDriver: true }),
         Animated.timing(shakeAnim, { toValue: 0, duration: 60, useNativeDriver: true }),
-      ]).start();
+      ]).start(() => setDemoAnswer(null));
     }
   };
 
@@ -147,7 +154,7 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
               )}
               {demoWrong && (
                 <Text style={[styles.body, { color: colors.textSecondary }]}>
-                  Nicht ganz – tippe nochmal!
+                  {t.onboardingDemoRetry}
                 </Text>
               )}
             </View>
@@ -166,7 +173,7 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
               >
                 <Text style={styles.menuHintText}>☰</Text>
               </LinearGradient>
-              <Text style={[styles.tooltip, { color: colors.textSecondary }]}>↑ Settings</Text>
+              <Text style={[styles.tooltip, { color: colors.textSecondary }]}>{t.onboardingSettingsLabel}</Text>
             </View>
           )}
 

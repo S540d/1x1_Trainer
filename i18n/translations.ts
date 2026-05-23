@@ -103,6 +103,8 @@ export interface TranslationStrings {
   onboardingSettingsBody: string;
   onboardingReadyTitle: string;
   onboardingReadyBody: string;
+  onboardingDemoRetry: string;
+  onboardingSettingsLabel: string;
   onboardingNext: string;
   onboardingStart: string;
   onboardingSkip: string;
@@ -208,6 +210,8 @@ export const translations: Record<Language, TranslationStrings> = {
     onboardingSettingsBody: 'Tap the menu button to change the operation, difficulty and number range.',
     onboardingReadyTitle: "You're ready!",
     onboardingReadyBody: 'Have fun practicing!',
+    onboardingDemoRetry: 'Not quite — try again!',
+    onboardingSettingsLabel: '↑ Settings',
     onboardingNext: 'Next',
     onboardingStart: 'Start',
     onboardingSkip: 'Skip',
@@ -311,6 +315,8 @@ export const translations: Record<Language, TranslationStrings> = {
     onboardingSettingsBody: 'Tippe auf den Menü-Button, um Rechenart, Schwierigkeit und Zahlenbereich zu ändern.',
     onboardingReadyTitle: 'Du bist bereit!',
     onboardingReadyBody: 'Viel Spaß beim Üben!',
+    onboardingDemoRetry: 'Nicht ganz – tippe nochmal!',
+    onboardingSettingsLabel: '↑ Einstellungen',
     onboardingNext: 'Weiter',
     onboardingStart: 'Loslegen',
     onboardingSkip: 'Überspringen',
