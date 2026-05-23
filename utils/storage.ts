@@ -6,7 +6,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from './constants';
-import { ThemeMode, Language, Operation, NumberRange, DifficultyMode, SessionRecord, TaskStat } from '../types/game';
+import { ThemeMode, Language, Operation, NumberRange, DifficultyMode, SessionRecord, TaskStat, StreakData } from '../types/game';
 
 /**
  * Get a value from storage (platform-safe)
@@ -209,7 +209,6 @@ export const setOnboardingDone = async (): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.ONBOARDING_DONE, 'true');
 };
 
-// Stores 'pending' so migration logic is skipped on next launch
 export const resetOnboarding = async (): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.ONBOARDING_DONE, 'pending');
 };
@@ -312,30 +311,70 @@ export const saveBadges = async (badges: BadgeStore): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.BADGES, JSON.stringify(badges));
 };
 
-// Persistent streak counter – decoupled from the 28-day session record window
-export interface StreakData {
-  currentStreak: number;
-  lastPlayedDay: string; // YYYY-MM-DD
+// Streak storage helpers
+
+export function getLocalDateString(date?: Date): string {
+  const d = date ?? new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+const STREAK_DEFAULT: StreakData = { currentStreak: 0, lastPlayedDate: '', longestStreak: 0 };
+
+function isNonNegInt(v: unknown): v is number {
+  return typeof v === 'number' && Number.isFinite(v) && v >= 0 && Number.isInteger(v);
+}
+
+function isLocalDateString(v: unknown): v is string {
+  return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
 }
 
 export const getStreakData = async (): Promise<StreakData> => {
   const value = await getStorageItem(STORAGE_KEYS.STREAK);
-  if (!value) return { currentStreak: 0, lastPlayedDay: '' };
+  if (!value) return STREAK_DEFAULT;
   try {
     const parsed = JSON.parse(value);
     if (
-      typeof parsed === 'object' && parsed !== null &&
-      typeof parsed.currentStreak === 'number' &&
-      typeof parsed.lastPlayedDay === 'string'
+      isNonNegInt(parsed.currentStreak) &&
+      isLocalDateString(parsed.lastPlayedDate) &&
+      isNonNegInt(parsed.longestStreak)
     ) {
       return parsed as StreakData;
     }
-  } catch { /* ignore */ }
-  return { currentStreak: 0, lastPlayedDay: '' };
+  } catch {
+    // fall through
+  }
+  return STREAK_DEFAULT;
 };
 
 export const saveStreakData = async (data: StreakData): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.STREAK, JSON.stringify(data));
+};
+
+export const updateStreakAfterSession = async (): Promise<StreakData> => {
+  const today = getLocalDateString();
+  const data = await getStreakData();
+
+  if (data.lastPlayedDate === today) {
+    return data;
+  }
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = getLocalDateString(yesterday);
+
+  const newStreak = data.lastPlayedDate === yesterdayStr ? data.currentStreak + 1 : 1;
+
+  const updated: StreakData = {
+    currentStreak: newStreak,
+    lastPlayedDate: today,
+    longestStreak: Math.max(newStreak, data.longestStreak),
+  };
+
+  await saveStreakData(updated);
+  return updated;
 };
 
 export const saveNumberRange = async (range: NumberRange): Promise<void> => {

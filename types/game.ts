@@ -94,6 +94,12 @@ export interface AchievementBadge {
   unlockedAt: number;
 }
 
+export interface StreakData {
+  currentStreak: number;
+  lastPlayedDate: string; // YYYY-MM-DD (local date)
+  longestStreak: number;
+}
+
 export interface ThemeColors {
   background: string;
   text: string;

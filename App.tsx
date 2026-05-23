@@ -4,6 +4,10 @@ import {
   SafeAreaView,
   useWindowDimensions,
   Animated,
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
@@ -37,8 +41,8 @@ import { OnboardingModal } from './components/OnboardingModal';
 import { BadgesModal } from './components/BadgesModal';
 import { BadgeUnlockToast } from './components/BadgeUnlockToast';
 import { FloatingStars } from './components/FloatingStars';
-import { saveSessionRecord, recordTaskResult, getTaskStats, getWeakTasks, getOnboardingDone, setOnboardingDone, resetOnboarding, getStorageItem } from './utils/storage';
-import { SessionRecord, TaskStat, Operation } from './types/game';
+import { saveSessionRecord, getStreakData, updateStreakAfterSession, getLocalDateString, recordTaskResult, getTaskStats, getWeakTasks, getOnboardingDone, setOnboardingDone, resetOnboarding, getStorageItem } from './utils/storage';
+import { SessionRecord, StreakData, TaskStat, Operation } from './types/game';
 import { useBadges } from './hooks/useBadges';
 import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
 
@@ -59,6 +63,8 @@ export default function App() {
   const [badgesVisible, setBadgesVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
+  const [streakData, setStreakData] = useState<StreakData>({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  const [streakWarningVisible, setStreakWarningVisible] = useState(false);
   const [onboardingVisible, setOnboardingVisible] = useState(false);
   const [taskStats, setTaskStats] = useState<TaskStat[]>([]);
 
@@ -92,7 +98,11 @@ export default function App() {
     },
     onSessionComplete: (record: SessionRecord) => {
       saveSessionRecord(record)
-        .then(() => badgeSystem.checkAndUnlock(record))
+        .then(async () => {
+          const updatedStreak = await updateStreakAfterSession();
+          setStreakData(updatedStreak);
+          await badgeSystem.checkAndUnlock(record);
+        })
         .catch((err) => console.error('Session save / badge unlock failed:', err));
     },
     taskStats,
@@ -191,6 +201,20 @@ export default function App() {
     }
   }, [isDarkMode]);
 
+  // Load streak data and show warning when appropriate
+  useEffect(() => {
+    getStreakData().then((data) => {
+      setStreakData(data);
+      const now = new Date();
+      const isEvening = now.getHours() >= 20;
+      const hasStreakToProtect = data.currentStreak > 0;
+      const hasNotPlayedToday = data.lastPlayedDate !== getLocalDateString();
+      if (isEvening && hasStreakToProtect && hasNotPlayedToday) {
+        setStreakWarningVisible(true);
+      }
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Card feedback animation (skipped when reduce motion is enabled)
   useEffect(() => {
     if (!game.gameState.isAnswerChecked || prefersReducedMotion()) return;
@@ -276,6 +300,7 @@ export default function App() {
         score={game.gameState.score}
         currentTask={game.gameState.currentTask}
         totalTasks={game.gameState.totalTasks}
+        currentStreak={streakData.currentStreak}
         onShowMenu={showMenu}
         t={t}
       />
@@ -370,6 +395,24 @@ export default function App() {
         t={t}
       />
 
+      <Modal visible={streakWarningVisible} transparent animationType="fade" onRequestClose={() => setStreakWarningVisible(false)}>
+        <View style={styles.streakOverlay}>
+          <View style={[styles.streakWarningCard, { backgroundColor: colors.settingsMenu }]}>
+            <Text style={styles.streakWarningEmoji}>🔥</Text>
+            <Text style={[styles.streakWarningTitle, { color: colors.text }]}>{t.streakWarningTitle}</Text>
+            <Text style={[styles.streakWarningMessage, { color: colors.textSecondary }]}>
+              {t.streakWarningMessage.replace('{days}', String(streakData.currentStreak))}
+            </Text>
+            <TouchableOpacity
+              style={styles.streakWarningButton}
+              onPress={() => setStreakWarningVisible(false)}
+            >
+              <Text style={styles.streakWarningButtonText}>{t.streakWarningButton}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <OnboardingModal
         visible={onboardingVisible}
         onFinish={async () => {
@@ -401,5 +444,50 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  streakOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  streakWarningCard: {
+    borderRadius: 24,
+    padding: 28,
+    width: '80%',
+    maxWidth: 340,
+    alignItems: 'center',
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+  },
+  streakWarningEmoji: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
+  streakWarningTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  streakWarningMessage: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  streakWarningButton: {
+    backgroundColor: '#F59E0B',
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+  },
+  streakWarningButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: 'bold',
   },
 });

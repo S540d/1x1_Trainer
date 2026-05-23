@@ -8,8 +8,8 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { ThemeColors, SessionRecord, Operation, DifficultyMode, TaskStat } from '../types/game';
-import { getSessionRecords, getTaskStats, getWeakTasks, FOUR_WEEKS_MS } from '../utils/storage';
+import { ThemeColors, SessionRecord, Operation, DifficultyMode, StreakData, TaskStat } from '../types/game';
+import { getSessionRecords, getStreakData, getTaskStats, getWeakTasks, FOUR_WEEKS_MS } from '../utils/storage';
 import { DESIGN_TOKENS } from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
 
@@ -34,6 +34,9 @@ interface ParentDashboardProps {
     parentYesterday: string;
     parentCorrect: string;
     parentErrors: string;
+    parentCurrentStreak: string;
+    parentLongestStreak: string;
+    parentStreakDays: string;
     parentWeakTasks: string;
     parentWeakTasksEmpty: string;
     ok: string;
@@ -92,14 +95,16 @@ function errorRateColor(rate: number): string {
 
 export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboardProps) {
   const [records, setRecords] = useState<SessionRecord[]>([]);
+  const [streak, setStreak] = useState<StreakData>({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   const [weakTasks, setWeakTasks] = useState<TaskStat[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (visible) {
       setLoading(true);
-      Promise.all([getSessionRecords(), getTaskStats()]).then(([sessions, stats]) => {
-        setRecords(sessions);
+      Promise.all([getSessionRecords(), getStreakData(), getTaskStats()]).then(([data, streakData, stats]) => {
+        setRecords(data);
+        setStreak(streakData);
         setWeakTasks(getWeakTasks(stats).slice(0, 5));
         setLoading(false);
       });
@@ -141,13 +146,15 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           </View>
 
           {/* Summary bar */}
-          {records.length > 0 && (
+          {(records.length > 0 || streak.currentStreak > 0 || streak.longestStreak > 0) && (
             <View style={[styles.summaryBar, { borderColor: colors.border }]}>
-              <View style={styles.summaryItem}>
-                <Text style={[styles.summaryValue, { color: colors.text }]}>{recentRecords.length}</Text>
-                <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentSessions}</Text>
-              </View>
-              {avgErrorRate !== null && (
+              {records.length > 0 && (
+                <View style={styles.summaryItem}>
+                  <Text style={[styles.summaryValue, { color: colors.text }]}>{recentRecords.length}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentSessions}</Text>
+                </View>
+              )}
+              {records.length > 0 && avgErrorRate !== null && (
                 <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
               )}
               {avgErrorRate !== null && (
@@ -156,6 +163,24 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
                     {Math.round(avgErrorRate * 100)}%
                   </Text>
                   <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentAvgError}</Text>
+                </View>
+              )}
+              {streak.currentStreak > 0 && records.length > 0 && (
+                <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
+              )}
+              {streak.currentStreak > 0 && (
+                <View style={styles.summaryItem}>
+                  <Text style={[styles.summaryValue, { color: '#F59E0B' }]}>🔥 {streak.currentStreak}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentCurrentStreak}</Text>
+                </View>
+              )}
+              {streak.longestStreak > 0 && (records.length > 0 || streak.currentStreak > 0) && (
+                <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
+              )}
+              {streak.longestStreak > 0 && (
+                <View style={styles.summaryItem}>
+                  <Text style={[styles.summaryValue, { color: colors.text }]}>{streak.longestStreak}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentLongestStreak}</Text>
                 </View>
               )}
             </View>

@@ -97,6 +97,12 @@ export interface TranslationStrings {
   parentYesterday: string;
   parentCorrect: string;
   parentErrors: string;
+  parentCurrentStreak: string;
+  parentLongestStreak: string;
+  parentStreakDays: string;
+  streakWarningTitle: string;
+  streakWarningMessage: string;
+  streakWarningButton: string;
   parentWeakTasks: string;
   parentWeakTasksEmpty: string;
   // Badges
@@ -242,6 +248,12 @@ export const translations: Record<Language, TranslationStrings> = {
     parentYesterday: 'Yesterday',
     parentCorrect: 'Correct',
     parentErrors: 'Errors',
+    parentCurrentStreak: 'Current Streak',
+    parentLongestStreak: 'Longest Streak',
+    parentStreakDays: 'Days',
+    streakWarningTitle: 'Don\'t break your streak!',
+    streakWarningMessage: 'Play a quick round today to keep your {days}-day streak going!',
+    streakWarningButton: 'Let\'s go!',
     parentWeakTasks: 'Weak Areas (Top 5)',
     parentWeakTasksEmpty: 'No weak areas identified yet.',
     // Badges
@@ -385,6 +397,12 @@ export const translations: Record<Language, TranslationStrings> = {
     parentYesterday: 'Gestern',
     parentCorrect: 'Richtig',
     parentErrors: 'Fehler',
+    parentCurrentStreak: 'Aktueller Streak',
+    parentLongestStreak: 'Längster Streak',
+    parentStreakDays: 'Tage',
+    streakWarningTitle: 'Brich deinen Streak nicht!',
+    streakWarningMessage: 'Spiel heute eine Runde, um deinen {days}-Tage-Streak zu halten!',
+    streakWarningButton: 'Los geht\'s!',
     parentWeakTasks: 'Schwachstellen (Top 5)',
     parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
     // Badges
