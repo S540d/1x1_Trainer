@@ -94,6 +94,19 @@ export interface TranslationStrings {
   parentYesterday: string;
   parentCorrect: string;
   parentErrors: string;
+  // Onboarding
+  onboardingWelcomeTitle: string;
+  onboardingWelcomeBody: string;
+  onboardingDemoTitle: string;
+  onboardingDemoTooltip: string;
+  onboardingSettingsTitle: string;
+  onboardingSettingsBody: string;
+  onboardingReadyTitle: string;
+  onboardingReadyBody: string;
+  onboardingNext: string;
+  onboardingStart: string;
+  onboardingSkip: string;
+  resetOnboarding: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -186,6 +199,19 @@ export const translations: Record<Language, TranslationStrings> = {
     parentYesterday: 'Yesterday',
     parentCorrect: 'Correct',
     parentErrors: 'Errors',
+    // Onboarding
+    onboardingWelcomeTitle: 'Welcome to 1×1 Trainer!',
+    onboardingWelcomeBody: 'Practice multiplication, division, addition and subtraction — fun and easy!',
+    onboardingDemoTitle: 'Try it out!',
+    onboardingDemoTooltip: 'Enter your answer here',
+    onboardingSettingsTitle: 'Everything Adjustable',
+    onboardingSettingsBody: 'Tap the menu button to change the operation, difficulty and number range.',
+    onboardingReadyTitle: "You're ready!",
+    onboardingReadyBody: 'Have fun practicing!',
+    onboardingNext: 'Next',
+    onboardingStart: 'Start',
+    onboardingSkip: 'Skip',
+    resetOnboarding: 'Restart tutorial',
   },
   de: {
     // Settings Menu
@@ -276,5 +302,18 @@ export const translations: Record<Language, TranslationStrings> = {
     parentYesterday: 'Gestern',
     parentCorrect: 'Richtig',
     parentErrors: 'Fehler',
+    // Onboarding
+    onboardingWelcomeTitle: 'Willkommen beim 1×1 Trainer!',
+    onboardingWelcomeBody: 'Übe Multiplikation, Division, Addition und Subtraktion – Spaß und einfach!',
+    onboardingDemoTitle: 'Probiere es aus!',
+    onboardingDemoTooltip: 'Gib deine Antwort hier ein',
+    onboardingSettingsTitle: 'Alles einstellbar',
+    onboardingSettingsBody: 'Tippe auf den Menü-Button, um Rechenart, Schwierigkeit und Zahlenbereich zu ändern.',
+    onboardingReadyTitle: 'Du bist bereit!',
+    onboardingReadyBody: 'Viel Spaß beim Üben!',
+    onboardingNext: 'Weiter',
+    onboardingStart: 'Loslegen',
+    onboardingSkip: 'Überspringen',
+    resetOnboarding: 'Tutorial zurücksetzen',
   },
 };

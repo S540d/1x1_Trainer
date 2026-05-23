@@ -20,6 +20,7 @@ import {
 
 // Local imports
 import { translations } from './i18n/translations';
+import { STORAGE_KEYS } from './utils/constants';
 import { useTheme } from './hooks/useTheme';
 import { usePreferences } from './hooks/usePreferences';
 import { useGameLogic } from './hooks/useGameLogic';
@@ -32,8 +33,9 @@ import { ResultModal } from './components/ResultModal';
 import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
 import { ParentDashboard } from './components/ParentDashboard';
+import { OnboardingModal } from './components/OnboardingModal';
 import { FloatingStars } from './components/FloatingStars';
-import { saveSessionRecord } from './utils/storage';
+import { saveSessionRecord, getOnboardingShown, setOnboardingShown, resetOnboarding, getStorageItem } from './utils/storage';
 import { SessionRecord } from './types/game';
 import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
 
@@ -53,6 +55,7 @@ export default function App() {
   const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
+  const [onboardingVisible, setOnboardingVisible] = useState(false);
 
   // Reduced motion preference — centralized in utils/animations.ts
   useEffect(() => {
@@ -183,6 +186,29 @@ export default function App() {
     }
   }, [game.gameState.isAnswerChecked, game.gameState.lastAnswerCorrect]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Show onboarding for new users; silently skip for existing users (migration)
+  useEffect(() => {
+    if (!preferences.isLoaded) return;
+    (async () => {
+      const shown = await getOnboardingShown();
+      if (shown) return;
+      const rawValue = await getStorageItem(STORAGE_KEYS.ONBOARDING_SHOWN);
+      if (rawValue === 'pending') {
+        // Explicit reset → always show onboarding
+        setOnboardingVisible(true);
+        return;
+      }
+      // rawValue is null → first launch: migrate existing users silently
+      const existingLanguage = await getStorageItem(STORAGE_KEYS.LANGUAGE);
+      if (existingLanguage) {
+        await setOnboardingShown();
+      } else {
+        setOnboardingVisible(true);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferences.isLoaded]);
+
   // Generate first question on mount
   useEffect(() => {
     if (preferences.isLoaded) {
@@ -241,6 +267,10 @@ export default function App() {
             hideMenu();
           }}
           onOpenParentDashboard={() => setParentDashboardVisible(true)}
+          onResetOnboarding={async () => {
+            await resetOnboarding();
+            setOnboardingVisible(true);
+          }}
           t={t}
         />
       )}
@@ -300,6 +330,16 @@ export default function App() {
       <ParentDashboard
         visible={parentDashboardVisible}
         onClose={() => setParentDashboardVisible(false)}
+        colors={colors}
+        t={t}
+      />
+
+      <OnboardingModal
+        visible={onboardingVisible}
+        onFinish={async () => {
+          await setOnboardingShown();
+          setOnboardingVisible(false);
+        }}
         colors={colors}
         t={t}
       />

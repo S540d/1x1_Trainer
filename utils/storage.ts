@@ -198,6 +198,22 @@ export const saveSessionRecord = async (record: SessionRecord): Promise<void> =>
   await setStorageItem(STORAGE_KEYS.PARENT_STATS, JSON.stringify(records));
 };
 
+// Returns true when onboarding is done (value = 'true').
+// Returns false for null (never seen) or 'pending' (explicitly reset).
+export const getOnboardingShown = async (): Promise<boolean> => {
+  const value = await getStorageItem(STORAGE_KEYS.ONBOARDING_SHOWN);
+  return value === 'true';
+};
+
+export const setOnboardingShown = async (): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.ONBOARDING_SHOWN, 'true');
+};
+
+// Stores 'pending' so migration logic is skipped on next launch
+export const resetOnboarding = async (): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.ONBOARDING_SHOWN, 'pending');
+};
+
 export const saveNumberRange = async (range: NumberRange): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.NUMBER_RANGE, range);
 };
