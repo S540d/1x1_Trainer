@@ -106,7 +106,7 @@ npm run test:coverage # Coverage
 |-------|--------|
 | `utils/constants.ts` | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS |
 | `utils/theme.ts` | `getThemeColors(isDarkMode)` |
-| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `updateTaskStat` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `FOUR_WEEKS_MS` |
+| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `FOUR_WEEKS_MS` |
 | `utils/animations.ts` | `prefersReducedMotion()` — liest Accessibility-Einstellung |
 | `types/game.ts` | ThemeColors, GameState, Enums, SessionRecord |
 | `i18n/translations.ts` | DE/EN Übersetzungen, `TranslationStrings`-Interface |
@@ -159,7 +159,7 @@ npm run test:coverage # Coverage
 
 - `TaskStat` (`types/game.ts`): pro konkreter Aufgabe (num1/num2/operation) correctCount + errorCount + lastSeen
 - Storage Key: `app-task-stats` (separater Key, unabhängig von Session-Records)
-- `updateTaskStat()` in `utils/storage.ts`: Race-Condition-sicher via Promise-Queue
+- `recordTaskResult()` in `utils/storage.ts`: Race-Condition-sicher via Promise-Queue
 - In App.tsx wird `taskStats` als Ref gehalten und per `useEffect` aktualisiert
 - `DifficultyMode.PRACTICE`: 75% Chance schwache Aufgabe (Fehlerrate >30%, ≥3 Versuche), 25% zufällig; Aufgaben werden nach `effectiveMaxNumber` gefiltert (range-sicher)
 - `getWeakTasks(stats)` in `utils/storage.ts`: reine Funktion, filtert + sortiert nach Fehlerrate absteigend

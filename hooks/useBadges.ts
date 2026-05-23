@@ -4,16 +4,14 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { SessionRecord, Operation, DifficultyMode, NumberRange } from '../types/game';
+import { SessionRecord, Operation, DifficultyMode, NumberRange, StreakData } from '../types/game';
 import {
   getBadges,
   saveBadges,
   getSessionRecords,
   getChallengeHighScore,
   getStreakData,
-  saveStreakData,
   BadgeStore,
-  StreakData,
 } from '../utils/storage';
 import { getChallengeLevelNumber } from '../utils/constants';
 
@@ -116,11 +114,13 @@ function yesterdayISODate(): string {
 
 export function advanceStreak(current: StreakData): StreakData {
   const today = todayISODate();
-  if (current.lastPlayedDay === today) return current;
-  if (current.lastPlayedDay === yesterdayISODate()) {
-    return { currentStreak: current.currentStreak + 1, lastPlayedDay: today };
-  }
-  return { currentStreak: 1, lastPlayedDay: today };
+  if (current.lastPlayedDate === today) return current;
+  const newStreak = current.lastPlayedDate === yesterdayISODate() ? current.currentStreak + 1 : 1;
+  return {
+    currentStreak: newStreak,
+    lastPlayedDate: today,
+    longestStreak: Math.max(newStreak, current.longestStreak),
+  };
 }
 
 // --- hook ---
@@ -145,15 +145,12 @@ export function useBadges() {
       getStreakData(),
     ]);
 
-    const updatedStreak = advanceStreak(streakData);
-    await saveStreakData(updatedStreak);
-
     const newIds = computeNewlyUnlocked(
       record,
       allRecords,
       challengeHighScore,
       existing,
-      updatedStreak.currentStreak,
+      streakData.currentStreak,
     );
     if (newIds.length === 0) return;
 

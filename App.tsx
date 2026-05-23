@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -67,6 +67,7 @@ export default function App() {
   const [streakWarningVisible, setStreakWarningVisible] = useState(false);
   const [onboardingVisible, setOnboardingVisible] = useState(false);
   const [taskStats, setTaskStats] = useState<TaskStat[]>([]);
+  const weakTaskCount = useMemo(() => getWeakTasks(taskStats, 3, 0.3).length, [taskStats]);
 
   // Reduced motion preference — centralized in utils/animations.ts
   useEffect(() => {
@@ -313,7 +314,7 @@ export default function App() {
           difficultyMode={game.gameState.difficultyMode}
           selectedOperations={game.gameState.selectedOperations}
           numberRange={preferences.numberRange}
-          weakTaskCount={getWeakTasks(taskStats, 3, 0.3).length}
+          weakTaskCount={weakTaskCount}
           onToggleOperation={game.toggleOperation}
           onChangeDifficultyMode={game.changeDifficultyMode}
           onSetNumberRange={preferences.setNumberRange}

@@ -186,25 +186,25 @@ describe('advanceStreak', () => {
   }
 
   it('starts streak at 1 on first ever play', () => {
-    const result = advanceStreak({ currentStreak: 0, lastPlayedDay: '' });
+    const result = advanceStreak({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
     expect(result.currentStreak).toBe(1);
-    expect(result.lastPlayedDay).toBe(isoToday());
+    expect(result.lastPlayedDate).toBe(isoToday());
   });
 
   it('does not increase streak when called twice on same day', () => {
     const today = isoToday();
-    const result = advanceStreak({ currentStreak: 5, lastPlayedDay: today });
+    const result = advanceStreak({ currentStreak: 5, lastPlayedDate: today, longestStreak: 5 });
     expect(result.currentStreak).toBe(5);
   });
 
   it('increments streak on consecutive day', () => {
-    const result = advanceStreak({ currentStreak: 4, lastPlayedDay: isoYesterday() });
+    const result = advanceStreak({ currentStreak: 4, lastPlayedDate: isoYesterday(), longestStreak: 4 });
     expect(result.currentStreak).toBe(5);
-    expect(result.lastPlayedDay).toBe(isoToday());
+    expect(result.lastPlayedDate).toBe(isoToday());
   });
 
   it('resets streak to 1 after a gap', () => {
-    const result = advanceStreak({ currentStreak: 10, lastPlayedDay: '2020-01-01' });
+    const result = advanceStreak({ currentStreak: 10, lastPlayedDate: '2020-01-01', longestStreak: 10 });
     expect(result.currentStreak).toBe(1);
   });
 });

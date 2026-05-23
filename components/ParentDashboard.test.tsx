@@ -27,6 +27,9 @@ const t = {
   parentErrors: 'Fehler',
   parentWeakTasks: 'Schwachstellen (Top 5)',
   parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
+  parentCurrentStreak: 'Aktueller Streak',
+  parentLongestStreak: 'Längster Streak',
+  parentStreakDays: 'Tage',
   ok: 'OK',
 };
 

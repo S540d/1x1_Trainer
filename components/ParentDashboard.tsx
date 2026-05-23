@@ -190,10 +190,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           {!loading && weakTasks.length > 0 && (
             <View style={[styles.weakSection, { borderColor: colors.border }]}>
               <Text style={[styles.weakTitle, { color: colors.textSecondary }]}>{t.parentWeakTasks}</Text>
-              {weakTasks.length === 0 ? (
-                <Text style={[styles.weakEmpty, { color: colors.textSecondary }]}>{t.parentWeakTasksEmpty}</Text>
-              ) : (
-                weakTasks.map((s, i) => {
+              {weakTasks.map((s, i) => {
                   const total = s.correctCount + s.errorCount;
                   const rate = total > 0 ? s.errorCount / total : 0;
                   return (
@@ -211,8 +208,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
                       </Text>
                     </View>
                   );
-                })
-              )}
+                })}
             </View>
           )}
 
