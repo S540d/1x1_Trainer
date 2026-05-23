@@ -61,6 +61,7 @@ export interface TranslationStrings {
   newRound: string;
   continueGame: string;
   encouragement: string; // Motivational text shown below the numpad during input
+  practiceModeFeedback: string; // Shown instead of encouragement in PRACTICE mode
   // Results Modal
   great: string;
   youSolved: string;
@@ -214,6 +215,7 @@ export const translations: Record<Language, TranslationStrings> = {
     settings: 'Settings',
     ok: 'OK',
     encouragement: 'You can do it! 💪',
+    practiceModeFeedback: 'Practising your difficult tasks!',
     // Parent Dashboard
     parentDashboard: 'Parent Dashboard',
     parentDashboardMenu: 'Parent Dashboard (Beta)',
@@ -341,6 +343,7 @@ export const translations: Record<Language, TranslationStrings> = {
     settings: 'Einstellungen',
     ok: 'OK',
     encouragement: 'Du schaffst das! 💪',
+    practiceModeFeedback: 'Du übst deine schwierigen Aufgaben!',
     // Parent Dashboard
     parentDashboard: 'Eltern-Dashboard',
     parentDashboardMenu: 'Eltern-Dashboard (Beta)',
