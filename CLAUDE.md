@@ -81,8 +81,8 @@ npm run test:coverage # Coverage
 ## Aktueller Stand (2026-05-23)
 
 - Version: **1.3.5** / versionCode 24
-- Tests: 454 passed, 3 skipped, 14/14 Suites grün
-- Branches: `testing` vorn (`d689c7c`); `staging` und `main` noch auf `1b551ea`
+- Tests: 475 passed, 3 skipped, 14/14 Suites grün
+- Branches: `testing` vorn (`3d52f56`); `staging` und `main` noch auf `1b551ea`
 - Offene Issues: #165, #160, #156, #146, #131, #100, #96
 - Security: 21 Vulnerabilities (alle über Expo-Tooling, build-time) → Issue #146
 
@@ -90,6 +90,7 @@ npm run test:coverage # Coverage
 
 | PR  | Was |
 |-----|-----|
+| #200 | Täglicher Streak-Tracker (Issue #185) — StreakData, 🔥 Header-Badge, Abend-Warnung, ParentDashboard |
 | #196 | fix: practiceModeFeedback im Übungsmodus in GameCard anzeigen + Tests |
 | #195 | CI: Jest-Test-Job zu ci-cd.yml hinzufügen (läuft jetzt automatisch bei PRs) |
 | #184 | Achievement & Badge System |
@@ -105,7 +106,7 @@ npm run test:coverage # Coverage
 |-------|--------|
 | `utils/constants.ts` | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS |
 | `utils/theme.ts` | `getThemeColors(isDarkMode)` |
-| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `updateTaskStat` / `getTaskStats` / `getWeakTasks`, `FOUR_WEEKS_MS` |
+| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `updateTaskStat` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `FOUR_WEEKS_MS` |
 | `utils/animations.ts` | `prefersReducedMotion()` — liest Accessibility-Einstellung |
 | `types/game.ts` | ThemeColors, GameState, Enums, SessionRecord |
 | `i18n/translations.ts` | DE/EN Übersetzungen, `TranslationStrings`-Interface |
@@ -141,6 +142,18 @@ npm run test:coverage # Coverage
 - `getSessionRecords()` bereinigt automatisch Einträge älter als 28 Tage und schreibt zurück
 - `FOUR_WEEKS_MS` ist in `utils/storage.ts` exportiert — nicht duplizieren
 - `isValidSessionRecord` validiert alle Felder gegen Enum-Werte
+
+## Streak-Tracker — Hinweise
+
+- `StreakData` (`types/game.ts`): `currentStreak`, `lastPlayedDate` (YYYY-MM-DD lokal), `longestStreak`
+- Storage Key: `app-streak`
+- `updateStreakAfterSession()` in `utils/storage.ts`: DST-sicherer Vergleich via `getLocalDateString()` — kein UTC-Offset-Problem
+- Streak-Logik: gleicher Tag → kein Update; Folgetag → +1; Lücke → Reset auf 1 (longestStreak bleibt)
+- `isNonNegInt` / `isLocalDateString`: Validatoren in storage.ts verhindern korrupte Werte (NaN, negativ, falsches Format)
+- Header zeigt 🔥 {n} Badge wenn `currentStreak > 0` (via `currentStreak`-Prop in Header.tsx)
+- Abend-Warnung: Modal bei App-Öffnung wenn `hour >= 20` + Streak aktiv + heute noch nicht gespielt
+- ParentDashboard: currentStreak + longestStreak im Summary-Bar (inkl. korrekter Divider-Logik)
+- `streakWarningMessage` enthält `{days}` Platzhalter → wird via `.replace('{days}', ...)` in App.tsx ersetzt
 
 ## Adaptives Lernen / Übungsmodus (PRACTICE) — Hinweise
 
