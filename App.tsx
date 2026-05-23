@@ -34,9 +34,12 @@ import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
 import { ParentDashboard } from './components/ParentDashboard';
 import { OnboardingModal } from './components/OnboardingModal';
+import { BadgesModal } from './components/BadgesModal';
+import { BadgeUnlockToast } from './components/BadgeUnlockToast';
 import { FloatingStars } from './components/FloatingStars';
-import { saveSessionRecord, getOnboardingDone, setOnboardingDone, resetOnboarding, getStorageItem } from './utils/storage';
-import { SessionRecord } from './types/game';
+import { saveSessionRecord, recordTaskResult, getTaskStats, getWeakTasks, getOnboardingDone, setOnboardingDone, resetOnboarding, getStorageItem } from './utils/storage';
+import { SessionRecord, TaskStat, Operation } from './types/game';
+import { useBadges } from './hooks/useBadges';
 import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
 
 export default function App() {
@@ -53,13 +56,19 @@ export default function App() {
   const [aboutVisible, setAboutVisible] = useState(false);
   const [personalizeVisible, setPersonalizeVisible] = useState(false);
   const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
+  const [badgesVisible, setBadgesVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
   const [onboardingVisible, setOnboardingVisible] = useState(false);
+  const [taskStats, setTaskStats] = useState<TaskStat[]>([]);
 
   // Reduced motion preference — centralized in utils/animations.ts
   useEffect(() => {
     return initReducedMotionListener();
+  }, []);
+
+  useEffect(() => {
+    getTaskStats().then(setTaskStats);
   }, []);
 
   // Animation values
@@ -71,6 +80,7 @@ export default function App() {
   // Use custom hooks
   const preferences = usePreferences();
   const theme = useTheme(preferences.themeMode);
+  const badgeSystem = useBadges();
   const game = useGameLogic({
     initialOperation: preferences.operation,
     initialOperations: preferences.operations,
@@ -81,7 +91,31 @@ export default function App() {
       setShowMotivation(true);
     },
     onSessionComplete: (record: SessionRecord) => {
-      saveSessionRecord(record);
+      saveSessionRecord(record)
+        .then(() => badgeSystem.checkAndUnlock(record))
+        .catch((err) => console.error('Session save / badge unlock failed:', err));
+    },
+    taskStats,
+    onTaskResult: (num1: number, num2: number, operation: Operation, isCorrect: boolean) => {
+      setTaskStats(prev => {
+        const idx = prev.findIndex(s => s.num1 === num1 && s.num2 === num2 && s.operation === operation);
+        if (idx >= 0) {
+          const updated = { ...prev[idx] };
+          if (isCorrect) updated.correctCount++;
+          else updated.errorCount++;
+          updated.lastSeen = new Date().toISOString();
+          const next = [...prev];
+          next[idx] = updated;
+          return next;
+        }
+        return [...prev, {
+          num1, num2, operation,
+          correctCount: isCorrect ? 1 : 0,
+          errorCount: isCorrect ? 0 : 1,
+          lastSeen: new Date().toISOString(),
+        }];
+      });
+      recordTaskResult(num1, num2, operation, isCorrect);
     },
     numberRange: preferences.numberRange,
     challengeHighScore: preferences.challengeHighScore,
@@ -254,6 +288,7 @@ export default function App() {
           difficultyMode={game.gameState.difficultyMode}
           selectedOperations={game.gameState.selectedOperations}
           numberRange={preferences.numberRange}
+          weakTaskCount={getWeakTasks(taskStats, 3, 0.3).length}
           onToggleOperation={game.toggleOperation}
           onChangeDifficultyMode={game.changeDifficultyMode}
           onSetNumberRange={preferences.setNumberRange}
@@ -271,6 +306,7 @@ export default function App() {
             await resetOnboarding();
             setOnboardingVisible(true);
           }}
+          onOpenBadges={() => setBadgesVisible(true)}
           t={t}
         />
       )}
@@ -342,6 +378,21 @@ export default function App() {
         }}
         colors={colors}
         t={t}
+      />
+
+      <BadgesModal
+        visible={badgesVisible}
+        onClose={() => setBadgesVisible(false)}
+        colors={colors}
+        badges={badgeSystem.badges}
+        language={preferences.language}
+        t={t}
+      />
+
+      <BadgeUnlockToast
+        badgeIds={badgeSystem.newlyUnlocked}
+        onDone={badgeSystem.clearNewlyUnlocked}
+        badgeNewUnlockedLabel={t.badgeNewUnlocked}
       />
     </SafeAreaView>
   );

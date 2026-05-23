@@ -6,7 +6,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from './constants';
-import { ThemeMode, Language, Operation, NumberRange, DifficultyMode, SessionRecord } from '../types/game';
+import { ThemeMode, Language, Operation, NumberRange, DifficultyMode, SessionRecord, TaskStat } from '../types/game';
 
 /**
  * Get a value from storage (platform-safe)
@@ -212,6 +212,130 @@ export const setOnboardingDone = async (): Promise<void> => {
 // Stores 'pending' so migration logic is skipped on next launch
 export const resetOnboarding = async (): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.ONBOARDING_DONE, 'pending');
+};
+
+function isValidTaskStat(r: unknown): r is TaskStat {
+  if (!r || typeof r !== 'object') return false;
+  const obj = r as Record<string, unknown>;
+  return (
+    typeof obj.num1 === 'number' &&
+    typeof obj.num2 === 'number' &&
+    typeof obj.operation === 'string' && VALID_OPERATIONS.has(obj.operation) &&
+    typeof obj.correctCount === 'number' &&
+    typeof obj.errorCount === 'number' &&
+    typeof obj.lastSeen === 'string'
+  );
+}
+
+export const getTaskStats = async (): Promise<TaskStat[]> => {
+  const value = await getStorageItem(STORAGE_KEYS.TASK_STATS);
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isValidTaskStat);
+  } catch {
+    return [];
+  }
+};
+
+export const saveTaskStats = async (stats: TaskStat[]): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.TASK_STATS, JSON.stringify(stats));
+};
+
+let taskStatsQueue: Promise<void> = Promise.resolve();
+
+export const recordTaskResult = async (
+  num1: number,
+  num2: number,
+  operation: Operation,
+  isCorrect: boolean,
+): Promise<void> => {
+  taskStatsQueue = taskStatsQueue.then(async () => {
+    const stats = await getTaskStats();
+    const existing = stats.find(s => s.num1 === num1 && s.num2 === num2 && s.operation === operation);
+    if (existing) {
+      if (isCorrect) existing.correctCount++;
+      else existing.errorCount++;
+      existing.lastSeen = new Date().toISOString();
+    } else {
+      stats.push({
+        num1,
+        num2,
+        operation,
+        correctCount: isCorrect ? 1 : 0,
+        errorCount: isCorrect ? 0 : 1,
+        lastSeen: new Date().toISOString(),
+      });
+    }
+    await saveTaskStats(stats);
+  });
+  return taskStatsQueue;
+};
+
+export const getWeakTasks = (stats: TaskStat[], minAttempts = 3, minErrorRate = 0.3): TaskStat[] => {
+  return stats
+    .filter(s => {
+      const total = s.correctCount + s.errorCount;
+      const rate = total > 0 ? s.errorCount / total : 0;
+      return total >= minAttempts && rate > minErrorRate;
+    })
+    .sort((a, b) => {
+      const rateA = a.errorCount / (a.correctCount + a.errorCount);
+      const rateB = b.errorCount / (b.correctCount + b.errorCount);
+      return rateB - rateA;
+    });
+};
+
+// Badge storage – maps badgeId → unlock timestamp
+export type BadgeStore = Record<string, number>;
+
+export const getBadges = async (): Promise<BadgeStore> => {
+  const value = await getStorageItem(STORAGE_KEYS.BADGES);
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value);
+    if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+      const validated: BadgeStore = {};
+      for (const [key, val] of Object.entries(parsed)) {
+        if (typeof val === 'number' && Number.isFinite(val)) {
+          validated[key] = val;
+        }
+      }
+      return validated;
+    }
+  } catch { /* ignore */ }
+  return {};
+};
+
+export const saveBadges = async (badges: BadgeStore): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.BADGES, JSON.stringify(badges));
+};
+
+// Persistent streak counter – decoupled from the 28-day session record window
+export interface StreakData {
+  currentStreak: number;
+  lastPlayedDay: string; // YYYY-MM-DD
+}
+
+export const getStreakData = async (): Promise<StreakData> => {
+  const value = await getStorageItem(STORAGE_KEYS.STREAK);
+  if (!value) return { currentStreak: 0, lastPlayedDay: '' };
+  try {
+    const parsed = JSON.parse(value);
+    if (
+      typeof parsed === 'object' && parsed !== null &&
+      typeof parsed.currentStreak === 'number' &&
+      typeof parsed.lastPlayedDay === 'string'
+    ) {
+      return parsed as StreakData;
+    }
+  } catch { /* ignore */ }
+  return { currentStreak: 0, lastPlayedDay: '' };
+};
+
+export const saveStreakData = async (data: StreakData): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.STREAK, JSON.stringify(data));
 };
 
 export const saveNumberRange = async (range: NumberRange): Promise<void> => {

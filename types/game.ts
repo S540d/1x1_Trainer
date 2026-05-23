@@ -26,6 +26,7 @@ export enum DifficultyMode {
   SIMPLE = 'SIMPLE',
   CREATIVE = 'CREATIVE',
   CHALLENGE = 'CHALLENGE',
+  PRACTICE = 'PRACTICE',
 }
 
 export enum NumberRange {
@@ -67,6 +68,15 @@ export interface GameState {
   challengeState?: ChallengeState; // Challenge mode state
 }
 
+export interface TaskStat {
+  num1: number;
+  num2: number;
+  operation: Operation;
+  correctCount: number;
+  errorCount: number;
+  lastSeen: string; // ISO date
+}
+
 export interface SessionRecord {
   id: string;
   timestamp: number;
@@ -77,6 +87,11 @@ export interface SessionRecord {
   errorRate: number;
   difficultyMode: DifficultyMode;
   numberRange: NumberRange;
+}
+
+export interface AchievementBadge {
+  id: string;
+  unlockedAt: number;
 }
 
 export interface ThemeColors {
