@@ -3,8 +3,8 @@
  * Manages all game state and logic
  */
 
-import { useState, useMemo } from 'react';
-import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange, ChallengeState, SessionRecord } from '../types/game';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange, ChallengeState, SessionRecord, TaskStat } from '../types/game';
 import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER, CHALLENGE_MAX_LIVES, getChallengeLevel, getChallengeLevelNumber } from '../utils/constants';
 
 interface UseGameLogicProps {
@@ -17,6 +17,8 @@ interface UseGameLogicProps {
   numberRange: NumberRange;
   challengeHighScore?: number;
   onChallengeHighScoreChange?: (score: number) => void;
+  taskStats?: TaskStat[];
+  onTaskResult?: (num1: number, num2: number, operation: Operation, isCorrect: boolean) => void;
 }
 
 /**
@@ -141,7 +143,13 @@ export function useGameLogic({
   numberRange,
   challengeHighScore = 0,
   onChallengeHighScoreChange,
+  taskStats,
+  onTaskResult,
 }: UseGameLogicProps) {
+  const taskStatsRef = useRef<TaskStat[]>(taskStats ?? []);
+  useEffect(() => {
+    taskStatsRef.current = taskStats ?? [];
+  }, [taskStats]);
   // Helper: Get max number based on number range
   const getMaxNumber = (range: NumberRange = numberRange) => {
     switch (range) {
@@ -237,14 +245,50 @@ export function useGameLogic({
   };
 
   // Generate a new question with proper number generation for each operation
-  const generateQuestion = (mode: GameMode = gameState.gameMode, operationSet: Set<Operation> = gameState.selectedOperations, overrideMaxNumber?: number) => {
-    // Pick a random operation from selected operations
-    const operations = Array.from(operationSet);
-    const selectedOp = operations[Math.floor(Math.random() * operations.length)];
+  const generateQuestion = (mode: GameMode = gameState.gameMode, operationSet: Set<Operation> = gameState.selectedOperations, overrideMaxNumber?: number, difficultyOverride?: DifficultyMode) => {
+    const effectiveDifficulty = difficultyOverride ?? gameState.difficultyMode;
 
     let newNum1: number;
     let newNum2: number;
     const effectiveMaxNumber = overrideMaxNumber ?? maxNumber;
+
+    // In PRACTICE mode: 75% chance to pick a weak task
+    let selectedOp: Operation;
+    if (effectiveDifficulty === DifficultyMode.PRACTICE) {
+      const maxNum = effectiveMaxNumber;
+      const weak = taskStatsRef.current.filter(s => {
+        const total = s.correctCount + s.errorCount;
+        if (total < 3 || s.errorCount / total <= 0.3) return false;
+        if (!operationSet.has(s.operation)) return false;
+        // Ensure stored task numbers are valid for current range
+        if (s.operation === Operation.ADDITION) return s.num1 + s.num2 <= maxNum;
+        if (s.operation === Operation.MULTIPLICATION) return s.num1 * s.num2 <= maxNum;
+        return s.num1 <= maxNum && s.num2 <= maxNum;
+      });
+      if (weak.length > 0 && Math.random() < 0.75) {
+        const task = weak[Math.floor(Math.random() * weak.length)];
+        newNum1 = task.num1;
+        newNum2 = task.num2;
+        selectedOp = task.operation;
+        setGameState((prev) => ({
+          ...prev,
+          num1: newNum1,
+          num2: newNum2,
+          operation: selectedOp,
+          userAnswer: '',
+          questionPart: 2,
+          answerMode: AnswerMode.INPUT,
+          lastAnswerCorrect: null,
+          isAnswerChecked: false,
+          selectedChoice: null,
+        }));
+        return;
+      }
+    }
+
+    // Normal random generation
+    const operations = Array.from(operationSet);
+    selectedOp = operations[Math.floor(Math.random() * operations.length)];
 
     // Generate appropriate numbers based on operation
     // IMPORTANT: ALL numbers (operands AND results) must be within numberRange
@@ -327,7 +371,7 @@ export function useGameLogic({
     // In CREATIVE and CHALLENGE modes, randomize answer mode each question
     // NUMBER_SEQUENCE only available when asking for result (questionPart === 2)
     let newAnswerMode = gameState.answerMode;
-    if (gameState.difficultyMode === DifficultyMode.CREATIVE || gameState.difficultyMode === DifficultyMode.CHALLENGE) {
+    if (effectiveDifficulty === DifficultyMode.CREATIVE || effectiveDifficulty === DifficultyMode.CHALLENGE) {
       const availableModes =
         newQuestionPart === 2
           ? [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE, AnswerMode.NUMBER_SEQUENCE]
@@ -404,6 +448,8 @@ export function useGameLogic({
     } else {
       isCorrect = gameState.selectedChoice === correctAnswer;
     }
+
+    onTaskResult?.(gameState.num1, gameState.num2, gameState.operation, isCorrect);
 
     const newScore = isCorrect ? gameState.score + 1 : gameState.score;
     const challengeGameOver =
@@ -661,8 +707,8 @@ export function useGameLogic({
       return;
     }
 
-    if (newMode === DifficultyMode.SIMPLE) {
-      // Simple: Normal tasks with keypad input
+    if (newMode === DifficultyMode.SIMPLE || newMode === DifficultyMode.PRACTICE) {
+      // Simple / Practice: Normal tasks with keypad input
       newGameMode = GameMode.NORMAL;
       newAnswerMode = AnswerMode.INPUT;
     } else {
@@ -686,7 +732,7 @@ export function useGameLogic({
       selectedChoice: null,
       challengeState: undefined,
     }));
-    setTimeout(() => generateQuestion(newGameMode), 0);
+    setTimeout(() => generateQuestion(newGameMode, undefined, undefined, newMode), 0);
   };
 
   // Generate multiple choice options

@@ -23,6 +23,7 @@ interface SettingsMenuProps {
   difficultyMode: DifficultyMode;
   selectedOperations: Set<Operation>;
   numberRange: NumberRange;
+  weakTaskCount?: number;
   // Actions
   onToggleOperation: (op: Operation) => void;
   onChangeDifficultyMode: (mode: DifficultyMode) => void;
@@ -31,6 +32,8 @@ interface SettingsMenuProps {
   onOpenPersonalize: () => void;
   onOpenAbout: () => void;
   onOpenParentDashboard: () => void;
+  onResetOnboarding: () => void;
+  onOpenBadges: () => void;
   // Translations
   t: {
     operation: string;
@@ -41,9 +44,11 @@ interface SettingsMenuProps {
     difficultyMode: string;
     simpleMode: string;
     creativeMode: string;
+    practiceMode: string;
     challenge: string;
     simpleModeInfo: string;
     creativeModeInfo: string;
+    practiceModeInfo: string;
     challengeInfo: string;
     numberRange: string;
     upTo10: string;
@@ -53,10 +58,12 @@ interface SettingsMenuProps {
     personalize: string;
     parentDashboard: string;
     parentDashboardMenu: string;
+    badgesMenu: string;
     feedback: string;
     support: string;
     about: string;
     settings: string;
+    resetOnboarding: string;
   };
 }
 
@@ -67,6 +74,7 @@ export function SettingsMenu({
   difficultyMode,
   selectedOperations,
   numberRange,
+  weakTaskCount,
   onToggleOperation,
   onChangeDifficultyMode,
   onSetNumberRange,
@@ -74,6 +82,8 @@ export function SettingsMenu({
   onOpenPersonalize,
   onOpenAbout,
   onOpenParentDashboard,
+  onResetOnboarding,
+  onOpenBadges,
   t,
 }: SettingsMenuProps) {
   const buttonBg = colors.buttonInactive;
@@ -119,6 +129,12 @@ export function SettingsMenu({
           >
             <Text style={styles.personalizeButtonText}>{t.parentDashboardMenu}</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.personalizeButton}
+            onPress={() => { onOpenBadges(); onHideMenu(); }}
+          >
+            <Text style={styles.personalizeButtonText}>{t.badgesMenu}</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.settingsDivider} />
@@ -161,7 +177,7 @@ export function SettingsMenu({
         {/* Difficulty Mode Settings */}
         <View style={styles.settingsSection}>
           <Text style={[styles.settingsSectionTitle, { color: sectionTitle }]}>{t.difficultyMode}</Text>
-          <View style={styles.themeToggle}>
+          <View style={styles.difficultyGrid}>
             <TouchableOpacity
               style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonActive]}
               onPress={() => onChangeDifficultyMode(DifficultyMode.SIMPLE)}
@@ -189,12 +205,22 @@ export function SettingsMenu({
                 {t.challenge}
               </Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.PRACTICE && styles.themeButtonActive]}
+              onPress={() => onChangeDifficultyMode(DifficultyMode.PRACTICE)}
+            >
+              <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.PRACTICE && styles.themeButtonTextActive]}>
+                {t.practiceMode}{weakTaskCount !== undefined && weakTaskCount > 0 ? ` (${weakTaskCount})` : ''}
+              </Text>
+            </TouchableOpacity>
           </View>
           <Text style={[styles.settingsModeInfo, { color: modeInfo }]}>
             {difficultyMode === DifficultyMode.SIMPLE
               ? t.simpleModeInfo
               : difficultyMode === DifficultyMode.CREATIVE
               ? t.creativeModeInfo
+              : difficultyMode === DifficultyMode.PRACTICE
+              ? t.practiceModeInfo
               : t.challengeInfo}
           </Text>
         </View>
@@ -263,6 +289,14 @@ export function SettingsMenu({
             <Text style={styles.settingsMenuLinkText}>{t.about}</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Reset Onboarding */}
+        <TouchableOpacity
+          style={[styles.settingsSection, styles.resetOnboardingButton]}
+          onPress={() => { onResetOnboarding(); onHideMenu(); }}
+        >
+          <Text style={styles.resetOnboardingText}>{t.resetOnboarding}</Text>
+        </TouchableOpacity>
         </ScrollView>
       </Animated.View>
     </>
@@ -380,6 +414,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
   },
+  difficultyGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
   themeButton: {
     flex: 1,
     paddingVertical: 8,
@@ -457,5 +496,16 @@ const styles = StyleSheet.create({
   },
   rangeButtonTextActive: {
     color: '#fff',
+  },
+  resetOnboardingButton: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(102,126,234,0.1)',
+  },
+  resetOnboardingText: {
+    fontSize: 12,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    color: 'rgba(102,126,234,0.6)',
   },
 });

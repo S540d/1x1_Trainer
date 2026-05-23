@@ -27,8 +27,15 @@ import {
   saveStreakData,
   updateStreakAfterSession,
   getLocalDateString,
+  getOnboardingDone,
+  setOnboardingDone,
+  resetOnboarding,
+  getTaskStats,
+  saveTaskStats,
+  recordTaskResult,
+  getWeakTasks,
 } from './storage';
-import { Operation, ThemeMode, Language, NumberRange, DifficultyMode, SessionRecord, StreakData } from '../types/game';
+import { Operation, ThemeMode, Language, NumberRange, DifficultyMode, SessionRecord, StreakData, TaskStat } from '../types/game';
 
 // Mock react-native Platform
 jest.mock('react-native', () => ({
@@ -559,6 +566,146 @@ describe('getLocalDateString()', () => {
   });
 });
 
+describe('TaskStat Storage', () => {
+  let mockStore: { [key: string]: string };
+
+  beforeEach(() => {
+    mockStore = {};
+    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => { mockStore[key] = value; });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should return empty array when nothing stored', async () => {
+    expect(await getTaskStats()).toEqual([]);
+  });
+
+  it('should return empty array for corrupted JSON', async () => {
+    mockStore['app-task-stats'] = '{invalid}';
+    expect(await getTaskStats()).toEqual([]);
+  });
+
+  it('should filter out invalid entries on read', async () => {
+    const bad = { num1: 'x', num2: 2, operation: 'MULTIPLICATION', correctCount: 1, errorCount: 0, lastSeen: 'now' };
+    const good: TaskStat = { num1: 3, num2: 4, operation: Operation.MULTIPLICATION, correctCount: 2, errorCount: 1, lastSeen: new Date().toISOString() };
+    mockStore['app-task-stats'] = JSON.stringify([bad, good]);
+    const result = await getTaskStats();
+    expect(result).toHaveLength(1);
+    expect(result[0].num1).toBe(3);
+  });
+
+  it('should save and retrieve task stats', async () => {
+    const stat: TaskStat = { num1: 7, num2: 8, operation: Operation.MULTIPLICATION, correctCount: 1, errorCount: 2, lastSeen: '2026-01-01T00:00:00.000Z' };
+    await saveTaskStats([stat]);
+    const result = await getTaskStats();
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual(stat);
+  });
+
+  it('recordTaskResult creates new entry for unknown task', async () => {
+    await recordTaskResult(3, 4, Operation.MULTIPLICATION, false);
+    const stats = await getTaskStats();
+    expect(stats).toHaveLength(1);
+    expect(stats[0]).toMatchObject({ num1: 3, num2: 4, operation: Operation.MULTIPLICATION, correctCount: 0, errorCount: 1 });
+  });
+
+  it('recordTaskResult increments existing entry', async () => {
+    await recordTaskResult(3, 4, Operation.MULTIPLICATION, true);
+    await recordTaskResult(3, 4, Operation.MULTIPLICATION, false);
+    await recordTaskResult(3, 4, Operation.MULTIPLICATION, false);
+    const stats = await getTaskStats();
+    expect(stats).toHaveLength(1);
+    expect(stats[0].correctCount).toBe(1);
+    expect(stats[0].errorCount).toBe(2);
+  });
+
+  it('recordTaskResult keeps separate entries for different tasks', async () => {
+    await recordTaskResult(3, 4, Operation.MULTIPLICATION, false);
+    await recordTaskResult(3, 5, Operation.MULTIPLICATION, true);
+    const stats = await getTaskStats();
+    expect(stats).toHaveLength(2);
+  });
+});
+
+describe('getWeakTasks', () => {
+  const makeStat = (num1: number, num2: number, correct: number, error: number): TaskStat => ({
+    num1, num2, operation: Operation.MULTIPLICATION,
+    correctCount: correct, errorCount: error,
+    lastSeen: new Date().toISOString(),
+  });
+
+  it('returns only tasks with > 30% error rate and >= 3 attempts', () => {
+    const stats = [
+      makeStat(7, 8, 0, 3),
+      makeStat(3, 4, 8, 2),
+      makeStat(6, 7, 1, 2),
+      makeStat(9, 6, 5, 0),
+      makeStat(2, 3, 1, 1),
+    ];
+    const result = getWeakTasks(stats);
+    expect(result).toHaveLength(2);
+    expect(result.map(s => `${s.num1}×${s.num2}`)).toContain('7×8');
+    expect(result.map(s => `${s.num1}×${s.num2}`)).toContain('6×7');
+  });
+
+  it('sorts by error rate descending', () => {
+    const stats = [
+      makeStat(6, 7, 1, 2),
+      makeStat(7, 8, 0, 3),
+      makeStat(5, 6, 1, 4),
+    ];
+    const result = getWeakTasks(stats);
+    expect(result[0]).toMatchObject({ num1: 7, num2: 8 });
+    expect(result[1]).toMatchObject({ num1: 5, num2: 6 });
+    expect(result[2]).toMatchObject({ num1: 6, num2: 7 });
+  });
+
+  it('respects custom minAttempts and minErrorRate', () => {
+    const stats = [makeStat(7, 8, 1, 1)];
+    expect(getWeakTasks(stats, 2, 0.4)).toHaveLength(1);
+    expect(getWeakTasks(stats, 3, 0.4)).toHaveLength(0);
+  });
+});
+
+describe('storage.ts - Onboarding helpers', () => {
+  let mockStore: { [key: string]: string };
+
+  beforeEach(() => {
+    mockStore = {};
+    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => { mockStore[key] = value; });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('getOnboardingDone returns false when key is absent', async () => {
+    expect(await getOnboardingDone()).toBe(false);
+  });
+
+  it('getOnboardingDone returns false when value is "pending"', async () => {
+    mockStore['app-onboarding-done'] = 'pending';
+    expect(await getOnboardingDone()).toBe(false);
+  });
+
+  it('setOnboardingDone persists true and getOnboardingDone returns true', async () => {
+    await setOnboardingDone();
+    expect(mockStore['app-onboarding-done']).toBe('true');
+    expect(await getOnboardingDone()).toBe(true);
+  });
+
+  it('resetOnboarding stores "pending" so getOnboardingDone returns false', async () => {
+    await setOnboardingDone();
+    await resetOnboarding();
+    expect(mockStore['app-onboarding-done']).toBe('pending');
+    expect(await getOnboardingDone()).toBe(false);
+  });
+});
+
 describe('Streak Storage', () => {
   let mockStore: { [key: string]: string };
 
@@ -572,50 +719,50 @@ describe('Streak Storage', () => {
     jest.restoreAllMocks();
   });
 
-  it('should return default streak when nothing is stored', async () => {
+  it('returns default when nothing stored', async () => {
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
 
-  it('should save and retrieve streak data', async () => {
-    const data: StreakData = { currentStreak: 5, lastPlayedDate: '2024-01-10', longestStreak: 7 };
+  it('returns saved streak data', async () => {
+    const data: StreakData = { currentStreak: 5, lastPlayedDate: '2024-06-15', longestStreak: 10 };
     await saveStreakData(data);
     const result = await getStreakData();
     expect(result).toEqual(data);
   });
 
-  it('should return default for corrupted streak data', async () => {
-    mockStore['app-streak'] = '{invalid json}';
+  it('returns default for corrupted JSON', async () => {
+    mockStore['app-streak'] = '{invalid}';
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
 
-  it('should return default for streak data with wrong types', async () => {
-    mockStore['app-streak'] = JSON.stringify({ currentStreak: 'five', lastPlayedDate: 123, longestStreak: null });
+  it('rejects null currentStreak', async () => {
+    mockStore['app-streak'] = '{"currentStreak":null,"lastPlayedDate":"2024-01-01","longestStreak":0}';
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
 
-  it('should return default for NaN streak values', async () => {
-    mockStore['app-streak'] = JSON.stringify({ currentStreak: NaN, lastPlayedDate: '2024-01-10', longestStreak: 5 });
+  it('rejects negative currentStreak', async () => {
+    mockStore['app-streak'] = JSON.stringify({ currentStreak: -1, lastPlayedDate: '2024-01-01', longestStreak: 0 });
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
 
-  it('should return default for negative streak values', async () => {
-    mockStore['app-streak'] = JSON.stringify({ currentStreak: -1, lastPlayedDate: '2024-01-10', longestStreak: 5 });
+  it('rejects non-integer streak value', async () => {
+    mockStore['app-streak'] = JSON.stringify({ currentStreak: 1.5, lastPlayedDate: '2024-01-01', longestStreak: 3 });
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
 
-  it('should return default for invalid date format', async () => {
-    mockStore['app-streak'] = JSON.stringify({ currentStreak: 3, lastPlayedDate: '2024/01/10', longestStreak: 3 });
+  it('rejects invalid date format', async () => {
+    mockStore['app-streak'] = JSON.stringify({ currentStreak: 1, lastPlayedDate: '01-01-2024', longestStreak: 1 });
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
 
-  it('should return default for Infinity streak', async () => {
-    mockStore['app-streak'] = JSON.stringify({ currentStreak: Infinity, lastPlayedDate: '2024-01-10', longestStreak: 5 });
+  it('rejects null longestStreak', async () => {
+    mockStore['app-streak'] = '{"currentStreak":1,"lastPlayedDate":"2024-01-01","longestStreak":null}';
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
@@ -682,7 +829,7 @@ describe('updateStreakAfterSession()', () => {
 
     const result = await updateStreakAfterSession();
     expect(result.currentStreak).toBe(1);
-    expect(result.longestStreak).toBe(10); // longestStreak preserved
+    expect(result.longestStreak).toBe(10);
     expect(result.lastPlayedDate).toBe('2024-06-15');
   });
 
