@@ -81,8 +81,8 @@ npm run test:coverage # Coverage
 ## Aktueller Stand (2026-05-23)
 
 - Version: **1.3.5** / versionCode 24
-- Tests: 451 passed, 3 skipped, 14/14 Suites grün
-- Branches: `testing` vorn (`3435d57`); `staging` und `main` noch auf `1b551ea`
+- Tests: 454 passed, 3 skipped, 14/14 Suites grün
+- Branches: `testing` vorn (`d689c7c`); `staging` und `main` noch auf `1b551ea`
 - Offene Issues: #165, #160, #156, #146, #131, #100, #96
 - Security: 21 Vulnerabilities (alle über Expo-Tooling, build-time) → Issue #146
 
@@ -90,6 +90,7 @@ npm run test:coverage # Coverage
 
 | PR  | Was |
 |-----|-----|
+| #196 | fix: practiceModeFeedback im Übungsmodus in GameCard anzeigen + Tests |
 | #195 | CI: Jest-Test-Job zu ci-cd.yml hinzufügen (läuft jetzt automatisch bei PRs) |
 | #184 | Achievement & Badge System |
 | #192 | Adaptives Lernen – Übungsmodus (PRACTICE) mit Schwachstellen-Fokus (Issue #188) |
