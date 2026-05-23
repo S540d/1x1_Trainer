@@ -196,7 +196,7 @@ export const translations: Record<Language, TranslationStrings> = {
     parentLongestStreak: 'Longest Streak',
     parentStreakDays: 'Days',
     streakWarningTitle: 'Don\'t break your streak!',
-    streakWarningMessage: 'Play a quick round today to keep your streak going!',
+    streakWarningMessage: 'Play a quick round today to keep your {days}-day streak going!',
     streakWarningButton: 'Let\'s go!',
   },
   de: {
@@ -292,7 +292,7 @@ export const translations: Record<Language, TranslationStrings> = {
     parentLongestStreak: 'Längster Streak',
     parentStreakDays: 'Tage',
     streakWarningTitle: 'Brich deinen Streak nicht!',
-    streakWarningMessage: 'Spiel heute eine Runde, um deinen Streak zu halten!',
+    streakWarningMessage: 'Spiel heute eine Runde, um deinen {days}-Tage-Streak zu halten!',
     streakWarningButton: 'Los geht\'s!',
   },
 };

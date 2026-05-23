@@ -208,22 +208,32 @@ export function getLocalDateString(date?: Date): string {
   return `${y}-${m}-${day}`;
 }
 
+const STREAK_DEFAULT: StreakData = { currentStreak: 0, lastPlayedDate: '', longestStreak: 0 };
+
+function isNonNegInt(v: unknown): v is number {
+  return typeof v === 'number' && Number.isFinite(v) && v >= 0 && Number.isInteger(v);
+}
+
+function isLocalDateString(v: unknown): v is string {
+  return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+}
+
 export const getStreakData = async (): Promise<StreakData> => {
   const value = await getStorageItem(STORAGE_KEYS.STREAK);
-  if (!value) return { currentStreak: 0, lastPlayedDate: '', longestStreak: 0 };
+  if (!value) return STREAK_DEFAULT;
   try {
     const parsed = JSON.parse(value);
     if (
-      typeof parsed.currentStreak === 'number' &&
-      typeof parsed.lastPlayedDate === 'string' &&
-      typeof parsed.longestStreak === 'number'
+      isNonNegInt(parsed.currentStreak) &&
+      isLocalDateString(parsed.lastPlayedDate) &&
+      isNonNegInt(parsed.longestStreak)
     ) {
       return parsed as StreakData;
     }
   } catch {
     // fall through
   }
-  return { currentStreak: 0, lastPlayedDate: '', longestStreak: 0 };
+  return STREAK_DEFAULT;
 };
 
 export const saveStreakData = async (data: StreakData): Promise<void> => {

@@ -142,7 +142,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           </View>
 
           {/* Summary bar */}
-          {(records.length > 0 || streak.currentStreak > 0) && (
+          {(records.length > 0 || streak.currentStreak > 0 || streak.longestStreak > 0) && (
             <View style={[styles.summaryBar, { borderColor: colors.border }]}>
               {records.length > 0 && (
                 <View style={styles.summaryItem}>
@@ -161,7 +161,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
                   <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentAvgError}</Text>
                 </View>
               )}
-              {streak.currentStreak > 0 && (
+              {streak.currentStreak > 0 && records.length > 0 && (
                 <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
               )}
               {streak.currentStreak > 0 && (
@@ -170,7 +170,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
                   <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentCurrentStreak}</Text>
                 </View>
               )}
-              {streak.longestStreak > 0 && (
+              {streak.longestStreak > 0 && (records.length > 0 || streak.currentStreak > 0) && (
                 <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
               )}
               {streak.longestStreak > 0 && (

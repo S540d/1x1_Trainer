@@ -595,6 +595,30 @@ describe('Streak Storage', () => {
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
+
+  it('should return default for NaN streak values', async () => {
+    mockStore['app-streak'] = JSON.stringify({ currentStreak: NaN, lastPlayedDate: '2024-01-10', longestStreak: 5 });
+    const result = await getStreakData();
+    expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  });
+
+  it('should return default for negative streak values', async () => {
+    mockStore['app-streak'] = JSON.stringify({ currentStreak: -1, lastPlayedDate: '2024-01-10', longestStreak: 5 });
+    const result = await getStreakData();
+    expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  });
+
+  it('should return default for invalid date format', async () => {
+    mockStore['app-streak'] = JSON.stringify({ currentStreak: 3, lastPlayedDate: '2024/01/10', longestStreak: 3 });
+    const result = await getStreakData();
+    expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  });
+
+  it('should return default for Infinity streak', async () => {
+    mockStore['app-streak'] = JSON.stringify({ currentStreak: Infinity, lastPlayedDate: '2024-01-10', longestStreak: 5 });
+    const result = await getStreakData();
+    expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  });
 });
 
 describe('updateStreakAfterSession()', () => {

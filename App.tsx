@@ -326,7 +326,7 @@ export default function App() {
         t={t}
       />
 
-      <Modal visible={streakWarningVisible} transparent animationType="fade">
+      <Modal visible={streakWarningVisible} transparent animationType="fade" onRequestClose={() => setStreakWarningVisible(false)}>
         <View style={styles.streakOverlay}>
           <View style={[styles.streakWarningCard, { backgroundColor: colors.settingsMenu }]}>
             <Text style={styles.streakWarningEmoji}>🔥</Text>
