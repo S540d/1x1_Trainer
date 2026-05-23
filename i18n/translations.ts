@@ -17,8 +17,10 @@ export interface TranslationStrings {
   difficultyMode: string;
   simpleMode: string;
   creativeMode: string;
+  practiceMode: string;
   simpleModeInfo: string;
   creativeModeInfo: string;
+  practiceModeInfo: string;
   gameMode: string;
   operation: string;
   addition: string;
@@ -59,6 +61,7 @@ export interface TranslationStrings {
   newRound: string;
   continueGame: string;
   encouragement: string; // Motivational text shown below the numpad during input
+  practiceModeFeedback: string; // Shown instead of encouragement in PRACTICE mode
   // Results Modal
   great: string;
   youSolved: string;
@@ -94,6 +97,62 @@ export interface TranslationStrings {
   parentYesterday: string;
   parentCorrect: string;
   parentErrors: string;
+  parentCurrentStreak: string;
+  parentLongestStreak: string;
+  parentStreakDays: string;
+  streakWarningTitle: string;
+  streakWarningMessage: string;
+  streakWarningButton: string;
+  parentWeakTasks: string;
+  parentWeakTasksEmpty: string;
+  // Badges
+  badges: string;
+  badgesMenu: string;
+  badgesSubtitle: string;
+  badgeLocked: string;
+  badgeUnlockedOn: string;
+  badgeCategoryStreak: string;
+  badgeCategoryPerformance: string;
+  badgeCategoryChallenge: string;
+  badgeCategoryExplorer: string;
+  badgeStreak3Name: string;
+  badgeStreak7Name: string;
+  badgeStreak30Name: string;
+  badgePerfect1Name: string;
+  badgePerfect5Name: string;
+  badgeAllOpsName: string;
+  badgeChallengeLevel3Name: string;
+  badgeChallengeLevel6Name: string;
+  badgeChallengeNoErrorsName: string;
+  badgeRange100Name: string;
+  badgeCreativeModeName: string;
+  badgeStreak3Desc: string;
+  badgeStreak7Desc: string;
+  badgeStreak30Desc: string;
+  badgePerfect1Desc: string;
+  badgePerfect5Desc: string;
+  badgeAllOpsDesc: string;
+  badgeChallengeLevel3Desc: string;
+  badgeChallengeLevel6Desc: string;
+  badgeChallengeNoErrorsDesc: string;
+  badgeRange100Desc: string;
+  badgeCreativeModeDesc: string;
+  badgeNewUnlocked: string;
+  // Onboarding
+  onboardingWelcomeTitle: string;
+  onboardingWelcomeBody: string;
+  onboardingDemoTitle: string;
+  onboardingDemoTooltip: string;
+  onboardingSettingsTitle: string;
+  onboardingSettingsBody: string;
+  onboardingReadyTitle: string;
+  onboardingReadyBody: string;
+  onboardingDemoRetry: string;
+  onboardingSettingsLabel: string;
+  onboardingNext: string;
+  onboardingStart: string;
+  onboardingSkip: string;
+  resetOnboarding: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -109,8 +168,10 @@ export const translations: Record<Language, TranslationStrings> = {
     difficultyMode: 'DIFFICULTY',
     simpleMode: 'Simple',
     creativeMode: 'Creative',
+    practiceMode: 'Practice',
     simpleModeInfo: 'Enter the result via keypad',
     creativeModeInfo: 'Random input methods and question types',
+    practiceModeInfo: 'Practicing your difficult tasks right now!',
     gameMode: 'GAME MODE',
     operation: 'OPERATION',
     addition: 'Addition',
@@ -175,6 +236,7 @@ export const translations: Record<Language, TranslationStrings> = {
     settings: 'Settings',
     ok: 'OK',
     encouragement: 'You can do it! 💪',
+    practiceModeFeedback: 'Practising your difficult tasks!',
     // Parent Dashboard
     parentDashboard: 'Parent Dashboard',
     parentDashboardMenu: 'Parent Dashboard (Beta)',
@@ -186,6 +248,62 @@ export const translations: Record<Language, TranslationStrings> = {
     parentYesterday: 'Yesterday',
     parentCorrect: 'Correct',
     parentErrors: 'Errors',
+    parentCurrentStreak: 'Current Streak',
+    parentLongestStreak: 'Longest Streak',
+    parentStreakDays: 'Days',
+    streakWarningTitle: 'Don\'t break your streak!',
+    streakWarningMessage: 'Play a quick round today to keep your {days}-day streak going!',
+    streakWarningButton: 'Let\'s go!',
+    parentWeakTasks: 'Weak Areas (Top 5)',
+    parentWeakTasksEmpty: 'No weak areas identified yet.',
+    // Badges
+    badges: 'Achievements',
+    badgesMenu: 'Achievements',
+    badgesSubtitle: 'Collect badges by reaching milestones',
+    badgeLocked: 'Locked',
+    badgeUnlockedOn: 'Unlocked',
+    badgeCategoryStreak: 'Streaks',
+    badgeCategoryPerformance: 'Performance',
+    badgeCategoryChallenge: 'Challenge',
+    badgeCategoryExplorer: 'Explorer',
+    badgeStreak3Name: 'On Fire!',
+    badgeStreak7Name: 'Hot Streak',
+    badgeStreak30Name: 'Unstoppable',
+    badgePerfect1Name: 'Perfectionist',
+    badgePerfect5Name: 'Star Player',
+    badgeAllOpsName: 'All-Rounder',
+    badgeChallengeLevel3Name: 'Rising Star',
+    badgeChallengeLevel6Name: 'Champion',
+    badgeChallengeNoErrorsName: 'Flawless',
+    badgeRange100Name: 'Big Numbers',
+    badgeCreativeModeName: 'Creative Mind',
+    badgeStreak3Desc: 'Played 3 days in a row',
+    badgeStreak7Desc: 'Played 7 days in a row',
+    badgeStreak30Desc: 'Played 30 days in a row',
+    badgePerfect1Desc: 'First perfect round (10/10)',
+    badgePerfect5Desc: '5 perfect rounds',
+    badgeAllOpsDesc: 'Perfect round with all 4 operations',
+    badgeChallengeLevel3Desc: 'Reached Challenge Level 3',
+    badgeChallengeLevel6Desc: 'Reached Challenge Level 6',
+    badgeChallengeNoErrorsDesc: 'Completed a challenge without errors',
+    badgeRange100Desc: 'Played with numbers up to 100',
+    badgeCreativeModeDesc: 'Played in Creative Mode',
+    badgeNewUnlocked: 'New badge unlocked!',
+    // Onboarding
+    onboardingWelcomeTitle: 'Welcome to 1×1 Trainer!',
+    onboardingWelcomeBody: 'Practice multiplication, division, addition and subtraction — fun and easy!',
+    onboardingDemoTitle: 'Try it out!',
+    onboardingDemoTooltip: 'Enter your answer here',
+    onboardingSettingsTitle: 'Everything Adjustable',
+    onboardingSettingsBody: 'Tap the menu button to change the operation, difficulty and number range.',
+    onboardingReadyTitle: "You're ready!",
+    onboardingReadyBody: 'Have fun practicing!',
+    onboardingDemoRetry: 'Not quite — try again!',
+    onboardingSettingsLabel: '↑ Settings',
+    onboardingNext: 'Next',
+    onboardingStart: 'Start',
+    onboardingSkip: 'Skip',
+    resetOnboarding: 'Restart tutorial',
   },
   de: {
     // Settings Menu
@@ -199,8 +317,10 @@ export const translations: Record<Language, TranslationStrings> = {
     difficultyMode: 'SCHWIERIGKEIT',
     simpleMode: 'Einfach',
     creativeMode: 'Kreativ',
+    practiceMode: 'Übung',
     simpleModeInfo: 'Das Ergebnis wird über die Tastatur eingegeben',
     creativeModeInfo: 'Zufällige Eingabemethoden und Fragetypen',
+    practiceModeInfo: 'Du übst gerade deine schwierigen Aufgaben!',
     gameMode: 'SPIELMODUS',
     operation: 'RECHENART',
     addition: 'Addition',
@@ -265,6 +385,7 @@ export const translations: Record<Language, TranslationStrings> = {
     settings: 'Einstellungen',
     ok: 'OK',
     encouragement: 'Du schaffst das! 💪',
+    practiceModeFeedback: 'Du übst deine schwierigen Aufgaben!',
     // Parent Dashboard
     parentDashboard: 'Eltern-Dashboard',
     parentDashboardMenu: 'Eltern-Dashboard (Beta)',
@@ -276,5 +397,61 @@ export const translations: Record<Language, TranslationStrings> = {
     parentYesterday: 'Gestern',
     parentCorrect: 'Richtig',
     parentErrors: 'Fehler',
+    parentCurrentStreak: 'Aktueller Streak',
+    parentLongestStreak: 'Längster Streak',
+    parentStreakDays: 'Tage',
+    streakWarningTitle: 'Brich deinen Streak nicht!',
+    streakWarningMessage: 'Spiel heute eine Runde, um deinen {days}-Tage-Streak zu halten!',
+    streakWarningButton: 'Los geht\'s!',
+    parentWeakTasks: 'Schwachstellen (Top 5)',
+    parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
+    // Badges
+    badges: 'Abzeichen',
+    badgesMenu: 'Abzeichen',
+    badgesSubtitle: 'Sammle Abzeichen durch Meilensteine',
+    badgeLocked: 'Gesperrt',
+    badgeUnlockedOn: 'Freigeschaltet',
+    badgeCategoryStreak: 'Serien',
+    badgeCategoryPerformance: 'Leistung',
+    badgeCategoryChallenge: 'Herausforderung',
+    badgeCategoryExplorer: 'Entdecker',
+    badgeStreak3Name: 'Auf Kurs!',
+    badgeStreak7Name: 'Heiße Serie',
+    badgeStreak30Name: 'Unaufhaltsam',
+    badgePerfect1Name: 'Perfektionist',
+    badgePerfect5Name: 'Superstar',
+    badgeAllOpsName: 'Allrounder',
+    badgeChallengeLevel3Name: 'Aufsteiger',
+    badgeChallengeLevel6Name: 'Champion',
+    badgeChallengeNoErrorsName: 'Fehlerlos',
+    badgeRange100Name: 'Große Zahlen',
+    badgeCreativeModeName: 'Kreativkopf',
+    badgeStreak3Desc: '3 Tage in Folge gespielt',
+    badgeStreak7Desc: '7 Tage in Folge gespielt',
+    badgeStreak30Desc: '30 Tage in Folge gespielt',
+    badgePerfect1Desc: 'Erste perfekte Runde (10/10)',
+    badgePerfect5Desc: '5 perfekte Runden',
+    badgeAllOpsDesc: 'Perfekte Runde mit allen 4 Rechenarten',
+    badgeChallengeLevel3Desc: 'Herausforderung Stufe 3 erreicht',
+    badgeChallengeLevel6Desc: 'Herausforderung Stufe 6 erreicht',
+    badgeChallengeNoErrorsDesc: 'Herausforderung ohne Fehler abgeschlossen',
+    badgeRange100Desc: 'Mit Zahlen bis 100 gespielt',
+    badgeCreativeModeDesc: 'Im Kreativmodus gespielt',
+    badgeNewUnlocked: 'Neues Abzeichen freigeschaltet!',
+    // Onboarding
+    onboardingWelcomeTitle: 'Willkommen beim 1×1 Trainer!',
+    onboardingWelcomeBody: 'Übe Multiplikation, Division, Addition und Subtraktion – Spaß und einfach!',
+    onboardingDemoTitle: 'Probiere es aus!',
+    onboardingDemoTooltip: 'Gib deine Antwort hier ein',
+    onboardingSettingsTitle: 'Alles einstellbar',
+    onboardingSettingsBody: 'Tippe auf den Menü-Button, um Rechenart, Schwierigkeit und Zahlenbereich zu ändern.',
+    onboardingReadyTitle: 'Du bist bereit!',
+    onboardingReadyBody: 'Viel Spaß beim Üben!',
+    onboardingDemoRetry: 'Nicht ganz – tippe nochmal!',
+    onboardingSettingsLabel: '↑ Einstellungen',
+    onboardingNext: 'Weiter',
+    onboardingStart: 'Loslegen',
+    onboardingSkip: 'Überspringen',
+    resetOnboarding: 'Tutorial zurücksetzen',
   },
 };

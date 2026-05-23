@@ -6,7 +6,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from './constants';
-import { ThemeMode, Language, Operation, NumberRange, DifficultyMode, SessionRecord } from '../types/game';
+import { ThemeMode, Language, Operation, NumberRange, DifficultyMode, SessionRecord, TaskStat, StreakData } from '../types/game';
 
 /**
  * Get a value from storage (platform-safe)
@@ -196,6 +196,185 @@ export const saveSessionRecord = async (record: SessionRecord): Promise<void> =>
   const records = await getSessionRecords();
   records.push(record);
   await setStorageItem(STORAGE_KEYS.PARENT_STATS, JSON.stringify(records));
+};
+
+// Returns true when onboarding is done (value = 'true').
+// Returns false for null (never seen) or 'pending' (explicitly reset).
+export const getOnboardingDone = async (): Promise<boolean> => {
+  const value = await getStorageItem(STORAGE_KEYS.ONBOARDING_DONE);
+  return value === 'true';
+};
+
+export const setOnboardingDone = async (): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.ONBOARDING_DONE, 'true');
+};
+
+export const resetOnboarding = async (): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.ONBOARDING_DONE, 'pending');
+};
+
+function isValidTaskStat(r: unknown): r is TaskStat {
+  if (!r || typeof r !== 'object') return false;
+  const obj = r as Record<string, unknown>;
+  return (
+    typeof obj.num1 === 'number' &&
+    typeof obj.num2 === 'number' &&
+    typeof obj.operation === 'string' && VALID_OPERATIONS.has(obj.operation) &&
+    typeof obj.correctCount === 'number' &&
+    typeof obj.errorCount === 'number' &&
+    typeof obj.lastSeen === 'string'
+  );
+}
+
+export const getTaskStats = async (): Promise<TaskStat[]> => {
+  const value = await getStorageItem(STORAGE_KEYS.TASK_STATS);
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isValidTaskStat);
+  } catch {
+    return [];
+  }
+};
+
+export const saveTaskStats = async (stats: TaskStat[]): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.TASK_STATS, JSON.stringify(stats));
+};
+
+let taskStatsQueue: Promise<void> = Promise.resolve();
+
+export const recordTaskResult = async (
+  num1: number,
+  num2: number,
+  operation: Operation,
+  isCorrect: boolean,
+): Promise<void> => {
+  taskStatsQueue = taskStatsQueue.then(async () => {
+    const stats = await getTaskStats();
+    const existing = stats.find(s => s.num1 === num1 && s.num2 === num2 && s.operation === operation);
+    if (existing) {
+      if (isCorrect) existing.correctCount++;
+      else existing.errorCount++;
+      existing.lastSeen = new Date().toISOString();
+    } else {
+      stats.push({
+        num1,
+        num2,
+        operation,
+        correctCount: isCorrect ? 1 : 0,
+        errorCount: isCorrect ? 0 : 1,
+        lastSeen: new Date().toISOString(),
+      });
+    }
+    await saveTaskStats(stats);
+  });
+  return taskStatsQueue;
+};
+
+export const getWeakTasks = (stats: TaskStat[], minAttempts = 3, minErrorRate = 0.3): TaskStat[] => {
+  return stats
+    .filter(s => {
+      const total = s.correctCount + s.errorCount;
+      const rate = total > 0 ? s.errorCount / total : 0;
+      return total >= minAttempts && rate > minErrorRate;
+    })
+    .sort((a, b) => {
+      const rateA = a.errorCount / (a.correctCount + a.errorCount);
+      const rateB = b.errorCount / (b.correctCount + b.errorCount);
+      return rateB - rateA;
+    });
+};
+
+// Badge storage – maps badgeId → unlock timestamp
+export type BadgeStore = Record<string, number>;
+
+export const getBadges = async (): Promise<BadgeStore> => {
+  const value = await getStorageItem(STORAGE_KEYS.BADGES);
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value);
+    if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+      const validated: BadgeStore = {};
+      for (const [key, val] of Object.entries(parsed)) {
+        if (typeof val === 'number' && Number.isFinite(val)) {
+          validated[key] = val;
+        }
+      }
+      return validated;
+    }
+  } catch { /* ignore */ }
+  return {};
+};
+
+export const saveBadges = async (badges: BadgeStore): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.BADGES, JSON.stringify(badges));
+};
+
+// Streak storage helpers
+
+export function getLocalDateString(date?: Date): string {
+  const d = date ?? new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+const STREAK_DEFAULT: StreakData = { currentStreak: 0, lastPlayedDate: '', longestStreak: 0 };
+
+function isNonNegInt(v: unknown): v is number {
+  return typeof v === 'number' && Number.isFinite(v) && v >= 0 && Number.isInteger(v);
+}
+
+function isLocalDateString(v: unknown): v is string {
+  return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+}
+
+export const getStreakData = async (): Promise<StreakData> => {
+  const value = await getStorageItem(STORAGE_KEYS.STREAK);
+  if (!value) return STREAK_DEFAULT;
+  try {
+    const parsed = JSON.parse(value);
+    if (
+      isNonNegInt(parsed.currentStreak) &&
+      isLocalDateString(parsed.lastPlayedDate) &&
+      isNonNegInt(parsed.longestStreak)
+    ) {
+      return parsed as StreakData;
+    }
+  } catch {
+    // fall through
+  }
+  return STREAK_DEFAULT;
+};
+
+export const saveStreakData = async (data: StreakData): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.STREAK, JSON.stringify(data));
+};
+
+export const updateStreakAfterSession = async (): Promise<StreakData> => {
+  const today = getLocalDateString();
+  const data = await getStreakData();
+
+  if (data.lastPlayedDate === today) {
+    return data;
+  }
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = getLocalDateString(yesterday);
+
+  const newStreak = data.lastPlayedDate === yesterdayStr ? data.currentStreak + 1 : 1;
+
+  const updated: StreakData = {
+    currentStreak: newStreak,
+    lastPlayedDate: today,
+    longestStreak: Math.max(newStreak, data.longestStreak),
+  };
+
+  await saveStreakData(updated);
+  return updated;
 };
 
 export const saveNumberRange = async (range: NumberRange): Promise<void> => {

@@ -23,7 +23,33 @@ export const STORAGE_KEYS = {
   NUMBER_RANGE: 'app-number-range',
   CHALLENGE_HIGHSCORE: 'app-challenge-highscore',
   PARENT_STATS: 'app-parent-stats',
+  ONBOARDING_DONE: 'app-onboarding-done',
+  TASK_STATS: 'app-task-stats',
+  BADGES: 'app-badges',
+  STREAK: 'app-streak',
 } as const;
+
+export type BadgeCategory = 'streak' | 'performance' | 'challenge' | 'explorer';
+
+export interface BadgeDefinition {
+  id: string;
+  icon: string;
+  category: BadgeCategory;
+}
+
+export const BADGE_DEFINITIONS: BadgeDefinition[] = [
+  { id: 'streak_3',             icon: '🔥',    category: 'streak' },
+  { id: 'streak_7',             icon: '🔥🔥',  category: 'streak' },
+  { id: 'streak_30',            icon: '🔥🔥🔥', category: 'streak' },
+  { id: 'perfect_1',            icon: '⭐',    category: 'performance' },
+  { id: 'perfect_5',            icon: '🌟',    category: 'performance' },
+  { id: 'all_operations',       icon: '💎',    category: 'performance' },
+  { id: 'challenge_level_3',    icon: '🏆',    category: 'challenge' },
+  { id: 'challenge_level_6',    icon: '👑',    category: 'challenge' },
+  { id: 'challenge_no_errors',  icon: '❤️',    category: 'challenge' },
+  { id: 'range_100',            icon: '🔢',    category: 'explorer' },
+  { id: 'creative_mode',        icon: '🎨',    category: 'explorer' },
+];
 
 // Challenge Mode Configuration
 export const CHALLENGE_MAX_LIVES = 3;

@@ -8,8 +8,8 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { ThemeColors, SessionRecord, Operation, DifficultyMode } from '../types/game';
-import { getSessionRecords, FOUR_WEEKS_MS } from '../utils/storage';
+import { ThemeColors, SessionRecord, Operation, DifficultyMode, StreakData, TaskStat } from '../types/game';
+import { getSessionRecords, getStreakData, getTaskStats, getWeakTasks, FOUR_WEEKS_MS } from '../utils/storage';
 import { DESIGN_TOKENS } from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
 
@@ -34,6 +34,11 @@ interface ParentDashboardProps {
     parentYesterday: string;
     parentCorrect: string;
     parentErrors: string;
+    parentCurrentStreak: string;
+    parentLongestStreak: string;
+    parentStreakDays: string;
+    parentWeakTasks: string;
+    parentWeakTasksEmpty: string;
     ok: string;
   };
 }
@@ -90,13 +95,17 @@ function errorRateColor(rate: number): string {
 
 export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboardProps) {
   const [records, setRecords] = useState<SessionRecord[]>([]);
+  const [streak, setStreak] = useState<StreakData>({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  const [weakTasks, setWeakTasks] = useState<TaskStat[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (visible) {
       setLoading(true);
-      getSessionRecords().then((data) => {
+      Promise.all([getSessionRecords(), getStreakData(), getTaskStats()]).then(([data, streakData, stats]) => {
         setRecords(data);
+        setStreak(streakData);
+        setWeakTasks(getWeakTasks(stats).slice(0, 5));
         setLoading(false);
       });
     }
@@ -137,13 +146,15 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           </View>
 
           {/* Summary bar */}
-          {records.length > 0 && (
+          {(records.length > 0 || streak.currentStreak > 0 || streak.longestStreak > 0) && (
             <View style={[styles.summaryBar, { borderColor: colors.border }]}>
-              <View style={styles.summaryItem}>
-                <Text style={[styles.summaryValue, { color: colors.text }]}>{recentRecords.length}</Text>
-                <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentSessions}</Text>
-              </View>
-              {avgErrorRate !== null && (
+              {records.length > 0 && (
+                <View style={styles.summaryItem}>
+                  <Text style={[styles.summaryValue, { color: colors.text }]}>{recentRecords.length}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentSessions}</Text>
+                </View>
+              )}
+              {records.length > 0 && avgErrorRate !== null && (
                 <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
               )}
               {avgErrorRate !== null && (
@@ -154,6 +165,50 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
                   <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentAvgError}</Text>
                 </View>
               )}
+              {streak.currentStreak > 0 && records.length > 0 && (
+                <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
+              )}
+              {streak.currentStreak > 0 && (
+                <View style={styles.summaryItem}>
+                  <Text style={[styles.summaryValue, { color: '#F59E0B' }]}>🔥 {streak.currentStreak}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentCurrentStreak}</Text>
+                </View>
+              )}
+              {streak.longestStreak > 0 && (records.length > 0 || streak.currentStreak > 0) && (
+                <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
+              )}
+              {streak.longestStreak > 0 && (
+                <View style={styles.summaryItem}>
+                  <Text style={[styles.summaryValue, { color: colors.text }]}>{streak.longestStreak}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentLongestStreak}</Text>
+                </View>
+              )}
+            </View>
+          )}
+
+          {/* Weak Tasks Section */}
+          {!loading && weakTasks.length > 0 && (
+            <View style={[styles.weakSection, { borderColor: colors.border }]}>
+              <Text style={[styles.weakTitle, { color: colors.textSecondary }]}>{t.parentWeakTasks}</Text>
+              {weakTasks.map((s, i) => {
+                  const total = s.correctCount + s.errorCount;
+                  const rate = total > 0 ? s.errorCount / total : 0;
+                  return (
+                    <View key={`${s.num1}-${s.num2}-${s.operation}-${i}`} style={styles.weakRow}>
+                      <Text style={[styles.weakTask, { color: colors.text }]}>
+                        {s.num1} {OP_SYMBOL[s.operation]} {s.num2}
+                      </Text>
+                      <View style={[styles.errorBadge, { backgroundColor: errorRateColor(rate) + '22' }]}>
+                        <Text style={[styles.errorBadgeText, { color: errorRateColor(rate) }]}>
+                          {Math.round(rate * 100)}%
+                        </Text>
+                      </View>
+                      <Text style={[styles.weakAttempts, { color: colors.textSecondary }]}>
+                        {total}×
+                      </Text>
+                    </View>
+                  );
+                })}
             </View>
           )}
 
@@ -343,6 +398,41 @@ const styles = StyleSheet.create({
   },
   challengeBadge: {
     fontSize: 13,
+  },
+  weakSection: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 12,
+  },
+  weakTitle: {
+    fontSize: 10,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  weakEmpty: {
+    fontSize: 12,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    fontStyle: 'italic',
+  },
+  weakRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+    gap: 8,
+  },
+  weakTask: {
+    fontSize: 14,
+    fontFamily: DESIGN_TOKENS.FONT_NUMBER,
+    flex: 1,
+  },
+  weakAttempts: {
+    fontSize: 11,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    minWidth: 28,
+    textAlign: 'right',
   },
   closeBtn: {
     backgroundColor: ACTIVE_COLOR,

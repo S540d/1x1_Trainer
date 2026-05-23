@@ -18,6 +18,7 @@ interface HeaderProps {
   score: number;
   currentTask: number;
   totalTasks: number;
+  currentStreak?: number;
   onShowMenu: () => void;
   t: {
     level: string;
@@ -33,6 +34,7 @@ export function Header({
   score,
   currentTask,
   totalTasks,
+  currentStreak,
   onShowMenu,
   t,
 }: HeaderProps) {
@@ -66,6 +68,11 @@ export function Header({
             <Text style={styles.scoreBadgeText}>⭐ {score}</Text>
           </LinearGradient>
         </>
+      )}
+      {!!currentStreak && currentStreak > 0 && (
+        <View style={styles.streakBadge}>
+          <Text style={styles.streakText}>🔥 {currentStreak}</Text>
+        </View>
       )}
       <TouchableOpacity
         onPress={onShowMenu}
@@ -124,5 +131,18 @@ const styles = StyleSheet.create({
   settingsButtonText: {
     fontSize: 24,
     fontWeight: 'normal',
+  },
+  streakBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 14,
+    backgroundColor: 'rgba(249,212,35,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  streakText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#F59E0B',
   },
 });
