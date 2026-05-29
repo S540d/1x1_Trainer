@@ -103,6 +103,10 @@ export interface TranslationStrings {
   streakWarningTitle: string;
   streakWarningMessage: string;
   streakWarningButton: string;
+  streakInfoTitle: string;
+  streakInfoBody: string;
+  scoreInfoTitle: string;
+  scoreInfoBody: string;
   parentWeakTasks: string;
   parentWeakTasksEmpty: string;
   // Badges
@@ -254,6 +258,10 @@ export const translations: Record<Language, TranslationStrings> = {
     streakWarningTitle: 'Don\'t break your streak!',
     streakWarningMessage: 'Play a quick round today to keep your {days}-day streak going!',
     streakWarningButton: 'Let\'s go!',
+    streakInfoTitle: 'Streak',
+    streakInfoBody: 'days played in a row. Keep it up!',
+    scoreInfoTitle: 'Score',
+    scoreInfoBody: 'Your score for this round',
     parentWeakTasks: 'Weak Areas (Top 5)',
     parentWeakTasksEmpty: 'No weak areas identified yet.',
     // Badges
@@ -397,12 +405,16 @@ export const translations: Record<Language, TranslationStrings> = {
     parentYesterday: 'Gestern',
     parentCorrect: 'Richtig',
     parentErrors: 'Fehler',
-    parentCurrentStreak: 'Aktueller Streak',
-    parentLongestStreak: 'Längster Streak',
+    parentCurrentStreak: 'Aktuelle Serie',
+    parentLongestStreak: 'Längste Serie',
     parentStreakDays: 'Tage',
-    streakWarningTitle: 'Brich deinen Streak nicht!',
-    streakWarningMessage: 'Spiel heute eine Runde, um deinen {days}-Tage-Streak zu halten!',
+    streakWarningTitle: 'Brich deine Serie nicht!',
+    streakWarningMessage: 'Spiel heute eine Runde, um deine {days}-Tage-Serie zu halten!',
     streakWarningButton: 'Los geht\'s!',
+    streakInfoTitle: 'Serie',
+    streakInfoBody: 'Tage in Folge gespielt. Weiter so!',
+    scoreInfoTitle: 'Punkte',
+    scoreInfoBody: 'Dein Punktestand in dieser Runde',
     parentWeakTasks: 'Schwachstellen (Top 5)',
     parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
     // Badges
