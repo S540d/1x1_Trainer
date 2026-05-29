@@ -78,10 +78,13 @@ describe('usePreferences Hook', () => {
   });
 
   describe('Initialization and Loading', () => {
-    it('should start with isLoaded as false', () => {
+    it('should start with isLoaded as false', async () => {
       const { result } = renderHook(() => usePreferences());
 
       expect(result.current.isLoaded).toBe(false);
+      // Flush pending async state updates so React 19 doesn't warn about
+      // setState calls outside act() during test cleanup
+      await act(async () => {});
     });
 
     it('should set isLoaded to true after loading preferences', async () => {
