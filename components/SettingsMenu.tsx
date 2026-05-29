@@ -366,11 +366,14 @@ const styles = StyleSheet.create({
   },
   topButtonsSection: {
     gap: 8,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   personalizeButton: {
-    width: '100%',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    flex: 1,
+    minWidth: '45%',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
     backgroundColor: 'transparent',
     borderWidth: 2,
