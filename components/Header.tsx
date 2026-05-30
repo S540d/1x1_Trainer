@@ -59,7 +59,7 @@ export function Header({
       ) : (
         <>
           <View style={styles.progressContainer}>
-            <ProgressBar current={currentTask - 1} total={totalTasks} />
+            <ProgressBar current={currentTask - 1} total={totalTasks} gradientColors={colors.gradientPrimary} />
             <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>
               {currentTask}/{totalTasks}
             </Text>

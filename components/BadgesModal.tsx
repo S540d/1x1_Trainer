@@ -115,6 +115,7 @@ function formatUnlockDate(ts: number, language: Language): string {
 export function BadgesModal({ visible, onClose, colors, badges, language, t }: BadgesModalProps) {
   const unlockedCount = Object.keys(badges).length;
   const totalCount = BADGE_DEFINITIONS.length;
+  const activeColor = colors.gradientPrimary[0];
 
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -152,7 +153,7 @@ export function BadgesModal({ visible, onClose, colors, badges, language, t }: B
                           style={[
                             styles.badgeCard,
                             { backgroundColor: colors.card, borderColor: colors.border },
-                            isUnlocked && styles.badgeCardUnlocked,
+                            isUnlocked && [styles.badgeCardUnlocked, { borderColor: activeColor + '55' }],
                           ]}
                         >
                           <Text style={[styles.badgeIcon, !isUnlocked && styles.badgeIconLocked]}>
@@ -174,7 +175,7 @@ export function BadgesModal({ visible, onClose, colors, badges, language, t }: B
                             {getBadgeDesc(def.id, t)}
                           </Text>
                           {isUnlocked && (
-                            <Text style={styles.unlockedDate}>
+                            <Text style={[styles.unlockedDate, { color: activeColor }]}>
                               {t.badgeUnlockedOn} {formatUnlockDate(unlockedAt, language)}
                             </Text>
                           )}
@@ -188,7 +189,7 @@ export function BadgesModal({ visible, onClose, colors, badges, language, t }: B
           </ScrollView>
 
           {/* Close button */}
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+          <TouchableOpacity style={[styles.closeBtn, { backgroundColor: activeColor }]} onPress={onClose}>
             <Text style={styles.closeBtnText}>{t.ok}</Text>
           </TouchableOpacity>
         </View>
@@ -196,8 +197,6 @@ export function BadgesModal({ visible, onClose, colors, badges, language, t }: B
     </Modal>
   );
 }
-
-const ACTIVE_COLOR = DESIGN_TOKENS.GRADIENT_PRIMARY[0];
 
 const styles = StyleSheet.create({
   container: {
@@ -267,7 +266,6 @@ const styles = StyleSheet.create({
   },
   badgeCardUnlocked: {
     opacity: 1,
-    borderColor: ACTIVE_COLOR + '55',
   },
   badgeIcon: {
     fontSize: 28,
@@ -291,12 +289,10 @@ const styles = StyleSheet.create({
   unlockedDate: {
     fontSize: 9,
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    color: ACTIVE_COLOR,
     marginTop: 4,
     textAlign: 'center',
   },
   closeBtn: {
-    backgroundColor: ACTIVE_COLOR,
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
     paddingVertical: 12,
     alignItems: 'center',

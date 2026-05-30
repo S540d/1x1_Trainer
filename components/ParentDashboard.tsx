@@ -290,7 +290,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
 
           {/* Content */}
           {loading ? (
-            <ActivityIndicator style={styles.loader} color={DESIGN_TOKENS.GRADIENT_PRIMARY[0]} />
+            <ActivityIndicator style={styles.loader} color={colors.gradientPrimary[0]} />
           ) : records.length === 0 ? (
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t.parentNoData}</Text>
           ) : (
@@ -303,7 +303,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
                     data={chartData}
                     valueKey="sessions"
                     maxValue={maxSessions}
-                    getBarColor={() => ACTIVE_COLOR}
+                    getBarColor={() => colors.gradientPrimary[0]}
                     colors={colors}
                   />
                   <Text style={[styles.chartTitle, styles.chartTitleSpaced, { color: colors.textSecondary }]}>
@@ -374,7 +374,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           )}
 
           {/* Close button */}
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+          <TouchableOpacity style={[styles.closeBtn, { backgroundColor: colors.gradientPrimary[0] }]} onPress={onClose}>
             <Text style={styles.closeBtnText}>{t.ok}</Text>
           </TouchableOpacity>
         </View>
@@ -382,8 +382,6 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
     </Modal>
   );
 }
-
-const ACTIVE_COLOR = DESIGN_TOKENS.GRADIENT_PRIMARY[0];
 
 const styles = StyleSheet.create({
   container: {
@@ -578,7 +576,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   closeBtn: {
-    backgroundColor: ACTIVE_COLOR,
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
     paddingVertical: 12,
     alignItems: 'center',

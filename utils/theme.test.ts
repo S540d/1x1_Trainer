@@ -4,7 +4,7 @@
  */
 
 import { getThemeColors } from './theme';
-import { THEME_COLORS } from './constants';
+import { THEME_COLORS, THEMES } from './constants';
 
 describe('theme.ts - Theme Color Selection', () => {
   describe('Dark Mode Colors', () => {
@@ -23,6 +23,7 @@ describe('theme.ts - Theme Color Selection', () => {
         buttonInactiveText: THEME_COLORS.DARK.BUTTON_INACTIVE_TEXT,
         settingsOverlay: THEME_COLORS.DARK.SETTINGS_OVERLAY,
         settingsMenu: THEME_COLORS.DARK.SETTINGS_MENU,
+        gradientPrimary: THEMES.sunset.DARK.GRADIENT_PRIMARY,
       });
     });
 
@@ -62,6 +63,7 @@ describe('theme.ts - Theme Color Selection', () => {
         buttonInactiveText: THEME_COLORS.LIGHT.BUTTON_INACTIVE_TEXT,
         settingsOverlay: THEME_COLORS.LIGHT.SETTINGS_OVERLAY,
         settingsMenu: THEME_COLORS.LIGHT.SETTINGS_MENU,
+        gradientPrimary: THEMES.sunset.LIGHT.GRADIENT_PRIMARY,
       });
     });
 
@@ -114,22 +116,52 @@ describe('theme.ts - Theme Color Selection', () => {
       expect(colors).toHaveProperty('buttonInactiveText');
       expect(colors).toHaveProperty('settingsOverlay');
       expect(colors).toHaveProperty('settingsMenu');
+      expect(colors).toHaveProperty('gradientPrimary');
     });
 
-    it('should return valid color strings for all properties', () => {
+    it('should return valid color strings for string properties', () => {
       const lightColors = getThemeColors(false);
       const darkColors = getThemeColors(true);
 
-      // Check all colors are strings
-      Object.values(lightColors).forEach((color) => {
-        expect(typeof color).toBe('string');
-        expect(color.length).toBeGreaterThan(0);
+      const stringKeys: (keyof typeof lightColors)[] = [
+        'background', 'text', 'textSecondary', 'border', 'card',
+        'cardCorrect', 'cardIncorrect', 'buttonInactive', 'buttonInactiveText',
+        'settingsOverlay', 'settingsMenu',
+      ];
+
+      stringKeys.forEach((key) => {
+        expect(typeof lightColors[key]).toBe('string');
+        expect((lightColors[key] as string).length).toBeGreaterThan(0);
+        expect(typeof darkColors[key]).toBe('string');
+        expect((darkColors[key] as string).length).toBeGreaterThan(0);
       });
 
-      Object.values(darkColors).forEach((color) => {
-        expect(typeof color).toBe('string');
-        expect(color.length).toBeGreaterThan(0);
-      });
+      expect(Array.isArray(lightColors.gradientPrimary)).toBe(true);
+      expect(lightColors.gradientPrimary).toHaveLength(2);
+    });
+  });
+
+  describe('Theme Name Support', () => {
+    it('should default to sunset theme when no theme name given', () => {
+      const colors = getThemeColors(false);
+      expect(colors.gradientPrimary).toEqual(['#667eea', '#764ba2']);
+    });
+
+    it('should return ocean theme colors when themeName is ocean', () => {
+      const colors = getThemeColors(false, 'ocean');
+      expect(colors.background).toBe('#F0FAFF');
+      expect(colors.gradientPrimary).toEqual(['#06b6d4', '#0284c7']);
+    });
+
+    it('should return forest dark theme', () => {
+      const colors = getThemeColors(true, 'forest');
+      expect(colors.background).toBe('#0A1F10');
+      expect(colors.gradientPrimary).toEqual(['#22c55e', '#15803d']);
+    });
+
+    it('should fall back to sunset for invalid theme name', () => {
+      const colors = getThemeColors(false, 'invalid' as any);
+      expect(colors.gradientPrimary).toEqual(['#667eea', '#764ba2']);
     });
   });
 
