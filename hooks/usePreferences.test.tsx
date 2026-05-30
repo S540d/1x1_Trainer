@@ -18,6 +18,8 @@ import {
   saveLanguage,
   getTheme,
   saveTheme,
+  getThemeName,
+  saveThemeName,
   getOperations,
   saveOperations,
   getTotalTasks,
@@ -35,6 +37,8 @@ jest.mock('../utils/storage', () => ({
   saveLanguage: jest.fn(),
   getTheme: jest.fn(),
   saveTheme: jest.fn(),
+  getThemeName: jest.fn(),
+  saveThemeName: jest.fn(),
   getOperations: jest.fn(),
   saveOperations: jest.fn(),
   getTotalTasks: jest.fn(),
@@ -55,6 +59,8 @@ describe('usePreferences Hook', () => {
   const mockSaveLanguage = saveLanguage as jest.MockedFunction<typeof saveLanguage>;
   const mockGetTheme = getTheme as jest.MockedFunction<typeof getTheme>;
   const mockSaveTheme = saveTheme as jest.MockedFunction<typeof saveTheme>;
+  const mockGetThemeName = getThemeName as jest.MockedFunction<typeof getThemeName>;
+  const mockSaveThemeName = saveThemeName as jest.MockedFunction<typeof saveThemeName>;
   const mockGetOperations = getOperations as jest.MockedFunction<typeof getOperations>;
   const mockSaveOperations = saveOperations as jest.MockedFunction<typeof saveOperations>;
   const mockGetTotalTasks = getTotalTasks as jest.MockedFunction<typeof getTotalTasks>;
@@ -70,6 +76,7 @@ describe('usePreferences Hook', () => {
     // Set default mock implementations
     mockGetLanguage.mockResolvedValue(null);
     mockGetTheme.mockResolvedValue(null);
+    mockGetThemeName.mockResolvedValue(null);
     mockGetOperations.mockResolvedValue([Operation.MULTIPLICATION]);
     mockGetTotalTasks.mockResolvedValue(null);
     mockGetNumberRange.mockResolvedValue(NumberRange.RANGE_100); // Now returns RANGE_100 by default

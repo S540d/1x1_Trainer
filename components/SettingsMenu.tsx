@@ -91,6 +91,9 @@ export function SettingsMenu({
   const buttonText = colors.buttonInactiveText;
   const sectionTitle = colors.textSecondary;
   const modeInfo = colors.textSecondary;
+  const activeColor = colors.gradientPrimary[0];
+  const activeStyle = { backgroundColor: activeColor, borderColor: activeColor };
+
   return (
     <>
       <TouchableOpacity
@@ -100,7 +103,7 @@ export function SettingsMenu({
       />
       <Animated.View style={[styles.settingsMenu, { maxHeight: screenHeight - 80, backgroundColor: colors.settingsMenu }, menuAnimatedStyle]}>
         <LinearGradient
-          colors={DESIGN_TOKENS.GRADIENT_PRIMARY}
+          colors={colors.gradientPrimary}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.settingsMenuHeader}
@@ -118,22 +121,22 @@ export function SettingsMenu({
         {/* Personalize Button */}
         <View style={[styles.settingsSection, styles.topButtonsSection]}>
           <TouchableOpacity
-            style={styles.personalizeButton}
+            style={[styles.personalizeButton, { borderColor: activeColor }]}
             onPress={() => { onOpenPersonalize(); onHideMenu(); }}
           >
-            <Text style={styles.personalizeButtonText}>{t.personalize}</Text>
+            <Text style={[styles.personalizeButtonText, { color: activeColor }]}>{t.personalize}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.personalizeButton}
+            style={[styles.personalizeButton, { borderColor: activeColor }]}
             onPress={() => { onOpenParentDashboard(); onHideMenu(); }}
           >
-            <Text style={styles.personalizeButtonText}>{t.parentDashboardMenu}</Text>
+            <Text style={[styles.personalizeButtonText, { color: activeColor }]}>{t.parentDashboardMenu}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.personalizeButton}
+            style={[styles.personalizeButton, { borderColor: activeColor }]}
             onPress={() => { onOpenBadges(); onHideMenu(); }}
           >
-            <Text style={styles.personalizeButtonText}>{t.badgesMenu}</Text>
+            <Text style={[styles.personalizeButtonText, { color: activeColor }]}>{t.badgesMenu}</Text>
           </TouchableOpacity>
         </View>
 
@@ -157,7 +160,7 @@ export function SettingsMenu({
                   style={[
                     styles.operationButton,
                     { backgroundColor: buttonBg, borderColor: buttonBorder },
-                    isActive && styles.operationButtonActive,
+                    isActive && activeStyle,
                     isChallenge && { opacity: 0.6 },
                   ]}
                   onPress={() => onToggleOperation(op)}
@@ -179,7 +182,7 @@ export function SettingsMenu({
           <Text style={[styles.settingsSectionTitle, { color: sectionTitle }]}>{t.difficultyMode}</Text>
           <View style={styles.difficultyGrid}>
             <TouchableOpacity
-              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonActive]}
+              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.SIMPLE && activeStyle]}
               onPress={() => onChangeDifficultyMode(DifficultyMode.SIMPLE)}
             >
               <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonTextActive]}>
@@ -187,7 +190,7 @@ export function SettingsMenu({
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonActive]}
+              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.CREATIVE && activeStyle]}
               onPress={() => onChangeDifficultyMode(DifficultyMode.CREATIVE)}
             >
               <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonTextActive]}>
@@ -195,7 +198,7 @@ export function SettingsMenu({
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonActive]}
+              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.CHALLENGE && activeStyle]}
               onPress={() => {
                 onChangeDifficultyMode(DifficultyMode.CHALLENGE);
                 onHideMenu();
@@ -206,7 +209,7 @@ export function SettingsMenu({
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.PRACTICE && styles.themeButtonActive]}
+              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.PRACTICE && activeStyle]}
               onPress={() => onChangeDifficultyMode(DifficultyMode.PRACTICE)}
             >
               <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.PRACTICE && styles.themeButtonTextActive]}>
@@ -245,7 +248,7 @@ export function SettingsMenu({
                   style={[
                     styles.rangeButton,
                     { backgroundColor: buttonBg, borderColor: buttonBorder },
-                    isActive && styles.rangeButtonActive,
+                    isActive && activeStyle,
                     isChallengeMode && { opacity: 0.6 },
                   ]}
                   onPress={() => onSetNumberRange(range)}
@@ -271,7 +274,7 @@ export function SettingsMenu({
               onHideMenu();
             }}
           >
-            <Text style={styles.settingsMenuLinkText}>{t.feedback}</Text>
+            <Text style={[styles.settingsMenuLinkText, { color: activeColor }]}>{t.feedback}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.settingsMenuLinkFlex}
@@ -280,13 +283,13 @@ export function SettingsMenu({
               onHideMenu();
             }}
           >
-            <Text style={styles.settingsMenuLinkText}>{t.support}</Text>
+            <Text style={[styles.settingsMenuLinkText, { color: activeColor }]}>{t.support}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.settingsMenuLinkFlex}
             onPress={onOpenAbout}
           >
-            <Text style={styles.settingsMenuLinkText}>{t.about}</Text>
+            <Text style={[styles.settingsMenuLinkText, { color: activeColor }]}>{t.about}</Text>
           </TouchableOpacity>
         </View>
 
@@ -302,8 +305,6 @@ export function SettingsMenu({
     </>
   );
 }
-
-const ACTIVE_COLOR = DESIGN_TOKENS.GRADIENT_PRIMARY[0]; // #667eea
 
 const styles = StyleSheet.create({
   settingsOverlay: {
@@ -362,7 +363,6 @@ const styles = StyleSheet.create({
   settingsMenuLinkText: {
     fontSize: 13,
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    color: ACTIVE_COLOR,
   },
   topButtonsSection: {
     gap: 8,
@@ -377,13 +377,11 @@ const styles = StyleSheet.create({
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: ACTIVE_COLOR,
     alignItems: 'center',
   },
   personalizeButtonText: {
     fontSize: 14,
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    color: ACTIVE_COLOR,
   },
   settingsSection: {
     paddingHorizontal: 16,
@@ -432,17 +430,13 @@ const styles = StyleSheet.create({
     borderColor: '#dde3ff',
     alignItems: 'center',
   },
-  themeButtonActive: {
-    backgroundColor: ACTIVE_COLOR,
-    borderColor: ACTIVE_COLOR,
+  themeButtonTextActive: {
+    color: '#fff',
   },
   themeButtonText: {
     fontSize: 12,
     fontFamily: DESIGN_TOKENS.FONT_UI,
     color: '#2d2b55',
-  },
-  themeButtonTextActive: {
-    color: '#fff',
   },
   operationGrid: {
     flexDirection: 'row',
@@ -459,10 +453,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#dde3ff',
     alignItems: 'center',
-  },
-  operationButtonActive: {
-    backgroundColor: ACTIVE_COLOR,
-    borderColor: ACTIVE_COLOR,
   },
   operationButtonText: {
     fontSize: 12,
@@ -487,10 +477,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#dde3ff',
     alignItems: 'center',
-  },
-  rangeButtonActive: {
-    backgroundColor: ACTIVE_COLOR,
-    borderColor: ACTIVE_COLOR,
   },
   rangeButtonText: {
     fontSize: 12,

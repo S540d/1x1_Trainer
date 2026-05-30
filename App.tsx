@@ -86,7 +86,7 @@ export default function App() {
 
   // Use custom hooks
   const preferences = usePreferences();
-  const theme = useTheme(preferences.themeMode);
+  const theme = useTheme(preferences.themeMode, preferences.themeName);
   const badgeSystem = useBadges();
   const game = useGameLogic({
     initialOperation: preferences.operation,
@@ -198,9 +198,9 @@ export default function App() {
   // Set body background color dynamically on web
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.body.style.backgroundColor = isDarkMode ? '#0F1419' : '#F0F4FF';
+      document.body.style.backgroundColor = colors.background;
     }
-  }, [isDarkMode]);
+  }, [colors.background]);
 
   // Load streak data and show warning when appropriate
   useEffect(() => {
@@ -380,6 +380,8 @@ export default function App() {
         onLanguageChange={preferences.setLanguage}
         themeMode={theme.themeMode}
         onThemeModeChange={preferences.setThemeMode}
+        themeName={preferences.themeName}
+        onThemeNameChange={preferences.setThemeName}
       />
 
       <AboutModal

@@ -4,12 +4,14 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Language, ThemeMode, Operation, NumberRange } from '../types/game';
+import { Language, ThemeMode, ThemeName, Operation, NumberRange } from '../types/game';
 import {
   getLanguage,
   saveLanguage,
   getTheme,
   saveTheme,
+  getThemeName,
+  saveThemeName,
   getOperations,
   saveOperations,
   getTotalTasks,
@@ -24,6 +26,7 @@ import { getDeviceLanguage } from '../utils/language';
 export function usePreferences() {
   const [language, setLanguage] = useState<Language>('en');
   const [themeMode, setThemeMode] = useState<ThemeMode>('light');
+  const [themeName, setThemeName] = useState<ThemeName>('sunset');
   const [operations, setOperations] = useState<Operation[]>([Operation.MULTIPLICATION]);
   const [numberRange, setNumberRange] = useState<NumberRange>(NumberRange.RANGE_100);
   const [totalSolvedTasks, setTotalSolvedTasks] = useState(0);
@@ -49,6 +52,12 @@ export function usePreferences() {
         const savedTheme = await getTheme();
         if (savedTheme) {
           setThemeMode(savedTheme);
+        }
+
+        // Load theme name
+        const savedThemeName = await getThemeName();
+        if (savedThemeName) {
+          setThemeName(savedThemeName);
         }
 
         // Load operations
@@ -92,6 +101,13 @@ export function usePreferences() {
       saveTheme(themeMode);
     }
   }, [themeMode, isLoaded]);
+
+  // Auto-save theme name
+  useEffect(() => {
+    if (isLoaded) {
+      saveThemeName(themeName);
+    }
+  }, [themeName, isLoaded]);
 
   // Auto-save operations
   useEffect(() => {
@@ -140,6 +156,8 @@ export function usePreferences() {
     setLanguage,
     themeMode,
     setThemeMode,
+    themeName,
+    setThemeName,
     operation: operations.length > 0
       ? operations[0]
       : Operation.MULTIPLICATION, // First selected operation as primary

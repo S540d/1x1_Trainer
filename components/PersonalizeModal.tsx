@@ -6,9 +6,9 @@ import {
   StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ThemeColors, Language, ThemeMode } from '../types/game';
+import { ThemeColors, Language, ThemeMode, ThemeName } from '../types/game';
 import { translations } from '../i18n/translations';
-import { DESIGN_TOKENS } from '../utils/constants';
+import { THEMES } from '../utils/constants';
 import { Chip } from './Chip';
 
 interface PersonalizeModalProps {
@@ -19,6 +19,8 @@ interface PersonalizeModalProps {
   onLanguageChange: (language: Language) => void;
   themeMode: ThemeMode;
   onThemeModeChange: (mode: ThemeMode) => void;
+  themeName: ThemeName;
+  onThemeNameChange: (name: ThemeName) => void;
 }
 
 export function PersonalizeModal({
@@ -29,6 +31,8 @@ export function PersonalizeModal({
   onLanguageChange,
   themeMode,
   onThemeModeChange,
+  themeName,
+  onThemeNameChange,
 }: PersonalizeModalProps) {
   const t = translations[language];
 
@@ -44,7 +48,7 @@ export function PersonalizeModal({
 
       <View style={[styles.settingsMenu, { backgroundColor: colors.settingsMenu }]}>
         <LinearGradient
-          colors={DESIGN_TOKENS.GRADIENT_PRIMARY}
+          colors={colors.gradientPrimary}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.settingsMenuHeader}
@@ -78,6 +82,38 @@ export function PersonalizeModal({
               onPress={() => onThemeModeChange('system')}
               colors={colors}
             />
+          </View>
+        </View>
+
+        <View style={[styles.settingsDivider, { backgroundColor: colors.border }]} />
+
+        <View style={styles.settingsSection}>
+          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
+            {t.colorTheme}
+          </Text>
+          <View style={styles.themeGrid}>
+            {(Object.keys(THEMES) as ThemeName[]).map((name) => {
+              const themeData = THEMES[name];
+              const isActive = themeName === name;
+              return (
+                <TouchableOpacity
+                  key={name}
+                  style={[styles.themeSwatchWrapper, isActive && styles.themeSwatchActive]}
+                  onPress={() => onThemeNameChange(name)}
+                  activeOpacity={0.75}
+                >
+                  <LinearGradient
+                    colors={themeData.LIGHT.GRADIENT_PRIMARY}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.themeSwatch}
+                  />
+                  <Text style={[styles.themeLabel, { color: colors.text }]}>
+                    {themeData.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
@@ -122,7 +158,7 @@ const styles = StyleSheet.create({
     top: 60,
     right: 16,
     left: 16,
-    borderRadius: DESIGN_TOKENS.NUMPAD_BORDER_RADIUS,
+    borderRadius: 28,
     elevation: 12,
     shadowColor: '#667eea',
     shadowOffset: { width: 0, height: 4 },
@@ -140,7 +176,7 @@ const styles = StyleSheet.create({
   },
   settingsMenuTitle: {
     fontSize: 18,
-    fontFamily: DESIGN_TOKENS.FONT_UI,
+    fontFamily: 'Nunito_700Bold',
     color: '#fff',
     letterSpacing: 0.3,
   },
@@ -150,7 +186,7 @@ const styles = StyleSheet.create({
   },
   settingsMenuCloseButtonText: {
     fontSize: 18,
-    fontFamily: DESIGN_TOKENS.FONT_UI,
+    fontFamily: 'Nunito_700Bold',
     color: '#fff',
   },
   settingsSection: {
@@ -159,7 +195,7 @@ const styles = StyleSheet.create({
   },
   settingsSectionTitle: {
     fontSize: 11,
-    fontFamily: DESIGN_TOKENS.FONT_UI,
+    fontFamily: 'Nunito_700Bold',
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.08,
@@ -171,5 +207,32 @@ const styles = StyleSheet.create({
   settingsDivider: {
     height: 1,
     marginVertical: 2,
+  },
+  themeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  themeSwatchWrapper: {
+    alignItems: 'center',
+    gap: 4,
+    padding: 4,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  themeSwatchActive: {
+    borderColor: '#667eea',
+  },
+  themeSwatch: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+  },
+  themeLabel: {
+    fontSize: 10,
+    fontFamily: 'Nunito_700Bold',
+    textAlign: 'center',
+    maxWidth: 52,
   },
 });

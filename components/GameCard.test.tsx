@@ -22,6 +22,7 @@ const mockColors: ThemeColors = {
   buttonInactiveText: '#666',
   settingsOverlay: 'rgba(0,0,0,0.5)',
   settingsMenu: '#fff',
+  gradientPrimary: ['#667eea', '#764ba2'],
 };
 
 const baseGameState: GameState = {

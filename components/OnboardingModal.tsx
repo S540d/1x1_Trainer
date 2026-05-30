@@ -93,7 +93,7 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
                 style={[
                   styles.dot,
                   i === step && styles.dotActive,
-                  { backgroundColor: i === step ? DESIGN_TOKENS.GRADIENT_PRIMARY[0] : colors.border },
+                  { backgroundColor: i === step ? colors.gradientPrimary[0] : colors.border },
                 ]}
               />
             ))}
@@ -166,7 +166,7 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
               <Text style={[styles.title, { color: colors.text }]}>{t.onboardingSettingsTitle}</Text>
               <Text style={[styles.body, { color: colors.textSecondary }]}>{t.onboardingSettingsBody}</Text>
               <LinearGradient
-                colors={DESIGN_TOKENS.GRADIENT_PRIMARY}
+                colors={colors.gradientPrimary}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.menuHint}
@@ -196,7 +196,7 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
               disabled={!canProceedStep1}
             >
               <LinearGradient
-                colors={canProceedStep1 ? DESIGN_TOKENS.GRADIENT_PRIMARY : ['#ccc', '#ccc']}
+                colors={canProceedStep1 ? colors.gradientPrimary : ['#ccc', '#ccc']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.nextButtonGradient}

@@ -111,6 +111,7 @@ export interface TranslationStrings {
   parentWeakTasksEmpty: string;
   chartSessions: string;
   chartErrorRate: string;
+  colorTheme: string;
   // Badges
   badges: string;
   badgesMenu: string;
@@ -268,6 +269,7 @@ export const translations: Record<Language, TranslationStrings> = {
     parentWeakTasksEmpty: 'No weak areas identified yet.',
     chartSessions: 'Sessions · 14 days',
     chartErrorRate: 'Error rate · 14 days',
+    colorTheme: 'COLOR THEME',
     // Badges
     badges: 'Achievements',
     badgesMenu: 'Achievements',
@@ -423,6 +425,7 @@ export const translations: Record<Language, TranslationStrings> = {
     parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
     chartSessions: 'Einheiten · 14 Tage',
     chartErrorRate: 'Fehlerquote · 14 Tage',
+    colorTheme: 'FARBTHEMA',
     // Badges
     badges: 'Abzeichen',
     badgesMenu: 'Abzeichen',
