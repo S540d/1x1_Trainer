@@ -112,6 +112,11 @@ export interface TranslationStrings {
   chartSessions: string;
   chartErrorRate: string;
   colorTheme: string;
+  // Sounds
+  sounds: string;
+  soundsOn: string;
+  soundsOff: string;
+  soundVolume: string;
   // Badges
   badges: string;
   badgesMenu: string;
@@ -270,6 +275,10 @@ export const translations: Record<Language, TranslationStrings> = {
     chartSessions: 'Sessions · 14 days',
     chartErrorRate: 'Error rate · 14 days',
     colorTheme: 'COLOR THEME',
+    sounds: 'SOUNDS',
+    soundsOn: 'On',
+    soundsOff: 'Off',
+    soundVolume: 'VOLUME',
     // Badges
     badges: 'Achievements',
     badgesMenu: 'Achievements',
@@ -426,6 +435,10 @@ export const translations: Record<Language, TranslationStrings> = {
     chartSessions: 'Einheiten · 14 Tage',
     chartErrorRate: 'Fehlerquote · 14 Tage',
     colorTheme: 'FARBTHEMA',
+    sounds: 'TÖNE',
+    soundsOn: 'An',
+    soundsOff: 'Aus',
+    soundVolume: 'LAUTSTÄRKE',
     // Badges
     badges: 'Abzeichen',
     badgesMenu: 'Abzeichen',

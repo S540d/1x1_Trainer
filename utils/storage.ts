@@ -421,3 +421,25 @@ export const getNumberRange = async (): Promise<NumberRange> => {
   // Default: 1-100 for existing users
   return NumberRange.RANGE_100;
 };
+
+export const saveSoundsEnabled = async (enabled: boolean): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.SOUNDS_ENABLED, enabled ? 'true' : 'false');
+};
+
+export const getSoundsEnabled = async (): Promise<boolean | null> => {
+  const value = await getStorageItem(STORAGE_KEYS.SOUNDS_ENABLED);
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return null;
+};
+
+export const saveSoundsVolume = async (volume: number): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.SOUNDS_VOLUME, String(volume));
+};
+
+export const getSoundsVolume = async (): Promise<number | null> => {
+  const value = await getStorageItem(STORAGE_KEYS.SOUNDS_VOLUME);
+  const n = Number(value);
+  if (!Number.isNaN(n) && n >= 0 && n <= 100) return n;
+  return null;
+};

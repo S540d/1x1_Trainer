@@ -32,8 +32,9 @@ module.exports = {
     '^expo-font$': '<rootDir>/__mocks__/expo-font.js',
     '^expo-status-bar$': '<rootDir>/__mocks__/expo-status-bar.js',
     '^@expo-google-fonts/(.*)$': '<rootDir>/__mocks__/@expo-google-fonts.js',
+    '^expo-av$': '<rootDir>/__mocks__/expo-av.js',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(expo-localization|expo-linear-gradient|expo-font|expo-status-bar|@expo-google-fonts)/)',
+    'node_modules/(?!(expo-localization|expo-linear-gradient|expo-font|expo-status-bar|expo-av|@expo-google-fonts)/)',
   ],
 };

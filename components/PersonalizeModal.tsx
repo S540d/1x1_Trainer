@@ -3,6 +3,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  ScrollView,
   StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -21,6 +22,10 @@ interface PersonalizeModalProps {
   onThemeModeChange: (mode: ThemeMode) => void;
   themeName: ThemeName;
   onThemeNameChange: (name: ThemeName) => void;
+  soundEnabled: boolean;
+  onSoundEnabledChange: (enabled: boolean) => void;
+  soundVolume: number;
+  onSoundVolumeChange: (volume: number) => void;
 }
 
 export function PersonalizeModal({
@@ -33,6 +38,10 @@ export function PersonalizeModal({
   onThemeModeChange,
   themeName,
   onThemeNameChange,
+  soundEnabled,
+  onSoundEnabledChange,
+  soundVolume,
+  onSoundVolumeChange,
 }: PersonalizeModalProps) {
   const t = translations[language];
 
@@ -59,89 +68,135 @@ export function PersonalizeModal({
           </TouchableOpacity>
         </LinearGradient>
 
-        <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
-            {t.appearance}
-          </Text>
-          <View style={styles.chipRow}>
-            <Chip
-              label={t.light}
-              active={themeMode === 'light'}
-              onPress={() => onThemeModeChange('light')}
-              colors={colors}
-            />
-            <Chip
-              label={t.dark}
-              active={themeMode === 'dark'}
-              onPress={() => onThemeModeChange('dark')}
-              colors={colors}
-            />
-            <Chip
-              label={t.system}
-              active={themeMode === 'system'}
-              onPress={() => onThemeModeChange('system')}
-              colors={colors}
-            />
+        <ScrollView bounces={false}>
+          <View style={styles.settingsSection}>
+            <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
+              {t.appearance}
+            </Text>
+            <View style={styles.chipRow}>
+              <Chip
+                label={t.light}
+                active={themeMode === 'light'}
+                onPress={() => onThemeModeChange('light')}
+                colors={colors}
+              />
+              <Chip
+                label={t.dark}
+                active={themeMode === 'dark'}
+                onPress={() => onThemeModeChange('dark')}
+                colors={colors}
+              />
+              <Chip
+                label={t.system}
+                active={themeMode === 'system'}
+                onPress={() => onThemeModeChange('system')}
+                colors={colors}
+              />
+            </View>
           </View>
-        </View>
 
-        <View style={[styles.settingsDivider, { backgroundColor: colors.border }]} />
+          <View style={[styles.settingsDivider, { backgroundColor: colors.border }]} />
 
-        <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
-            {t.colorTheme}
-          </Text>
-          <View style={styles.themeGrid}>
-            {(Object.keys(THEMES) as ThemeName[]).map((name) => {
-              const themeData = THEMES[name];
-              const isActive = themeName === name;
-              const swatchBorderColor = themeData.LIGHT.GRADIENT_PRIMARY[0];
-              return (
-                <TouchableOpacity
-                  key={name}
-                  style={[
-                    styles.themeSwatchWrapper,
-                    isActive && { borderColor: swatchBorderColor },
-                  ]}
-                  onPress={() => onThemeNameChange(name)}
-                  activeOpacity={0.75}
-                >
-                  <LinearGradient
-                    colors={themeData.LIGHT.GRADIENT_PRIMARY}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.themeSwatch}
-                  />
-                  <Text style={[styles.themeLabel, { color: colors.text }]}>
-                    {themeData.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+          <View style={styles.settingsSection}>
+            <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
+              {t.colorTheme}
+            </Text>
+            <View style={styles.themeGrid}>
+              {(Object.keys(THEMES) as ThemeName[]).map((name) => {
+                const themeData = THEMES[name];
+                const isActive = themeName === name;
+                const swatchBorderColor = themeData.LIGHT.GRADIENT_PRIMARY[0];
+                return (
+                  <TouchableOpacity
+                    key={name}
+                    style={[
+                      styles.themeSwatchWrapper,
+                      isActive && { borderColor: swatchBorderColor },
+                    ]}
+                    onPress={() => onThemeNameChange(name)}
+                    activeOpacity={0.75}
+                  >
+                    <LinearGradient
+                      colors={themeData.LIGHT.GRADIENT_PRIMARY}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.themeSwatch}
+                    />
+                    <Text style={[styles.themeLabel, { color: colors.text }]}>
+                      {themeData.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
-        </View>
 
-        <View style={[styles.settingsDivider, { backgroundColor: colors.border }]} />
+          <View style={[styles.settingsDivider, { backgroundColor: colors.border }]} />
 
-        <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
-            {t.language}
-          </Text>
-          <View style={styles.chipRow}>
-            <Chip
-              label={t.english}
-              active={language === 'en'}
-              onPress={() => onLanguageChange('en')}
-              colors={colors}
-            />
-            <Chip
-              label={t.german}
-              active={language === 'de'}
-              onPress={() => onLanguageChange('de')}
-              colors={colors}
-            />
+          <View style={styles.settingsSection}>
+            <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
+              {t.language}
+            </Text>
+            <View style={styles.chipRow}>
+              <Chip
+                label={t.english}
+                active={language === 'en'}
+                onPress={() => onLanguageChange('en')}
+                colors={colors}
+              />
+              <Chip
+                label={t.german}
+                active={language === 'de'}
+                onPress={() => onLanguageChange('de')}
+                colors={colors}
+              />
+            </View>
           </View>
-        </View>
+
+          <View style={[styles.settingsDivider, { backgroundColor: colors.border }]} />
+
+          <View style={styles.settingsSection}>
+            <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
+              {t.sounds}
+            </Text>
+            <View style={styles.chipRow}>
+              <Chip
+                label={t.soundsOn}
+                active={soundEnabled}
+                onPress={() => onSoundEnabledChange(true)}
+                colors={colors}
+              />
+              <Chip
+                label={t.soundsOff}
+                active={!soundEnabled}
+                onPress={() => onSoundEnabledChange(false)}
+                colors={colors}
+              />
+            </View>
+          </View>
+
+          {soundEnabled && (
+            <>
+              <View style={[styles.settingsDivider, { backgroundColor: colors.border }]} />
+              <View style={styles.settingsSection}>
+                <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
+                  {t.soundVolume}
+                </Text>
+                <View style={styles.chipRow}>
+                  {([25, 50, 75, 100] as const).map((v) => (
+                    <Chip
+                      key={v}
+                      label={`${v}%`}
+                      active={soundVolume === v}
+                      onPress={() => onSoundVolumeChange(v)}
+                      colors={colors}
+                    />
+                  ))}
+                </View>
+              </View>
+            </>
+          )}
+        </ScrollView>
       </View>
     </>
   );
