@@ -20,6 +20,10 @@ import {
   saveNumberRange,
   getChallengeHighScore,
   saveChallengeHighScore,
+  getSoundsEnabled,
+  saveSoundsEnabled,
+  getSoundsVolume,
+  saveSoundsVolume,
 } from '../utils/storage';
 import { getDeviceLanguage } from '../utils/language';
 
@@ -31,6 +35,8 @@ export function usePreferences() {
   const [numberRange, setNumberRange] = useState<NumberRange>(NumberRange.RANGE_100);
   const [totalSolvedTasks, setTotalSolvedTasks] = useState(0);
   const [challengeHighScore, setChallengeHighScore] = useState(0);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundVolume, setSoundVolume] = useState(75);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load preferences on mount
@@ -77,6 +83,12 @@ export function usePreferences() {
         // Load challenge high score
         const savedHighScore = await getChallengeHighScore();
         setChallengeHighScore(savedHighScore);
+
+        // Load sound preferences
+        const savedSoundsEnabled = await getSoundsEnabled();
+        if (savedSoundsEnabled !== null) setSoundEnabled(savedSoundsEnabled);
+        const savedSoundsVolume = await getSoundsVolume();
+        if (savedSoundsVolume !== null) setSoundVolume(savedSoundsVolume);
 
         setIsLoaded(true);
       } catch (error) {
@@ -151,6 +163,15 @@ export function usePreferences() {
     }
   }, [challengeHighScore, isLoaded]);
 
+  // Auto-save sound preferences
+  useEffect(() => {
+    if (isLoaded) saveSoundsEnabled(soundEnabled);
+  }, [soundEnabled, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) saveSoundsVolume(soundVolume);
+  }, [soundVolume, isLoaded]);
+
   return {
     language,
     setLanguage,
@@ -170,6 +191,10 @@ export function usePreferences() {
     setTotalSolvedTasks,
     challengeHighScore,
     setChallengeHighScore,
+    soundEnabled,
+    setSoundEnabled,
+    soundVolume,
+    setSoundVolume,
     isLoaded,
   };
 }

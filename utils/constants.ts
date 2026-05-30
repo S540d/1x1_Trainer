@@ -28,6 +28,8 @@ export const STORAGE_KEYS = {
   TASK_STATS: 'app-task-stats',
   BADGES: 'app-badges',
   STREAK: 'app-streak',
+  SOUNDS_ENABLED: 'app-sounds-enabled',
+  SOUNDS_VOLUME: 'app-sounds-volume',
 } as const;
 
 export type BadgeCategory = 'streak' | 'performance' | 'challenge' | 'explorer';

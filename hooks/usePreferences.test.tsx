@@ -28,6 +28,8 @@ import {
   saveNumberRange,
   getChallengeHighScore,
   saveChallengeHighScore,
+  getSoundsEnabled,
+  getSoundsVolume,
 } from '../utils/storage';
 import { getDeviceLanguage } from '../utils/language';
 
@@ -47,6 +49,10 @@ jest.mock('../utils/storage', () => ({
   saveNumberRange: jest.fn(),
   getChallengeHighScore: jest.fn(),
   saveChallengeHighScore: jest.fn(),
+  getSoundsEnabled: jest.fn(),
+  saveSoundsEnabled: jest.fn(),
+  getSoundsVolume: jest.fn(),
+  saveSoundsVolume: jest.fn(),
 }));
 
 // Mock language detection utility
@@ -69,6 +75,8 @@ describe('usePreferences Hook', () => {
   const mockSaveNumberRange = saveNumberRange as jest.MockedFunction<typeof saveNumberRange>;
   const mockGetChallengeHighScore = getChallengeHighScore as jest.MockedFunction<typeof getChallengeHighScore>;
   const mockSaveChallengeHighScore = saveChallengeHighScore as jest.MockedFunction<typeof saveChallengeHighScore>;
+  const mockGetSoundsEnabled = getSoundsEnabled as jest.MockedFunction<typeof getSoundsEnabled>;
+  const mockGetSoundsVolume = getSoundsVolume as jest.MockedFunction<typeof getSoundsVolume>;
   const mockGetDeviceLanguage = getDeviceLanguage as jest.MockedFunction<typeof getDeviceLanguage>;
 
   beforeEach(() => {
@@ -81,6 +89,8 @@ describe('usePreferences Hook', () => {
     mockGetTotalTasks.mockResolvedValue(null);
     mockGetNumberRange.mockResolvedValue(NumberRange.RANGE_100); // Now returns RANGE_100 by default
     mockGetChallengeHighScore.mockResolvedValue(0);
+    mockGetSoundsEnabled.mockResolvedValue(null);
+    mockGetSoundsVolume.mockResolvedValue(null);
     mockGetDeviceLanguage.mockReturnValue('en');
   });
 
