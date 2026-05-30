@@ -74,29 +74,29 @@ npm run test:coverage # Coverage
 
 - `expo-linear-gradient`, `expo-font`, `expo-status-bar`, `@expo-google-fonts` müssen in `transformIgnorePatterns` **und** `moduleNameMapper` eingetragen sein
 - Neue Expo-Pakete immer in **beiden** Listen ergänzen
-- `usePreferences.test.tsx` hat strukturelle React 19 `act()`-Warnung — Issue #160 (low priority)
 
 ---
 
-## Aktueller Stand (2026-05-23)
+## Aktueller Stand (2026-05-30)
 
-- Version: **1.3.5** / versionCode 24
-- Tests: 475 passed, 3 skipped, 14/14 Suites grün
-- Branches: `testing` vorn (`3d52f56`); `staging` und `main` noch auf `1b551ea`
-- Offene Issues: #165, #160, #156, #146, #131, #100, #96
-- Security: 21 Vulnerabilities (alle über Expo-Tooling, build-time) → Issue #146
+- Version: **1.3.6** / versionCode 24
+- Tests: 485 passed, 3 skipped, 14/14 Suites grün
+- Branches: `testing` vorn (`bc20cfb`); `staging` und `main` noch auf `1b551ea`
+- Offene Issues: #165, #156, #186, #187, #100, #96
+- Security: 17 Vulnerabilities (nach jest 30 Upgrade, alle build-time über Expo-Tooling)
 
 ### Zuletzt gemergt (testing)
 
 | PR  | Was |
 |-----|-----|
-| #200 | Täglicher Streak-Tracker (Issue #185) — StreakData, 🔥 Header-Badge, Abend-Warnung, ParentDashboard |
-| #196 | fix: practiceModeFeedback im Übungsmodus in GameCard anzeigen + Tests |
-| #195 | CI: Jest-Test-Job zu ci-cd.yml hinzufügen (läuft jetzt automatisch bei PRs) |
-| #184 | Achievement & Badge System |
+| #208 | Visuelle Themes / App-Skins – 5 Farbthemes (Issue #190) |
+| #207 | Fortschritts-Charts im Parent Dashboard – Sessions + Fehlerquote (Issue #191) |
+| #206 | React 19 act()-Warnings in usePreferences.test.tsx behoben (Issue #160) |
+| #205 | Jest 30 Upgrade + Dependency Audit (Issue #146) |
+| #204 | User Feedback UX-Fixes – Streak/Score Tooltip, Settings Layout (Issue #203) |
+| #200 | Täglicher Streak-Tracker (Issue #185) — StreakData, 🔥 Header-Badge, Abend-Warnung |
+| #196 | fix: practiceModeFeedback im Übungsmodus in GameCard anzeigen |
 | #192 | Adaptives Lernen – Übungsmodus (PRACTICE) mit Schwachstellen-Fokus (Issue #188) |
-| #183 | CI/CD ci-cd.yml-Startup-Failure beheben (Issue #152-Regression) |
-| #177 | TypeScript-Fixes + isValidSessionRecord Enum-Validierung + Challenge-Ops Fix |
 
 ---
 
@@ -104,13 +104,15 @@ npm run test:coverage # Coverage
 
 | Datei | Inhalt |
 |-------|--------|
-| `utils/constants.ts` | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS |
-| `utils/theme.ts` | `getThemeColors(isDarkMode)` |
-| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `FOUR_WEEKS_MS` |
+| `utils/constants.ts` | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS, `THEMES` (alle 5 Farbthemes mit LIGHT/DARK-Varianten) |
+| `utils/theme.ts` | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'` |
+| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `saveThemeName` / `getThemeName`, `FOUR_WEEKS_MS` |
 | `utils/animations.ts` | `prefersReducedMotion()` — liest Accessibility-Einstellung |
-| `types/game.ts` | ThemeColors, GameState, Enums, SessionRecord |
+| `types/game.ts` | ThemeColors (inkl. `gradientPrimary`), GameState, Enums, SessionRecord, `ThemeName` |
 | `i18n/translations.ts` | DE/EN Übersetzungen, `TranslationStrings`-Interface |
 | `hooks/useGameLogic.ts` | Gesamte Spiellogik, `onSessionComplete`-Callback |
+| `hooks/usePreferences.ts` | Persistierte User-Einstellungen (Sprache, ThemeMode, ThemeName) |
+| `components/PersonalizeModal.tsx` | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache) |
 | `components/ParentDashboard.tsx` | Eltern-Dashboard Modal (Beta) |
 | `components/GameCard.tsx` | Hauptspielansicht (alle 3 Antwortmodi) |
 | `styles/modalStyles.ts` | Gemeinsame Modal-Styles |
@@ -168,8 +170,22 @@ npm run test:coverage # Coverage
 
 ---
 
+## Visuelle Themes / App-Skins — Hinweise
+
+- `ThemeName = 'sunset' | 'ocean' | 'space' | 'forest' | 'candy'` in `types/game.ts`
+- `THEMES` in `utils/constants.ts`: jedes Theme hat `label`, `LIGHT` und `DARK` (je alle ThemeColors-Felder + `GRADIENT_PRIMARY`)
+- `getThemeColors(isDarkMode, themeName?)` — zweiter Parameter optional, Default `'sunset'`; ungültiger Name fällt auf sunset zurück
+- Storage Key: `app-theme-name` (`STORAGE_KEYS.THEME_NAME`)
+- `saveThemeName` / `getThemeName` in `utils/storage.ts`; `getThemeName` validiert gegen bekannte Werte, gibt `null` zurück wenn unbekannt
+- `usePreferences` lädt `getThemeName()` beim Mount, speichert bei Änderung automatisch
+- `useTheme(themeMode, themeName)` — erhält `themeName` als zweiten Parameter von `App.tsx`
+- `ThemeColors.gradientPrimary: readonly [string, string]` — alle Komponenten nutzen diesen statt statischer Konstanten
+- Aktive Zustände (Chips, Buttons, Badges) verwenden `colors.gradientPrimary[0]` inline (kein statisches `ACTIVE_COLOR`)
+- `PersonalizeModal` zeigt Gradient-Swatches; aktiver Swatch-Border nutzt `themeData.LIGHT.GRADIENT_PRIMARY[0]` (theme-spezifisch)
+
+---
+
 ## Offene TODOs / Bekannte Einschränkungen
 
-- Größere Dependency-Updates verschoben: react-native 0.84, jest 30, react 19.2.4, async-storage 3.x
-- jest 30 würde 4x low Vulnerabilities (jest-environment-jsdom) beheben → Issue #146
+- Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 - Reanimated wurde durch `Animated` core ersetzt (Web-Kompatibilität) — Issue #131
