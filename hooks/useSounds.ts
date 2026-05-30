@@ -18,8 +18,8 @@ function playWebTone(config: NoteConfig[], volume: number): void {
   if (typeof window === 'undefined') return;
   try {
     const AudioCtx =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      window.AudioContext || // platform-safe
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext; // platform-safe
     if (!AudioCtx) return;
     const ctx = new AudioCtx();
     let t = ctx.currentTime;
