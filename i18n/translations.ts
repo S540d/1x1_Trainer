@@ -109,6 +109,8 @@ export interface TranslationStrings {
   scoreInfoBody: string;
   parentWeakTasks: string;
   parentWeakTasksEmpty: string;
+  chartSessions: string;
+  chartErrorRate: string;
   // Badges
   badges: string;
   badgesMenu: string;
@@ -264,6 +266,8 @@ export const translations: Record<Language, TranslationStrings> = {
     scoreInfoBody: 'Your score for this round',
     parentWeakTasks: 'Weak Areas (Top 5)',
     parentWeakTasksEmpty: 'No weak areas identified yet.',
+    chartSessions: 'Sessions · 14 days',
+    chartErrorRate: 'Error rate · 14 days',
     // Badges
     badges: 'Achievements',
     badgesMenu: 'Achievements',
@@ -417,6 +421,8 @@ export const translations: Record<Language, TranslationStrings> = {
     scoreInfoBody: 'Dein Punktestand in dieser Runde',
     parentWeakTasks: 'Schwachstellen (Top 5)',
     parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
+    chartSessions: 'Einheiten · 14 Tage',
+    chartErrorRate: 'Fehlerquote · 14 Tage',
     // Badges
     badges: 'Abzeichen',
     badgesMenu: 'Abzeichen',
