@@ -356,6 +356,59 @@ describe('usePreferences Hook', () => {
     });
   });
 
+  describe('Theme Name Management', () => {
+    it('should default to sunset when no saved theme name', async () => {
+      mockGetThemeName.mockResolvedValue(null);
+
+      const { result } = renderHook(() => usePreferences());
+
+      await waitFor(() => {
+        expect(result.current.isLoaded).toBe(true);
+      });
+
+      expect(result.current.themeName).toBe('sunset');
+    });
+
+    it('should load a saved theme name on mount', async () => {
+      mockGetThemeName.mockResolvedValue('ocean');
+
+      const { result } = renderHook(() => usePreferences());
+
+      await waitFor(() => {
+        expect(result.current.isLoaded).toBe(true);
+      });
+
+      expect(result.current.themeName).toBe('ocean');
+    });
+
+    it('should call saveThemeName when themeName changes after load', async () => {
+      const { result } = renderHook(() => usePreferences());
+
+      await waitFor(() => {
+        expect(result.current.isLoaded).toBe(true);
+      });
+
+      act(() => {
+        result.current.setThemeName('forest');
+      });
+
+      await waitFor(() => {
+        expect(mockSaveThemeName).toHaveBeenCalledWith('forest');
+      });
+    });
+
+    it('should not call saveThemeName before isLoaded', async () => {
+      const { result } = renderHook(() => usePreferences());
+
+      expect(result.current.isLoaded).toBe(false);
+      expect(mockSaveThemeName).not.toHaveBeenCalled();
+
+      await waitFor(() => {
+        expect(result.current.isLoaded).toBe(true);
+      });
+    });
+  });
+
   describe('Operation Selection', () => {
     it('should load saved operations', async () => {
       mockGetOperations.mockResolvedValue([Operation.ADDITION, Operation.MULTIPLICATION]);

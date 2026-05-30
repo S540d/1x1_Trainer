@@ -8,7 +8,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors, Language, ThemeMode, ThemeName } from '../types/game';
 import { translations } from '../i18n/translations';
-import { THEMES } from '../utils/constants';
+import { THEMES, DESIGN_TOKENS } from '../utils/constants';
 import { Chip } from './Chip';
 
 interface PersonalizeModalProps {
@@ -95,10 +95,14 @@ export function PersonalizeModal({
             {(Object.keys(THEMES) as ThemeName[]).map((name) => {
               const themeData = THEMES[name];
               const isActive = themeName === name;
+              const swatchBorderColor = themeData.LIGHT.GRADIENT_PRIMARY[0];
               return (
                 <TouchableOpacity
                   key={name}
-                  style={[styles.themeSwatchWrapper, isActive && styles.themeSwatchActive]}
+                  style={[
+                    styles.themeSwatchWrapper,
+                    isActive && { borderColor: swatchBorderColor },
+                  ]}
                   onPress={() => onThemeNameChange(name)}
                   activeOpacity={0.75}
                 >
@@ -158,7 +162,7 @@ const styles = StyleSheet.create({
     top: 60,
     right: 16,
     left: 16,
-    borderRadius: 28,
+    borderRadius: DESIGN_TOKENS.NUMPAD_BORDER_RADIUS,
     elevation: 12,
     shadowColor: '#667eea',
     shadowOffset: { width: 0, height: 4 },
@@ -176,7 +180,7 @@ const styles = StyleSheet.create({
   },
   settingsMenuTitle: {
     fontSize: 18,
-    fontFamily: 'Nunito_700Bold',
+    fontFamily: DESIGN_TOKENS.FONT_UI,
     color: '#fff',
     letterSpacing: 0.3,
   },
@@ -186,7 +190,7 @@ const styles = StyleSheet.create({
   },
   settingsMenuCloseButtonText: {
     fontSize: 18,
-    fontFamily: 'Nunito_700Bold',
+    fontFamily: DESIGN_TOKENS.FONT_UI,
     color: '#fff',
   },
   settingsSection: {
@@ -195,7 +199,7 @@ const styles = StyleSheet.create({
   },
   settingsSectionTitle: {
     fontSize: 11,
-    fontFamily: 'Nunito_700Bold',
+    fontFamily: DESIGN_TOKENS.FONT_UI,
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.08,
@@ -221,9 +225,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  themeSwatchActive: {
-    borderColor: '#667eea',
-  },
   themeSwatch: {
     width: 44,
     height: 44,
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
   },
   themeLabel: {
     fontSize: 10,
-    fontFamily: 'Nunito_700Bold',
+    fontFamily: DESIGN_TOKENS.FONT_UI,
     textAlign: 'center',
     maxWidth: 52,
   },
