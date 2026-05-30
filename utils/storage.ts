@@ -439,6 +439,7 @@ export const saveSoundsVolume = async (volume: number): Promise<void> => {
 
 export const getSoundsVolume = async (): Promise<number | null> => {
   const value = await getStorageItem(STORAGE_KEYS.SOUNDS_VOLUME);
+  if (value === null) return null;
   const n = Number(value);
   if (!Number.isNaN(n) && n >= 0 && n <= 100) return n;
   return null;

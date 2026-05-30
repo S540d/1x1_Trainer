@@ -72,7 +72,11 @@ export function useSounds(soundEnabled: boolean, soundVolume: number) {
         if (cancelled) break;
         try {
           const { sound } = await Audio.Sound.createAsync(src, { shouldPlay: false });
-          if (!cancelled) soundRefs.current[event] = sound;
+          if (cancelled) {
+            sound.unloadAsync().catch(() => {});
+            break;
+          }
+          soundRefs.current[event] = sound;
         } catch {
           /* skip individual sound that fails to load */
         }
