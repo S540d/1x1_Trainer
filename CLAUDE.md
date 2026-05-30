@@ -72,7 +72,7 @@ npm run test:coverage # Coverage
 
 ### Jest-Konfiguration — Fallstricke
 
-- `expo-linear-gradient`, `expo-font`, `expo-status-bar`, `@expo-google-fonts` müssen in `transformIgnorePatterns` **und** `moduleNameMapper` eingetragen sein
+- `expo-linear-gradient`, `expo-font`, `expo-status-bar`, `expo-av`, `@expo-google-fonts` müssen in `transformIgnorePatterns` **und** `moduleNameMapper` eingetragen sein
 - Neue Expo-Pakete immer in **beiden** Listen ergänzen
 
 ---
@@ -81,14 +81,15 @@ npm run test:coverage # Coverage
 
 - Version: **1.3.6** / versionCode 24
 - Tests: 485 passed, 3 skipped, 14/14 Suites grün
-- Branches: `testing` vorn (`bc20cfb`); `staging` und `main` noch auf `1b551ea`
-- Offene Issues: #165, #156, #186, #187, #100, #96
+- Branches: `testing` vorn (`49a6d9e`); `staging` und `main` noch auf `1b551ea`
+- Offene Issues: #165, #156, #187, #100, #96
 - Security: 17 Vulnerabilities (nach jest 30 Upgrade, alle build-time über Expo-Tooling)
 
 ### Zuletzt gemergt (testing)
 
 | PR  | Was |
 |-----|-----|
+| #210 | Sound-Effekte – useSounds-Hook, 5 WAV-Assets, expo-av, UI in PersonalizeModal (Issue #186) |
 | #208 | Visuelle Themes / App-Skins – 5 Farbthemes (Issue #190) |
 | #207 | Fortschritts-Charts im Parent Dashboard – Sessions + Fehlerquote (Issue #191) |
 | #206 | React 19 act()-Warnings in usePreferences.test.tsx behoben (Issue #160) |
@@ -106,13 +107,16 @@ npm run test:coverage # Coverage
 |-------|--------|
 | `utils/constants.ts` | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS, `THEMES` (alle 5 Farbthemes mit LIGHT/DARK-Varianten) |
 | `utils/theme.ts` | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'` |
-| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `saveThemeName` / `getThemeName`, `FOUR_WEEKS_MS` |
+| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `saveThemeName` / `getThemeName`, `saveSoundsEnabled` / `getSoundsEnabled`, `saveSoundsVolume` / `getSoundsVolume`, `FOUR_WEEKS_MS` |
 | `utils/animations.ts` | `prefersReducedMotion()` — liest Accessibility-Einstellung |
 | `types/game.ts` | ThemeColors (inkl. `gradientPrimary`), GameState, Enums, SessionRecord, `ThemeName` |
 | `i18n/translations.ts` | DE/EN Übersetzungen, `TranslationStrings`-Interface |
 | `hooks/useGameLogic.ts` | Gesamte Spiellogik, `onSessionComplete`-Callback |
-| `hooks/usePreferences.ts` | Persistierte User-Einstellungen (Sprache, ThemeMode, ThemeName) |
-| `components/PersonalizeModal.tsx` | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache) |
+| `hooks/usePreferences.ts` | Persistierte User-Einstellungen (Sprache, ThemeMode, ThemeName, soundEnabled, soundVolume) |
+| `hooks/useSounds.ts` | Sound-Hook: `playSound(event)` — Web: AudioContext-Oszillatoren, Native: expo-av + WAV-Assets |
+| `assets/sounds/` | WAV-Assets: correct / incorrect / perfect / level_up / badge_unlock (je 8–17 KB) |
+| `scripts/generate-sounds.js` | Generator für WAV-Assets (`node scripts/generate-sounds.js`) |
+| `components/PersonalizeModal.tsx` | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache, Sound An/Aus + Lautstärke) |
 | `components/ParentDashboard.tsx` | Eltern-Dashboard Modal (Beta) |
 | `components/GameCard.tsx` | Hauptspielansicht (alle 3 Antwortmodi) |
 | `styles/modalStyles.ts` | Gemeinsame Modal-Styles |
@@ -189,3 +193,14 @@ npm run test:coverage # Coverage
 
 - Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 - Reanimated wurde durch `Animated` core ersetzt (Web-Kompatibilität) — Issue #131
+- Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
+
+## Sound-Effekte — Hinweise
+
+- `SoundEvent = 'correct' | 'incorrect' | 'perfect' | 'level_up' | 'badge_unlock'`
+- Storage Keys: `app-sounds-enabled` / `app-sounds-volume` (Default: true / 75)
+- Web: `AudioContext`-Oszillatoren (`playWebTone`), keine Dateien nötig
+- Native: `expo-av` + WAV-Assets aus `assets/sounds/`; `playsInSilentModeIOS: false`
+- Linting: `window.*` in `useSounds.ts` muss `// platform-safe` Kommentar tragen (CI-Check)
+- WAV-Assets bei Bedarf neu generieren: `node scripts/generate-sounds.js`
+- Hintergrundmusik: bewusst nicht implementiert (erfordert Lizenz-freie Loop-Audiodatei), separates Follow-up
