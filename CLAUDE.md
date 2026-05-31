@@ -51,7 +51,7 @@ Beim Erhöhen der Version IMMER alle drei Stellen aktualisieren:
 
 ## Build-Workflow (Übersicht)
 
-- **APK (Test):** Lokal bauen — Details in `docs/private/CLAUDE.md`
+- **APK (Test):** ⚠️ **Lokaler Build aktuell defekt** (expo-av/SDK-55-Inkompatibilität, Issue #214) → per GitHub Actions: `gh workflow run build-android.yml --ref staging -f profile=preview -f bump=none`
 - **AAB (Play Store):** GitHub Actions → `Build Android` → profile: `production`
 - Workflow: `.github/workflows/build-android.yml`
 
@@ -80,24 +80,21 @@ npm run test:coverage # Coverage
 
 ## Aktueller Stand (2026-05-31)
 
-- Version: **1.3.6** / versionCode 26
-- Tests: 494 passed, 3 skipped, 15/15 Suites grün
-- Branches: `testing` und `staging` synchron (`3a22613`); `main` noch auf `cac8a3c`
-- Offene PRs: #212 (staging → main, bereit zum Merge nach Staging-Tests)
-- Offene Issues: #165, #156, #187, #100, #96
-- Security: 17 Vulnerabilities (alle build-time über Expo-Tooling)
+- Version: **1.3.7** / versionCode 27
+- Tests: 497 total (494 passed, 3 skipped), 15/15 Suites grün
+- Branches: `staging` vorn (`c640120`); `main` noch auf `cac8a3c` (v1.3.6)
+- Offene PRs: #212 (staging → main, wartet auf App-Test auf Gerät)
+- Offene Issues: #214 (expo-av→expo-audio), #156, #187, #131, #100, #96
+- APK v1.3.7 auf Testgerät installiert (via GitHub Actions preview-Build)
 
 ### Zuletzt gemergt / gepusht
 
-| PR / Branch | Was |
+| PR / Commit | Was |
 |-------------|-----|
-| #212 (offen) | staging → main: wartet auf Staging-Tests |
+| `c640120` | fix: expo-av auf ~16.0.8 (SDK-55-kompatibel; 15.0.2 brach lokalen Build) |
+| `3a1d43c` | chore: Version auf 1.3.7 / versionCode 27 |
+| #212 (offen) | staging → main: wartet auf App-Test |
 | #211 | testing → staging: Sound-Effekte, Visuelle Themes, Charts, UX, Jest 30 |
-| Hotfix | Accessibility-Labels Score/Streak-Badge (Header.tsx), PersonalizeModal ScrollView-Höhe, useSounds-Tests (9 Tests), .wav-Mock in Jest |
-| Hotfix | Fehlerquote-Chart zeigt 0%-Tage (barH=0 → 2px); useSounds überspringt AudioContext bei volume=0 |
-| #210 | Sound-Effekte – useSounds-Hook, 5 WAV-Assets, expo-av, UI in PersonalizeModal (Issue #186) |
-| #208 | Visuelle Themes / App-Skins – 5 Farbthemes (Issue #190) |
-| #207 | Fortschritts-Charts im Parent Dashboard – Sessions + Fehlerquote (Issue #191) |
 
 ---
 
@@ -138,6 +135,7 @@ npm run test:coverage # Coverage
 - **Number Sequence Grid:** 2-Spalten-Grid (`width: '48%'`, `flexWrap: 'wrap'`) für kleine Bildschirme
 - **Merge-Konflikt staging→main:** temporäre Workflow-Dateien können kollidieren → staging-Version bevorzugen
 - **Expo-Pakete in Jest:** Neue Pakete immer in `transformIgnorePatterns` **und** `moduleNameMapper` eintragen
+- **expo-av lokaler Build bricht auf SDK 55:** `resolveView` aus Legacy-UIManager entfernt → APK per GitHub Actions (`profile=preview`). Nachhaltige Lösung: Migration auf `expo-audio` (Issue #214)
 
 ---
 
@@ -191,6 +189,7 @@ npm run test:coverage # Coverage
 
 ## Offene TODOs / Bekannte Einschränkungen
 
+- **expo-av → expo-audio Migration ausstehend** — lokaler Build bis dahin defekt (Issue #214)
 - Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 - Reanimated wurde durch `Animated` core ersetzt (Web-Kompatibilität) — Issue #131
 
