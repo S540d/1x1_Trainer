@@ -51,7 +51,7 @@ Beim Erhöhen der Version IMMER alle drei Stellen aktualisieren:
 
 ## Build-Workflow (Übersicht)
 
-- **APK (Test):** ⚠️ **Lokaler Build aktuell defekt** (expo-av/SDK-55-Inkompatibilität, Issue #214) → per GitHub Actions: `gh workflow run build-android.yml --ref staging -f profile=preview -f bump=none`
+- **APK (Test):** Lokaler Build wieder lauffähig seit expo-audio-Migration (Issue #214, PR #215). **Wichtig: JDK 17 verwenden** (`export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home`) — Default-Java ist 21/25 und bricht den Gradle-Build. Alternativ per GitHub Actions: `gh workflow run build-android.yml --ref staging -f profile=preview -f bump=none`
 - **AAB (Play Store):** GitHub Actions → `Build Android` → profile: `production`
 - Workflow: `.github/workflows/build-android.yml`
 
@@ -110,7 +110,7 @@ npm run test:coverage # Coverage
 | `i18n/translations.ts` | DE/EN Übersetzungen, `TranslationStrings`-Interface |
 | `hooks/useGameLogic.ts` | Gesamte Spiellogik, `onSessionComplete`-Callback |
 | `hooks/usePreferences.ts` | Persistierte User-Einstellungen (Sprache, ThemeMode, ThemeName, soundEnabled, soundVolume) |
-| `hooks/useSounds.ts` | Sound-Hook: `playSound(event)` — Web: AudioContext-Oszillatoren, Native: expo-av + WAV-Assets |
+| `hooks/useSounds.ts` | Sound-Hook: `playSound(event)` — Web: AudioContext-Oszillatoren, Native: expo-audio (`createAudioPlayer`) + WAV-Assets |
 | `assets/sounds/` | WAV-Assets: correct / incorrect / perfect / level_up / badge_unlock (je 8–17 KB) |
 | `scripts/generate-sounds.js` | Generator für WAV-Assets (`node scripts/generate-sounds.js`) |
 | `components/PersonalizeModal.tsx` | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache, Sound An/Aus + Lautstärke) |
@@ -135,7 +135,7 @@ npm run test:coverage # Coverage
 - **Number Sequence Grid:** 2-Spalten-Grid (`width: '48%'`, `flexWrap: 'wrap'`) für kleine Bildschirme
 - **Merge-Konflikt staging→main:** temporäre Workflow-Dateien können kollidieren → staging-Version bevorzugen
 - **Expo-Pakete in Jest:** Neue Pakete immer in `transformIgnorePatterns` **und** `moduleNameMapper` eintragen
-- **expo-av lokaler Build bricht auf SDK 55:** `resolveView` aus Legacy-UIManager entfernt → APK per GitHub Actions (`profile=preview`). Nachhaltige Lösung: Migration auf `expo-audio` (Issue #214)
+- **expo-audio statt expo-av (gelöst, Issue #214 / PR #215):** expo-av brach auf SDK 55 (`resolveView` aus Legacy-UIManager entfernt). Migration auf `expo-audio ~55.0.14` behebt den lokalen Build. **JDK 17 zwingend** für `./gradlew assembleRelease` — Default-Java (21/25) bricht ab.
 
 ---
 
@@ -189,7 +189,7 @@ npm run test:coverage # Coverage
 
 ## Offene TODOs / Bekannte Einschränkungen
 
-- **expo-av → expo-audio Migration ausstehend** — lokaler Build bis dahin defekt (Issue #214)
+- ✅ **expo-av → expo-audio Migration erledigt** (Issue #214 / PR #215) — lokaler Build wieder lauffähig (mit JDK 17)
 - Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 - Reanimated wurde durch `Animated` core ersetzt (Web-Kompatibilität) — Issue #131
 
@@ -198,7 +198,7 @@ npm run test:coverage # Coverage
 - `SoundEvent = 'correct' | 'incorrect' | 'perfect' | 'level_up' | 'badge_unlock'`
 - Storage Keys: `app-sounds-enabled` / `app-sounds-volume` (Default: true / 75)
 - Web: `AudioContext`-Oszillatoren (`playWebTone`), keine Dateien nötig
-- Native: `expo-av` + WAV-Assets aus `assets/sounds/`; `playsInSilentModeIOS: false`
+- Native: `expo-audio` (`createAudioPlayer` → `player.seekTo(0)` + `player.play()`, `player.volume`, `player.remove()`) + WAV-Assets aus `assets/sounds/`; `setAudioModeAsync({ playsInSilentMode: false })`
 - Linting: `window.*` in `useSounds.ts` muss `// platform-safe` Kommentar tragen (CI-Check)
 - WAV-Assets bei Bedarf neu generieren: `node scripts/generate-sounds.js`
 - Hintergrundmusik: bewusst nicht implementiert (erfordert Lizenz-freie Loop-Audiodatei), separates Follow-up
