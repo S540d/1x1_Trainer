@@ -217,6 +217,7 @@ const styles = StyleSheet.create({
     top: 60,
     right: 16,
     left: 16,
+    bottom: 20,
     borderRadius: DESIGN_TOKENS.NUMPAD_BORDER_RADIUS,
     elevation: 12,
     shadowColor: '#667eea',

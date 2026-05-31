@@ -67,6 +67,8 @@ export function Header({
           <TouchableOpacity
             onPress={() => Alert.alert(t.scoreInfoTitle, t.scoreInfoBody)}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={t.scoreInfoTitle}
           >
             <LinearGradient
               colors={DESIGN_TOKENS.GRADIENT_GOLD}
@@ -84,6 +86,8 @@ export function Header({
           onPress={() => Alert.alert(t.streakInfoTitle, `${currentStreak} ${t.streakInfoBody}`)}
           activeOpacity={0.7}
           style={styles.streakBadge}
+          accessibilityRole="button"
+          accessibilityLabel={t.streakInfoTitle}
         >
           <Text style={styles.streakText}>🔥 {currentStreak}</Text>
         </TouchableOpacity>
