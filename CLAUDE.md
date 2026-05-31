@@ -51,7 +51,7 @@ Beim Erhöhen der Version IMMER alle drei Stellen aktualisieren:
 
 ## Build-Workflow (Übersicht)
 
-- **APK (Test):** Lokal bauen — Details in `docs/private/CLAUDE.md`
+- **APK (Test):** ⚠️ **Lokaler Build aktuell defekt** (expo-av/SDK-55-Inkompatibilität, Issue #214) → per GitHub Actions: `gh workflow run build-android.yml --ref staging -f profile=preview -f bump=none`
 - **AAB (Play Store):** GitHub Actions → `Build Android` → profile: `production`
 - Workflow: `.github/workflows/build-android.yml`
 
@@ -74,30 +74,27 @@ npm run test:coverage # Coverage
 
 - `expo-linear-gradient`, `expo-font`, `expo-status-bar`, `expo-av`, `@expo-google-fonts` müssen in `transformIgnorePatterns` **und** `moduleNameMapper` eingetragen sein
 - Neue Expo-Pakete immer in **beiden** Listen ergänzen
+- Binäre Assets (`.wav`, `.mp3` etc.) brauchen `moduleNameMapper`-Eintrag → `__mocks__/fileMock.js` (gibt `1` zurück)
 
 ---
 
-## Aktueller Stand (2026-05-30)
+## Aktueller Stand (2026-05-31)
 
-- Version: **1.3.6** / versionCode 24
-- Tests: 485 passed, 3 skipped, 14/14 Suites grün
-- Branches: `testing` vorn (`49a6d9e`); `staging` und `main` noch auf `1b551ea`
-- Offene Issues: #165, #156, #187, #100, #96
-- Security: 17 Vulnerabilities (nach jest 30 Upgrade, alle build-time über Expo-Tooling)
+- Version: **1.3.7** / versionCode 27
+- Tests: 497 total (494 passed, 3 skipped), 15/15 Suites grün
+- Branches: `staging` vorn (`c640120`); `main` noch auf `cac8a3c` (v1.3.6)
+- Offene PRs: #212 (staging → main, wartet auf App-Test auf Gerät)
+- Offene Issues: #214 (expo-av→expo-audio), #156, #187, #131, #100, #96
+- APK v1.3.7 auf Testgerät installiert (via GitHub Actions preview-Build)
 
-### Zuletzt gemergt (testing)
+### Zuletzt gemergt / gepusht
 
-| PR  | Was |
-|-----|-----|
-| #210 | Sound-Effekte – useSounds-Hook, 5 WAV-Assets, expo-av, UI in PersonalizeModal (Issue #186) |
-| #208 | Visuelle Themes / App-Skins – 5 Farbthemes (Issue #190) |
-| #207 | Fortschritts-Charts im Parent Dashboard – Sessions + Fehlerquote (Issue #191) |
-| #206 | React 19 act()-Warnings in usePreferences.test.tsx behoben (Issue #160) |
-| #205 | Jest 30 Upgrade + Dependency Audit (Issue #146) |
-| #204 | User Feedback UX-Fixes – Streak/Score Tooltip, Settings Layout (Issue #203) |
-| #200 | Täglicher Streak-Tracker (Issue #185) — StreakData, 🔥 Header-Badge, Abend-Warnung |
-| #196 | fix: practiceModeFeedback im Übungsmodus in GameCard anzeigen |
-| #192 | Adaptives Lernen – Übungsmodus (PRACTICE) mit Schwachstellen-Fokus (Issue #188) |
+| PR / Commit | Was |
+|-------------|-----|
+| `c640120` | fix: expo-av auf ~16.0.8 (SDK-55-kompatibel; 15.0.2 brach lokalen Build) |
+| `3a1d43c` | chore: Version auf 1.3.7 / versionCode 27 |
+| #212 (offen) | staging → main: wartet auf App-Test |
+| #211 | testing → staging: Sound-Effekte, Visuelle Themes, Charts, UX, Jest 30 |
 
 ---
 
@@ -138,6 +135,7 @@ npm run test:coverage # Coverage
 - **Number Sequence Grid:** 2-Spalten-Grid (`width: '48%'`, `flexWrap: 'wrap'`) für kleine Bildschirme
 - **Merge-Konflikt staging→main:** temporäre Workflow-Dateien können kollidieren → staging-Version bevorzugen
 - **Expo-Pakete in Jest:** Neue Pakete immer in `transformIgnorePatterns` **und** `moduleNameMapper` eintragen
+- **expo-av lokaler Build bricht auf SDK 55:** `resolveView` aus Legacy-UIManager entfernt → APK per GitHub Actions (`profile=preview`). Nachhaltige Lösung: Migration auf `expo-audio` (Issue #214)
 
 ---
 
@@ -191,9 +189,9 @@ npm run test:coverage # Coverage
 
 ## Offene TODOs / Bekannte Einschränkungen
 
+- **expo-av → expo-audio Migration ausstehend** — lokaler Build bis dahin defekt (Issue #214)
 - Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 - Reanimated wurde durch `Animated` core ersetzt (Web-Kompatibilität) — Issue #131
-- Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 
 ## Sound-Effekte — Hinweise
 
