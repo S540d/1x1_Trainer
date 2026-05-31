@@ -33,6 +33,7 @@ module.exports = {
     '^expo-status-bar$': '<rootDir>/__mocks__/expo-status-bar.js',
     '^@expo-google-fonts/(.*)$': '<rootDir>/__mocks__/@expo-google-fonts.js',
     '^expo-av$': '<rootDir>/__mocks__/expo-av.js',
+    '\\.(wav|mp3|m4a|ogg)$': '<rootDir>/__mocks__/fileMock.js',
   },
   transformIgnorePatterns: [
     'node_modules/(?!(expo-localization|expo-linear-gradient|expo-font|expo-status-bar|expo-av|@expo-google-fonts)/)',
