@@ -27,6 +27,7 @@ jest.mock('../utils/theme', () => ({
     textSecondary: isDarkMode ? '#9CA3AF' : '#6B7280',
     settingsOverlay: 'rgba(0,0,0,0.5)',
     settingsMenu: isDarkMode ? '#1F2937' : '#FFFFFF',
+    gradientPrimary: ['#667eea', '#764ba2'],
   })),
 }));
 

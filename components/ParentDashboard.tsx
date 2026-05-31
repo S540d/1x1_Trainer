@@ -39,9 +39,108 @@ interface ParentDashboardProps {
     parentStreakDays: string;
     parentWeakTasks: string;
     parentWeakTasksEmpty: string;
+    chartSessions: string;
+    chartErrorRate: string;
     ok: string;
   };
 }
+
+interface DayChartData {
+  label: string;
+  sessions: number;
+  avgErrorRate: number | null;
+}
+
+function getLast14Days(records: SessionRecord[]): DayChartData[] {
+  const result: DayChartData[] = [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (let i = 13; i >= 0; i--) {
+    const dayStart = new Date(today);
+    dayStart.setDate(today.getDate() - i);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayStart.getDate() + 1);
+
+    const dayRecords = records.filter(
+      r => r.timestamp >= dayStart.getTime() && r.timestamp < dayEnd.getTime()
+    );
+
+    result.push({
+      label: dayStart.getDate().toString(),
+      sessions: dayRecords.length,
+      avgErrorRate:
+        dayRecords.length > 0
+          ? dayRecords.reduce((s, r) => s + r.errorRate, 0) / dayRecords.length
+          : null,
+    });
+  }
+
+  return result;
+}
+
+function MiniBarChart({
+  data,
+  valueKey,
+  maxValue,
+  getBarColor,
+  colors,
+}: {
+  data: DayChartData[];
+  valueKey: 'sessions' | 'errorRate';
+  maxValue: number;
+  getBarColor: (d: DayChartData) => string;
+  colors: ThemeColors;
+}) {
+  const BAR_H = 44;
+
+  return (
+    <View>
+      <View style={{ flexDirection: 'row', height: BAR_H, alignItems: 'flex-end' }}>
+        {data.map((d, i) => {
+          const raw =
+            valueKey === 'sessions'
+              ? d.sessions
+              : d.avgErrorRate !== null
+              ? d.avgErrorRate * 100
+              : 0;
+          const hasData = valueKey === 'sessions' ? d.sessions > 0 : d.avgErrorRate !== null;
+          const barH = maxValue > 0 ? Math.round((raw / maxValue) * BAR_H) : 0;
+
+          return (
+            <View key={i} style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-end', height: BAR_H }}>
+              <View
+                style={{
+                  width: '60%',
+                  height: hasData ? (barH > 0 ? Math.max(3, barH) : 2) : 0,
+                  backgroundColor: hasData ? getBarColor(d) : 'transparent',
+                  borderRadius: 3,
+                }}
+              />
+            </View>
+          );
+        })}
+      </View>
+      {/* X-axis labels: show 1st, middle (7th), last (14th) */}
+      <View style={{ flexDirection: 'row', marginTop: 3 }}>
+        {data.map((d, i) => (
+          <View key={i} style={{ flex: 1, alignItems: 'center' }}>
+            {(i === 0 || i === 6 || i === 13) && (
+              <Text style={[chartStyles.axisLabel, { color: colors.textSecondary }]}>{d.label}</Text>
+            )}
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+const chartStyles = StyleSheet.create({
+  axisLabel: {
+    fontSize: 9,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+  },
+});
 
 function formatTime(ts: number): string {
   const d = new Date(ts);
@@ -112,6 +211,9 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
   }, [visible]);
 
   const grouped = groupByDay(records);
+  const chartData = getLast14Days(records);
+  const hasChartData = chartData.some(d => d.sessions > 0);
+  const maxSessions = Math.max(1, ...chartData.map(d => d.sessions));
 
   const recentRecords = records.filter(r => Date.now() - r.timestamp < FOUR_WEEKS_MS);
   const avgErrorRate =
@@ -186,39 +288,64 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
             </View>
           )}
 
-          {/* Weak Tasks Section */}
-          {!loading && weakTasks.length > 0 && (
-            <View style={[styles.weakSection, { borderColor: colors.border }]}>
-              <Text style={[styles.weakTitle, { color: colors.textSecondary }]}>{t.parentWeakTasks}</Text>
-              {weakTasks.map((s, i) => {
-                  const total = s.correctCount + s.errorCount;
-                  const rate = total > 0 ? s.errorCount / total : 0;
-                  return (
-                    <View key={`${s.num1}-${s.num2}-${s.operation}-${i}`} style={styles.weakRow}>
-                      <Text style={[styles.weakTask, { color: colors.text }]}>
-                        {s.num1} {OP_SYMBOL[s.operation]} {s.num2}
-                      </Text>
-                      <View style={[styles.errorBadge, { backgroundColor: errorRateColor(rate) + '22' }]}>
-                        <Text style={[styles.errorBadgeText, { color: errorRateColor(rate) }]}>
-                          {Math.round(rate * 100)}%
-                        </Text>
-                      </View>
-                      <Text style={[styles.weakAttempts, { color: colors.textSecondary }]}>
-                        {total}×
-                      </Text>
-                    </View>
-                  );
-                })}
-            </View>
-          )}
-
           {/* Content */}
           {loading ? (
-            <ActivityIndicator style={styles.loader} color={DESIGN_TOKENS.GRADIENT_PRIMARY[0]} />
+            <ActivityIndicator style={styles.loader} color={colors.gradientPrimary[0]} />
           ) : records.length === 0 ? (
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t.parentNoData}</Text>
           ) : (
             <ScrollView style={styles.list} showsVerticalScrollIndicator={false}>
+              {/* Charts */}
+              {hasChartData && (
+                <View style={[styles.chartsSection, { borderColor: colors.border }]}>
+                  <Text style={[styles.chartTitle, { color: colors.textSecondary }]}>{t.chartSessions}</Text>
+                  <MiniBarChart
+                    data={chartData}
+                    valueKey="sessions"
+                    maxValue={maxSessions}
+                    getBarColor={() => colors.gradientPrimary[0]}
+                    colors={colors}
+                  />
+                  <Text style={[styles.chartTitle, styles.chartTitleSpaced, { color: colors.textSecondary }]}>
+                    {t.chartErrorRate}
+                  </Text>
+                  <MiniBarChart
+                    data={chartData}
+                    valueKey="errorRate"
+                    maxValue={100}
+                    getBarColor={d => (d.avgErrorRate !== null ? errorRateColor(d.avgErrorRate) : 'transparent')}
+                    colors={colors}
+                  />
+                </View>
+              )}
+
+              {/* Weak tasks */}
+              {weakTasks.length > 0 && (
+                <View style={[styles.weakSection, { borderColor: colors.border }]}>
+                  <Text style={[styles.weakTitle, { color: colors.textSecondary }]}>{t.parentWeakTasks}</Text>
+                  {weakTasks.map((s, i) => {
+                    const total = s.correctCount + s.errorCount;
+                    const rate = total > 0 ? s.errorCount / total : 0;
+                    return (
+                      <View key={`${s.num1}-${s.num2}-${s.operation}-${i}`} style={styles.weakRow}>
+                        <Text style={[styles.weakTask, { color: colors.text }]}>
+                          {s.num1} {OP_SYMBOL[s.operation]} {s.num2}
+                        </Text>
+                        <View style={[styles.errorBadge, { backgroundColor: errorRateColor(rate) + '22' }]}>
+                          <Text style={[styles.errorBadgeText, { color: errorRateColor(rate) }]}>
+                            {Math.round(rate * 100)}%
+                          </Text>
+                        </View>
+                        <Text style={[styles.weakAttempts, { color: colors.textSecondary }]}>
+                          {total}×
+                        </Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+
+              {/* Session log */}
               {grouped.map(({ label, entries }) => (
                 <View key={label}>
                   <Text style={[styles.dayLabel, { color: colors.textSecondary }]}>{getDayLabel(label)}</Text>
@@ -247,7 +374,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           )}
 
           {/* Close button */}
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+          <TouchableOpacity style={[styles.closeBtn, { backgroundColor: colors.gradientPrimary[0] }]} onPress={onClose}>
             <Text style={styles.closeBtnText}>{t.ok}</Text>
           </TouchableOpacity>
         </View>
@@ -256,15 +383,13 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
   );
 }
 
-const ACTIVE_COLOR = DESIGN_TOKENS.GRADIENT_PRIMARY[0];
-
 const styles = StyleSheet.create({
   container: {
     borderRadius: 24,
     padding: 20,
     width: '90%',
     maxWidth: 420,
-    maxHeight: '85%',
+    maxHeight: '88%',
     elevation: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
@@ -349,8 +474,59 @@ const styles = StyleSheet.create({
     marginVertical: 32,
   },
   list: {
-    maxHeight: 340,
+    flex: 1,
     marginBottom: 12,
+  },
+  chartsSection: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+  },
+  chartTitle: {
+    fontSize: 10,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  chartTitleSpaced: {
+    marginTop: 14,
+  },
+  weakSection: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 12,
+  },
+  weakTitle: {
+    fontSize: 10,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  weakEmpty: {
+    fontSize: 12,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    fontStyle: 'italic',
+  },
+  weakRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+    gap: 8,
+  },
+  weakTask: {
+    fontSize: 14,
+    fontFamily: DESIGN_TOKENS.FONT_NUMBER,
+    flex: 1,
+  },
+  weakAttempts: {
+    fontSize: 11,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    minWidth: 28,
+    textAlign: 'right',
   },
   dayLabel: {
     fontSize: 11,
@@ -399,43 +575,7 @@ const styles = StyleSheet.create({
   challengeBadge: {
     fontSize: 13,
   },
-  weakSection: {
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 10,
-    marginBottom: 12,
-  },
-  weakTitle: {
-    fontSize: 10,
-    fontFamily: DESIGN_TOKENS.FONT_UI,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 6,
-  },
-  weakEmpty: {
-    fontSize: 12,
-    fontFamily: DESIGN_TOKENS.FONT_UI,
-    fontStyle: 'italic',
-  },
-  weakRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 4,
-    gap: 8,
-  },
-  weakTask: {
-    fontSize: 14,
-    fontFamily: DESIGN_TOKENS.FONT_NUMBER,
-    flex: 1,
-  },
-  weakAttempts: {
-    fontSize: 11,
-    fontFamily: DESIGN_TOKENS.FONT_UI,
-    minWidth: 28,
-    textAlign: 'right',
-  },
   closeBtn: {
-    backgroundColor: ACTIVE_COLOR,
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
     paddingVertical: 12,
     alignItems: 'center',

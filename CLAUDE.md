@@ -51,7 +51,7 @@ Beim Erhöhen der Version IMMER alle drei Stellen aktualisieren:
 
 ## Build-Workflow (Übersicht)
 
-- **APK (Test):** Lokal bauen — Details in `docs/private/CLAUDE.md`
+- **APK (Test):** ⚠️ **Lokaler Build aktuell defekt** (expo-av/SDK-55-Inkompatibilität, Issue #214) → per GitHub Actions: `gh workflow run build-android.yml --ref staging -f profile=preview -f bump=none`
 - **AAB (Play Store):** GitHub Actions → `Build Android` → profile: `production`
 - Workflow: `.github/workflows/build-android.yml`
 
@@ -72,31 +72,29 @@ npm run test:coverage # Coverage
 
 ### Jest-Konfiguration — Fallstricke
 
-- `expo-linear-gradient`, `expo-font`, `expo-status-bar`, `@expo-google-fonts` müssen in `transformIgnorePatterns` **und** `moduleNameMapper` eingetragen sein
+- `expo-linear-gradient`, `expo-font`, `expo-status-bar`, `expo-av`, `@expo-google-fonts` müssen in `transformIgnorePatterns` **und** `moduleNameMapper` eingetragen sein
 - Neue Expo-Pakete immer in **beiden** Listen ergänzen
-- `usePreferences.test.tsx` hat strukturelle React 19 `act()`-Warnung — Issue #160 (low priority)
+- Binäre Assets (`.wav`, `.mp3` etc.) brauchen `moduleNameMapper`-Eintrag → `__mocks__/fileMock.js` (gibt `1` zurück)
 
 ---
 
-## Aktueller Stand (2026-05-23)
+## Aktueller Stand (2026-05-31)
 
-- Version: **1.3.5** / versionCode 24
-- Tests: 475 passed, 3 skipped, 14/14 Suites grün
-- Branches: `testing` vorn (`3d52f56`); `staging` und `main` noch auf `1b551ea`
-- Offene Issues: #165, #160, #156, #146, #131, #100, #96
-- Security: 21 Vulnerabilities (alle über Expo-Tooling, build-time) → Issue #146
+- Version: **1.3.7** / versionCode 27
+- Tests: 497 total (494 passed, 3 skipped), 15/15 Suites grün
+- Branches: `staging` vorn (`c640120`); `main` noch auf `cac8a3c` (v1.3.6)
+- Offene PRs: #212 (staging → main, wartet auf App-Test auf Gerät)
+- Offene Issues: #214 (expo-av→expo-audio), #156, #187, #131, #100, #96
+- APK v1.3.7 auf Testgerät installiert (via GitHub Actions preview-Build)
 
-### Zuletzt gemergt (testing)
+### Zuletzt gemergt / gepusht
 
-| PR  | Was |
-|-----|-----|
-| #200 | Täglicher Streak-Tracker (Issue #185) — StreakData, 🔥 Header-Badge, Abend-Warnung, ParentDashboard |
-| #196 | fix: practiceModeFeedback im Übungsmodus in GameCard anzeigen + Tests |
-| #195 | CI: Jest-Test-Job zu ci-cd.yml hinzufügen (läuft jetzt automatisch bei PRs) |
-| #184 | Achievement & Badge System |
-| #192 | Adaptives Lernen – Übungsmodus (PRACTICE) mit Schwachstellen-Fokus (Issue #188) |
-| #183 | CI/CD ci-cd.yml-Startup-Failure beheben (Issue #152-Regression) |
-| #177 | TypeScript-Fixes + isValidSessionRecord Enum-Validierung + Challenge-Ops Fix |
+| PR / Commit | Was |
+|-------------|-----|
+| `c640120` | fix: expo-av auf ~16.0.8 (SDK-55-kompatibel; 15.0.2 brach lokalen Build) |
+| `3a1d43c` | chore: Version auf 1.3.7 / versionCode 27 |
+| #212 (offen) | staging → main: wartet auf App-Test |
+| #211 | testing → staging: Sound-Effekte, Visuelle Themes, Charts, UX, Jest 30 |
 
 ---
 
@@ -104,13 +102,18 @@ npm run test:coverage # Coverage
 
 | Datei | Inhalt |
 |-------|--------|
-| `utils/constants.ts` | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS |
-| `utils/theme.ts` | `getThemeColors(isDarkMode)` |
-| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `FOUR_WEEKS_MS` |
+| `utils/constants.ts` | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS, `THEMES` (alle 5 Farbthemes mit LIGHT/DARK-Varianten) |
+| `utils/theme.ts` | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'` |
+| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `saveThemeName` / `getThemeName`, `saveSoundsEnabled` / `getSoundsEnabled`, `saveSoundsVolume` / `getSoundsVolume`, `FOUR_WEEKS_MS` |
 | `utils/animations.ts` | `prefersReducedMotion()` — liest Accessibility-Einstellung |
-| `types/game.ts` | ThemeColors, GameState, Enums, SessionRecord |
+| `types/game.ts` | ThemeColors (inkl. `gradientPrimary`), GameState, Enums, SessionRecord, `ThemeName` |
 | `i18n/translations.ts` | DE/EN Übersetzungen, `TranslationStrings`-Interface |
 | `hooks/useGameLogic.ts` | Gesamte Spiellogik, `onSessionComplete`-Callback |
+| `hooks/usePreferences.ts` | Persistierte User-Einstellungen (Sprache, ThemeMode, ThemeName, soundEnabled, soundVolume) |
+| `hooks/useSounds.ts` | Sound-Hook: `playSound(event)` — Web: AudioContext-Oszillatoren, Native: expo-av + WAV-Assets |
+| `assets/sounds/` | WAV-Assets: correct / incorrect / perfect / level_up / badge_unlock (je 8–17 KB) |
+| `scripts/generate-sounds.js` | Generator für WAV-Assets (`node scripts/generate-sounds.js`) |
+| `components/PersonalizeModal.tsx` | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache, Sound An/Aus + Lautstärke) |
 | `components/ParentDashboard.tsx` | Eltern-Dashboard Modal (Beta) |
 | `components/GameCard.tsx` | Hauptspielansicht (alle 3 Antwortmodi) |
 | `styles/modalStyles.ts` | Gemeinsame Modal-Styles |
@@ -132,6 +135,7 @@ npm run test:coverage # Coverage
 - **Number Sequence Grid:** 2-Spalten-Grid (`width: '48%'`, `flexWrap: 'wrap'`) für kleine Bildschirme
 - **Merge-Konflikt staging→main:** temporäre Workflow-Dateien können kollidieren → staging-Version bevorzugen
 - **Expo-Pakete in Jest:** Neue Pakete immer in `transformIgnorePatterns` **und** `moduleNameMapper` eintragen
+- **expo-av lokaler Build bricht auf SDK 55:** `resolveView` aus Legacy-UIManager entfernt → APK per GitHub Actions (`profile=preview`). Nachhaltige Lösung: Migration auf `expo-audio` (Issue #214)
 
 ---
 
@@ -168,8 +172,33 @@ npm run test:coverage # Coverage
 
 ---
 
+## Visuelle Themes / App-Skins — Hinweise
+
+- `ThemeName = 'sunset' | 'ocean' | 'space' | 'forest' | 'candy'` in `types/game.ts`
+- `THEMES` in `utils/constants.ts`: jedes Theme hat `label`, `LIGHT` und `DARK` (je alle ThemeColors-Felder + `GRADIENT_PRIMARY`)
+- `getThemeColors(isDarkMode, themeName?)` — zweiter Parameter optional, Default `'sunset'`; ungültiger Name fällt auf sunset zurück
+- Storage Key: `app-theme-name` (`STORAGE_KEYS.THEME_NAME`)
+- `saveThemeName` / `getThemeName` in `utils/storage.ts`; `getThemeName` validiert gegen bekannte Werte, gibt `null` zurück wenn unbekannt
+- `usePreferences` lädt `getThemeName()` beim Mount, speichert bei Änderung automatisch
+- `useTheme(themeMode, themeName)` — erhält `themeName` als zweiten Parameter von `App.tsx`
+- `ThemeColors.gradientPrimary: readonly [string, string]` — alle Komponenten nutzen diesen statt statischer Konstanten
+- Aktive Zustände (Chips, Buttons, Badges) verwenden `colors.gradientPrimary[0]` inline (kein statisches `ACTIVE_COLOR`)
+- `PersonalizeModal` zeigt Gradient-Swatches; aktiver Swatch-Border nutzt `themeData.LIGHT.GRADIENT_PRIMARY[0]` (theme-spezifisch)
+
+---
+
 ## Offene TODOs / Bekannte Einschränkungen
 
-- Größere Dependency-Updates verschoben: react-native 0.84, jest 30, react 19.2.4, async-storage 3.x
-- jest 30 würde 4x low Vulnerabilities (jest-environment-jsdom) beheben → Issue #146
+- **expo-av → expo-audio Migration ausstehend** — lokaler Build bis dahin defekt (Issue #214)
+- Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 - Reanimated wurde durch `Animated` core ersetzt (Web-Kompatibilität) — Issue #131
+
+## Sound-Effekte — Hinweise
+
+- `SoundEvent = 'correct' | 'incorrect' | 'perfect' | 'level_up' | 'badge_unlock'`
+- Storage Keys: `app-sounds-enabled` / `app-sounds-volume` (Default: true / 75)
+- Web: `AudioContext`-Oszillatoren (`playWebTone`), keine Dateien nötig
+- Native: `expo-av` + WAV-Assets aus `assets/sounds/`; `playsInSilentModeIOS: false`
+- Linting: `window.*` in `useSounds.ts` muss `// platform-safe` Kommentar tragen (CI-Check)
+- WAV-Assets bei Bedarf neu generieren: `node scripts/generate-sounds.js`
+- Hintergrundmusik: bewusst nicht implementiert (erfordert Lizenz-freie Loop-Audiodatei), separates Follow-up

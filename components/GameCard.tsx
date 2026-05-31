@@ -52,7 +52,7 @@ export function GameCard({
   const getGradientColors = (): readonly [string, string] => {
     if (gameState.lastAnswerCorrect === true) return DESIGN_TOKENS.GRADIENT_CORRECT;
     if (gameState.lastAnswerCorrect === false) return DESIGN_TOKENS.GRADIENT_INCORRECT;
-    return DESIGN_TOKENS.GRADIENT_PRIMARY;
+    return colors.gradientPrimary;
   };
 
   const getResult = () => {
@@ -121,6 +121,7 @@ export function GameCard({
                 checkLabel={t.check}
                 nextLabel={t.nextQuestion}
                 encouragement={gameState.difficultyMode === DifficultyMode.PRACTICE ? t.practiceModeFeedback : t.encouragement}
+                gradientPrimary={colors.gradientPrimary}
               />
             )}
 
@@ -152,6 +153,7 @@ export function GameCard({
                   label={gameState.isAnswerChecked ? t.nextQuestion : t.check}
                   onPress={gameState.isAnswerChecked ? onNext : onCheck}
                   disabled={gameState.selectedChoice === null && !gameState.isAnswerChecked}
+                  gradientPrimary={colors.gradientPrimary}
                 />
               </View>
             )}
@@ -186,6 +188,7 @@ export function GameCard({
                   label={gameState.isAnswerChecked ? t.nextQuestion : t.check}
                   onPress={gameState.isAnswerChecked ? onNext : onCheck}
                   disabled={gameState.selectedChoice === null && !gameState.isAnswerChecked}
+                  gradientPrimary={colors.gradientPrimary}
                 />
               </View>
             )}
@@ -202,10 +205,12 @@ function GradientCheckButton({
   label,
   onPress,
   disabled,
+  gradientPrimary,
 }: {
   label: string;
   onPress: () => void;
   disabled: boolean;
+  gradientPrimary: readonly [string, string];
 }) {
   if (disabled) {
     return (
@@ -217,7 +222,7 @@ function GradientCheckButton({
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
       <LinearGradient
-        colors={DESIGN_TOKENS.GRADIENT_PRIMARY}
+        colors={gradientPrimary}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.checkButton}

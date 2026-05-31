@@ -13,12 +13,13 @@ interface ChipProps {
 }
 
 export function Chip({ label, active, onPress, colors, disabled = false, size = 'md' }: ChipProps) {
+  const activeColor = colors.gradientPrimary[0];
   return (
     <TouchableOpacity
       style={[
         styles.chip,
         { backgroundColor: colors.buttonInactive, borderColor: colors.border },
-        active && styles.chipActive,
+        active && { backgroundColor: activeColor, borderColor: activeColor },
         disabled && { opacity: 0.6 },
         size === 'sm' && styles.chipSm,
       ]}
@@ -39,8 +40,6 @@ export function Chip({ label, active, onPress, colors, disabled = false, size = 
   );
 }
 
-const ACTIVE_COLOR = DESIGN_TOKENS.GRADIENT_PRIMARY[0]; // #667eea
-
 const styles = StyleSheet.create({
   chip: {
     flex: 1,
@@ -51,10 +50,6 @@ const styles = StyleSheet.create({
     borderColor: '#dde3ff',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  chipActive: {
-    backgroundColor: ACTIVE_COLOR,
-    borderColor: ACTIVE_COLOR,
   },
   chipSm: {
     paddingVertical: 6,

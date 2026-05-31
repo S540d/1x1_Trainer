@@ -45,6 +45,7 @@ export interface ChallengeState {
 }
 
 export type ThemeMode = 'light' | 'dark' | 'system';
+export type ThemeName = 'sunset' | 'ocean' | 'space' | 'forest' | 'candy';
 export type Language = 'en' | 'de';
 
 export interface GameState {
@@ -112,4 +113,5 @@ export interface ThemeColors {
   buttonInactiveText: string;
   settingsOverlay: string;
   settingsMenu: string;
+  gradientPrimary: readonly [string, string];
 }

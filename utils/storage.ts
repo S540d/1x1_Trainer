@@ -6,7 +6,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from './constants';
-import { ThemeMode, Language, Operation, NumberRange, DifficultyMode, SessionRecord, TaskStat, StreakData } from '../types/game';
+import { ThemeMode, ThemeName, Language, Operation, NumberRange, DifficultyMode, SessionRecord, TaskStat, StreakData } from '../types/game';
 
 /**
  * Get a value from storage (platform-safe)
@@ -75,6 +75,18 @@ export const saveTheme = async (theme: ThemeMode): Promise<void> => {
 export const getTheme = async (): Promise<ThemeMode | null> => {
   const value = await getStorageItem(STORAGE_KEYS.THEME);
   if (value === 'light' || value === 'dark' || value === 'system') {
+    return value;
+  }
+  return null;
+};
+
+export const saveThemeName = async (themeName: ThemeName): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.THEME_NAME, themeName);
+};
+
+export const getThemeName = async (): Promise<ThemeName | null> => {
+  const value = await getStorageItem(STORAGE_KEYS.THEME_NAME);
+  if (value === 'sunset' || value === 'ocean' || value === 'space' || value === 'forest' || value === 'candy') {
     return value;
   }
   return null;
@@ -408,4 +420,27 @@ export const getNumberRange = async (): Promise<NumberRange> => {
 
   // Default: 1-100 for existing users
   return NumberRange.RANGE_100;
+};
+
+export const saveSoundsEnabled = async (enabled: boolean): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.SOUNDS_ENABLED, enabled ? 'true' : 'false');
+};
+
+export const getSoundsEnabled = async (): Promise<boolean | null> => {
+  const value = await getStorageItem(STORAGE_KEYS.SOUNDS_ENABLED);
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return null;
+};
+
+export const saveSoundsVolume = async (volume: number): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.SOUNDS_VOLUME, String(volume));
+};
+
+export const getSoundsVolume = async (): Promise<number | null> => {
+  const value = await getStorageItem(STORAGE_KEYS.SOUNDS_VOLUME);
+  if (value === null) return null;
+  const n = Number(value);
+  if (!Number.isNaN(n) && n >= 0 && n <= 100) return n;
+  return null;
 };

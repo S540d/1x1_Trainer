@@ -19,6 +19,7 @@ interface NumpadProps {
   checkLabel: string;
   nextLabel: string;
   encouragement: string;
+  gradientPrimary: readonly [string, string];
 }
 
 export function Numpad({
@@ -29,6 +30,7 @@ export function Numpad({
   checkLabel,
   nextLabel,
   encouragement,
+  gradientPrimary,
 }: NumpadProps) {
   const canCheck = userAnswer !== '' || isAnswerChecked;
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -79,7 +81,7 @@ export function Numpad({
             {canCheck ? (
               <TouchableOpacity onPress={onCheck} activeOpacity={0.85} style={{ flex: 1 }}>
                 <LinearGradient
-                  colors={DESIGN_TOKENS.GRADIENT_PRIMARY}
+                  colors={gradientPrimary}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.checkButton}

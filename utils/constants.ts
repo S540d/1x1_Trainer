@@ -2,9 +2,9 @@
  * Application Constants for 1x1 Trainer
  */
 
-import { GameMode, NumberRange, Operation } from '../types/game';
+import { GameMode, NumberRange, Operation, ThemeName } from '../types/game';
 
-export const APP_VERSION = '1.3.6';
+export const APP_VERSION = '1.3.7';
 export const APP_NAME = '1×1 Trainer';
 export const CONTACT_EMAIL = 'devsven@posteo.de';
 
@@ -17,6 +17,7 @@ export const MAX_RANDOM_ANSWER = 100;
 export const STORAGE_KEYS = {
   LANGUAGE: 'app-language',
   THEME: 'app-theme',
+  THEME_NAME: 'app-theme-name',
   OPERATION: 'app-operation',
   OPERATIONS: 'app-operations',
   TOTAL_TASKS: 'app-total-tasks',
@@ -27,6 +28,8 @@ export const STORAGE_KEYS = {
   TASK_STATS: 'app-task-stats',
   BADGES: 'app-badges',
   STREAK: 'app-streak',
+  SOUNDS_ENABLED: 'app-sounds-enabled',
+  SOUNDS_VOLUME: 'app-sounds-volume',
 } as const;
 
 export type BadgeCategory = 'streak' | 'performance' | 'challenge' | 'explorer';
@@ -128,6 +131,147 @@ export const THEME_COLORS = {
     SETTINGS_MENU: '#FFFFFF',
   },
 } as const;
+
+type ThemeVariant = {
+  BACKGROUND: string;
+  TEXT: string;
+  TEXT_SECONDARY: string;
+  BORDER: string;
+  CARD: string;
+  CARD_CORRECT: string;
+  CARD_INCORRECT: string;
+  BUTTON_INACTIVE: string;
+  BUTTON_INACTIVE_TEXT: string;
+  SETTINGS_OVERLAY: string;
+  SETTINGS_MENU: string;
+  GRADIENT_PRIMARY: readonly [string, string];
+};
+
+const SHARED_LIGHT = {
+  TEXT: '#0F172A',
+  TEXT_SECONDARY: '#475569',
+  CARD_CORRECT: '#ECFDF5',
+  CARD_INCORRECT: '#FFF1F2',
+  SETTINGS_OVERLAY: 'rgba(15,23,42,0.6)',
+  SETTINGS_MENU: '#FFFFFF',
+  CARD: '#FFFFFF',
+} as const;
+
+const SHARED_DARK = {
+  TEXT: '#E8EAED',
+  TEXT_SECONDARY: '#9AA0A6',
+  CARD_CORRECT: '#10B981',
+  CARD_INCORRECT: '#EF4444',
+  SETTINGS_OVERLAY: 'rgba(15,20,25,0.8)',
+} as const;
+
+export const THEMES: Record<ThemeName, { label: string; LIGHT: ThemeVariant; DARK: ThemeVariant }> = {
+  sunset: {
+    label: '🍊 Sunset',
+    LIGHT: {
+      ...SHARED_LIGHT,
+      BACKGROUND: '#F0F4FF',
+      BORDER: '#CBD5E1',
+      BUTTON_INACTIVE: '#F1F5F9',
+      BUTTON_INACTIVE_TEXT: '#475569',
+      GRADIENT_PRIMARY: ['#667eea', '#764ba2'],
+    },
+    DARK: {
+      ...SHARED_DARK,
+      BACKGROUND: '#0F1419',
+      BORDER: '#2D3748',
+      CARD: '#1A202C',
+      BUTTON_INACTIVE: '#1E293B',
+      BUTTON_INACTIVE_TEXT: '#94A3B8',
+      SETTINGS_MENU: '#1A202C',
+      GRADIENT_PRIMARY: ['#667eea', '#764ba2'],
+    },
+  },
+  ocean: {
+    label: '🌊 Ocean',
+    LIGHT: {
+      ...SHARED_LIGHT,
+      BACKGROUND: '#F0FAFF',
+      BORDER: '#BAE6FD',
+      BUTTON_INACTIVE: '#E0F2FE',
+      BUTTON_INACTIVE_TEXT: '#0369A1',
+      GRADIENT_PRIMARY: ['#06b6d4', '#0284c7'],
+    },
+    DARK: {
+      ...SHARED_DARK,
+      BACKGROUND: '#062637',
+      BORDER: '#0C4A6E',
+      CARD: '#0C3549',
+      BUTTON_INACTIVE: '#0C3549',
+      BUTTON_INACTIVE_TEXT: '#7DD3FC',
+      SETTINGS_MENU: '#0C3549',
+      GRADIENT_PRIMARY: ['#06b6d4', '#0284c7'],
+    },
+  },
+  space: {
+    label: '🚀 Space',
+    LIGHT: {
+      ...SHARED_LIGHT,
+      BACKGROUND: '#F5F3FF',
+      BORDER: '#C4B5FD',
+      BUTTON_INACTIVE: '#EDE9FE',
+      BUTTON_INACTIVE_TEXT: '#5B21B6',
+      GRADIENT_PRIMARY: ['#8B5CF6', '#4F46E5'],
+    },
+    DARK: {
+      ...SHARED_DARK,
+      BACKGROUND: '#0E0B1F',
+      BORDER: '#3730A3',
+      CARD: '#1A1435',
+      BUTTON_INACTIVE: '#1A1435',
+      BUTTON_INACTIVE_TEXT: '#A78BFA',
+      SETTINGS_MENU: '#1A1435',
+      GRADIENT_PRIMARY: ['#8B5CF6', '#4F46E5'],
+    },
+  },
+  forest: {
+    label: '🌿 Forest',
+    LIGHT: {
+      ...SHARED_LIGHT,
+      BACKGROUND: '#F0FFF4',
+      BORDER: '#86EFAC',
+      BUTTON_INACTIVE: '#DCFCE7',
+      BUTTON_INACTIVE_TEXT: '#15803D',
+      GRADIENT_PRIMARY: ['#22c55e', '#15803d'],
+    },
+    DARK: {
+      ...SHARED_DARK,
+      BACKGROUND: '#0A1F10',
+      BORDER: '#166534',
+      CARD: '#132A1A',
+      BUTTON_INACTIVE: '#132A1A',
+      BUTTON_INACTIVE_TEXT: '#86EFAC',
+      SETTINGS_MENU: '#132A1A',
+      GRADIENT_PRIMARY: ['#22c55e', '#15803d'],
+    },
+  },
+  candy: {
+    label: '🩷 Candy',
+    LIGHT: {
+      ...SHARED_LIGHT,
+      BACKGROUND: '#FFF0F7',
+      BORDER: '#F9A8D4',
+      BUTTON_INACTIVE: '#FCE7F3',
+      BUTTON_INACTIVE_TEXT: '#BE185D',
+      GRADIENT_PRIMARY: ['#ec4899', '#f43f5e'],
+    },
+    DARK: {
+      ...SHARED_DARK,
+      BACKGROUND: '#1F0A14',
+      BORDER: '#831843',
+      CARD: '#2D1020',
+      BUTTON_INACTIVE: '#2D1020',
+      BUTTON_INACTIVE_TEXT: '#F9A8D4',
+      SETTINGS_MENU: '#2D1020',
+      GRADIENT_PRIMARY: ['#ec4899', '#f43f5e'],
+    },
+  },
+};
 
 export const DESIGN_TOKENS = {
   GRADIENT_PRIMARY:        ['#667eea', '#764ba2'] as const,
