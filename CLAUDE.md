@@ -74,30 +74,30 @@ npm run test:coverage # Coverage
 
 - `expo-linear-gradient`, `expo-font`, `expo-status-bar`, `expo-av`, `@expo-google-fonts` müssen in `transformIgnorePatterns` **und** `moduleNameMapper` eingetragen sein
 - Neue Expo-Pakete immer in **beiden** Listen ergänzen
+- Binäre Assets (`.wav`, `.mp3` etc.) brauchen `moduleNameMapper`-Eintrag → `__mocks__/fileMock.js` (gibt `1` zurück)
 
 ---
 
-## Aktueller Stand (2026-05-30)
+## Aktueller Stand (2026-05-31)
 
-- Version: **1.3.6** / versionCode 24
-- Tests: 485 passed, 3 skipped, 14/14 Suites grün
-- Branches: `testing` vorn (`49a6d9e`); `staging` und `main` noch auf `1b551ea`
+- Version: **1.3.6** / versionCode 26
+- Tests: 494 passed, 3 skipped, 15/15 Suites grün
+- Branches: `testing` und `staging` synchron (`3a22613`); `main` noch auf `cac8a3c`
+- Offene PRs: #212 (staging → main, bereit zum Merge nach Staging-Tests)
 - Offene Issues: #165, #156, #187, #100, #96
-- Security: 17 Vulnerabilities (nach jest 30 Upgrade, alle build-time über Expo-Tooling)
+- Security: 17 Vulnerabilities (alle build-time über Expo-Tooling)
 
-### Zuletzt gemergt (testing)
+### Zuletzt gemergt / gepusht
 
-| PR  | Was |
-|-----|-----|
+| PR / Branch | Was |
+|-------------|-----|
+| #212 (offen) | staging → main: wartet auf Staging-Tests |
+| #211 | testing → staging: Sound-Effekte, Visuelle Themes, Charts, UX, Jest 30 |
+| Hotfix | Accessibility-Labels Score/Streak-Badge (Header.tsx), PersonalizeModal ScrollView-Höhe, useSounds-Tests (9 Tests), .wav-Mock in Jest |
+| Hotfix | Fehlerquote-Chart zeigt 0%-Tage (barH=0 → 2px); useSounds überspringt AudioContext bei volume=0 |
 | #210 | Sound-Effekte – useSounds-Hook, 5 WAV-Assets, expo-av, UI in PersonalizeModal (Issue #186) |
 | #208 | Visuelle Themes / App-Skins – 5 Farbthemes (Issue #190) |
 | #207 | Fortschritts-Charts im Parent Dashboard – Sessions + Fehlerquote (Issue #191) |
-| #206 | React 19 act()-Warnings in usePreferences.test.tsx behoben (Issue #160) |
-| #205 | Jest 30 Upgrade + Dependency Audit (Issue #146) |
-| #204 | User Feedback UX-Fixes – Streak/Score Tooltip, Settings Layout (Issue #203) |
-| #200 | Täglicher Streak-Tracker (Issue #185) — StreakData, 🔥 Header-Badge, Abend-Warnung |
-| #196 | fix: practiceModeFeedback im Übungsmodus in GameCard anzeigen |
-| #192 | Adaptives Lernen – Übungsmodus (PRACTICE) mit Schwachstellen-Fokus (Issue #188) |
 
 ---
 
@@ -193,7 +193,6 @@ npm run test:coverage # Coverage
 
 - Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 - Reanimated wurde durch `Animated` core ersetzt (Web-Kompatibilität) — Issue #131
-- Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 
 ## Sound-Effekte — Hinweise
 
