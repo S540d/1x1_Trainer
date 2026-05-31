@@ -68,7 +68,7 @@ export function PersonalizeModal({
           </TouchableOpacity>
         </LinearGradient>
 
-        <ScrollView bounces={false}>
+        <ScrollView bounces={false} style={styles.settingsScroll}>
           <View style={styles.settingsSection}>
             <Text style={[styles.settingsSectionTitle, { color: colors.textSecondary }]}>
               {t.appearance}
@@ -226,6 +226,9 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     zIndex: 1000,
     overflow: 'hidden',
+  },
+  settingsScroll: {
+    flexShrink: 1,
   },
   settingsMenuHeader: {
     flexDirection: 'row',
