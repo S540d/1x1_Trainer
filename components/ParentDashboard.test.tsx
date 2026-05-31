@@ -27,9 +27,11 @@ const t = {
   parentErrors: 'Fehler',
   parentWeakTasks: 'Schwachstellen (Top 5)',
   parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
-  parentCurrentStreak: 'Aktueller Streak',
-  parentLongestStreak: 'Längster Streak',
+  parentCurrentStreak: 'Aktuelle Serie',
+  parentLongestStreak: 'Längste Serie',
   parentStreakDays: 'Tage',
+  chartSessions: 'Einheiten · 14 Tage',
+  chartErrorRate: 'Fehlerquote · 14 Tage',
   ok: 'OK',
 };
 
@@ -153,6 +155,28 @@ describe('ParentDashboard', () => {
     await waitFor(() => {
       expect(getByText(t.parentWeakTasks)).toBeTruthy();
       expect(getByText('7 × 8')).toBeTruthy();
+    });
+  });
+
+  it('hides charts when all records are older than 14 days', async () => {
+    const old = makeRecord({ timestamp: Date.now() - 15 * 24 * 60 * 60 * 1000 });
+    mockGetSessionRecords.mockResolvedValue([old]);
+    const { queryByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => expect(mockGetSessionRecords).toHaveBeenCalled());
+    expect(queryByText(t.chartSessions)).toBeNull();
+    expect(queryByText(t.chartErrorRate)).toBeNull();
+  });
+
+  it('shows chart titles when there are sessions in the last 14 days', async () => {
+    mockGetSessionRecords.mockResolvedValue([makeRecord({ timestamp: Date.now() })]);
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => {
+      expect(getByText(t.chartSessions)).toBeTruthy();
+      expect(getByText(t.chartErrorRate)).toBeTruthy();
     });
   });
 

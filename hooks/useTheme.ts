@@ -5,10 +5,10 @@
 
 import { useState, useEffect } from 'react';
 import { Platform } from 'react-native';
-import { ThemeMode, ThemeColors } from '../types/game';
+import { ThemeMode, ThemeName, ThemeColors } from '../types/game';
 import { getThemeColors } from '../utils/theme';
 
-export function useTheme(initialTheme: ThemeMode = 'light') {
+export function useTheme(initialTheme: ThemeMode = 'light', themeName: ThemeName = 'sunset') {
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialTheme);
   const [systemDarkMode, setSystemDarkMode] = useState(false);
 
@@ -33,7 +33,7 @@ export function useTheme(initialTheme: ThemeMode = 'light') {
   const isDarkMode = themeMode === 'dark' || (themeMode === 'system' && systemDarkMode);
 
   // Get theme colors
-  const colors: ThemeColors = getThemeColors(isDarkMode);
+  const colors: ThemeColors = getThemeColors(isDarkMode, themeName);
 
   return {
     themeMode,

@@ -4,12 +4,14 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Language, ThemeMode, Operation, NumberRange } from '../types/game';
+import { Language, ThemeMode, ThemeName, Operation, NumberRange } from '../types/game';
 import {
   getLanguage,
   saveLanguage,
   getTheme,
   saveTheme,
+  getThemeName,
+  saveThemeName,
   getOperations,
   saveOperations,
   getTotalTasks,
@@ -18,16 +20,23 @@ import {
   saveNumberRange,
   getChallengeHighScore,
   saveChallengeHighScore,
+  getSoundsEnabled,
+  saveSoundsEnabled,
+  getSoundsVolume,
+  saveSoundsVolume,
 } from '../utils/storage';
 import { getDeviceLanguage } from '../utils/language';
 
 export function usePreferences() {
   const [language, setLanguage] = useState<Language>('en');
   const [themeMode, setThemeMode] = useState<ThemeMode>('light');
+  const [themeName, setThemeName] = useState<ThemeName>('sunset');
   const [operations, setOperations] = useState<Operation[]>([Operation.MULTIPLICATION]);
   const [numberRange, setNumberRange] = useState<NumberRange>(NumberRange.RANGE_100);
   const [totalSolvedTasks, setTotalSolvedTasks] = useState(0);
   const [challengeHighScore, setChallengeHighScore] = useState(0);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundVolume, setSoundVolume] = useState(75);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load preferences on mount
@@ -51,6 +60,12 @@ export function usePreferences() {
           setThemeMode(savedTheme);
         }
 
+        // Load theme name
+        const savedThemeName = await getThemeName();
+        if (savedThemeName) {
+          setThemeName(savedThemeName);
+        }
+
         // Load operations
         const savedOperations = await getOperations();
         setOperations(savedOperations);
@@ -68,6 +83,12 @@ export function usePreferences() {
         // Load challenge high score
         const savedHighScore = await getChallengeHighScore();
         setChallengeHighScore(savedHighScore);
+
+        // Load sound preferences
+        const savedSoundsEnabled = await getSoundsEnabled();
+        if (savedSoundsEnabled !== null) setSoundEnabled(savedSoundsEnabled);
+        const savedSoundsVolume = await getSoundsVolume();
+        if (savedSoundsVolume !== null) setSoundVolume(savedSoundsVolume);
 
         setIsLoaded(true);
       } catch (error) {
@@ -92,6 +113,13 @@ export function usePreferences() {
       saveTheme(themeMode);
     }
   }, [themeMode, isLoaded]);
+
+  // Auto-save theme name
+  useEffect(() => {
+    if (isLoaded) {
+      saveThemeName(themeName);
+    }
+  }, [themeName, isLoaded]);
 
   // Auto-save operations
   useEffect(() => {
@@ -135,11 +163,22 @@ export function usePreferences() {
     }
   }, [challengeHighScore, isLoaded]);
 
+  // Auto-save sound preferences
+  useEffect(() => {
+    if (isLoaded) saveSoundsEnabled(soundEnabled);
+  }, [soundEnabled, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) saveSoundsVolume(soundVolume);
+  }, [soundVolume, isLoaded]);
+
   return {
     language,
     setLanguage,
     themeMode,
     setThemeMode,
+    themeName,
+    setThemeName,
     operation: operations.length > 0
       ? operations[0]
       : Operation.MULTIPLICATION, // First selected operation as primary
@@ -152,6 +191,10 @@ export function usePreferences() {
     setTotalSolvedTasks,
     challengeHighScore,
     setChallengeHighScore,
+    soundEnabled,
+    setSoundEnabled,
+    soundVolume,
+    setSoundVolume,
     isLoaded,
   };
 }

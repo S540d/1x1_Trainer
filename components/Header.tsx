@@ -4,6 +4,7 @@ import {
   Text,
   View,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors, DifficultyMode, ChallengeState } from '../types/game';
@@ -24,6 +25,10 @@ interface HeaderProps {
     level: string;
     task: string;
     points: string;
+    streakInfoTitle: string;
+    streakInfoBody: string;
+    scoreInfoTitle: string;
+    scoreInfoBody: string;
   };
 }
 
@@ -54,25 +59,34 @@ export function Header({
       ) : (
         <>
           <View style={styles.progressContainer}>
-            <ProgressBar current={currentTask - 1} total={totalTasks} />
+            <ProgressBar current={currentTask - 1} total={totalTasks} gradientColors={colors.gradientPrimary} />
             <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>
               {currentTask}/{totalTasks}
             </Text>
           </View>
-          <LinearGradient
-            colors={DESIGN_TOKENS.GRADIENT_GOLD}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.scoreBadge}
+          <TouchableOpacity
+            onPress={() => Alert.alert(t.scoreInfoTitle, t.scoreInfoBody)}
+            activeOpacity={0.7}
           >
-            <Text style={styles.scoreBadgeText}>⭐ {score}</Text>
-          </LinearGradient>
+            <LinearGradient
+              colors={DESIGN_TOKENS.GRADIENT_GOLD}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.scoreBadge}
+            >
+              <Text style={styles.scoreBadgeText}>⭐ {score}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </>
       )}
       {!!currentStreak && currentStreak > 0 && (
-        <View style={styles.streakBadge}>
+        <TouchableOpacity
+          onPress={() => Alert.alert(t.streakInfoTitle, `${currentStreak} ${t.streakInfoBody}`)}
+          activeOpacity={0.7}
+          style={styles.streakBadge}
+        >
           <Text style={styles.streakText}>🔥 {currentStreak}</Text>
-        </View>
+        </TouchableOpacity>
       )}
       <TouchableOpacity
         onPress={onShowMenu}

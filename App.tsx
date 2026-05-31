@@ -42,6 +42,7 @@ import { BadgesModal } from './components/BadgesModal';
 import { BadgeUnlockToast } from './components/BadgeUnlockToast';
 import { FloatingStars } from './components/FloatingStars';
 import { saveSessionRecord, getStreakData, updateStreakAfterSession, getLocalDateString, recordTaskResult, getTaskStats, getWeakTasks, getOnboardingDone, setOnboardingDone, resetOnboarding, getStorageItem } from './utils/storage';
+import { useSounds } from './hooks/useSounds';
 import { SessionRecord, StreakData, TaskStat, Operation } from './types/game';
 import { useBadges } from './hooks/useBadges';
 import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
@@ -86,7 +87,8 @@ export default function App() {
 
   // Use custom hooks
   const preferences = usePreferences();
-  const theme = useTheme(preferences.themeMode);
+  const theme = useTheme(preferences.themeMode, preferences.themeName);
+  const sounds = useSounds(preferences.soundEnabled, preferences.soundVolume);
   const badgeSystem = useBadges();
   const game = useGameLogic({
     initialOperation: preferences.operation,
@@ -98,6 +100,9 @@ export default function App() {
       setShowMotivation(true);
     },
     onSessionComplete: (record: SessionRecord) => {
+      if (record.correctTasks === record.totalTasks) {
+        sounds.playSound('perfect');
+      }
       saveSessionRecord(record)
         .then(async () => {
           const updatedStreak = await updateStreakAfterSession();
@@ -198,9 +203,28 @@ export default function App() {
   // Set body background color dynamically on web
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.body.style.backgroundColor = isDarkMode ? '#0F1419' : '#F0F4FF';
+      document.body.style.backgroundColor = colors.background;
     }
-  }, [isDarkMode]);
+  }, [colors.background]);
+
+  // Badge unlock sound
+  const prevNewlyUnlockedLen = useRef(0);
+  useEffect(() => {
+    if (badgeSystem.newlyUnlocked.length > prevNewlyUnlockedLen.current) {
+      sounds.playSound('badge_unlock');
+    }
+    prevNewlyUnlockedLen.current = badgeSystem.newlyUnlocked.length;
+  }, [badgeSystem.newlyUnlocked]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Challenge level-up sound
+  const prevChallengeLevel = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    const level = game.gameState.challengeState?.level;
+    if (level !== undefined && prevChallengeLevel.current !== undefined && level > prevChallengeLevel.current) {
+      sounds.playSound('level_up');
+    }
+    prevChallengeLevel.current = level;
+  }, [game.gameState.challengeState?.level]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load streak data and show warning when appropriate
   useEffect(() => {
@@ -216,7 +240,17 @@ export default function App() {
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Card feedback animation (skipped when reduce motion is enabled)
+  // Sound + card feedback on answer check
+  useEffect(() => {
+    if (!game.gameState.isAnswerChecked) return;
+    if (game.gameState.lastAnswerCorrect === true) {
+      sounds.playSound('correct');
+    } else if (game.gameState.lastAnswerCorrect === false) {
+      sounds.playSound('incorrect');
+    }
+  }, [game.gameState.isAnswerChecked, game.gameState.lastAnswerCorrect]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Card animation (skipped when reduce motion is enabled)
   useEffect(() => {
     if (!game.gameState.isAnswerChecked || prefersReducedMotion()) return;
     if (game.gameState.lastAnswerCorrect === true) {
@@ -380,6 +414,12 @@ export default function App() {
         onLanguageChange={preferences.setLanguage}
         themeMode={theme.themeMode}
         onThemeModeChange={preferences.setThemeMode}
+        themeName={preferences.themeName}
+        onThemeNameChange={preferences.setThemeName}
+        soundEnabled={preferences.soundEnabled}
+        onSoundEnabledChange={preferences.setSoundEnabled}
+        soundVolume={preferences.soundVolume}
+        onSoundVolumeChange={preferences.setSoundVolume}
       />
 
       <AboutModal

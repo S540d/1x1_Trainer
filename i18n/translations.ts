@@ -103,8 +103,20 @@ export interface TranslationStrings {
   streakWarningTitle: string;
   streakWarningMessage: string;
   streakWarningButton: string;
+  streakInfoTitle: string;
+  streakInfoBody: string;
+  scoreInfoTitle: string;
+  scoreInfoBody: string;
   parentWeakTasks: string;
   parentWeakTasksEmpty: string;
+  chartSessions: string;
+  chartErrorRate: string;
+  colorTheme: string;
+  // Sounds
+  sounds: string;
+  soundsOn: string;
+  soundsOff: string;
+  soundVolume: string;
   // Badges
   badges: string;
   badgesMenu: string;
@@ -254,8 +266,19 @@ export const translations: Record<Language, TranslationStrings> = {
     streakWarningTitle: 'Don\'t break your streak!',
     streakWarningMessage: 'Play a quick round today to keep your {days}-day streak going!',
     streakWarningButton: 'Let\'s go!',
+    streakInfoTitle: 'Streak',
+    streakInfoBody: 'days played in a row. Keep it up!',
+    scoreInfoTitle: 'Score',
+    scoreInfoBody: 'Your score for this round',
     parentWeakTasks: 'Weak Areas (Top 5)',
     parentWeakTasksEmpty: 'No weak areas identified yet.',
+    chartSessions: 'Sessions · 14 days',
+    chartErrorRate: 'Error rate · 14 days',
+    colorTheme: 'COLOR THEME',
+    sounds: 'SOUNDS',
+    soundsOn: 'On',
+    soundsOff: 'Off',
+    soundVolume: 'VOLUME',
     // Badges
     badges: 'Achievements',
     badgesMenu: 'Achievements',
@@ -397,14 +420,25 @@ export const translations: Record<Language, TranslationStrings> = {
     parentYesterday: 'Gestern',
     parentCorrect: 'Richtig',
     parentErrors: 'Fehler',
-    parentCurrentStreak: 'Aktueller Streak',
-    parentLongestStreak: 'Längster Streak',
+    parentCurrentStreak: 'Aktuelle Serie',
+    parentLongestStreak: 'Längste Serie',
     parentStreakDays: 'Tage',
-    streakWarningTitle: 'Brich deinen Streak nicht!',
-    streakWarningMessage: 'Spiel heute eine Runde, um deinen {days}-Tage-Streak zu halten!',
+    streakWarningTitle: 'Brich deine Serie nicht!',
+    streakWarningMessage: 'Spiel heute eine Runde, um deine {days}-Tage-Serie zu halten!',
     streakWarningButton: 'Los geht\'s!',
+    streakInfoTitle: 'Serie',
+    streakInfoBody: 'Tage in Folge gespielt. Weiter so!',
+    scoreInfoTitle: 'Punkte',
+    scoreInfoBody: 'Dein Punktestand in dieser Runde',
     parentWeakTasks: 'Schwachstellen (Top 5)',
     parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
+    chartSessions: 'Einheiten · 14 Tage',
+    chartErrorRate: 'Fehlerquote · 14 Tage',
+    colorTheme: 'FARBTHEMA',
+    sounds: 'TÖNE',
+    soundsOn: 'An',
+    soundsOff: 'Aus',
+    soundVolume: 'LAUTSTÄRKE',
     // Badges
     badges: 'Abzeichen',
     badgesMenu: 'Abzeichen',

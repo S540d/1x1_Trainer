@@ -6,9 +6,10 @@ import { DESIGN_TOKENS } from '../utils/constants';
 interface ProgressBarProps {
   current: number;
   total: number;
+  gradientColors?: readonly [string, string];
 }
 
-export function ProgressBar({ current, total }: ProgressBarProps) {
+export function ProgressBar({ current, total, gradientColors }: ProgressBarProps) {
   const widthAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export function ProgressBar({ current, total }: ProgressBarProps) {
         ]}
       >
         <LinearGradient
-          colors={DESIGN_TOKENS.GRADIENT_PRIMARY}
+          colors={gradientColors ?? DESIGN_TOKENS.GRADIENT_PRIMARY}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={StyleSheet.absoluteFill}
