@@ -1,6 +1,6 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { Platform } from 'react-native';
-import { Audio } from 'expo-av';
+import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-audio';
 
 export type SoundEvent = 'correct' | 'incorrect' | 'perfect' | 'level_up' | 'badge_unlock';
 
@@ -47,7 +47,7 @@ function playWebTone(config: NoteConfig[], volume: number): void {
 }
 
 export function useSounds(soundEnabled: boolean, soundVolume: number) {
-  const soundRefs = useRef<Partial<Record<SoundEvent, Audio.Sound>>>({});
+  const playerRefs = useRef<Partial<Record<SoundEvent, AudioPlayer>>>({});
   const enabledRef = useRef(soundEnabled);
   const volumeRef = useRef(soundVolume);
 
@@ -56,40 +56,29 @@ export function useSounds(soundEnabled: boolean, soundVolume: number) {
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
-    let cancelled = false;
 
-    Audio.setAudioModeAsync({ playsInSilentModeIOS: false }).catch(() => {});
+    setAudioModeAsync({ playsInSilentMode: false }).catch(() => {});
 
-    const loadAll = async () => {
-      const assets: [SoundEvent, number][] = [
-        ['correct',      require('../assets/sounds/correct.wav') as number],
-        ['incorrect',    require('../assets/sounds/incorrect.wav') as number],
-        ['perfect',      require('../assets/sounds/perfect.wav') as number],
-        ['level_up',     require('../assets/sounds/level_up.wav') as number],
-        ['badge_unlock', require('../assets/sounds/badge_unlock.wav') as number],
-      ];
-      for (const [event, src] of assets) {
-        if (cancelled) break;
-        try {
-          const { sound } = await Audio.Sound.createAsync(src, { shouldPlay: false });
-          if (cancelled) {
-            sound.unloadAsync().catch(() => {});
-            break;
-          }
-          soundRefs.current[event] = sound;
-        } catch {
-          /* skip individual sound that fails to load */
-        }
+    const assets: [SoundEvent, number][] = [
+      ['correct',      require('../assets/sounds/correct.wav') as number],
+      ['incorrect',    require('../assets/sounds/incorrect.wav') as number],
+      ['perfect',      require('../assets/sounds/perfect.wav') as number],
+      ['level_up',     require('../assets/sounds/level_up.wav') as number],
+      ['badge_unlock', require('../assets/sounds/badge_unlock.wav') as number],
+    ];
+    for (const [event, src] of assets) {
+      try {
+        playerRefs.current[event] = createAudioPlayer(src);
+      } catch {
+        /* skip individual sound that fails to load */
       }
-    };
-    loadAll();
+    }
 
     return () => {
-      cancelled = true;
-      const refs = soundRefs.current;
-      soundRefs.current = {};
-      for (const s of Object.values(refs)) {
-        s?.unloadAsync().catch(() => {});
+      const refs = playerRefs.current;
+      playerRefs.current = {};
+      for (const p of Object.values(refs)) {
+        try { p?.remove(); } catch { /* already removed */ }
       }
     };
   }, []);
@@ -103,12 +92,15 @@ export function useSounds(soundEnabled: boolean, soundVolume: number) {
       return;
     }
 
-    const sound = soundRefs.current[event];
-    if (!sound) return;
-    sound
-      .setVolumeAsync(vol / 100)
-      .then(() => sound.replayAsync())
-      .catch(() => {});
+    const player = playerRefs.current[event];
+    if (!player) return;
+    try {
+      player.volume = vol / 100;
+      player.seekTo(0);
+      player.play();
+    } catch {
+      /* ignore playback errors */
+    }
   }, []);
 
   return { playSound };
