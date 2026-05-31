@@ -15,7 +15,7 @@ const SOUND_CONFIGS: Record<SoundEvent, NoteConfig[]> = {
 };
 
 function playWebTone(config: NoteConfig[], volume: number): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || volume === 0) return;
   try {
     const AudioCtx =
       window.AudioContext || // platform-safe

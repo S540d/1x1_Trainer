@@ -112,7 +112,7 @@ function MiniBarChart({
               <View
                 style={{
                   width: '60%',
-                  height: (hasData && barH > 0) ? Math.max(3, barH) : 0,
+                  height: hasData ? (barH > 0 ? Math.max(3, barH) : 2) : 0,
                   backgroundColor: hasData ? getBarColor(d) : 'transparent',
                   borderRadius: 3,
                 }}
