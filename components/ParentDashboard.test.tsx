@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor } from '@testing-library/react';
+import { render, waitFor, within } from '@testing-library/react';
 import { ParentDashboard } from './ParentDashboard';
 import { getThemeColors } from '../utils/theme';
 import { Operation, DifficultyMode, NumberRange } from '../types/game';
@@ -79,13 +79,12 @@ describe('ParentDashboard', () => {
 
   it('shows session count in summary bar', async () => {
     mockGetSessionRecords.mockResolvedValue([makeRecord({ errors: 0 }), makeRecord({ errors: 0 })]);
-    const { getAllByText, getByText } = render(
+    const { getByText } = render(
       <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
     );
     await waitFor(() => {
-      // use getAllByText because chart axis labels may also render '2' on the 2nd of a month
-      expect(getAllByText('2').length).toBeGreaterThan(0);
-      expect(getByText(t.parentSessions)).toBeTruthy();
+      const sessionLabel = getByText(t.parentSessions);
+      expect(within(sessionLabel.parentElement!).getByText('2')).toBeTruthy();
     });
   });
 
