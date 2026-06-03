@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor } from '@testing-library/react';
+import { render, waitFor, within } from '@testing-library/react';
 import { ParentDashboard } from './ParentDashboard';
 import { getThemeColors } from '../utils/theme';
 import { Operation, DifficultyMode, NumberRange } from '../types/game';
@@ -78,13 +78,13 @@ describe('ParentDashboard', () => {
   });
 
   it('shows session count in summary bar', async () => {
-    mockGetSessionRecords.mockResolvedValue([makeRecord(), makeRecord()]);
+    mockGetSessionRecords.mockResolvedValue([makeRecord({ errors: 0 }), makeRecord({ errors: 0 })]);
     const { getByText } = render(
       <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
     );
     await waitFor(() => {
-      expect(getByText('2')).toBeTruthy();
-      expect(getByText(t.parentSessions)).toBeTruthy();
+      const sessionLabel = getByText(t.parentSessions);
+      expect(within(sessionLabel.parentElement!).getByText('2')).toBeTruthy();
     });
   });
 
