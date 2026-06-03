@@ -78,7 +78,7 @@ describe('ParentDashboard', () => {
   });
 
   it('shows session count in summary bar', async () => {
-    mockGetSessionRecords.mockResolvedValue([makeRecord(), makeRecord()]);
+    mockGetSessionRecords.mockResolvedValue([makeRecord({ errors: 0 }), makeRecord({ errors: 0 })]);
     const { getByText } = render(
       <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
     );

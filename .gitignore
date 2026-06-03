@@ -84,3 +84,6 @@ public/screenshot*.png
 public/screenshot2.png
 public/favicon-new.png
 playstore-screenshots/
+
+# Security – Pflicht-Einträge (Issue #7 / reusable-gitignore-audit)
+.env.local
