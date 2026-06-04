@@ -9,19 +9,22 @@
 ## Branch-Workflow
 
 ```
-feature/fix → testing → staging → main
+feature/issue-XXX → testing → main
 ```
 
-| Branch    | Zweck                              |
-|-----------|------------------------------------|
-| `main`    | Produktion (protected)             |
-| `staging` | Pre-Release, Qualitätssicherung    |
-| `testing` | Integration neuer Features/Fixes   |
+`staging` wurde entfernt (2026-06-03, Issue #7).
 
-- PRs von Copilot/Claude immer gegen `testing` öffnen, nicht `main`
-- Copilot öffnet PRs automatisch gegen `main` → vor Merge: `gh pr edit <nr> --base testing`
-- `gh pr merge` erlaubt kein `--base`-Flag — Basis muss vorher im PR geändert werden
-- Nach jedem main-Merge: staging und testing synchronisieren
+| Branch           | Zweck                                        |
+|------------------|----------------------------------------------|
+| `main`           | Produktion (protected)                       |
+| `testing`        | Integration neuer Features/Fixes             |
+| `feature/issue-XXX` | Kurzlebige Feature-Branches              |
+
+- PRs immer gegen `testing` öffnen, nicht `main`
+- `gh pr merge <nr> --squash --delete-branch` für Feature→testing PRs
+- `gh pr merge <nr> --squash` für testing→main (kein `--delete-branch`!)
+- **Vor Push:** lokale Tests ausführen (`npm test`)
+- **Kein Merge bei CI-Fail**
 
 ## Merge-Workflow (PR → staging → main)
 
