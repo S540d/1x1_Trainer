@@ -103,14 +103,6 @@ The web version can be installed as an app on mobile devices and desktops:
 └── playstore-assets/            # Play Store marketing assets
 ```
 
-## Tech Stack
-
-- **React Native** - Cross-platform framework
-- **Expo** - Build & development tools (managed workflow)
-- **React Native Web** - Web support
-- **TypeScript** - Type safety
-- **Hermes** - JavaScript engine for optimized performance
-
 ## Build Process
 
 ### Android Production Builds
