@@ -67,7 +67,9 @@ test-results/
 coverage/
 
 # Local-only files (not for public repo — Issue #150)
-.claude/
+# .claude/commands/ wird versioniert (Issue #31 in project-templates)
+# Maschinenspezifisches via ~/.gitignore_global ignoriert; settings.json lokal halten
+.claude/settings.json
 docs/ANDROID_BUILD.md
 docs/RELEASE_CHECKLIST.md
 scripts/setup-twa-step1.sh
