@@ -272,7 +272,8 @@ jobs:
 
           # .claude/: nur commands/ darf versioniert sein (Issue #31)
           # Andere getrackte .claude/-Inhalte (settings, memory, CLAUDE.md, ...) sind verboten
-          CLAUDE_TRACKED=$(git ls-files '.claude/' | grep -v '^.claude/commands/' || true)
+          # -c core.quotepath=false: Umlaut-Pfade (aufräumen.md) nicht escapen, sonst greift der Filter nicht
+          CLAUDE_TRACKED=$(git -c core.quotepath=false ls-files '.claude/' | grep -v '^.claude/commands/' || true)
           if [ -n "$CLAUDE_TRACKED" ]; then
             echo "❌ Nicht erlaubte getrackte .claude/-Dateien (nur commands/ ist versioniert – Issue #31):"
             echo "$CLAUDE_TRACKED" | sed 's/^/   - /'
