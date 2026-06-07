@@ -97,3 +97,7 @@ playstore-screenshots/
 # Security – Pflicht-Einträge (Issue #7 / reusable-gitignore-audit)
 .env
 .env.local
+
+# Firebase – sensitive config (contains API key, never commit)
+google-services.json
+GoogleService-Info.plist
