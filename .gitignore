@@ -67,7 +67,16 @@ test-results/
 coverage/
 
 # Local-only files (not for public repo — Issue #150)
-.claude/
+# Claude Code – nur .claude/commands/ wird versioniert (Issue #31)
+# Alle maschinen-/projektlokalen .claude-Artefakte explizit ignorieren:
+.claude/CLAUDE.md
+.claude/settings.json
+.claude/settings.local.json
+.claude/memory/
+.claude/todos/
+.claude/cache/
+.claude/data/
+.claude/commands/README.md
 docs/ANDROID_BUILD.md
 docs/RELEASE_CHECKLIST.md
 scripts/setup-twa-step1.sh
