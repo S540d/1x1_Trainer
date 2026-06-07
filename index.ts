@@ -1,6 +1,14 @@
 import { registerRootComponent } from 'expo';
+import { Platform } from 'react-native';
 
 import App from './App';
+
+if (Platform.OS !== 'web') {
+  // Lazy import so web build doesn't bundle native-only Firebase modules
+  void import('@react-native-firebase/crashlytics').then(({ default: crashlytics }) => {
+    crashlytics().setCrashlyticsCollectionEnabled(true);
+  });
+}
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);
 // It also ensures that whether you load the app in Expo Go or in a native build,
