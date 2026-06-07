@@ -4,7 +4,7 @@
 
 import { GameMode, NumberRange, Operation, ThemeName } from '../types/game';
 
-export const APP_VERSION = '1.3.7';
+export const APP_VERSION = '1.3.8';
 export const APP_NAME = '1×1 Trainer';
 export const CONTACT_EMAIL = 'devsven@posteo.de';
 

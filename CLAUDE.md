@@ -202,6 +202,14 @@ npm run test:coverage # Coverage
 - Storage Keys: `app-sounds-enabled` / `app-sounds-volume` (Default: true / 75)
 - Web: `AudioContext`-Oszillatoren (`playWebTone`), keine Dateien nötig
 - Native: `expo-audio` (`createAudioPlayer` → `player.seekTo(0)` + `player.play()`, `player.volume`, `player.remove()`) + WAV-Assets aus `assets/sounds/`; `setAudioModeAsync({ playsInSilentMode: false })`
+- **`enableBackgroundPlayback: false`** in `app.json` bewusst gesetzt — verhindert `FOREGROUND_SERVICE_MEDIA_PLAYBACK` Permission im Play Store (die App nutzt nur kurze UI-Sounds, kein Hintergrund-Audio)
 - Linting: `window.*` in `useSounds.ts` muss `// platform-safe` Kommentar tragen (CI-Check)
 - WAV-Assets bei Bedarf neu generieren: `node scripts/generate-sounds.js`
 - Hintergrundmusik: bewusst nicht implementiert (erfordert Lizenz-freie Loop-Audiodatei), separates Follow-up
+
+## Firebase Crashlytics
+
+- Initialisierung in `index.ts` via dynamischem Import (Web-Bundle bleibt sauber)
+- `setCrashlyticsCollectionEnabled(!__DEV__)` — kein Dev-Traffic in Firebase Console
+- `google-services.json` liegt im Projekt-Root, ist gitignored — muss nach `prebuild --clean` nicht neu abgelegt werden (kein Expo-Native-Ordner)
+- **Paketname für Firebase**: `com.sven4321.trainer1x1` (Play-Store-Paketname, nicht `com.devsven.x1x1trainer` aus app.json!)
