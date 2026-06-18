@@ -54,7 +54,8 @@ Beim Erhöhen der Version IMMER alle drei Stellen aktualisieren:
 
 ## Build-Workflow (Übersicht)
 
-- **APK (Test):** Lokaler Build wieder lauffähig seit expo-audio-Migration (Issue #214, PR #215). **Wichtig: JDK 17 verwenden** (`export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home`) — Default-Java ist 21/25 und bricht den Gradle-Build. Alternativ per GitHub Actions: `gh workflow run build-android.yml --ref staging -f profile=preview -f bump=none`
+- **APK (Test):** Lokaler Build wieder lauffähig seit expo-audio-Migration (Issue #214, PR #215). **Wichtig: JDK 17 verwenden** (`export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home`) — Default-Java ist 21/25 und bricht den Gradle-Build. Alternativ per GitHub Actions: `gh workflow run build-android.yml --ref testing -f profile=preview -f bump=none`
+- **Lokaler AAB mit Store-Paketname:** `APP_PACKAGE=com.sven4321.trainer1x1 npx expo prebuild --platform android --clean && cd android && ./gradlew bundleRelease` — `app.config.js` injiziert den Paketnamen automatisch (Issue #233, PR #244 ✅)
 - **AAB (Play Store):** GitHub Actions → `Build Android` → profile: `production`
 - Workflow: `.github/workflows/build-android.yml`
 
@@ -81,23 +82,25 @@ npm run test:coverage # Coverage
 
 ---
 
-## Aktueller Stand (2026-05-31)
+## Aktueller Stand (2026-06-18)
 
-- Version: **1.3.7** / versionCode 27
-- Tests: 497 total (494 passed, 3 skipped), 15/15 Suites grün
-- Branches: `staging` vorn (`c640120`); `main` noch auf `cac8a3c` (v1.3.6)
-- Offene PRs: #212 (staging → main, wartet auf App-Test auf Gerät)
-- Offene Issues: #214 (expo-av→expo-audio), #156, #187, #131, #100, #96
-- APK v1.3.7 auf Testgerät installiert (via GitHub Actions preview-Build)
+- Version: **1.3.8** / versionCode 28
+- Branches: `testing` vorn (`b4939e1`); `main` auf `91cf92d` (sync v1.3.8)
+- Offene PRs: #242 (fix Sounds), #243 (Orientation), gegen `testing`
+- Offene Issues: #241, #235 (PRs offen), #156, #187, #131, #100, #96, #220, #231
+- APK v1.3.8 via CI
 
 ### Zuletzt gemergt / gepusht
 
 | PR / Commit | Was |
 |-------------|-----|
-| `c640120` | fix: expo-av auf ~16.0.8 (SDK-55-kompatibel; 15.0.2 brach lokalen Build) |
-| `3a1d43c` | chore: Version auf 1.3.7 / versionCode 27 |
-| #212 (offen) | staging → main: wartet auf App-Test |
-| #211 | testing → staging: Sound-Effekte, Visuelle Themes, Charts, UX, Jest 30 |
+| #244 ✅ | build: app.config.js für APP_PACKAGE env-var (Issue #233) |
+| #240 | ci: Cache-Cleanup-Workflow |
+| #239 | chore: Review-Modell v2 |
+| #234 | sync: testing → main (v1.3.8 + googleServicesFile fix) |
+| #230 | sync: testing → main (v1.3.8 Firebase Crashlytics) |
+| #242 (offen) | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241) |
+| #243 (offen) | feat: Orientation "default" für Tablet/Foldable (Issue #235) |
 
 ---
 
@@ -120,6 +123,7 @@ npm run test:coverage # Coverage
 | `components/ParentDashboard.tsx` | Eltern-Dashboard Modal (Beta) |
 | `components/GameCard.tsx` | Hauptspielansicht (alle 3 Antwortmodi) |
 | `styles/modalStyles.ts` | Gemeinsame Modal-Styles |
+| `app.config.js` | Dynamische Expo-Konfiguration: überschreibt `android.package` via `APP_PACKAGE` env-var (Issue #233) |
 | `jest.config.js` | Jest-Konfiguration |
 | `docs/private/CLAUDE.md` | Sensible Build/Keystore-Details (gitignored) |
 
@@ -193,15 +197,17 @@ npm run test:coverage # Coverage
 ## Offene TODOs / Bekannte Einschränkungen
 
 - ✅ **expo-av → expo-audio Migration erledigt** (Issue #214 / PR #215) — lokaler Build wieder lauffähig (mit JDK 17)
+- ✅ **Paketname-Diskrepanz gelöst** (Issue #233 / PR #244) — `app.config.js` mit `APP_PACKAGE` env-var
 - Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 - Reanimated wurde durch `Animated` core ersetzt (Web-Kompatibilität) — Issue #131
+- **Orientation auf `"default"` gesetzt** (Issue #235 / PR #243 offen) — Tablet/Foldable Landscape-Support
 
 ## Sound-Effekte — Hinweise
 
 - `SoundEvent = 'correct' | 'incorrect' | 'perfect' | 'level_up' | 'badge_unlock'`
 - Storage Keys: `app-sounds-enabled` / `app-sounds-volume` (Default: true / 75)
 - Web: `AudioContext`-Oszillatoren (`playWebTone`), keine Dateien nötig
-- Native: `expo-audio` (`createAudioPlayer` → `player.seekTo(0)` + `player.play()`, `player.volume`, `player.remove()`) + WAV-Assets aus `assets/sounds/`; `setAudioModeAsync({ playsInSilentMode: false })`
+- Native: `expo-audio` (`createAudioPlayer` → `player.seekTo(0)` + `player.play()`, `player.volume`, `player.remove()`) + WAV-Assets aus `assets/sounds/`; `setAudioModeAsync({ playsInSilentMode: false })`; bei `soundEnabled → false` werden alle Player sofort pausiert (PR #242)
 - **`enableBackgroundPlayback: false`** in `app.json` bewusst gesetzt — verhindert `FOREGROUND_SERVICE_MEDIA_PLAYBACK` Permission im Play Store (die App nutzt nur kurze UI-Sounds, kein Hintergrund-Audio)
 - Linting: `window.*` in `useSounds.ts` muss `// platform-safe` Kommentar tragen (CI-Check)
 - WAV-Assets bei Bedarf neu generieren: `node scripts/generate-sounds.js`
