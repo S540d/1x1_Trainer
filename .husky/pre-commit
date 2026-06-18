@@ -30,7 +30,7 @@ if [ -n "$STAGED_TS_FILES" ]; then
 fi
 
 # Check version consistency if package.json or app.json changed
-if git diff --cached --name-only | grep -E "(package\.json|app\.json|App\.tsx|build\.gradle\.kts)" >/dev/null; then
+if git diff --cached --name-only | grep -E "(package\.json|app\.json|app\.config\.js|App\.tsx|build\.gradle\.kts)" >/dev/null; then
   echo "Checking version consistency..."
 
   PACKAGE_VERSION=$(node -p "require('./package.json').version" 2>/dev/null)
