@@ -51,7 +51,14 @@ export function useSounds(soundEnabled: boolean, soundVolume: number) {
   const enabledRef = useRef(soundEnabled);
   const volumeRef = useRef(soundVolume);
 
-  useEffect(() => { enabledRef.current = soundEnabled; }, [soundEnabled]);
+  useEffect(() => {
+    enabledRef.current = soundEnabled;
+    if (!soundEnabled && Platform.OS !== 'web') {
+      for (const p of Object.values(playerRefs.current)) {
+        try { p?.pause(); } catch { /* ignore */ }
+      }
+    }
+  }, [soundEnabled]);
   useEffect(() => { volumeRef.current = soundVolume; }, [soundVolume]);
 
   useEffect(() => {
