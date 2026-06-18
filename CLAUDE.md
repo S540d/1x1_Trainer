@@ -85,22 +85,22 @@ npm run test:coverage # Coverage
 ## Aktueller Stand (2026-06-18)
 
 - Version: **1.3.8** / versionCode 28
-- Branches: `testing` vorn (`b4939e1`); `main` auf `91cf92d` (sync v1.3.8)
-- Offene PRs: #242 (fix Sounds), #243 (Orientation), gegen `testing`
-- Offene Issues: #241, #235 (PRs offen), #156, #187, #131, #100, #96, #220, #231
+- Branches: `testing` vorn (`dceba71`); `main` auf `91cf92d` (sync v1.3.8)
+- Offene PRs: #242 (fix Sounds), #243 (Orientation), #245 (CLAUDE.md), gegen `testing`
+- Offene Issues: #156, #187, #131, #100, #96, #220, #231
 - APK v1.3.8 via CI
 
 ### Zuletzt gemergt / gepusht
 
 | PR / Commit | Was |
 |-------------|-----|
-| #244 ✅ | build: app.config.js für APP_PACKAGE env-var (Issue #233) |
+| #245 (offen) | docs: CLAUDE.md 2026-06-18 |
+| #244 ✅ | build: app.config.js für APP_PACKAGE env-var (Issue #233 ✅ geschlossen) |
+| #243 (offen) | feat: Orientation "default" für Tablet/Foldable (Issue #235 ✅ geschlossen) |
+| #242 (offen) | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241 ✅ geschlossen) |
 | #240 | ci: Cache-Cleanup-Workflow |
 | #239 | chore: Review-Modell v2 |
 | #234 | sync: testing → main (v1.3.8 + googleServicesFile fix) |
-| #230 | sync: testing → main (v1.3.8 Firebase Crashlytics) |
-| #242 (offen) | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241) |
-| #243 (offen) | feat: Orientation "default" für Tablet/Foldable (Issue #235) |
 
 ---
 
