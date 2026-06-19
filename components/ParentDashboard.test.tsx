@@ -124,9 +124,7 @@ describe('ParentDashboard', () => {
   });
 
   it('does not fetch records when not visible', () => {
-    render(
-      <ParentDashboard visible={false} onClose={jest.fn()} colors={colors} t={t} />
-    );
+    render(<ParentDashboard visible={false} onClose={jest.fn()} colors={colors} t={t} />);
     expect(mockGetSessionRecords).not.toHaveBeenCalled();
     expect(mockGetTaskStats).not.toHaveBeenCalled();
   });
@@ -135,7 +133,14 @@ describe('ParentDashboard', () => {
     mockGetSessionRecords.mockResolvedValue([makeRecord()]);
     // Stats exist but error rate is only 20% → not weak
     mockGetTaskStats.mockResolvedValue([
-      { num1: 3, num2: 4, operation: 'MULTIPLICATION', correctCount: 8, errorCount: 2, lastSeen: new Date().toISOString() },
+      {
+        num1: 3,
+        num2: 4,
+        operation: 'MULTIPLICATION',
+        correctCount: 8,
+        errorCount: 2,
+        lastSeen: new Date().toISOString(),
+      },
     ]);
     const { queryByText } = render(
       <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
@@ -147,7 +152,14 @@ describe('ParentDashboard', () => {
   it('shows weak task row when a task has high error rate', async () => {
     mockGetSessionRecords.mockResolvedValue([makeRecord()]);
     mockGetTaskStats.mockResolvedValue([
-      { num1: 7, num2: 8, operation: 'MULTIPLICATION', correctCount: 0, errorCount: 3, lastSeen: new Date().toISOString() },
+      {
+        num1: 7,
+        num2: 8,
+        operation: 'MULTIPLICATION',
+        correctCount: 0,
+        errorCount: 3,
+        lastSeen: new Date().toISOString(),
+      },
     ]);
     const { getByText } = render(
       <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />

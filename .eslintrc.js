@@ -1,8 +1,6 @@
 module.exports = {
   root: true,
-  extends: [
-    '@react-native',
-  ],
+  extends: ['@react-native'],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
   rules: {
@@ -14,7 +12,7 @@ module.exports = {
     'no-console': ['warn', { allow: ['warn', 'error'] }],
 
     // Strict equality
-    'eqeqeq': ['error', 'always'],
+    eqeqeq: ['error', 'always'],
 
     // No var, use const/let
     'no-var': 'error',
@@ -22,10 +20,13 @@ module.exports = {
 
     // TypeScript specific
     '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/no-unused-vars': ['warn', {
-      argsIgnorePattern: '^_',
-      varsIgnorePattern: '^_',
-    }],
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      },
+    ],
   },
   overrides: [
     {

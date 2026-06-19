@@ -17,7 +17,7 @@ const filesToCopy = [
   { src: 'public/icon-384.png', dest: 'dist/icon-384.png' },
   { src: 'public/icon-512.png', dest: 'dist/icon-512.png' },
   { src: 'public/favicon.ico', dest: 'dist/favicon.ico' },
-  { src: 'public/.well-known/assetlinks.json', dest: 'dist/.well-known/assetlinks.json' }
+  { src: 'public/.well-known/assetlinks.json', dest: 'dist/.well-known/assetlinks.json' },
 ];
 
 filesToCopy.forEach(({ src, dest }) => {

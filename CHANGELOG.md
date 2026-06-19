@@ -8,14 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.8] - 2026-06-07
 
 ### Added
+
 - 📊 **Firebase Crashlytics** integriert: Absturzrate wird ab sofort im Play Store erfasst (zuvor fehlten Daten)
 
 ### Changed
+
 - 🔧 **FOREGROUND_SERVICE_MEDIA_PLAYBACK** entfernt: expo-audio auf `enableBackgroundPlayback: false` gesetzt — die App benötigt diese Permission nicht (nur kurze UI-Sounds während aktiver Nutzung)
 
 ## [1.3.0] - 2026-03-14
 
 ### Added
+
 - ✨ **App.tsx Refactoring** (PR #136): App.tsx von 1.399 auf 232 Zeilen reduziert (83% weniger)
   - 7 Komponenten extrahiert: `Header`, `SettingsMenu`, `GameCard`, `Numpad`, `ResultModal`, `MotivationModal`, `AboutModal`
   - Gemeinsame Modal-Styles in `styles/modalStyles.ts`
@@ -26,17 +29,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✨ **Build Workflow**: Version-Bump Default auf `patch` gesetzt mit Warnung
 
 ### Fixed
+
 - 🐛 **Numpad row height alignment**: Konsistente Höhe aller Numpad-Reihen
 - 🐛 **Copilot Review Fixes**: URL-Encoding, Linking Error-Handling, stabile React-Keys
 
 ## [1.2.2] - 2026-03-13
 
 ### Fixed
+
 - 🐛 **Copilot Review**: URL-Encoding, Error-Handling bei externen Links, stabile React-Keys in Listen
 
 ## [1.2.1] - 2026-02-28
 
 ### Fixed
+
 - 🐛 **Settings menu clipping on small/low-resolution screens** (Issue #116, PR #117): Settings menu no longer extends beyond the visible viewport
   - Added `maxHeight` constraint based on screen height via `useWindowDimensions`
   - Wrapped settings menu body in `ScrollView` so all sections remain accessible
@@ -44,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.0] - 2026-02-15
 
 ### Added
+
 - ✨ **Challenge Mode** (Issue #100): New endless game mode with progressive difficulty
   - Play until 3 mistakes — difficulty increases every few correct answers
   - 6 levels: starts with multiplication 1-10, progresses to mixed operations up to 100
@@ -67,6 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Test suite: 337 tests (334 passed, 3 skipped)
 
 ### Fixed
+
 - 🐛 **Challenge Mode Operations** (Issue #104, PR #106): All operations now activate automatically in challenge mode
   - Levels 2-6 no longer fall back to user-selected operations
   - Operation buttons are disabled and shown as active during challenge mode
@@ -79,6 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Creates more balanced layout on small screens and older Android devices
 
 ### Added
+
 - ✨ **iOS PWA Icon Support** (Issue #37, PR #91): Comprehensive iOS home screen support
   - Added multiple apple-touch-icon links with cache-busting (180x180, 192x192, 512x512)
   - Changed status bar style to `black-translucent` for native-like appearance
@@ -87,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Proper icon display when PWA is added to iOS home screen
 
 ### Changed
+
 - 🎨 **Personalize Button Style** (Issue #93, PR #94): Improved button visibility
   - Updated Personalize button to match unselected operation button style
   - Added oval gray border (borderRadius: 20, borderWidth: 2)
@@ -94,6 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Better visual prominence and consistency with app design
 
 ### Technical
+
 - ⚙️ **Jest Configuration**: Enhanced test infrastructure for Issue #97
   - Added transform for `.jsx?` files to handle ES modules
   - Added `transformIgnorePatterns` for expo-localization compatibility
@@ -102,6 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2026-01-24
 
 ### Added
+
 - ✨ **Flexible Number Range** (Issue #80, PR #80): Enhanced number range selection
   - Expanded from 2 ranges to 4 selectable ranges: 1-10, 1-20, 1-50, 1-100
   - Added NumberRange enum with values RANGE_10, RANGE_20, RANGE_50, RANGE_100
@@ -118,6 +130,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated translations in both languages
 
 ### Fixed
+
 - 🐛 **CRITICAL: Number Range Enforcement** (Issue #81, PR #82): Fixed range violations
   - Problem: Tasks like "42×32=?" appeared even with 1-20 range selected
   - Root cause: Division/multiplication could generate numbers beyond selected range
@@ -130,6 +143,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - All 272 tests passing
 
 ### Changed
+
 - 🔄 **Deployment Workflow**: Implemented 3-tier deployment strategy for safer releases
   - Added `staging` branch between `testing` and `main`
   - Workflow: `feature → testing → staging → main`
@@ -140,6 +154,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Reason: 1x1 Trainer has most active users - extra safety layer needed
 
 ### Fixed
+
 - 🐛 **CRITICAL: Number Range Enforcement - Complete Fix** (PR #88): Fixed remaining range violations
   - **Problem 1 - Operand Generation**: All operands AND results now stay within range
     - Example fixed: Range 1-20 no longer shows "80÷10=?" (dividend 80 > 20)
@@ -162,6 +177,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Files deployed to gh-pages successfully, URL verification pending (CDN propagation)
 
 ### Added
+
 - 🎨 **Landscape Mode Blocking**: Added bilingual landscape orientation blocking
   - Shows overlay message when device is in landscape mode
   - Message: "📱 Bitte drehen Sie Ihr Gerät ins Hochformat / Please rotate your device to portrait mode"
@@ -169,6 +185,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enhances mobile UX by enforcing portrait mode
 
 ### Fixed
+
 - 🐛 **CRITICAL: Game Logic Bugs** (Issue #66): Fixed multiple critical bugs in game operations
   - Fixed initial operation: Now defaults to MULTIPLICATION instead of undefined
   - Fixed TypeError: `setOperation is not a function` by syncing useGameLogic with usePreferences
@@ -186,6 +203,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Resolves off-screen check button issue across all screen sizes
 
 ### Added
+
 - ✅ **Comprehensive Tests for useTheme Hook**: Added 26 new tests
   - Theme initialization (light/dark/system)
   - System dark mode detection on web
@@ -197,6 +215,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.12] - 2025-12-22
 
 ### Fixed
+
 - 🐛 **Creative Mode** (Issue #30): Fixed answer mode randomization
   - Answer modes now randomize after each question in Creative Mode
   - NUMBER_SEQUENCE properly restricted to result questions only (questionPart === 2)
@@ -206,6 +225,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.11] - 2025-12-22
 
 ### Added
+
 - ✨ **Modernized UI Design** ("Soft & Modern" style)
   - Updated theme colors for better visual cohesion
   - Improved dark mode with warmer tones
@@ -218,20 +238,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Better state management and performance
 
 ### Fixed
+
 - 🐛 **Android Platform**:
   - Enabled Hermes JavaScript engine for better performance
   - Fixed orientation restrictions to support large displays
 - 🔧 **Pre-commit Hook**: Fixed xargs bug when no staged TS/JS files
 
 ### Changed
+
 - 📱 Updated Android versionCode to 12
 
 ### Build & Deployment
+
 - Build artifact: https://expo.dev/artifacts/eas/9Pu5SgYYtkTsH3DdHBM2cW.aab
 - React 19.1.0 confirmed as production-ready
 - Ready for App Store deployment
 
 ### Repository Maintenance
+
 - ✅ Merged `testing` branch into `main`
 - 🧹 Cleaned up stale branches:
   - Deleted `testing` (merged into main on 2025-12-21)
@@ -242,6 +266,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.10] - 2024-12-15
 
 ### Fixed
+
 - 🚨 **CRITICAL**: App startup issue in Play Store
   - Removed old native Android project that conflicted with EAS Build
   - EAS Build now generates native Android code correctly
@@ -262,6 +287,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Theme background color now applied consistently across all viewports
 
 ### Added
+
 - 🏗️ **Major Code Refactoring (Phase 1 & 2)**:
   - Created `types/` directory for all TypeScript type definitions
   - Created `i18n/` directory for translation management
@@ -287,6 +313,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 📱 Platform-safe Web API usage with proper guards
 
 ### Changed
+
 - 🏗️ **Build System Migration**: Switched from native Android project to EAS Build
   - Removed old Kotlin/Jetpack Compose Android project
   - Now using Expo Managed Workflow with EAS Build
@@ -304,12 +331,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.9] - 2024-12-13
 
 ### Fixed
+
 - 🚨 **Critical**: Android crash when checking dark mode
   - Added Platform.OS check before using window.matchMedia
   - Prevents crash on Android native app launch
 - 🔧 Removed expo-updates dependency for TWA build compatibility
 
 ### Changed
+
 - 📱 Updated Android versionCode to 10
 - 🔒 Improved build configuration for TWA
 

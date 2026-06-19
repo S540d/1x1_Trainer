@@ -1,7 +1,7 @@
 /**
  * Tests for platform.ts
  * Phase 4: Utilities - Platform detection and system APIs
- * 
+ *
  * NOTE: Tests use window APIs directly since they run in a jsdom environment // platform-safe
  * where these APIs are available. The platform-safe comments satisfy the
  * pre-commit hook that prevents accidental window usage without platform checks
@@ -92,7 +92,8 @@ describe('platform.ts - System Dark Mode Detection', () => {
   });
 
   it('should detect dark mode when prefers-color-scheme is dark', () => {
-    const mockMatchMedia = jest.fn((query: string) => ({ // platform-safe
+    const mockMatchMedia = jest.fn((query: string) => ({
+      // platform-safe
       matches: query === '(prefers-color-scheme: dark)',
       media: query,
       onchange: null,
@@ -111,7 +112,8 @@ describe('platform.ts - System Dark Mode Detection', () => {
   });
 
   it('should detect light mode when prefers-color-scheme is light', () => {
-    const mockMatchMedia = jest.fn((query: string) => ({ // platform-safe
+    const mockMatchMedia = jest.fn((query: string) => ({
+      // platform-safe
       matches: false,
       media: query,
       onchange: null,
@@ -138,8 +140,9 @@ describe('platform.ts - System Dark Mode Detection', () => {
 
   it('should handle matchMedia errors gracefully', () => {
     const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-    
-    (window as any).matchMedia = jest.fn(() => { // platform-safe
+
+    (window as any).matchMedia = jest.fn(() => {
+      // platform-safe
       throw new Error('matchMedia error');
     });
 
@@ -167,7 +170,8 @@ describe('platform.ts - Theme Change Listener', () => {
   it('should add and remove theme change listener successfully', () => {
     const mockRemoveEventListener = jest.fn();
     const mockAddEventListener = jest.fn();
-    const mockMediaQuery = { // platform-safe
+    const mockMediaQuery = {
+      // platform-safe
       matches: false,
       media: '(prefers-color-scheme: dark)',
       onchange: null,
@@ -190,7 +194,7 @@ describe('platform.ts - Theme Change Listener', () => {
 
     // Call cleanup
     cleanup();
-    
+
     // Should call removeEventListener with 'change' event and the same function handler
     expect(mockRemoveEventListener).toHaveBeenCalled();
     expect(mockRemoveEventListener.mock.calls[0][0]).toBe('change');
@@ -204,7 +208,8 @@ describe('platform.ts - Theme Change Listener', () => {
       }
     });
 
-    const mockMediaQuery = { // platform-safe
+    const mockMediaQuery = {
+      // platform-safe
       matches: false,
       media: '(prefers-color-scheme: dark)',
       onchange: null,
@@ -242,7 +247,8 @@ describe('platform.ts - Theme Change Listener', () => {
     const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
     // Mock matchMedia to return an object that throws when addEventListener is called
-    const mockMediaQuery = { // platform-safe
+    const mockMediaQuery = {
+      // platform-safe
       matches: false,
       media: '(prefers-color-scheme: dark)',
       onchange: null,
@@ -275,7 +281,8 @@ describe('platform.ts - Storage (Web/localStorage paths)', () => {
   });
 
   afterEach(() => {
-    Object.defineProperty(window, 'localStorage', { // platform-safe
+    Object.defineProperty(window, 'localStorage', {
+      // platform-safe
       value: originalLocalStorage,
       writable: true,
       configurable: true,
@@ -284,7 +291,8 @@ describe('platform.ts - Storage (Web/localStorage paths)', () => {
 
   it('getItem should use localStorage on web', async () => {
     const mockGetItem = jest.fn().mockReturnValue('stored-value');
-    Object.defineProperty(window, 'localStorage', { // platform-safe
+    Object.defineProperty(window, 'localStorage', {
+      // platform-safe
       value: { getItem: mockGetItem, setItem: jest.fn(), removeItem: jest.fn() },
       writable: true,
       configurable: true,
@@ -297,7 +305,8 @@ describe('platform.ts - Storage (Web/localStorage paths)', () => {
 
   it('setItem should use localStorage on web', async () => {
     const mockSetItem = jest.fn();
-    Object.defineProperty(window, 'localStorage', { // platform-safe
+    Object.defineProperty(window, 'localStorage', {
+      // platform-safe
       value: { getItem: jest.fn(), setItem: mockSetItem, removeItem: jest.fn() },
       writable: true,
       configurable: true,
@@ -309,7 +318,8 @@ describe('platform.ts - Storage (Web/localStorage paths)', () => {
 
   it('removeItem should use localStorage on web', async () => {
     const mockRemoveItem = jest.fn();
-    Object.defineProperty(window, 'localStorage', { // platform-safe
+    Object.defineProperty(window, 'localStorage', {
+      // platform-safe
       value: { getItem: jest.fn(), setItem: jest.fn(), removeItem: mockRemoveItem },
       writable: true,
       configurable: true,

@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Modal,
-} from 'react-native';
+import { StyleSheet, Text, View, Modal } from 'react-native';
 import { ThemeColors, DifficultyMode, ChallengeState } from '../types/game';
 import { modalStyles } from '../styles/modalStyles';
 import { Button } from './Button';
@@ -52,7 +47,9 @@ export function ResultModal({
             <>
               <Text style={[modalStyles.title, { color: colors.text }]}>{t.challengeOver}</Text>
               {challengeState.isNewHighScore && (
-                <Text style={[styles.newHighScoreText, { color: '#F59E0B' }]}>{t.newHighScore}</Text>
+                <Text style={[styles.newHighScoreText, { color: '#F59E0B' }]}>
+                  {t.newHighScore}
+                </Text>
               )}
               <Text style={[modalStyles.text, { color: colors.text }]}>
                 {t.challengeResult
@@ -64,7 +61,13 @@ export function ResultModal({
                   {t.highScore}: {challengeState.highScore}
                 </Text>
               )}
-              <Button label={t.tryAgain} onPress={onRestart} variant="primary" fullWidth colors={colors} />
+              <Button
+                label={t.tryAgain}
+                onPress={onRestart}
+                variant="primary"
+                fullWidth
+                colors={colors}
+              />
             </>
           ) : (
             <>
@@ -74,10 +77,22 @@ export function ResultModal({
               </Text>
               <View style={styles.modalButtonRow}>
                 <View style={styles.modalButtonWrap}>
-                  <Button label={t.newRound} onPress={onRestart} variant="primary" fullWidth colors={colors} />
+                  <Button
+                    label={t.newRound}
+                    onPress={onRestart}
+                    variant="primary"
+                    fullWidth
+                    colors={colors}
+                  />
                 </View>
                 <View style={styles.modalButtonWrap}>
-                  <Button label={t.continueGame} onPress={onContinue} variant="secondary" fullWidth colors={colors} />
+                  <Button
+                    label={t.continueGame}
+                    onPress={onContinue}
+                    variant="secondary"
+                    fullWidth
+                    colors={colors}
+                  />
                 </View>
               </View>
             </>

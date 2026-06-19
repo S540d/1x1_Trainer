@@ -14,11 +14,11 @@ feature/issue-XXX → testing → main
 
 `staging` wurde entfernt (2026-06-03, Issue #7).
 
-| Branch           | Zweck                                        |
-|------------------|----------------------------------------------|
-| `main`           | Produktion (protected)                       |
-| `testing`        | Integration neuer Features/Fixes             |
-| `feature/issue-XXX` | Kurzlebige Feature-Branches              |
+| Branch              | Zweck                            |
+| ------------------- | -------------------------------- |
+| `main`              | Produktion (protected)           |
+| `testing`           | Integration neuer Features/Fixes |
+| `feature/issue-XXX` | Kurzlebige Feature-Branches      |
 
 - PRs immer gegen `testing` öffnen, nicht `main`
 - `gh pr merge <nr> --squash --delete-branch` für Feature→testing PRs
@@ -41,6 +41,7 @@ git checkout main
 ## Versionsbump-Checkliste
 
 Beim Erhöhen der Version IMMER alle drei Stellen aktualisieren:
+
 1. `package.json` → `version`
 2. `app.json` → `expo.version` + `android.versionCode` (+1)
 3. `utils/constants.ts` → `APP_VERSION`
@@ -92,40 +93,40 @@ npm run test:coverage # Coverage
 
 ### Zuletzt gemergt / gepusht
 
-| PR / Commit | Was |
-|-------------|-----|
-| #245 (offen) | docs: CLAUDE.md 2026-06-18 |
-| #244 ✅ | build: app.config.js für APP_PACKAGE env-var (Issue #233 ✅ geschlossen) |
+| PR / Commit  | Was                                                                         |
+| ------------ | --------------------------------------------------------------------------- |
+| #245 (offen) | docs: CLAUDE.md 2026-06-18                                                  |
+| #244 ✅      | build: app.config.js für APP_PACKAGE env-var (Issue #233 ✅ geschlossen)    |
 | #243 (offen) | feat: Orientation "default" für Tablet/Foldable (Issue #235 ✅ geschlossen) |
-| #242 (offen) | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241 ✅ geschlossen) |
-| #240 | ci: Cache-Cleanup-Workflow |
-| #239 | chore: Review-Modell v2 |
-| #234 | sync: testing → main (v1.3.8 + googleServicesFile fix) |
+| #242 (offen) | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241 ✅ geschlossen)     |
+| #240         | ci: Cache-Cleanup-Workflow                                                  |
+| #239         | chore: Review-Modell v2                                                     |
+| #234         | sync: testing → main (v1.3.8 + googleServicesFile fix)                      |
 
 ---
 
 ## Wichtige Dateien
 
-| Datei | Inhalt |
-|-------|--------|
-| `utils/constants.ts` | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS, `THEMES` (alle 5 Farbthemes mit LIGHT/DARK-Varianten) |
-| `utils/theme.ts` | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'` |
-| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `saveThemeName` / `getThemeName`, `saveSoundsEnabled` / `getSoundsEnabled`, `saveSoundsVolume` / `getSoundsVolume`, `FOUR_WEEKS_MS` |
-| `utils/animations.ts` | `prefersReducedMotion()` — liest Accessibility-Einstellung |
-| `types/game.ts` | ThemeColors (inkl. `gradientPrimary`), GameState, Enums, SessionRecord, `ThemeName` |
-| `i18n/translations.ts` | DE/EN Übersetzungen, `TranslationStrings`-Interface |
-| `hooks/useGameLogic.ts` | Gesamte Spiellogik, `onSessionComplete`-Callback |
-| `hooks/usePreferences.ts` | Persistierte User-Einstellungen (Sprache, ThemeMode, ThemeName, soundEnabled, soundVolume) |
-| `hooks/useSounds.ts` | Sound-Hook: `playSound(event)` — Web: AudioContext-Oszillatoren, Native: expo-audio (`createAudioPlayer`) + WAV-Assets |
-| `assets/sounds/` | WAV-Assets: correct / incorrect / perfect / level_up / badge_unlock (je 8–17 KB) |
-| `scripts/generate-sounds.js` | Generator für WAV-Assets (`node scripts/generate-sounds.js`) |
-| `components/PersonalizeModal.tsx` | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache, Sound An/Aus + Lautstärke) |
-| `components/ParentDashboard.tsx` | Eltern-Dashboard Modal (Beta) |
-| `components/GameCard.tsx` | Hauptspielansicht (alle 3 Antwortmodi) |
-| `styles/modalStyles.ts` | Gemeinsame Modal-Styles |
-| `app.config.js` | Dynamische Expo-Konfiguration: überschreibt `android.package` via `APP_PACKAGE` env-var (Issue #233) |
-| `jest.config.js` | Jest-Konfiguration |
-| `docs/private/CLAUDE.md` | Sensible Build/Keystore-Details (gitignored) |
+| Datei                             | Inhalt                                                                                                                                                                                                                                                                                                                |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `utils/constants.ts`              | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS, `THEMES` (alle 5 Farbthemes mit LIGHT/DARK-Varianten)                                                                                                                                                                                                    |
+| `utils/theme.ts`                  | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'`                                                                                                                                                                                                                                     |
+| `utils/storage.ts`                | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `saveThemeName` / `getThemeName`, `saveSoundsEnabled` / `getSoundsEnabled`, `saveSoundsVolume` / `getSoundsVolume`, `FOUR_WEEKS_MS` |
+| `utils/animations.ts`             | `prefersReducedMotion()` — liest Accessibility-Einstellung                                                                                                                                                                                                                                                            |
+| `types/game.ts`                   | ThemeColors (inkl. `gradientPrimary`), GameState, Enums, SessionRecord, `ThemeName`                                                                                                                                                                                                                                   |
+| `i18n/translations.ts`            | DE/EN Übersetzungen, `TranslationStrings`-Interface                                                                                                                                                                                                                                                                   |
+| `hooks/useGameLogic.ts`           | Gesamte Spiellogik, `onSessionComplete`-Callback                                                                                                                                                                                                                                                                      |
+| `hooks/usePreferences.ts`         | Persistierte User-Einstellungen (Sprache, ThemeMode, ThemeName, soundEnabled, soundVolume)                                                                                                                                                                                                                            |
+| `hooks/useSounds.ts`              | Sound-Hook: `playSound(event)` — Web: AudioContext-Oszillatoren, Native: expo-audio (`createAudioPlayer`) + WAV-Assets                                                                                                                                                                                                |
+| `assets/sounds/`                  | WAV-Assets: correct / incorrect / perfect / level_up / badge_unlock (je 8–17 KB)                                                                                                                                                                                                                                      |
+| `scripts/generate-sounds.js`      | Generator für WAV-Assets (`node scripts/generate-sounds.js`)                                                                                                                                                                                                                                                          |
+| `components/PersonalizeModal.tsx` | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache, Sound An/Aus + Lautstärke)                                                                                                                                                                                                                              |
+| `components/ParentDashboard.tsx`  | Eltern-Dashboard Modal (Beta)                                                                                                                                                                                                                                                                                         |
+| `components/GameCard.tsx`         | Hauptspielansicht (alle 3 Antwortmodi)                                                                                                                                                                                                                                                                                |
+| `styles/modalStyles.ts`           | Gemeinsame Modal-Styles                                                                                                                                                                                                                                                                                               |
+| `app.config.js`                   | Dynamische Expo-Konfiguration: überschreibt `android.package` via `APP_PACKAGE` env-var (Issue #233)                                                                                                                                                                                                                  |
+| `jest.config.js`                  | Jest-Konfiguration                                                                                                                                                                                                                                                                                                    |
+| `docs/private/CLAUDE.md`          | Sensible Build/Keystore-Details (gitignored)                                                                                                                                                                                                                                                                          |
 
 ---
 

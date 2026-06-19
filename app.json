@@ -36,10 +36,7 @@
               "pathPrefix": "/1x1_Trainer"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         },
         {
           "action": "VIEW",
@@ -51,10 +48,7 @@
               "pathPrefix": "/1x1_Trainer"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ],
       "package": "com.devsven.x1x1trainer"

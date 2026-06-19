@@ -35,7 +35,16 @@ import {
   recordTaskResult,
   getWeakTasks,
 } from './storage';
-import { Operation, ThemeMode, Language, NumberRange, DifficultyMode, SessionRecord, StreakData, TaskStat } from '../types/game';
+import {
+  Operation,
+  ThemeMode,
+  Language,
+  NumberRange,
+  DifficultyMode,
+  SessionRecord,
+  StreakData,
+  TaskStat,
+} from '../types/game';
 
 // Mock react-native Platform
 jest.mock('react-native', () => ({
@@ -60,19 +69,23 @@ describe('storage.ts - Basic CRUD Operations', () => {
   beforeEach(() => {
     // Reset mock localStorage
     mockLocalStorage = {};
-    
+
     // Create spies on localStorage methods
     getItemSpy = jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => {
       return mockLocalStorage[key] || null;
     });
-    
-    setItemSpy = jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => {
-      mockLocalStorage[key] = value;
-    });
-    
-    removeItemSpy = jest.spyOn(Storage.prototype, 'removeItem').mockImplementation((key: string) => {
-      delete mockLocalStorage[key];
-    });
+
+    setItemSpy = jest
+      .spyOn(Storage.prototype, 'setItem')
+      .mockImplementation((key: string, value: string) => {
+        mockLocalStorage[key] = value;
+      });
+
+    removeItemSpy = jest
+      .spyOn(Storage.prototype, 'removeItem')
+      .mockImplementation((key: string) => {
+        delete mockLocalStorage[key];
+      });
   });
 
   afterEach(() => {
@@ -108,10 +121,10 @@ describe('storage.ts - Basic CRUD Operations', () => {
 
     it('should overwrite existing values', async () => {
       const key = 'overwrite-test';
-      
+
       await setStorageItem(key, 'first-value');
       await setStorageItem(key, 'second-value');
-      
+
       const result = await getStorageItem(key);
       expect(result).toBe('second-value');
     });
@@ -144,14 +157,16 @@ describe('storage.ts - Typed Storage Helpers', () => {
 
   beforeEach(() => {
     mockLocalStorage = {};
-    
+
     getItemSpy = jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => {
       return mockLocalStorage[key] || null;
     });
-    
-    setItemSpy = jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => {
-      mockLocalStorage[key] = value;
-    });
+
+    setItemSpy = jest
+      .spyOn(Storage.prototype, 'setItem')
+      .mockImplementation((key: string, value: string) => {
+        mockLocalStorage[key] = value;
+      });
   });
 
   afterEach(() => {
@@ -245,10 +260,10 @@ describe('storage.ts - Typed Storage Helpers', () => {
     it('should migrate from old single-operation storage', async () => {
       // Simulate old storage format
       mockLocalStorage['app-operation'] = Operation.ADDITION;
-      
+
       const operations = await getOperations();
       expect(operations).toEqual([Operation.ADDITION]);
-      
+
       // Verify migration saved new format
       expect(mockLocalStorage['app-operations']).toBe(JSON.stringify([Operation.ADDITION]));
     });
@@ -380,16 +395,16 @@ describe('storage.ts - Error Handling', () => {
 
   beforeEach(() => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    
+
     // Mock localStorage to throw errors
     getItemSpy = jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('Storage error');
     });
-    
+
     setItemSpy = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('Storage error');
     });
-    
+
     removeItemSpy = jest.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {
       throw new Error('Storage error');
     });
@@ -480,8 +495,12 @@ describe('Session Records Storage', () => {
 
   beforeEach(() => {
     mockStore = {};
-    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => mockStore[key] || null);
-    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => { mockStore[key] = value; });
+    jest
+      .spyOn(Storage.prototype, 'getItem')
+      .mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => {
+      mockStore[key] = value;
+    });
   });
 
   afterEach(() => {
@@ -571,8 +590,12 @@ describe('TaskStat Storage', () => {
 
   beforeEach(() => {
     mockStore = {};
-    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => mockStore[key] || null);
-    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => { mockStore[key] = value; });
+    jest
+      .spyOn(Storage.prototype, 'getItem')
+      .mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => {
+      mockStore[key] = value;
+    });
   });
 
   afterEach(() => {
@@ -589,8 +612,22 @@ describe('TaskStat Storage', () => {
   });
 
   it('should filter out invalid entries on read', async () => {
-    const bad = { num1: 'x', num2: 2, operation: 'MULTIPLICATION', correctCount: 1, errorCount: 0, lastSeen: 'now' };
-    const good: TaskStat = { num1: 3, num2: 4, operation: Operation.MULTIPLICATION, correctCount: 2, errorCount: 1, lastSeen: new Date().toISOString() };
+    const bad = {
+      num1: 'x',
+      num2: 2,
+      operation: 'MULTIPLICATION',
+      correctCount: 1,
+      errorCount: 0,
+      lastSeen: 'now',
+    };
+    const good: TaskStat = {
+      num1: 3,
+      num2: 4,
+      operation: Operation.MULTIPLICATION,
+      correctCount: 2,
+      errorCount: 1,
+      lastSeen: new Date().toISOString(),
+    };
     mockStore['app-task-stats'] = JSON.stringify([bad, good]);
     const result = await getTaskStats();
     expect(result).toHaveLength(1);
@@ -598,7 +635,14 @@ describe('TaskStat Storage', () => {
   });
 
   it('should save and retrieve task stats', async () => {
-    const stat: TaskStat = { num1: 7, num2: 8, operation: Operation.MULTIPLICATION, correctCount: 1, errorCount: 2, lastSeen: '2026-01-01T00:00:00.000Z' };
+    const stat: TaskStat = {
+      num1: 7,
+      num2: 8,
+      operation: Operation.MULTIPLICATION,
+      correctCount: 1,
+      errorCount: 2,
+      lastSeen: '2026-01-01T00:00:00.000Z',
+    };
     await saveTaskStats([stat]);
     const result = await getTaskStats();
     expect(result).toHaveLength(1);
@@ -609,7 +653,13 @@ describe('TaskStat Storage', () => {
     await recordTaskResult(3, 4, Operation.MULTIPLICATION, false);
     const stats = await getTaskStats();
     expect(stats).toHaveLength(1);
-    expect(stats[0]).toMatchObject({ num1: 3, num2: 4, operation: Operation.MULTIPLICATION, correctCount: 0, errorCount: 1 });
+    expect(stats[0]).toMatchObject({
+      num1: 3,
+      num2: 4,
+      operation: Operation.MULTIPLICATION,
+      correctCount: 0,
+      errorCount: 1,
+    });
   });
 
   it('recordTaskResult increments existing entry', async () => {
@@ -632,8 +682,11 @@ describe('TaskStat Storage', () => {
 
 describe('getWeakTasks', () => {
   const makeStat = (num1: number, num2: number, correct: number, error: number): TaskStat => ({
-    num1, num2, operation: Operation.MULTIPLICATION,
-    correctCount: correct, errorCount: error,
+    num1,
+    num2,
+    operation: Operation.MULTIPLICATION,
+    correctCount: correct,
+    errorCount: error,
     lastSeen: new Date().toISOString(),
   });
 
@@ -647,16 +700,12 @@ describe('getWeakTasks', () => {
     ];
     const result = getWeakTasks(stats);
     expect(result).toHaveLength(2);
-    expect(result.map(s => `${s.num1}×${s.num2}`)).toContain('7×8');
-    expect(result.map(s => `${s.num1}×${s.num2}`)).toContain('6×7');
+    expect(result.map((s) => `${s.num1}×${s.num2}`)).toContain('7×8');
+    expect(result.map((s) => `${s.num1}×${s.num2}`)).toContain('6×7');
   });
 
   it('sorts by error rate descending', () => {
-    const stats = [
-      makeStat(6, 7, 1, 2),
-      makeStat(7, 8, 0, 3),
-      makeStat(5, 6, 1, 4),
-    ];
+    const stats = [makeStat(6, 7, 1, 2), makeStat(7, 8, 0, 3), makeStat(5, 6, 1, 4)];
     const result = getWeakTasks(stats);
     expect(result[0]).toMatchObject({ num1: 7, num2: 8 });
     expect(result[1]).toMatchObject({ num1: 5, num2: 6 });
@@ -675,8 +724,12 @@ describe('storage.ts - Onboarding helpers', () => {
 
   beforeEach(() => {
     mockStore = {};
-    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => mockStore[key] || null);
-    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => { mockStore[key] = value; });
+    jest
+      .spyOn(Storage.prototype, 'getItem')
+      .mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => {
+      mockStore[key] = value;
+    });
   });
 
   afterEach(() => {
@@ -711,8 +764,12 @@ describe('Streak Storage', () => {
 
   beforeEach(() => {
     mockStore = {};
-    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => mockStore[key] || null);
-    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => { mockStore[key] = value; });
+    jest
+      .spyOn(Storage.prototype, 'getItem')
+      .mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => {
+      mockStore[key] = value;
+    });
   });
 
   afterEach(() => {
@@ -738,31 +795,45 @@ describe('Streak Storage', () => {
   });
 
   it('rejects null currentStreak', async () => {
-    mockStore['app-streak'] = '{"currentStreak":null,"lastPlayedDate":"2024-01-01","longestStreak":0}';
+    mockStore['app-streak'] =
+      '{"currentStreak":null,"lastPlayedDate":"2024-01-01","longestStreak":0}';
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
 
   it('rejects negative currentStreak', async () => {
-    mockStore['app-streak'] = JSON.stringify({ currentStreak: -1, lastPlayedDate: '2024-01-01', longestStreak: 0 });
+    mockStore['app-streak'] = JSON.stringify({
+      currentStreak: -1,
+      lastPlayedDate: '2024-01-01',
+      longestStreak: 0,
+    });
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
 
   it('rejects non-integer streak value', async () => {
-    mockStore['app-streak'] = JSON.stringify({ currentStreak: 1.5, lastPlayedDate: '2024-01-01', longestStreak: 3 });
+    mockStore['app-streak'] = JSON.stringify({
+      currentStreak: 1.5,
+      lastPlayedDate: '2024-01-01',
+      longestStreak: 3,
+    });
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
 
   it('rejects invalid date format', async () => {
-    mockStore['app-streak'] = JSON.stringify({ currentStreak: 1, lastPlayedDate: '01-01-2024', longestStreak: 1 });
+    mockStore['app-streak'] = JSON.stringify({
+      currentStreak: 1,
+      lastPlayedDate: '01-01-2024',
+      longestStreak: 1,
+    });
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
 
   it('rejects null longestStreak', async () => {
-    mockStore['app-streak'] = '{"currentStreak":1,"lastPlayedDate":"2024-01-01","longestStreak":null}';
+    mockStore['app-streak'] =
+      '{"currentStreak":1,"lastPlayedDate":"2024-01-01","longestStreak":null}';
     const result = await getStreakData();
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
@@ -773,8 +844,12 @@ describe('updateStreakAfterSession()', () => {
 
   beforeEach(() => {
     mockStore = {};
-    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => mockStore[key] || null);
-    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => { mockStore[key] = value; });
+    jest
+      .spyOn(Storage.prototype, 'getItem')
+      .mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => {
+      mockStore[key] = value;
+    });
   });
 
   afterEach(() => {
@@ -791,7 +866,11 @@ describe('updateStreakAfterSession()', () => {
 
   it('should not change streak when already played today', async () => {
     const today = getLocalDateString();
-    mockStore['app-streak'] = JSON.stringify({ currentStreak: 3, lastPlayedDate: today, longestStreak: 5 });
+    mockStore['app-streak'] = JSON.stringify({
+      currentStreak: 3,
+      lastPlayedDate: today,
+      longestStreak: 5,
+    });
     const result = await updateStreakAfterSession();
     expect(result.currentStreak).toBe(3);
     expect(result.longestStreak).toBe(5);

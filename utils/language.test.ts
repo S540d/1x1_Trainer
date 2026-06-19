@@ -10,37 +10,31 @@ import { getDeviceLanguage } from './language';
 import * as Localization from 'expo-localization';
 
 describe('getDeviceLanguage', () => {
-  const mockGetLocales = Localization.getLocales as jest.MockedFunction<typeof Localization.getLocales>;
+  const mockGetLocales = Localization.getLocales as jest.MockedFunction<
+    typeof Localization.getLocales
+  >;
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('should detect German locale', () => {
-    mockGetLocales.mockReturnValue([
-      { languageCode: 'de' } as any
-    ]);
+    mockGetLocales.mockReturnValue([{ languageCode: 'de' } as any]);
     expect(getDeviceLanguage()).toBe('de');
   });
 
   it('should detect English locale', () => {
-    mockGetLocales.mockReturnValue([
-      { languageCode: 'en' } as any
-    ]);
+    mockGetLocales.mockReturnValue([{ languageCode: 'en' } as any]);
     expect(getDeviceLanguage()).toBe('en');
   });
 
   it('should fallback to English for unsupported locales', () => {
-    mockGetLocales.mockReturnValue([
-      { languageCode: 'fr' } as any
-    ]);
+    mockGetLocales.mockReturnValue([{ languageCode: 'fr' } as any]);
     expect(getDeviceLanguage()).toBe('en');
   });
 
   it('should fallback to English for Spanish locale', () => {
-    mockGetLocales.mockReturnValue([
-      { languageCode: 'es' } as any
-    ]);
+    mockGetLocales.mockReturnValue([{ languageCode: 'es' } as any]);
     expect(getDeviceLanguage()).toBe('en');
   });
 
@@ -50,9 +44,7 @@ describe('getDeviceLanguage', () => {
   });
 
   it('should fallback to English when languageCode is undefined', () => {
-    mockGetLocales.mockReturnValue([
-      { languageCode: undefined } as any
-    ]);
+    mockGetLocales.mockReturnValue([{ languageCode: undefined } as any]);
     expect(getDeviceLanguage()).toBe('en');
   });
 

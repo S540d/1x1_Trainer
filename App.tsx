@@ -17,10 +17,7 @@ import {
   Nunito_800ExtraBold,
   Nunito_900Black,
 } from '@expo-google-fonts/nunito';
-import {
-  Baloo2_700Bold,
-  Baloo2_800ExtraBold,
-} from '@expo-google-fonts/baloo-2';
+import { Baloo2_700Bold, Baloo2_800ExtraBold } from '@expo-google-fonts/baloo-2';
 
 // Local imports
 import { translations } from './i18n/translations';
@@ -41,11 +38,27 @@ import { OnboardingModal } from './components/OnboardingModal';
 import { BadgesModal } from './components/BadgesModal';
 import { BadgeUnlockToast } from './components/BadgeUnlockToast';
 import { FloatingStars } from './components/FloatingStars';
-import { saveSessionRecord, getStreakData, updateStreakAfterSession, getLocalDateString, recordTaskResult, getTaskStats, getWeakTasks, getOnboardingDone, setOnboardingDone, resetOnboarding, getStorageItem } from './utils/storage';
+import {
+  saveSessionRecord,
+  getStreakData,
+  updateStreakAfterSession,
+  getLocalDateString,
+  recordTaskResult,
+  getTaskStats,
+  getWeakTasks,
+  getOnboardingDone,
+  setOnboardingDone,
+  resetOnboarding,
+  getStorageItem,
+} from './utils/storage';
 import { useSounds } from './hooks/useSounds';
 import { SessionRecord, StreakData, TaskStat, Operation } from './types/game';
 import { useBadges } from './hooks/useBadges';
-import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
+import {
+  ANIMATION_DURATIONS,
+  initReducedMotionListener,
+  prefersReducedMotion,
+} from './utils/animations';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -64,7 +77,11 @@ export default function App() {
   const [badgesVisible, setBadgesVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
-  const [streakData, setStreakData] = useState<StreakData>({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  const [streakData, setStreakData] = useState<StreakData>({
+    currentStreak: 0,
+    lastPlayedDate: '',
+    longestStreak: 0,
+  });
   const [streakWarningVisible, setStreakWarningVisible] = useState(false);
   const [onboardingVisible, setOnboardingVisible] = useState(false);
   const [taskStats, setTaskStats] = useState<TaskStat[]>([]);
@@ -113,8 +130,10 @@ export default function App() {
     },
     taskStats,
     onTaskResult: (num1: number, num2: number, operation: Operation, isCorrect: boolean) => {
-      setTaskStats(prev => {
-        const idx = prev.findIndex(s => s.num1 === num1 && s.num2 === num2 && s.operation === operation);
+      setTaskStats((prev) => {
+        const idx = prev.findIndex(
+          (s) => s.num1 === num1 && s.num2 === num2 && s.operation === operation
+        );
         if (idx >= 0) {
           const updated = { ...prev[idx] };
           if (isCorrect) updated.correctCount++;
@@ -124,12 +143,17 @@ export default function App() {
           next[idx] = updated;
           return next;
         }
-        return [...prev, {
-          num1, num2, operation,
-          correctCount: isCorrect ? 1 : 0,
-          errorCount: isCorrect ? 0 : 1,
-          lastSeen: new Date().toISOString(),
-        }];
+        return [
+          ...prev,
+          {
+            num1,
+            num2,
+            operation,
+            correctCount: isCorrect ? 1 : 0,
+            errorCount: isCorrect ? 0 : 1,
+            lastSeen: new Date().toISOString(),
+          },
+        ];
       });
       recordTaskResult(num1, num2, operation, isCorrect);
     },
@@ -144,10 +168,7 @@ export default function App() {
 
   // Animated styles
   const cardAnimatedStyle = {
-    transform: [
-      { scale: cardScale },
-      { translateX: cardShakeX },
-    ],
+    transform: [{ scale: cardScale }, { translateX: cardShakeX }],
   };
 
   const menuAnimatedStyle = {
@@ -220,7 +241,11 @@ export default function App() {
   const prevChallengeLevel = useRef<number | undefined>(undefined);
   useEffect(() => {
     const level = game.gameState.challengeState?.level;
-    if (level !== undefined && prevChallengeLevel.current !== undefined && level > prevChallengeLevel.current) {
+    if (
+      level !== undefined &&
+      prevChallengeLevel.current !== undefined &&
+      level > prevChallengeLevel.current
+    ) {
       sounds.playSound('level_up');
     }
     prevChallengeLevel.current = level;
@@ -436,11 +461,18 @@ export default function App() {
         t={t}
       />
 
-      <Modal visible={streakWarningVisible} transparent animationType="fade" onRequestClose={() => setStreakWarningVisible(false)}>
+      <Modal
+        visible={streakWarningVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setStreakWarningVisible(false)}
+      >
         <View style={styles.streakOverlay}>
           <View style={[styles.streakWarningCard, { backgroundColor: colors.settingsMenu }]}>
             <Text style={styles.streakWarningEmoji}>🔥</Text>
-            <Text style={[styles.streakWarningTitle, { color: colors.text }]}>{t.streakWarningTitle}</Text>
+            <Text style={[styles.streakWarningTitle, { color: colors.text }]}>
+              {t.streakWarningTitle}
+            </Text>
             <Text style={[styles.streakWarningMessage, { color: colors.textSecondary }]}>
               {t.streakWarningMessage.replace('{days}', String(streakData.currentStreak))}
             </Text>

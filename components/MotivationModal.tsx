@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  Text,
-  View,
-  Modal,
-} from 'react-native';
+import { Text, View, Modal } from 'react-native';
 import { ThemeColors } from '../types/game';
 import { modalStyles } from '../styles/modalStyles';
 import { Button } from './Button';
@@ -33,17 +29,23 @@ export function MotivationModal({ visible, onClose, colors, score, t }: Motivati
             {score <= 3
               ? t.motivationTitleLowScore
               : score <= 6
-              ? t.motivationTitleMediumScore
-              : t.motivationTitleHighScore}
+                ? t.motivationTitleMediumScore
+                : t.motivationTitleHighScore}
           </Text>
           <Text style={[modalStyles.text, { color: colors.text }]}>
             {score <= 3
               ? t.motivationMessageLowScore
               : score <= 6
-              ? t.motivationMessageMediumScore
-              : t.motivationMessageHighScore}
+                ? t.motivationMessageMediumScore
+                : t.motivationMessageHighScore}
           </Text>
-          <Button label={t.motivationButton} onPress={onClose} variant="primary" fullWidth colors={colors} />
+          <Button
+            label={t.motivationButton}
+            onPress={onClose}
+            variant="primary"
+            fullWidth
+            colors={colors}
+          />
         </View>
       </View>
     </Modal>
