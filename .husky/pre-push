@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+echo "🎨 Checking code formatting..."
+npm run format:check
+if [ $? -ne 0 ]; then
+  echo "❌ Formatting issues found. Run 'npm run format' to fix them."
+  exit 1
+fi
+echo "✅ Formatting check passed!"
