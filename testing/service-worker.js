@@ -27,7 +27,8 @@ const urlsToCache = [
  */
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAMES.static)
+    caches
+      .open(CACHE_NAMES.static)
       .then((cache) => {
         return cache.addAll(urlsToCache).catch(() => {
           // Silent error handling
@@ -44,7 +45,8 @@ self.addEventListener('install', (event) => {
  */
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys()
+    caches
+      .keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
@@ -78,9 +80,13 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Statische Assets - Cache First
-  if (request.method === 'GET' && /\.(js|css|png|jpg|jpeg|svg|gif|webp|woff|woff2)$/.test(url.pathname)) {
+  if (
+    request.method === 'GET' &&
+    /\.(js|css|png|jpg|jpeg|svg|gif|webp|woff|woff2)$/.test(url.pathname)
+  ) {
     event.respondWith(
-      caches.match(request)
+      caches
+        .match(request)
         .then((response) => {
           if (response) {
             return response;
@@ -91,9 +97,10 @@ self.addEventListener('fetch', (event) => {
               return response;
             }
             const responseToCache = response.clone();
-            const cacheName = request.url.includes('.png') || request.url.includes('.jpg')
-              ? CACHE_NAMES.images
-              : CACHE_NAMES.static;
+            const cacheName =
+              request.url.includes('.png') || request.url.includes('.jpg')
+                ? CACHE_NAMES.images
+                : CACHE_NAMES.static;
             caches.open(cacheName).then((cache) => {
               cache.put(request, responseToCache);
             });
@@ -129,23 +136,22 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => {
           // Fallback auf gecachte Version
-          return caches.match(request)
-            .then((response) => {
-              if (response) {
-                return response;
-              }
-              // Offline Fallback Page
-              if (request.headers.get('accept').includes('text/html')) {
-                return caches.match('/1x1_Trainer/testing/index.html');
-              }
-              return new Response('Offline', {
-                status: 503,
-                statusText: 'Service Unavailable',
-                headers: new Headers({
-                  'Content-Type': 'text/plain',
-                }),
-              });
+          return caches.match(request).then((response) => {
+            if (response) {
+              return response;
+            }
+            // Offline Fallback Page
+            if (request.headers.get('accept').includes('text/html')) {
+              return caches.match('/1x1_Trainer/testing/index.html');
+            }
+            return new Response('Offline', {
+              status: 503,
+              statusText: 'Service Unavailable',
+              headers: new Headers({
+                'Content-Type': 'text/plain',
+              }),
             });
+          });
         })
     );
   }
