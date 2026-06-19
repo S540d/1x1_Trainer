@@ -14,11 +14,11 @@ feature/issue-XXX → testing → main
 
 `staging` wurde entfernt (2026-06-03, Issue #7).
 
-| Branch           | Zweck                                        |
-|------------------|----------------------------------------------|
-| `main`           | Produktion (protected)                       |
-| `testing`        | Integration neuer Features/Fixes             |
-| `feature/issue-XXX` | Kurzlebige Feature-Branches              |
+| Branch              | Zweck                            |
+| ------------------- | -------------------------------- |
+| `main`              | Produktion (protected)           |
+| `testing`           | Integration neuer Features/Fixes |
+| `feature/issue-XXX` | Kurzlebige Feature-Branches      |
 
 - PRs immer gegen `testing` öffnen, nicht `main`
 - `gh pr merge <nr> --squash --delete-branch` für Feature→testing PRs
@@ -41,6 +41,7 @@ git checkout main
 ## Versionsbump-Checkliste
 
 Beim Erhöhen der Version IMMER alle drei Stellen aktualisieren:
+
 1. `package.json` → `version`
 2. `app.json` → `expo.version` + `android.versionCode` (+1)
 3. `utils/constants.ts` → `APP_VERSION`
@@ -92,36 +93,36 @@ npm run test:coverage # Coverage
 
 ### Zuletzt gemergt / gepusht
 
-| PR / Commit | Was |
-|-------------|-----|
-| `c640120` | fix: expo-av auf ~16.0.8 (SDK-55-kompatibel; 15.0.2 brach lokalen Build) |
-| `3a1d43c` | chore: Version auf 1.3.7 / versionCode 27 |
-| #212 (offen) | staging → main: wartet auf App-Test |
-| #211 | testing → staging: Sound-Effekte, Visuelle Themes, Charts, UX, Jest 30 |
+| PR / Commit  | Was                                                                      |
+| ------------ | ------------------------------------------------------------------------ |
+| `c640120`    | fix: expo-av auf ~16.0.8 (SDK-55-kompatibel; 15.0.2 brach lokalen Build) |
+| `3a1d43c`    | chore: Version auf 1.3.7 / versionCode 27                                |
+| #212 (offen) | staging → main: wartet auf App-Test                                      |
+| #211         | testing → staging: Sound-Effekte, Visuelle Themes, Charts, UX, Jest 30   |
 
 ---
 
 ## Wichtige Dateien
 
-| Datei | Inhalt |
-|-------|--------|
-| `utils/constants.ts` | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS, `THEMES` (alle 5 Farbthemes mit LIGHT/DARK-Varianten) |
-| `utils/theme.ts` | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'` |
-| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `saveThemeName` / `getThemeName`, `saveSoundsEnabled` / `getSoundsEnabled`, `saveSoundsVolume` / `getSoundsVolume`, `FOUR_WEEKS_MS` |
-| `utils/animations.ts` | `prefersReducedMotion()` — liest Accessibility-Einstellung |
-| `types/game.ts` | ThemeColors (inkl. `gradientPrimary`), GameState, Enums, SessionRecord, `ThemeName` |
-| `i18n/translations.ts` | DE/EN Übersetzungen, `TranslationStrings`-Interface |
-| `hooks/useGameLogic.ts` | Gesamte Spiellogik, `onSessionComplete`-Callback |
-| `hooks/usePreferences.ts` | Persistierte User-Einstellungen (Sprache, ThemeMode, ThemeName, soundEnabled, soundVolume) |
-| `hooks/useSounds.ts` | Sound-Hook: `playSound(event)` — Web: AudioContext-Oszillatoren, Native: expo-audio (`createAudioPlayer`) + WAV-Assets |
-| `assets/sounds/` | WAV-Assets: correct / incorrect / perfect / level_up / badge_unlock (je 8–17 KB) |
-| `scripts/generate-sounds.js` | Generator für WAV-Assets (`node scripts/generate-sounds.js`) |
-| `components/PersonalizeModal.tsx` | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache, Sound An/Aus + Lautstärke) |
-| `components/ParentDashboard.tsx` | Eltern-Dashboard Modal (Beta) |
-| `components/GameCard.tsx` | Hauptspielansicht (alle 3 Antwortmodi) |
-| `styles/modalStyles.ts` | Gemeinsame Modal-Styles |
-| `jest.config.js` | Jest-Konfiguration |
-| `docs/private/CLAUDE.md` | Sensible Build/Keystore-Details (gitignored) |
+| Datei                             | Inhalt                                                                                                                                                                                                                                                                                                                |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `utils/constants.ts`              | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS, `THEMES` (alle 5 Farbthemes mit LIGHT/DARK-Varianten)                                                                                                                                                                                                    |
+| `utils/theme.ts`                  | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'`                                                                                                                                                                                                                                     |
+| `utils/storage.ts`                | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `saveThemeName` / `getThemeName`, `saveSoundsEnabled` / `getSoundsEnabled`, `saveSoundsVolume` / `getSoundsVolume`, `FOUR_WEEKS_MS` |
+| `utils/animations.ts`             | `prefersReducedMotion()` — liest Accessibility-Einstellung                                                                                                                                                                                                                                                            |
+| `types/game.ts`                   | ThemeColors (inkl. `gradientPrimary`), GameState, Enums, SessionRecord, `ThemeName`                                                                                                                                                                                                                                   |
+| `i18n/translations.ts`            | DE/EN Übersetzungen, `TranslationStrings`-Interface                                                                                                                                                                                                                                                                   |
+| `hooks/useGameLogic.ts`           | Gesamte Spiellogik, `onSessionComplete`-Callback                                                                                                                                                                                                                                                                      |
+| `hooks/usePreferences.ts`         | Persistierte User-Einstellungen (Sprache, ThemeMode, ThemeName, soundEnabled, soundVolume)                                                                                                                                                                                                                            |
+| `hooks/useSounds.ts`              | Sound-Hook: `playSound(event)` — Web: AudioContext-Oszillatoren, Native: expo-audio (`createAudioPlayer`) + WAV-Assets                                                                                                                                                                                                |
+| `assets/sounds/`                  | WAV-Assets: correct / incorrect / perfect / level_up / badge_unlock (je 8–17 KB)                                                                                                                                                                                                                                      |
+| `scripts/generate-sounds.js`      | Generator für WAV-Assets (`node scripts/generate-sounds.js`)                                                                                                                                                                                                                                                          |
+| `components/PersonalizeModal.tsx` | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache, Sound An/Aus + Lautstärke)                                                                                                                                                                                                                              |
+| `components/ParentDashboard.tsx`  | Eltern-Dashboard Modal (Beta)                                                                                                                                                                                                                                                                                         |
+| `components/GameCard.tsx`         | Hauptspielansicht (alle 3 Antwortmodi)                                                                                                                                                                                                                                                                                |
+| `styles/modalStyles.ts`           | Gemeinsame Modal-Styles                                                                                                                                                                                                                                                                                               |
+| `jest.config.js`                  | Jest-Konfiguration                                                                                                                                                                                                                                                                                                    |
+| `docs/private/CLAUDE.md`          | Sensible Build/Keystore-Details (gitignored)                                                                                                                                                                                                                                                                          |
 
 ---
 

@@ -1,4 +1,10 @@
-import { getStreakDays, countPerfectSessions, hasAllOperationsPerfect, computeNewlyUnlocked, advanceStreak } from './useBadges';
+import {
+  getStreakDays,
+  countPerfectSessions,
+  hasAllOperationsPerfect,
+  computeNewlyUnlocked,
+  advanceStreak,
+} from './useBadges';
 import { DifficultyMode, NumberRange, Operation } from '../types/game';
 import type { SessionRecord } from '../types/game';
 import type { BadgeStore } from '../utils/storage';
@@ -63,7 +69,7 @@ describe('countPerfectSessions', () => {
   it('counts sessions where correctTasks === totalTasks in non-challenge mode', () => {
     const records = [
       makeRecord({ correctTasks: 10, totalTasks: 10 }),
-      makeRecord({ correctTasks: 8,  totalTasks: 10 }),
+      makeRecord({ correctTasks: 8, totalTasks: 10 }),
       makeRecord({ correctTasks: 10, totalTasks: 10 }),
     ];
     expect(countPerfectSessions(records)).toBe(2);
@@ -85,8 +91,8 @@ describe('countPerfectSessions', () => {
 describe('hasAllOperationsPerfect', () => {
   it('returns false when not all ops have a perfect session', () => {
     const records = [
-      makeRecord({ operations: [Operation.ADDITION],       correctTasks: 10 }),
-      makeRecord({ operations: [Operation.SUBTRACTION],    correctTasks: 10 }),
+      makeRecord({ operations: [Operation.ADDITION], correctTasks: 10 }),
+      makeRecord({ operations: [Operation.SUBTRACTION], correctTasks: 10 }),
       makeRecord({ operations: [Operation.MULTIPLICATION], correctTasks: 10 }),
       // division missing
     ];
@@ -95,10 +101,10 @@ describe('hasAllOperationsPerfect', () => {
 
   it('returns true when all 4 operations have a perfect session', () => {
     const records = [
-      makeRecord({ operations: [Operation.ADDITION],       correctTasks: 10 }),
-      makeRecord({ operations: [Operation.SUBTRACTION],    correctTasks: 10 }),
+      makeRecord({ operations: [Operation.ADDITION], correctTasks: 10 }),
+      makeRecord({ operations: [Operation.SUBTRACTION], correctTasks: 10 }),
       makeRecord({ operations: [Operation.MULTIPLICATION], correctTasks: 10 }),
-      makeRecord({ operations: [Operation.DIVISION],       correctTasks: 10 }),
+      makeRecord({ operations: [Operation.DIVISION], correctTasks: 10 }),
     ];
     expect(hasAllOperationsPerfect(records)).toBe(true);
   });
@@ -198,13 +204,21 @@ describe('advanceStreak', () => {
   });
 
   it('increments streak on consecutive day', () => {
-    const result = advanceStreak({ currentStreak: 4, lastPlayedDate: isoYesterday(), longestStreak: 4 });
+    const result = advanceStreak({
+      currentStreak: 4,
+      lastPlayedDate: isoYesterday(),
+      longestStreak: 4,
+    });
     expect(result.currentStreak).toBe(5);
     expect(result.lastPlayedDate).toBe(isoToday());
   });
 
   it('resets streak to 1 after a gap', () => {
-    const result = advanceStreak({ currentStreak: 10, lastPlayedDate: '2020-01-01', longestStreak: 10 });
+    const result = advanceStreak({
+      currentStreak: 10,
+      lastPlayedDate: '2020-01-01',
+      longestStreak: 10,
+    });
     expect(result.currentStreak).toBe(1);
   });
 });

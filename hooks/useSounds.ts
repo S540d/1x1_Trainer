@@ -7,11 +7,29 @@ export type SoundEvent = 'correct' | 'incorrect' | 'perfect' | 'level_up' | 'bad
 type NoteConfig = { freq: number; durationMs: number; amp?: number };
 
 const SOUND_CONFIGS: Record<SoundEvent, NoteConfig[]> = {
-  correct:      [{ freq: 880, durationMs: 80, amp: 0.50 }, { freq: 1319, durationMs: 110, amp: 0.42 }],
-  incorrect:    [{ freq: 210, durationMs: 200, amp: 0.32 }],
-  perfect:      [{ freq: 523, durationMs: 80 }, { freq: 659, durationMs: 80 }, { freq: 784, durationMs: 80 }, { freq: 1047, durationMs: 160, amp: 0.58 }],
-  level_up:     [{ freq: 392, durationMs: 70, amp: 0.48 }, { freq: 494, durationMs: 70, amp: 0.48 }, { freq: 587, durationMs: 70, amp: 0.48 }, { freq: 784, durationMs: 130, amp: 0.55 }],
-  badge_unlock: [{ freq: 1047, durationMs: 60, amp: 0.40 }, { freq: 1319, durationMs: 60, amp: 0.40 }, { freq: 1047, durationMs: 55, amp: 0.36 }, { freq: 1568, durationMs: 130, amp: 0.46 }],
+  correct: [
+    { freq: 880, durationMs: 80, amp: 0.5 },
+    { freq: 1319, durationMs: 110, amp: 0.42 },
+  ],
+  incorrect: [{ freq: 210, durationMs: 200, amp: 0.32 }],
+  perfect: [
+    { freq: 523, durationMs: 80 },
+    { freq: 659, durationMs: 80 },
+    { freq: 784, durationMs: 80 },
+    { freq: 1047, durationMs: 160, amp: 0.58 },
+  ],
+  level_up: [
+    { freq: 392, durationMs: 70, amp: 0.48 },
+    { freq: 494, durationMs: 70, amp: 0.48 },
+    { freq: 587, durationMs: 70, amp: 0.48 },
+    { freq: 784, durationMs: 130, amp: 0.55 },
+  ],
+  badge_unlock: [
+    { freq: 1047, durationMs: 60, amp: 0.4 },
+    { freq: 1319, durationMs: 60, amp: 0.4 },
+    { freq: 1047, durationMs: 55, amp: 0.36 },
+    { freq: 1568, durationMs: 130, amp: 0.46 },
+  ],
 };
 
 function playWebTone(config: NoteConfig[], volume: number): void {
@@ -40,7 +58,9 @@ function playWebTone(config: NoteConfig[], volume: number): void {
       t += dur;
     }
     const delay = (t - ctx.currentTime) * 1000 + 300;
-    setTimeout(() => { ctx.close().catch(() => {}); }, delay);
+    setTimeout(() => {
+      ctx.close().catch(() => {});
+    }, delay);
   } catch {
     /* ignore – autoplay policy or missing AudioContext */
   }
@@ -51,8 +71,12 @@ export function useSounds(soundEnabled: boolean, soundVolume: number) {
   const enabledRef = useRef(soundEnabled);
   const volumeRef = useRef(soundVolume);
 
-  useEffect(() => { enabledRef.current = soundEnabled; }, [soundEnabled]);
-  useEffect(() => { volumeRef.current = soundVolume; }, [soundVolume]);
+  useEffect(() => {
+    enabledRef.current = soundEnabled;
+  }, [soundEnabled]);
+  useEffect(() => {
+    volumeRef.current = soundVolume;
+  }, [soundVolume]);
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
@@ -60,10 +84,10 @@ export function useSounds(soundEnabled: boolean, soundVolume: number) {
     setAudioModeAsync({ playsInSilentMode: false }).catch(() => {});
 
     const assets: [SoundEvent, number][] = [
-      ['correct',      require('../assets/sounds/correct.wav') as number],
-      ['incorrect',    require('../assets/sounds/incorrect.wav') as number],
-      ['perfect',      require('../assets/sounds/perfect.wav') as number],
-      ['level_up',     require('../assets/sounds/level_up.wav') as number],
+      ['correct', require('../assets/sounds/correct.wav') as number],
+      ['incorrect', require('../assets/sounds/incorrect.wav') as number],
+      ['perfect', require('../assets/sounds/perfect.wav') as number],
+      ['level_up', require('../assets/sounds/level_up.wav') as number],
       ['badge_unlock', require('../assets/sounds/badge_unlock.wav') as number],
     ];
     for (const [event, src] of assets) {
@@ -78,7 +102,11 @@ export function useSounds(soundEnabled: boolean, soundVolume: number) {
       const refs = playerRefs.current;
       playerRefs.current = {};
       for (const p of Object.values(refs)) {
-        try { p?.remove(); } catch { /* already removed */ }
+        try {
+          p?.remove();
+        } catch {
+          /* already removed */
+        }
       }
     };
   }, []);

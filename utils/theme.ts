@@ -5,7 +5,10 @@
 import { ThemeColors, ThemeName } from '../types/game';
 import { THEMES } from './constants';
 
-export const getThemeColors = (isDarkMode: boolean, themeName: ThemeName = 'sunset'): ThemeColors => {
+export const getThemeColors = (
+  isDarkMode: boolean,
+  themeName: ThemeName = 'sunset'
+): ThemeColors => {
   const theme = THEMES[themeName] ?? THEMES.sunset;
   const variant = isDarkMode ? theme.DARK : theme.LIGHT;
   return {

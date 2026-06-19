@@ -84,10 +84,9 @@ describe('useTheme Hook', () => {
 
   describe('Theme Mode Changes', () => {
     it('should update themeMode when initialTheme prop changes', async () => {
-      const { result, rerender } = renderHook(
-        ({ theme }) => useTheme(theme),
-        { initialProps: { theme: 'light' as ThemeMode } }
-      );
+      const { result, rerender } = renderHook(({ theme }) => useTheme(theme), {
+        initialProps: { theme: 'light' as ThemeMode },
+      });
 
       expect(result.current.themeMode).toBe('light');
 
@@ -196,7 +195,8 @@ describe('useTheme Hook', () => {
     });
 
     it('should not setup listener when matchMedia is not available', () => {
-      Object.defineProperty(window, 'matchMedia', { // platform-safe
+      Object.defineProperty(window, 'matchMedia', {
+        // platform-safe
         writable: true,
         value: undefined,
       });
@@ -325,10 +325,9 @@ describe('useTheme Hook', () => {
 
   describe('Edge Cases', () => {
     it('should handle rapid theme mode changes', async () => {
-      const { result, rerender } = renderHook(
-        ({ theme }) => useTheme(theme),
-        { initialProps: { theme: 'light' as ThemeMode } }
-      );
+      const { result, rerender } = renderHook(({ theme }) => useTheme(theme), {
+        initialProps: { theme: 'light' as ThemeMode },
+      });
 
       rerender({ theme: 'dark' as ThemeMode });
       rerender({ theme: 'system' as ThemeMode });

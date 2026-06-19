@@ -6,7 +6,17 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from './constants';
-import { ThemeMode, ThemeName, Language, Operation, NumberRange, DifficultyMode, SessionRecord, TaskStat, StreakData } from '../types/game';
+import {
+  ThemeMode,
+  ThemeName,
+  Language,
+  Operation,
+  NumberRange,
+  DifficultyMode,
+  SessionRecord,
+  TaskStat,
+  StreakData,
+} from '../types/game';
 
 /**
  * Get a value from storage (platform-safe)
@@ -86,7 +96,13 @@ export const saveThemeName = async (themeName: ThemeName): Promise<void> => {
 
 export const getThemeName = async (): Promise<ThemeName | null> => {
   const value = await getStorageItem(STORAGE_KEYS.THEME_NAME);
-  if (value === 'sunset' || value === 'ocean' || value === 'space' || value === 'forest' || value === 'candy') {
+  if (
+    value === 'sunset' ||
+    value === 'ocean' ||
+    value === 'space' ||
+    value === 'forest' ||
+    value === 'candy'
+  ) {
     return value;
   }
   return null;
@@ -101,7 +117,10 @@ export const getOperations = async (): Promise<Operation[]> => {
   if (value) {
     try {
       const parsed = JSON.parse(value);
-      if (Array.isArray(parsed) && parsed.every(op => ['ADDITION', 'SUBTRACTION', 'MULTIPLICATION'].includes(op))) {
+      if (
+        Array.isArray(parsed) &&
+        parsed.every((op) => ['ADDITION', 'SUBTRACTION', 'MULTIPLICATION'].includes(op))
+      ) {
         return parsed as Operation[];
       }
     } catch {
@@ -178,13 +197,15 @@ function isValidSessionRecord(r: unknown): r is SessionRecord {
     typeof obj.correctTasks === 'number' &&
     typeof obj.errors === 'number' &&
     typeof obj.errorRate === 'number' &&
-    typeof obj.difficultyMode === 'string' && VALID_DIFFICULTY_MODES.has(obj.difficultyMode) &&
-    typeof obj.numberRange === 'string' && VALID_NUMBER_RANGES.has(obj.numberRange)
+    typeof obj.difficultyMode === 'string' &&
+    VALID_DIFFICULTY_MODES.has(obj.difficultyMode) &&
+    typeof obj.numberRange === 'string' &&
+    VALID_NUMBER_RANGES.has(obj.numberRange)
   );
 }
 
 function pruneOldRecords(records: SessionRecord[], now: number): SessionRecord[] {
-  return records.filter(r => now - r.timestamp < FOUR_WEEKS_MS);
+  return records.filter((r) => now - r.timestamp < FOUR_WEEKS_MS);
 }
 
 export const getSessionRecords = async (): Promise<SessionRecord[]> => {
@@ -231,7 +252,8 @@ function isValidTaskStat(r: unknown): r is TaskStat {
   return (
     typeof obj.num1 === 'number' &&
     typeof obj.num2 === 'number' &&
-    typeof obj.operation === 'string' && VALID_OPERATIONS.has(obj.operation) &&
+    typeof obj.operation === 'string' &&
+    VALID_OPERATIONS.has(obj.operation) &&
     typeof obj.correctCount === 'number' &&
     typeof obj.errorCount === 'number' &&
     typeof obj.lastSeen === 'string'
@@ -260,11 +282,13 @@ export const recordTaskResult = async (
   num1: number,
   num2: number,
   operation: Operation,
-  isCorrect: boolean,
+  isCorrect: boolean
 ): Promise<void> => {
   taskStatsQueue = taskStatsQueue.then(async () => {
     const stats = await getTaskStats();
-    const existing = stats.find(s => s.num1 === num1 && s.num2 === num2 && s.operation === operation);
+    const existing = stats.find(
+      (s) => s.num1 === num1 && s.num2 === num2 && s.operation === operation
+    );
     if (existing) {
       if (isCorrect) existing.correctCount++;
       else existing.errorCount++;
@@ -284,9 +308,13 @@ export const recordTaskResult = async (
   return taskStatsQueue;
 };
 
-export const getWeakTasks = (stats: TaskStat[], minAttempts = 3, minErrorRate = 0.3): TaskStat[] => {
+export const getWeakTasks = (
+  stats: TaskStat[],
+  minAttempts = 3,
+  minErrorRate = 0.3
+): TaskStat[] => {
   return stats
-    .filter(s => {
+    .filter((s) => {
       const total = s.correctCount + s.errorCount;
       const rate = total > 0 ? s.errorCount / total : 0;
       return total >= minAttempts && rate > minErrorRate;
@@ -315,7 +343,9 @@ export const getBadges = async (): Promise<BadgeStore> => {
       }
       return validated;
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   return {};
 };
 
@@ -397,7 +427,12 @@ export const getNumberRange = async (): Promise<NumberRange> => {
   const value = await getStorageItem(STORAGE_KEYS.NUMBER_RANGE);
 
   // Handle new format
-  if (value === 'RANGE_10' || value === 'RANGE_20' || value === 'RANGE_50' || value === 'RANGE_100') {
+  if (
+    value === 'RANGE_10' ||
+    value === 'RANGE_20' ||
+    value === 'RANGE_50' ||
+    value === 'RANGE_100'
+  ) {
     return value as NumberRange;
   }
 

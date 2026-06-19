@@ -11,42 +11,48 @@ A cross-platform multiplication table trainer for Android and Web (PWA) built wi
 
 ## Tech Stack
 
-| Technology | Role |
-|---|---|
-| React Native + Expo | Cross-platform framework |
-| TypeScript | Type-safe JavaScript |
-| React Native Web | Web support |
-| Hermes | Optimized JavaScript engine |
-| Service Worker | PWA offline support |
+| Technology          | Role                        |
+| ------------------- | --------------------------- |
+| React Native + Expo | Cross-platform framework    |
+| TypeScript          | Type-safe JavaScript        |
+| React Native Web    | Web support                 |
+| Hermes              | Optimized JavaScript engine |
+| Service Worker      | PWA offline support         |
 
 ## Setup
 
 ### Prerequisites
+
 ```bash
 npm install
 ```
 
 ### Android development
+
 ```bash
 npm run android
 ```
 
 ### Web/PWA development
+
 ```bash
 npm run web
 ```
 
 ### iOS development (Mac + Xcode required)
+
 ```bash
 npm run ios
 ```
 
 ### Web/PWA Build
+
 ```bash
 npm run build:web
 ```
 
 ### PWA testing locally
+
 ```bash
 npm run build:web
 cd dist
@@ -80,6 +86,7 @@ The web version can be installed as an app on mobile devices and desktops:
 3. The app is installed like a native app
 
 ### PWA Features
+
 - ✅ **Installable** - As a real app on the home screen
 - ✅ **Offline-capable** - Works without internet
 - ✅ **App icons** - Fully optimized for all devices (96px-512px)
@@ -120,6 +127,7 @@ cd android && ./gradlew bundleRelease
 ## Migration from Android Project
 
 The original Android project (Kotlin + Jetpack Compose) was ported to React Native with Expo Managed Workflow:
+
 - ✅ One shared codebase for Android and Web
 - ✅ PWA support out of the box
 - ✅ Simpler maintenance through Expo infrastructure

@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors, DifficultyMode, ChallengeState } from '../types/game';
 import { CHALLENGE_MAX_LIVES, DESIGN_TOKENS } from '../utils/constants';
@@ -49,7 +43,9 @@ export function Header({
         <>
           <Text style={[styles.headerScore, { color: colors.text }]}>
             {Array.from({ length: challengeState.lives }, () => '❤️').join('')}
-            {Array.from({ length: CHALLENGE_MAX_LIVES - challengeState.lives }, () => '🤍').join('')}
+            {Array.from({ length: CHALLENGE_MAX_LIVES - challengeState.lives }, () => '🤍').join(
+              ''
+            )}
           </Text>
           <Text style={[styles.headerScore, { color: colors.text }]}>
             {t.level} {challengeState.level}
@@ -59,7 +55,11 @@ export function Header({
       ) : (
         <>
           <View style={styles.progressContainer}>
-            <ProgressBar current={currentTask - 1} total={totalTasks} gradientColors={colors.gradientPrimary} />
+            <ProgressBar
+              current={currentTask - 1}
+              total={totalTasks}
+              gradientColors={colors.gradientPrimary}
+            />
             <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>
               {currentTask}/{totalTasks}
             </Text>
@@ -92,11 +92,7 @@ export function Header({
           <Text style={styles.streakText}>🔥 {currentStreak}</Text>
         </TouchableOpacity>
       )}
-      <TouchableOpacity
-        onPress={onShowMenu}
-        style={styles.settingsButton}
-        aria-label="Settings"
-      >
+      <TouchableOpacity onPress={onShowMenu} style={styles.settingsButton} aria-label="Settings">
         <Text style={[styles.settingsButtonText, { color: colors.text }]}>⋮</Text>
       </TouchableOpacity>
     </View>

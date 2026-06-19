@@ -101,7 +101,13 @@ export function SettingsMenu({
         activeOpacity={1}
         onPress={onHideMenu}
       />
-      <Animated.View style={[styles.settingsMenu, { maxHeight: screenHeight - 80, backgroundColor: colors.settingsMenu }, menuAnimatedStyle]}>
+      <Animated.View
+        style={[
+          styles.settingsMenu,
+          { maxHeight: screenHeight - 80, backgroundColor: colors.settingsMenu },
+          menuAnimatedStyle,
+        ]}
+      >
         <LinearGradient
           colors={colors.gradientPrimary}
           start={{ x: 0, y: 0 }}
@@ -109,197 +115,277 @@ export function SettingsMenu({
           style={styles.settingsMenuHeader}
         >
           <Text style={styles.settingsMenuTitle}>{t.settings}</Text>
-          <TouchableOpacity
-            style={styles.settingsMenuCloseButton}
-            onPress={onHideMenu}
-          >
+          <TouchableOpacity style={styles.settingsMenuCloseButton} onPress={onHideMenu}>
             <Text style={styles.settingsMenuCloseButtonText}>✕</Text>
           </TouchableOpacity>
         </LinearGradient>
         <ScrollView bounces={false}>
-
-        {/* Personalize Button */}
-        <View style={[styles.settingsSection, styles.topButtonsSection]}>
-          <TouchableOpacity
-            style={[styles.personalizeButton, { borderColor: activeColor }]}
-            onPress={() => { onOpenPersonalize(); onHideMenu(); }}
-          >
-            <Text style={[styles.personalizeButtonText, { color: activeColor }]}>{t.personalize}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.personalizeButton, { borderColor: activeColor }]}
-            onPress={() => { onOpenParentDashboard(); onHideMenu(); }}
-          >
-            <Text style={[styles.personalizeButtonText, { color: activeColor }]}>{t.parentDashboardMenu}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.personalizeButton, { borderColor: activeColor }]}
-            onPress={() => { onOpenBadges(); onHideMenu(); }}
-          >
-            <Text style={[styles.personalizeButtonText, { color: activeColor }]}>{t.badgesMenu}</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.settingsDivider} />
-
-        {/* Operation Settings */}
-        <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: sectionTitle }]}>{t.operation}</Text>
-          <View style={styles.operationGrid}>
-            {([
-              { op: Operation.ADDITION, symbol: '+', label: t.addition },
-              { op: Operation.SUBTRACTION, symbol: '−', label: t.subtraction },
-              { op: Operation.MULTIPLICATION, symbol: '×', label: t.multiplication },
-              { op: Operation.DIVISION, symbol: '÷', label: t.division },
-            ] as const).map(({ op, symbol, label }) => {
-              const isChallenge = difficultyMode === DifficultyMode.CHALLENGE;
-              const isActive = isChallenge || selectedOperations.has(op);
-              return (
-                <TouchableOpacity
-                  key={op}
-                  style={[
-                    styles.operationButton,
-                    { backgroundColor: buttonBg, borderColor: buttonBorder },
-                    isActive && activeStyle,
-                    isChallenge && { opacity: 0.6 },
-                  ]}
-                  onPress={() => onToggleOperation(op)}
-                  disabled={isChallenge}
-                >
-                  <Text style={[styles.operationButtonText, { color: buttonText }, isActive && styles.operationButtonTextActive]}>
-                    {symbol} {label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-
-        <View style={styles.settingsDivider} />
-
-        {/* Difficulty Mode Settings */}
-        <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: sectionTitle }]}>{t.difficultyMode}</Text>
-          <View style={styles.difficultyGrid}>
+          {/* Personalize Button */}
+          <View style={[styles.settingsSection, styles.topButtonsSection]}>
             <TouchableOpacity
-              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.SIMPLE && activeStyle]}
-              onPress={() => onChangeDifficultyMode(DifficultyMode.SIMPLE)}
-            >
-              <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonTextActive]}>
-                {t.simpleMode}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.CREATIVE && activeStyle]}
-              onPress={() => onChangeDifficultyMode(DifficultyMode.CREATIVE)}
-            >
-              <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonTextActive]}>
-                {t.creativeMode}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.CHALLENGE && activeStyle]}
+              style={[styles.personalizeButton, { borderColor: activeColor }]}
               onPress={() => {
-                onChangeDifficultyMode(DifficultyMode.CHALLENGE);
+                onOpenPersonalize();
                 onHideMenu();
               }}
             >
-              <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonTextActive]}>
-                {t.challenge}
+              <Text style={[styles.personalizeButtonText, { color: activeColor }]}>
+                {t.personalize}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.themeButton, { backgroundColor: buttonBg, borderColor: buttonBorder }, difficultyMode === DifficultyMode.PRACTICE && activeStyle]}
-              onPress={() => onChangeDifficultyMode(DifficultyMode.PRACTICE)}
+              style={[styles.personalizeButton, { borderColor: activeColor }]}
+              onPress={() => {
+                onOpenParentDashboard();
+                onHideMenu();
+              }}
             >
-              <Text style={[styles.themeButtonText, { color: buttonText }, difficultyMode === DifficultyMode.PRACTICE && styles.themeButtonTextActive]}>
-                {t.practiceMode}{weakTaskCount !== undefined && weakTaskCount > 0 ? ` (${weakTaskCount})` : ''}
+              <Text style={[styles.personalizeButtonText, { color: activeColor }]}>
+                {t.parentDashboardMenu}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.personalizeButton, { borderColor: activeColor }]}
+              onPress={() => {
+                onOpenBadges();
+                onHideMenu();
+              }}
+            >
+              <Text style={[styles.personalizeButtonText, { color: activeColor }]}>
+                {t.badgesMenu}
               </Text>
             </TouchableOpacity>
           </View>
-          <Text style={[styles.settingsModeInfo, { color: modeInfo }]}>
-            {difficultyMode === DifficultyMode.SIMPLE
-              ? t.simpleModeInfo
-              : difficultyMode === DifficultyMode.CREATIVE
-              ? t.creativeModeInfo
-              : difficultyMode === DifficultyMode.PRACTICE
-              ? t.practiceModeInfo
-              : t.challengeInfo}
-          </Text>
-        </View>
 
-        <View style={styles.settingsDivider} />
+          <View style={styles.settingsDivider} />
 
-        {/* Number Range Settings */}
-        <View style={styles.settingsSection}>
-          <Text style={[styles.settingsSectionTitle, { color: sectionTitle }]}>{t.numberRange}</Text>
-          <View style={styles.numberRangeGrid}>
-            {([
-              { range: NumberRange.RANGE_10, label: t.upTo10 },
-              { range: NumberRange.RANGE_20, label: t.upTo20 },
-              { range: NumberRange.RANGE_50, label: t.upTo50 },
-              { range: NumberRange.RANGE_100, label: t.upTo100 },
-            ] as const).map(({ range, label }) => {
-              const isChallengeMode = difficultyMode === DifficultyMode.CHALLENGE;
-              const isActive = isChallengeMode ? range === NumberRange.RANGE_100 : numberRange === range;
-              return (
-                <TouchableOpacity
-                  key={range}
-                  style={[
-                    styles.rangeButton,
-                    { backgroundColor: buttonBg, borderColor: buttonBorder },
-                    isActive && activeStyle,
-                    isChallengeMode && { opacity: 0.6 },
-                  ]}
-                  onPress={() => onSetNumberRange(range)}
-                  disabled={isChallengeMode}
-                >
-                  <Text style={[styles.rangeButtonText, { color: buttonText }, isActive && styles.rangeButtonTextActive]}>
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+          {/* Operation Settings */}
+          <View style={styles.settingsSection}>
+            <Text style={[styles.settingsSectionTitle, { color: sectionTitle }]}>
+              {t.operation}
+            </Text>
+            <View style={styles.operationGrid}>
+              {(
+                [
+                  { op: Operation.ADDITION, symbol: '+', label: t.addition },
+                  { op: Operation.SUBTRACTION, symbol: '−', label: t.subtraction },
+                  { op: Operation.MULTIPLICATION, symbol: '×', label: t.multiplication },
+                  { op: Operation.DIVISION, symbol: '÷', label: t.division },
+                ] as const
+              ).map(({ op, symbol, label }) => {
+                const isChallenge = difficultyMode === DifficultyMode.CHALLENGE;
+                const isActive = isChallenge || selectedOperations.has(op);
+                return (
+                  <TouchableOpacity
+                    key={op}
+                    style={[
+                      styles.operationButton,
+                      { backgroundColor: buttonBg, borderColor: buttonBorder },
+                      isActive && activeStyle,
+                      isChallenge && { opacity: 0.6 },
+                    ]}
+                    onPress={() => onToggleOperation(op)}
+                    disabled={isChallenge}
+                  >
+                    <Text
+                      style={[
+                        styles.operationButtonText,
+                        { color: buttonText },
+                        isActive && styles.operationButtonTextActive,
+                      ]}
+                    >
+                      {symbol} {label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
-        </View>
 
-        <View style={styles.settingsDivider} />
+          <View style={styles.settingsDivider} />
 
-        {/* Feedback, Support and About in One Row */}
-        <View style={[styles.settingsSection, styles.settingsSectionRow]}>
+          {/* Difficulty Mode Settings */}
+          <View style={styles.settingsSection}>
+            <Text style={[styles.settingsSectionTitle, { color: sectionTitle }]}>
+              {t.difficultyMode}
+            </Text>
+            <View style={styles.difficultyGrid}>
+              <TouchableOpacity
+                style={[
+                  styles.themeButton,
+                  { backgroundColor: buttonBg, borderColor: buttonBorder },
+                  difficultyMode === DifficultyMode.SIMPLE && activeStyle,
+                ]}
+                onPress={() => onChangeDifficultyMode(DifficultyMode.SIMPLE)}
+              >
+                <Text
+                  style={[
+                    styles.themeButtonText,
+                    { color: buttonText },
+                    difficultyMode === DifficultyMode.SIMPLE && styles.themeButtonTextActive,
+                  ]}
+                >
+                  {t.simpleMode}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.themeButton,
+                  { backgroundColor: buttonBg, borderColor: buttonBorder },
+                  difficultyMode === DifficultyMode.CREATIVE && activeStyle,
+                ]}
+                onPress={() => onChangeDifficultyMode(DifficultyMode.CREATIVE)}
+              >
+                <Text
+                  style={[
+                    styles.themeButtonText,
+                    { color: buttonText },
+                    difficultyMode === DifficultyMode.CREATIVE && styles.themeButtonTextActive,
+                  ]}
+                >
+                  {t.creativeMode}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.themeButton,
+                  { backgroundColor: buttonBg, borderColor: buttonBorder },
+                  difficultyMode === DifficultyMode.CHALLENGE && activeStyle,
+                ]}
+                onPress={() => {
+                  onChangeDifficultyMode(DifficultyMode.CHALLENGE);
+                  onHideMenu();
+                }}
+              >
+                <Text
+                  style={[
+                    styles.themeButtonText,
+                    { color: buttonText },
+                    difficultyMode === DifficultyMode.CHALLENGE && styles.themeButtonTextActive,
+                  ]}
+                >
+                  {t.challenge}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.themeButton,
+                  { backgroundColor: buttonBg, borderColor: buttonBorder },
+                  difficultyMode === DifficultyMode.PRACTICE && activeStyle,
+                ]}
+                onPress={() => onChangeDifficultyMode(DifficultyMode.PRACTICE)}
+              >
+                <Text
+                  style={[
+                    styles.themeButtonText,
+                    { color: buttonText },
+                    difficultyMode === DifficultyMode.PRACTICE && styles.themeButtonTextActive,
+                  ]}
+                >
+                  {t.practiceMode}
+                  {weakTaskCount !== undefined && weakTaskCount > 0 ? ` (${weakTaskCount})` : ''}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={[styles.settingsModeInfo, { color: modeInfo }]}>
+              {difficultyMode === DifficultyMode.SIMPLE
+                ? t.simpleModeInfo
+                : difficultyMode === DifficultyMode.CREATIVE
+                  ? t.creativeModeInfo
+                  : difficultyMode === DifficultyMode.PRACTICE
+                    ? t.practiceModeInfo
+                    : t.challengeInfo}
+            </Text>
+          </View>
+
+          <View style={styles.settingsDivider} />
+
+          {/* Number Range Settings */}
+          <View style={styles.settingsSection}>
+            <Text style={[styles.settingsSectionTitle, { color: sectionTitle }]}>
+              {t.numberRange}
+            </Text>
+            <View style={styles.numberRangeGrid}>
+              {(
+                [
+                  { range: NumberRange.RANGE_10, label: t.upTo10 },
+                  { range: NumberRange.RANGE_20, label: t.upTo20 },
+                  { range: NumberRange.RANGE_50, label: t.upTo50 },
+                  { range: NumberRange.RANGE_100, label: t.upTo100 },
+                ] as const
+              ).map(({ range, label }) => {
+                const isChallengeMode = difficultyMode === DifficultyMode.CHALLENGE;
+                const isActive = isChallengeMode
+                  ? range === NumberRange.RANGE_100
+                  : numberRange === range;
+                return (
+                  <TouchableOpacity
+                    key={range}
+                    style={[
+                      styles.rangeButton,
+                      { backgroundColor: buttonBg, borderColor: buttonBorder },
+                      isActive && activeStyle,
+                      isChallengeMode && { opacity: 0.6 },
+                    ]}
+                    onPress={() => onSetNumberRange(range)}
+                    disabled={isChallengeMode}
+                  >
+                    <Text
+                      style={[
+                        styles.rangeButtonText,
+                        { color: buttonText },
+                        isActive && styles.rangeButtonTextActive,
+                      ]}
+                    >
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
+          <View style={styles.settingsDivider} />
+
+          {/* Feedback, Support and About in One Row */}
+          <View style={[styles.settingsSection, styles.settingsSectionRow]}>
+            <TouchableOpacity
+              style={styles.settingsMenuLinkFlex}
+              onPress={() => {
+                Linking.openURL(
+                  `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('1x1 Trainer Feedback')}`
+                ).catch(() => {});
+                onHideMenu();
+              }}
+            >
+              <Text style={[styles.settingsMenuLinkText, { color: activeColor }]}>
+                {t.feedback}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.settingsMenuLinkFlex}
+              onPress={() => {
+                Linking.openURL('https://ko-fi.com/devsven').catch(() => {});
+                onHideMenu();
+              }}
+            >
+              <Text style={[styles.settingsMenuLinkText, { color: activeColor }]}>{t.support}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.settingsMenuLinkFlex} onPress={onOpenAbout}>
+              <Text style={[styles.settingsMenuLinkText, { color: activeColor }]}>{t.about}</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Reset Onboarding */}
           <TouchableOpacity
-            style={styles.settingsMenuLinkFlex}
+            style={[styles.settingsSection, styles.resetOnboardingButton]}
             onPress={() => {
-              Linking.openURL(`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('1x1 Trainer Feedback')}`).catch(() => {});
+              onResetOnboarding();
               onHideMenu();
             }}
           >
-            <Text style={[styles.settingsMenuLinkText, { color: activeColor }]}>{t.feedback}</Text>
+            <Text style={styles.resetOnboardingText}>{t.resetOnboarding}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.settingsMenuLinkFlex}
-            onPress={() => {
-              Linking.openURL('https://ko-fi.com/devsven').catch(() => {});
-              onHideMenu();
-            }}
-          >
-            <Text style={[styles.settingsMenuLinkText, { color: activeColor }]}>{t.support}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.settingsMenuLinkFlex}
-            onPress={onOpenAbout}
-          >
-            <Text style={[styles.settingsMenuLinkText, { color: activeColor }]}>{t.about}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Reset Onboarding */}
-        <TouchableOpacity
-          style={[styles.settingsSection, styles.resetOnboardingButton]}
-          onPress={() => { onResetOnboarding(); onHideMenu(); }}
-        >
-          <Text style={styles.resetOnboardingText}>{t.resetOnboarding}</Text>
-        </TouchableOpacity>
         </ScrollView>
       </Animated.View>
     </>

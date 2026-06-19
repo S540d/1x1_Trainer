@@ -229,11 +229,13 @@ export const translations: Record<Language, TranslationStrings> = {
     tasksCorrectly: 'tasks correctly',
     // Motivation Message
     motivationTitleLowScore: 'Keep Going!',
-    motivationMessageLowScore: 'Don\'t give up! Practice makes perfect. Let\'s try again!',
+    motivationMessageLowScore: "Don't give up! Practice makes perfect. Let's try again!",
     motivationTitleMediumScore: 'Almost There!',
-    motivationMessageMediumScore: 'You\'re doing well! Just a bit more practice and you\'ll master it!',
+    motivationMessageMediumScore:
+      "You're doing well! Just a bit more practice and you'll master it!",
     motivationTitleHighScore: 'Great!',
-    motivationMessageHighScore: 'Excellent work! You have already solved 10 tasks. Let\'s try another round!',
+    motivationMessageHighScore:
+      "Excellent work! You have already solved 10 tasks. Let's try another round!",
     motivationButton: 'Continue',
     // Challenge Mode
     challenge: 'Challenge',
@@ -263,9 +265,9 @@ export const translations: Record<Language, TranslationStrings> = {
     parentCurrentStreak: 'Current Streak',
     parentLongestStreak: 'Longest Streak',
     parentStreakDays: 'Days',
-    streakWarningTitle: 'Don\'t break your streak!',
+    streakWarningTitle: "Don't break your streak!",
     streakWarningMessage: 'Play a quick round today to keep your {days}-day streak going!',
-    streakWarningButton: 'Let\'s go!',
+    streakWarningButton: "Let's go!",
     streakInfoTitle: 'Streak',
     streakInfoBody: 'days played in a row. Keep it up!',
     scoreInfoTitle: 'Score',
@@ -314,11 +316,13 @@ export const translations: Record<Language, TranslationStrings> = {
     badgeNewUnlocked: 'New badge unlocked!',
     // Onboarding
     onboardingWelcomeTitle: 'Welcome to 1×1 Trainer!',
-    onboardingWelcomeBody: 'Practice multiplication, division, addition and subtraction — fun and easy!',
+    onboardingWelcomeBody:
+      'Practice multiplication, division, addition and subtraction — fun and easy!',
     onboardingDemoTitle: 'Try it out!',
     onboardingDemoTooltip: 'Enter your answer here',
     onboardingSettingsTitle: 'Everything Adjustable',
-    onboardingSettingsBody: 'Tap the menu button to change the operation, difficulty and number range.',
+    onboardingSettingsBody:
+      'Tap the menu button to change the operation, difficulty and number range.',
     onboardingReadyTitle: "You're ready!",
     onboardingReadyBody: 'Have fun practicing!',
     onboardingDemoRetry: 'Not quite — try again!',
@@ -391,9 +395,11 @@ export const translations: Record<Language, TranslationStrings> = {
     motivationTitleLowScore: 'Weiter so!',
     motivationMessageLowScore: 'Schade, versuche es nochmal!',
     motivationTitleMediumScore: 'Fast geschafft!',
-    motivationMessageMediumScore: 'Du machst das schon gut! Noch ein bisschen üben und du schaffst es!',
+    motivationMessageMediumScore:
+      'Du machst das schon gut! Noch ein bisschen üben und du schaffst es!',
     motivationTitleHighScore: 'Super!',
-    motivationMessageHighScore: 'Toll gemacht! Du hast schon 10 Aufgaben gerechnet. Lass uns noch eine Runde versuchen!',
+    motivationMessageHighScore:
+      'Toll gemacht! Du hast schon 10 Aufgaben gerechnet. Lass uns noch eine Runde versuchen!',
     motivationButton: 'Weiter',
     // Challenge Mode
     challenge: 'Herausforderung',
@@ -425,7 +431,7 @@ export const translations: Record<Language, TranslationStrings> = {
     parentStreakDays: 'Tage',
     streakWarningTitle: 'Brich deine Serie nicht!',
     streakWarningMessage: 'Spiel heute eine Runde, um deine {days}-Tage-Serie zu halten!',
-    streakWarningButton: 'Los geht\'s!',
+    streakWarningButton: "Los geht's!",
     streakInfoTitle: 'Serie',
     streakInfoBody: 'Tage in Folge gespielt. Weiter so!',
     scoreInfoTitle: 'Punkte',
@@ -474,11 +480,13 @@ export const translations: Record<Language, TranslationStrings> = {
     badgeNewUnlocked: 'Neues Abzeichen freigeschaltet!',
     // Onboarding
     onboardingWelcomeTitle: 'Willkommen beim 1×1 Trainer!',
-    onboardingWelcomeBody: 'Übe Multiplikation, Division, Addition und Subtraktion – Spaß und einfach!',
+    onboardingWelcomeBody:
+      'Übe Multiplikation, Division, Addition und Subtraktion – Spaß und einfach!',
     onboardingDemoTitle: 'Probiere es aus!',
     onboardingDemoTooltip: 'Gib deine Antwort hier ein',
     onboardingSettingsTitle: 'Alles einstellbar',
-    onboardingSettingsBody: 'Tippe auf den Menü-Button, um Rechenart, Schwierigkeit und Zahlenbereich zu ändern.',
+    onboardingSettingsBody:
+      'Tippe auf den Menü-Button, um Rechenart, Schwierigkeit und Zahlenbereich zu ändern.',
     onboardingReadyTitle: 'Du bist bereit!',
     onboardingReadyBody: 'Viel Spaß beim Üben!',
     onboardingDemoRetry: 'Nicht ganz – tippe nochmal!',

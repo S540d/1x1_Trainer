@@ -22,11 +22,34 @@ describe('useSounds – web platform', () => {
 
   beforeEach(() => {
     setPlatform('web');
-    const mockOsc = { connect: jest.fn(), frequency: { value: 0 }, type: '' as OscillatorType, start: jest.fn(), stop: jest.fn() };
-    const mockGain = { connect: jest.fn(), gain: { setValueAtTime: jest.fn(), linearRampToValueAtTime: jest.fn(), exponentialRampToValueAtTime: jest.fn() } };
-    mockCtx = { currentTime: 0, createOscillator: jest.fn(() => mockOsc), createGain: jest.fn(() => mockGain), destination: {}, close: jest.fn().mockResolvedValue(undefined) };
+    const mockOsc = {
+      connect: jest.fn(),
+      frequency: { value: 0 },
+      type: '' as OscillatorType,
+      start: jest.fn(),
+      stop: jest.fn(),
+    };
+    const mockGain = {
+      connect: jest.fn(),
+      gain: {
+        setValueAtTime: jest.fn(),
+        linearRampToValueAtTime: jest.fn(),
+        exponentialRampToValueAtTime: jest.fn(),
+      },
+    };
+    mockCtx = {
+      currentTime: 0,
+      createOscillator: jest.fn(() => mockOsc),
+      createGain: jest.fn(() => mockGain),
+      destination: {},
+      close: jest.fn().mockResolvedValue(undefined),
+    };
     AudioContextMock = jest.fn(() => mockCtx);
-    Object.defineProperty(window, 'AudioContext', { value: AudioContextMock, configurable: true, writable: true });
+    Object.defineProperty(window, 'AudioContext', {
+      value: AudioContextMock,
+      configurable: true,
+      writable: true,
+    });
   });
 
   afterEach(() => {
@@ -40,19 +63,25 @@ describe('useSounds – web platform', () => {
 
   it('creates AudioContext when playSound is called with sound enabled', () => {
     const { result } = renderHook(() => useSounds(true, 80));
-    act(() => { result.current.playSound('correct'); });
+    act(() => {
+      result.current.playSound('correct');
+    });
     expect(AudioContextMock).toHaveBeenCalled();
   });
 
   it('skips AudioContext when volume is 0', () => {
     const { result } = renderHook(() => useSounds(true, 0));
-    act(() => { result.current.playSound('correct'); });
+    act(() => {
+      result.current.playSound('correct');
+    });
     expect(AudioContextMock).not.toHaveBeenCalled();
   });
 
   it('does nothing when soundEnabled is false', () => {
     const { result } = renderHook(() => useSounds(false, 80));
-    act(() => { result.current.playSound('correct'); });
+    act(() => {
+      result.current.playSound('correct');
+    });
     expect(AudioContextMock).not.toHaveBeenCalled();
   });
 
@@ -61,16 +90,26 @@ describe('useSounds – web platform', () => {
       ({ enabled }: { enabled: boolean }) => useSounds(enabled, 80),
       { initialProps: { enabled: false } }
     );
-    act(() => { result.current.playSound('correct'); });
+    act(() => {
+      result.current.playSound('correct');
+    });
     expect(AudioContextMock).not.toHaveBeenCalled();
 
     rerender({ enabled: true });
-    act(() => { result.current.playSound('correct'); });
+    act(() => {
+      result.current.playSound('correct');
+    });
     expect(AudioContextMock).toHaveBeenCalledTimes(1);
   });
 });
 
-type MockPlayer = { play: jest.Mock; pause: jest.Mock; seekTo: jest.Mock; remove: jest.Mock; volume: number };
+type MockPlayer = {
+  play: jest.Mock;
+  pause: jest.Mock;
+  seekTo: jest.Mock;
+  remove: jest.Mock;
+  volume: number;
+};
 
 describe('useSounds – native platform', () => {
   beforeEach(() => {
@@ -90,7 +129,8 @@ describe('useSounds – native platform', () => {
     jest.clearAllMocks();
   });
 
-  const playerAt = (idx: number): MockPlayer => mockCreateAudioPlayer.mock.results[idx].value as MockPlayer;
+  const playerAt = (idx: number): MockPlayer =>
+    mockCreateAudioPlayer.mock.results[idx].value as MockPlayer;
 
   it('loads sounds on mount', () => {
     renderHook(() => useSounds(true, 80));
@@ -99,7 +139,9 @@ describe('useSounds – native platform', () => {
 
   it('plays sound with correct volume when enabled', () => {
     const { result } = renderHook(() => useSounds(true, 80));
-    act(() => { result.current.playSound('correct'); });
+    act(() => {
+      result.current.playSound('correct');
+    });
     const player = playerAt(0); // 'correct' is the first loaded asset
     expect(player.volume).toBe(0.8);
     expect(player.seekTo).toHaveBeenCalledWith(0);
@@ -108,7 +150,9 @@ describe('useSounds – native platform', () => {
 
   it('does nothing when soundEnabled is false', () => {
     const { result } = renderHook(() => useSounds(false, 80));
-    act(() => { result.current.playSound('correct'); });
+    act(() => {
+      result.current.playSound('correct');
+    });
     expect(playerAt(0).play).not.toHaveBeenCalled();
   });
 
