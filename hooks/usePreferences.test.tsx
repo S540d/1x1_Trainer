@@ -157,7 +157,7 @@ describe('usePreferences Hook', () => {
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Failed to load preferences:',
+        'Failed to load global preferences:',
         expect.any(Error)
       );
 
@@ -450,7 +450,7 @@ describe('usePreferences Hook', () => {
       });
 
       await waitFor(() => {
-        expect(mockSaveOperations).toHaveBeenCalledWith(newOperations);
+        expect(mockSaveOperations).toHaveBeenCalledWith(newOperations, undefined);
       });
     });
 
@@ -604,7 +604,7 @@ describe('usePreferences Hook', () => {
       });
 
       await waitFor(() => {
-        expect(mockSaveNumberRange).toHaveBeenCalledWith(NumberRange.RANGE_10);
+        expect(mockSaveNumberRange).toHaveBeenCalledWith(NumberRange.RANGE_10, undefined);
       });
     });
 
@@ -677,7 +677,7 @@ describe('usePreferences Hook', () => {
       });
 
       await waitFor(() => {
-        expect(mockSaveTotalTasks).toHaveBeenCalledWith(100);
+        expect(mockSaveTotalTasks).toHaveBeenCalledWith(100, undefined);
       });
     });
 
@@ -782,7 +782,7 @@ describe('usePreferences Hook', () => {
       });
 
       await waitFor(() => {
-        expect(mockSaveNumberRange).toHaveBeenCalledWith(NumberRange.RANGE_10);
+        expect(mockSaveNumberRange).toHaveBeenCalledWith(NumberRange.RANGE_10, undefined);
       });
     });
 
@@ -800,7 +800,7 @@ describe('usePreferences Hook', () => {
       });
 
       await waitFor(() => {
-        expect(mockSaveTotalTasks).toHaveBeenCalledWith(15);
+        expect(mockSaveTotalTasks).toHaveBeenCalledWith(15, undefined);
       });
     });
 
@@ -843,7 +843,7 @@ describe('usePreferences Hook', () => {
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Failed to load preferences:',
+        'Failed to load global preferences:',
         expect.any(Error)
       );
 

@@ -101,6 +101,13 @@ export interface StreakData {
   longestStreak: number;
 }
 
+export interface ChildProfile {
+  id: string;
+  name: string;
+  avatarColor: string;
+  createdAt: string; // ISO date
+}
+
 export interface ThemeColors {
   background: string;
   text: string;

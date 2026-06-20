@@ -125,44 +125,53 @@ export function advanceStreak(current: StreakData): StreakData {
 
 // --- hook ---
 
-export function useBadges() {
+export function useBadges(profileId?: string) {
   const [badges, setBadges] = useState<BadgeStore>({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [newlyUnlocked, setNewlyUnlocked] = useState<string[]>([]);
 
   useEffect(() => {
-    getBadges().then((b) => {
-      setBadges(b);
-      setIsLoaded(true);
+    let cancelled = false;
+    getBadges(profileId).then((b) => {
+      if (!cancelled) {
+        setBadges(b);
+        setIsLoaded(true);
+      }
     });
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [profileId]);
 
-  const checkAndUnlock = useCallback(async (record: SessionRecord) => {
-    const [existing, allRecords, challengeHighScore, streakData] = await Promise.all([
-      getBadges(),
-      getSessionRecords(),
-      getChallengeHighScore(),
-      getStreakData(),
-    ]);
+  const checkAndUnlock = useCallback(
+    async (record: SessionRecord) => {
+      const [existing, allRecords, challengeHighScore, streakData] = await Promise.all([
+        getBadges(profileId),
+        getSessionRecords(profileId),
+        getChallengeHighScore(profileId),
+        getStreakData(profileId),
+      ]);
 
-    const newIds = computeNewlyUnlocked(
-      record,
-      allRecords,
-      challengeHighScore,
-      existing,
-      streakData.currentStreak
-    );
-    if (newIds.length === 0) return;
+      const newIds = computeNewlyUnlocked(
+        record,
+        allRecords,
+        challengeHighScore,
+        existing,
+        streakData.currentStreak
+      );
+      if (newIds.length === 0) return;
 
-    const now = Date.now();
-    const updated: BadgeStore = { ...existing };
-    for (const id of newIds) {
-      updated[id] = now;
-    }
-    await saveBadges(updated);
-    setBadges(updated);
-    setNewlyUnlocked(newIds);
-  }, []);
+      const now = Date.now();
+      const updated: BadgeStore = { ...existing };
+      for (const id of newIds) {
+        updated[id] = now;
+      }
+      await saveBadges(updated, profileId);
+      setBadges(updated);
+      setNewlyUnlocked(newIds);
+    },
+    [profileId]
+  );
 
   const clearNewlyUnlocked = useCallback(() => {
     setNewlyUnlocked([]);
