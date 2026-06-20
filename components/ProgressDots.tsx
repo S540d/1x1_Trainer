@@ -12,15 +12,7 @@ export function ProgressDots({ current, total }: ProgressDotsProps) {
     <View style={styles.container}>
       {Array.from({ length: total }, (_, i) => {
         const done = i < current;
-        return (
-          <View
-            key={i}
-            style={[
-              styles.dot,
-              done ? styles.dotDone : styles.dotPending,
-            ]}
-          />
-        );
+        return <View key={i} style={[styles.dot, done ? styles.dotDone : styles.dotPending]} />;
       })}
     </View>
   );

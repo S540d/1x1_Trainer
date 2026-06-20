@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  Animated,
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors, Operation, AnswerMode, GameState, DifficultyMode } from '../types/game';
 import { DESIGN_TOKENS } from '../utils/constants';
@@ -70,13 +63,9 @@ export function GameCard({
     </View>
   );
 
-  const renderNumber = (value: number) => (
-    <Text style={styles.questionText}>{value}</Text>
-  );
+  const renderNumber = (value: number) => <Text style={styles.questionText}>{value}</Text>;
 
-  const renderQuestionMark = () => (
-    <Text style={styles.questionText}>?</Text>
-  );
+  const renderQuestionMark = () => <Text style={styles.questionText}>?</Text>;
 
   return (
     <View style={styles.contentArea}>
@@ -88,24 +77,28 @@ export function GameCard({
           style={styles.questionCard}
         >
           <View style={styles.questionRow}>
-            {gameState.questionPart === 0 ? (
-              gameState.answerMode === AnswerMode.INPUT ? renderAnswerBox() : renderQuestionMark()
-            ) : (
-              renderNumber(gameState.num1)
-            )}
+            {gameState.questionPart === 0
+              ? gameState.answerMode === AnswerMode.INPUT
+                ? renderAnswerBox()
+                : renderQuestionMark()
+              : renderNumber(gameState.num1)}
 
             <Text style={styles.questionText}> {operatorSymbol} </Text>
 
-            {gameState.questionPart === 1 ? (
-              gameState.answerMode === AnswerMode.INPUT ? renderAnswerBox() : renderQuestionMark()
-            ) : (
-              renderNumber(gameState.num2)
-            )}
+            {gameState.questionPart === 1
+              ? gameState.answerMode === AnswerMode.INPUT
+                ? renderAnswerBox()
+                : renderQuestionMark()
+              : renderNumber(gameState.num2)}
 
             <Text style={styles.questionText}> = </Text>
 
             {gameState.questionPart === 2 ? (
-              gameState.answerMode === AnswerMode.INPUT ? renderAnswerBox() : renderQuestionMark()
+              gameState.answerMode === AnswerMode.INPUT ? (
+                renderAnswerBox()
+              ) : (
+                renderQuestionMark()
+              )
             ) : (
               <Text style={styles.questionText}>{getResult()}</Text>
             )}
@@ -120,7 +113,11 @@ export function GameCard({
                 isAnswerChecked={gameState.isAnswerChecked}
                 checkLabel={t.check}
                 nextLabel={t.nextQuestion}
-                encouragement={gameState.difficultyMode === DifficultyMode.PRACTICE ? t.practiceModeFeedback : t.encouragement}
+                encouragement={
+                  gameState.difficultyMode === DifficultyMode.PRACTICE
+                    ? t.practiceModeFeedback
+                    : t.encouragement
+                }
                 gradientPrimary={colors.gradientPrimary}
               />
             )}
@@ -134,16 +131,23 @@ export function GameCard({
                       style={[
                         styles.choiceButton,
                         gameState.selectedChoice === choice && styles.choiceButtonSelected,
-                        gameState.isAnswerChecked && choice === getCorrectAnswer() && styles.choiceButtonCorrect,
-                        gameState.isAnswerChecked && gameState.selectedChoice === choice && choice !== getCorrectAnswer() && styles.choiceButtonIncorrect,
+                        gameState.isAnswerChecked &&
+                          choice === getCorrectAnswer() &&
+                          styles.choiceButtonCorrect,
+                        gameState.isAnswerChecked &&
+                          gameState.selectedChoice === choice &&
+                          choice !== getCorrectAnswer() &&
+                          styles.choiceButtonIncorrect,
                       ]}
                       onPress={() => onChoiceClick(choice)}
                       disabled={gameState.isAnswerChecked}
                     >
-                      <Text style={[
-                        styles.choiceButtonText,
-                        gameState.selectedChoice === choice && styles.choiceButtonTextSelected,
-                      ]}>
+                      <Text
+                        style={[
+                          styles.choiceButtonText,
+                          gameState.selectedChoice === choice && styles.choiceButtonTextSelected,
+                        ]}
+                      >
                         {choice}
                       </Text>
                     </TouchableOpacity>
@@ -168,16 +172,23 @@ export function GameCard({
                         style={[
                           styles.sequenceButton,
                           gameState.selectedChoice === num && styles.sequenceButtonSelected,
-                          gameState.isAnswerChecked && num === getCorrectAnswer() && styles.sequenceButtonCorrect,
-                          gameState.isAnswerChecked && gameState.selectedChoice === num && num !== getCorrectAnswer() && styles.sequenceButtonIncorrect,
+                          gameState.isAnswerChecked &&
+                            num === getCorrectAnswer() &&
+                            styles.sequenceButtonCorrect,
+                          gameState.isAnswerChecked &&
+                            gameState.selectedChoice === num &&
+                            num !== getCorrectAnswer() &&
+                            styles.sequenceButtonIncorrect,
                         ]}
                         onPress={() => onChoiceClick(num)}
                         disabled={gameState.isAnswerChecked}
                       >
-                        <Text style={[
-                          styles.sequenceButtonText,
-                          gameState.selectedChoice === num && styles.sequenceButtonTextSelected,
-                        ]}>
+                        <Text
+                          style={[
+                            styles.sequenceButtonText,
+                            gameState.selectedChoice === num && styles.sequenceButtonTextSelected,
+                          ]}
+                        >
                           {num}
                         </Text>
                       </TouchableOpacity>

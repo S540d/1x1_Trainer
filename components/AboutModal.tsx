@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Modal,
-  Linking,
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Modal, Linking } from 'react-native';
 import { ThemeColors } from '../types/game';
 import { APP_VERSION, APP_NAME, CONTACT_EMAIL } from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
@@ -34,16 +27,11 @@ export function AboutModal({ visible, onClose, colors, t }: AboutModalProps) {
         <View style={[modalStyles.content, { backgroundColor: colors.settingsMenu }]}>
           <View style={styles.aboutModalHeader}>
             <Text style={[modalStyles.title, { color: colors.text }]}>{t.about}</Text>
-            <TouchableOpacity
-              style={styles.aboutModalCloseButton}
-              onPress={onClose}
-            >
+            <TouchableOpacity style={styles.aboutModalCloseButton} onPress={onClose}>
               <Text style={[styles.aboutModalCloseText, { color: colors.text }]}>✕</Text>
             </TouchableOpacity>
           </View>
-          <Text style={[styles.aboutModalAppName, { color: colors.text }]}>
-            {APP_NAME}
-          </Text>
+          <Text style={[styles.aboutModalAppName, { color: colors.text }]}>{APP_NAME}</Text>
           <Text style={[styles.aboutModalInfoText, { color: colors.text }]}>
             {t.version} {APP_VERSION}
           </Text>
@@ -60,9 +48,7 @@ export function AboutModal({ visible, onClose, colors, t }: AboutModalProps) {
           <TouchableOpacity
             onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}`).catch(() => {})}
           >
-            <Text style={[styles.aboutModalInfoText, { color: '#4F46E5' }]}>
-              {t.contact}
-            </Text>
+            <Text style={[styles.aboutModalInfoText, { color: '#4F46E5' }]}>{t.contact}</Text>
           </TouchableOpacity>
           <Button label={t.ok} onPress={onClose} variant="primary" fullWidth colors={colors} />
         </View>

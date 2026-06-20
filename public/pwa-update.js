@@ -30,9 +30,12 @@ class PWAUpdateManager {
       });
 
       // Prüfe regelmäßig auf Updates (alle 24h)
-      setInterval(() => {
-        this.registration.update();
-      }, 24 * 60 * 60 * 1000);
+      setInterval(
+        () => {
+          this.registration.update();
+        },
+        24 * 60 * 60 * 1000
+      );
     } catch (error) {
       console.error('[PWA] Service Worker Registration fehlgeschlagen:', error);
     }

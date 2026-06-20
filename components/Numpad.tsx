@@ -1,12 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Pressable,
-  Animated,
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Pressable, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { DESIGN_TOKENS } from '../utils/constants';
 import { prefersReducedMotion } from '../utils/animations';
@@ -49,7 +42,9 @@ export function Numpad({
       pulseLoop.current?.stop();
       pulseAnim.setValue(1);
     }
-    return () => { pulseLoop.current?.stop(); };
+    return () => {
+      pulseLoop.current?.stop();
+    };
   }, [canCheck, pulseAnim, pulseLoop]);
 
   return (
@@ -71,11 +66,7 @@ export function Numpad({
           <NumpadButton text="9" onPress={() => onNumberClick(9)} />
         </View>
         <View style={styles.numpadRow}>
-          <NumpadButton
-            text="⌫"
-            onPress={() => onNumberClick(-1)}
-            isBackspace
-          />
+          <NumpadButton text="⌫" onPress={() => onNumberClick(-1)} isBackspace />
           <NumpadButton text="0" onPress={() => onNumberClick(0)} />
           <Animated.View style={[{ flex: 1 }, { transform: [{ scale: pulseAnim }] }]}>
             {canCheck ? (
@@ -117,13 +108,23 @@ function NumpadButton({
 
   const handlePressIn = () => {
     if (!prefersReducedMotion()) {
-      Animated.spring(scale, { toValue: 0.92, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
+      Animated.spring(scale, {
+        toValue: 0.92,
+        useNativeDriver: true,
+        speed: 50,
+        bounciness: 4,
+      }).start();
     }
   };
 
   const handlePressOut = () => {
     if (!prefersReducedMotion()) {
-      Animated.spring(scale, { toValue: 1.0, useNativeDriver: true, speed: 30, bounciness: 6 }).start();
+      Animated.spring(scale, {
+        toValue: 1.0,
+        useNativeDriver: true,
+        speed: 30,
+        bounciness: 6,
+      }).start();
     }
   };
 

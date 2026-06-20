@@ -8,7 +8,14 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { Animated } from 'react-native';
 import { GameCard } from './GameCard';
-import { AnswerMode, GameMode, Operation, DifficultyMode, GameState, ThemeColors } from '../types/game';
+import {
+  AnswerMode,
+  GameMode,
+  Operation,
+  DifficultyMode,
+  GameState,
+  ThemeColors,
+} from '../types/game';
 
 const mockColors: ThemeColors = {
   background: '#fff',
@@ -58,7 +65,12 @@ const defaultProps = {
   onChoiceClick: jest.fn(),
   onCheck: jest.fn(),
   onNext: jest.fn(),
-  t: { nextQuestion: 'Weiter →', check: 'Prüfen', encouragement: 'Du schaffst das! 💪', practiceModeFeedback: 'Du übst deine schwierigen Aufgaben!' },
+  t: {
+    nextQuestion: 'Weiter →',
+    check: 'Prüfen',
+    encouragement: 'Du schaffst das! 💪',
+    practiceModeFeedback: 'Du übst deine schwierigen Aufgaben!',
+  },
 };
 
 describe('GameCard - Button accessibility', () => {
@@ -73,9 +85,7 @@ describe('GameCard - Button accessibility', () => {
     };
 
     it('renders all sequence number buttons', () => {
-      const { getByText } = render(
-        <GameCard {...defaultProps} gameState={sequenceState} />
-      );
+      const { getByText } = render(<GameCard {...defaultProps} gameState={sequenceState} />);
 
       for (const num of defaultProps.numberSequence) {
         expect(getByText(String(num))).toBeTruthy();
@@ -83,9 +93,7 @@ describe('GameCard - Button accessibility', () => {
     });
 
     it('renders the check button', () => {
-      const { getByText } = render(
-        <GameCard {...defaultProps} gameState={sequenceState} />
-      );
+      const { getByText } = render(<GameCard {...defaultProps} gameState={sequenceState} />);
 
       expect(getByText('Prüfen')).toBeTruthy();
     });
@@ -95,11 +103,10 @@ describe('GameCard - Button accessibility', () => {
         ...sequenceState,
         selectedChoice: 12,
       };
-      const { getByText } = render(
-        <GameCard {...defaultProps} gameState={stateWithChoice} />
-      );
+      const { getByText } = render(<GameCard {...defaultProps} gameState={stateWithChoice} />);
 
-      const checkButton = getByText('Prüfen').closest('[role="button"]') || getByText('Prüfen').parentElement;
+      const checkButton =
+        getByText('Prüfen').closest('[role="button"]') || getByText('Prüfen').parentElement;
       // The button should be clickable
       fireEvent.click(getByText('Prüfen'));
       expect(defaultProps.onCheck).toHaveBeenCalled();
@@ -111,9 +118,7 @@ describe('GameCard - Button accessibility', () => {
         isAnswerChecked: true,
         selectedChoice: 12,
       };
-      const { getByText } = render(
-        <GameCard {...defaultProps} gameState={checkedState} />
-      );
+      const { getByText } = render(<GameCard {...defaultProps} gameState={checkedState} />);
 
       expect(getByText('Weiter →')).toBeTruthy();
       fireEvent.click(getByText('Weiter →'));
@@ -153,9 +158,7 @@ describe('GameCard - Button accessibility', () => {
     };
 
     it('renders all choice buttons', () => {
-      const { getByText } = render(
-        <GameCard {...defaultProps} gameState={choiceState} />
-      );
+      const { getByText } = render(<GameCard {...defaultProps} gameState={choiceState} />);
 
       for (const choice of defaultProps.multipleChoices) {
         expect(getByText(String(choice))).toBeTruthy();
@@ -163,9 +166,7 @@ describe('GameCard - Button accessibility', () => {
     });
 
     it('renders the check button', () => {
-      const { getByText } = render(
-        <GameCard {...defaultProps} gameState={choiceState} />
-      );
+      const { getByText } = render(<GameCard {...defaultProps} gameState={choiceState} />);
 
       expect(getByText('Prüfen')).toBeTruthy();
     });
@@ -218,9 +219,7 @@ describe('GameCard - Button accessibility', () => {
     };
 
     it('renders all numpad digit buttons (0-9)', () => {
-      const { getAllByText } = render(
-        <GameCard {...defaultProps} gameState={inputState} />
-      );
+      const { getAllByText } = render(<GameCard {...defaultProps} gameState={inputState} />);
 
       for (let i = 0; i <= 9; i++) {
         // Some digits may appear both in the question and numpad
@@ -229,17 +228,13 @@ describe('GameCard - Button accessibility', () => {
     });
 
     it('renders backspace button', () => {
-      const { getByText } = render(
-        <GameCard {...defaultProps} gameState={inputState} />
-      );
+      const { getByText } = render(<GameCard {...defaultProps} gameState={inputState} />);
 
       expect(getByText('⌫')).toBeTruthy();
     });
 
     it('renders check button', () => {
-      const { getByText } = render(
-        <GameCard {...defaultProps} gameState={inputState} />
-      );
+      const { getByText } = render(<GameCard {...defaultProps} gameState={inputState} />);
 
       expect(getByText('Prüfen')).toBeTruthy();
     });
@@ -250,9 +245,7 @@ describe('GameCard - Button accessibility', () => {
         isAnswerChecked: true,
         userAnswer: '12',
       };
-      const { getByText } = render(
-        <GameCard {...defaultProps} gameState={checkedState} />
-      );
+      const { getByText } = render(<GameCard {...defaultProps} gameState={checkedState} />);
 
       expect(getByText('Weiter →')).toBeTruthy();
     });
@@ -260,9 +253,7 @@ describe('GameCard - Button accessibility', () => {
 
   describe('Question display', () => {
     it('displays question with result missing (questionPart 2)', () => {
-      const { getAllByText } = render(
-        <GameCard {...defaultProps} gameState={baseGameState} />
-      );
+      const { getAllByText } = render(<GameCard {...defaultProps} gameState={baseGameState} />);
 
       // num1 and num2 are displayed (may appear multiple times due to numpad)
       expect(getAllByText('3').length).toBeGreaterThanOrEqual(1);
@@ -277,9 +268,7 @@ describe('GameCard - Button accessibility', () => {
         questionPart: 0,
         answerMode: AnswerMode.MULTIPLE_CHOICE,
       };
-      const { getAllByText } = render(
-        <GameCard {...defaultProps} gameState={state} />
-      );
+      const { getAllByText } = render(<GameCard {...defaultProps} gameState={state} />);
 
       // ? should appear for the missing first number
       expect(getAllByText('?').length).toBeGreaterThanOrEqual(1);
@@ -295,9 +284,7 @@ describe('GameCard - Button accessibility', () => {
         questionPart: 1,
         answerMode: AnswerMode.MULTIPLE_CHOICE,
       };
-      const { getAllByText } = render(
-        <GameCard {...defaultProps} gameState={state} />
-      );
+      const { getAllByText } = render(<GameCard {...defaultProps} gameState={state} />);
 
       // num1 (3) should be displayed
       expect(getAllByText('3').length).toBeGreaterThanOrEqual(1);
@@ -314,9 +301,7 @@ describe('GameCard - Button accessibility', () => {
         ...baseGameState,
         answerMode: AnswerMode.MULTIPLE_CHOICE,
       };
-      const { queryByText } = render(
-        <GameCard {...defaultProps} gameState={state} />
-      );
+      const { queryByText } = render(<GameCard {...defaultProps} gameState={state} />);
 
       // Numpad-specific elements must not be present
       expect(queryByText('⌫')).toBeNull();
@@ -327,17 +312,13 @@ describe('GameCard - Button accessibility', () => {
         ...baseGameState,
         answerMode: AnswerMode.NUMBER_SEQUENCE,
       };
-      const { queryByText } = render(
-        <GameCard {...defaultProps} gameState={state} />
-      );
+      const { queryByText } = render(<GameCard {...defaultProps} gameState={state} />);
 
       expect(queryByText('⌫')).toBeNull();
     });
 
     it('does not render numpad-specific buttons in INPUT mode', () => {
-      const { queryByText } = render(
-        <GameCard {...defaultProps} gameState={baseGameState} />
-      );
+      const { queryByText } = render(<GameCard {...defaultProps} gameState={baseGameState} />);
 
       // In INPUT mode the numpad shows "Prüfen", not GradientCheckButton — but same label
       // Verify the numpad is present via backspace button
@@ -358,9 +339,7 @@ describe('GameCard - Button accessibility', () => {
           highScore: 0,
         },
       };
-      const { getByText } = render(
-        <GameCard {...defaultProps} gameState={challengeState} />
-      );
+      const { getByText } = render(<GameCard {...defaultProps} gameState={challengeState} />);
 
       // All sequence numbers present
       for (const num of defaultProps.numberSequence) {
@@ -382,9 +361,7 @@ describe('GameCard - Button accessibility', () => {
           highScore: 0,
         },
       };
-      const { getByText } = render(
-        <GameCard {...defaultProps} gameState={challengeState} />
-      );
+      const { getByText } = render(<GameCard {...defaultProps} gameState={challengeState} />);
 
       // All choice buttons present
       for (const choice of defaultProps.multipleChoices) {
@@ -399,21 +376,30 @@ describe('GameCard - Button accessibility', () => {
 describe('GameCard - Practice mode encouragement text', () => {
   it('shows encouragement text in SIMPLE mode', () => {
     const { getByText } = render(
-      <GameCard {...defaultProps} gameState={{ ...baseGameState, difficultyMode: DifficultyMode.SIMPLE }} />
+      <GameCard
+        {...defaultProps}
+        gameState={{ ...baseGameState, difficultyMode: DifficultyMode.SIMPLE }}
+      />
     );
     expect(getByText('Du schaffst das! 💪')).toBeTruthy();
   });
 
   it('shows practiceModeFeedback text in PRACTICE mode', () => {
     const { getByText } = render(
-      <GameCard {...defaultProps} gameState={{ ...baseGameState, difficultyMode: DifficultyMode.PRACTICE }} />
+      <GameCard
+        {...defaultProps}
+        gameState={{ ...baseGameState, difficultyMode: DifficultyMode.PRACTICE }}
+      />
     );
     expect(getByText('Du übst deine schwierigen Aufgaben!')).toBeTruthy();
   });
 
   it('shows encouragement text in CREATIVE mode', () => {
     const { getByText } = render(
-      <GameCard {...defaultProps} gameState={{ ...baseGameState, difficultyMode: DifficultyMode.CREATIVE }} />
+      <GameCard
+        {...defaultProps}
+        gameState={{ ...baseGameState, difficultyMode: DifficultyMode.CREATIVE }}
+      />
     );
     expect(getByText('Du schaffst das! 💪')).toBeTruthy();
   });

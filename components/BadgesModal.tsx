@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Modal,
-  ScrollView,
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { ThemeColors, Language } from '../types/game';
 import { BADGE_DEFINITIONS, BadgeCategory, DESIGN_TOKENS } from '../utils/constants';
 import { BadgeStore } from '../utils/storage';
@@ -136,15 +129,15 @@ export function BadgesModal({ visible, onClose, colors, badges, language, t }: B
 
           {/* Badge grid by category */}
           <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-            {CATEGORY_ORDER.map(cat => {
-              const defs = BADGE_DEFINITIONS.filter(b => b.category === cat);
+            {CATEGORY_ORDER.map((cat) => {
+              const defs = BADGE_DEFINITIONS.filter((b) => b.category === cat);
               return (
                 <View key={cat} style={styles.categorySection}>
                   <Text style={[styles.categoryLabel, { color: colors.textSecondary }]}>
                     {getCategoryLabel(cat, t).toUpperCase()}
                   </Text>
                   <View style={styles.grid}>
-                    {defs.map(def => {
+                    {defs.map((def) => {
                       const unlockedAt = badges[def.id];
                       const isUnlocked = Boolean(unlockedAt);
                       return (
@@ -153,7 +146,10 @@ export function BadgesModal({ visible, onClose, colors, badges, language, t }: B
                           style={[
                             styles.badgeCard,
                             { backgroundColor: colors.card, borderColor: colors.border },
-                            isUnlocked && [styles.badgeCardUnlocked, { borderColor: activeColor + '55' }],
+                            isUnlocked && [
+                              styles.badgeCardUnlocked,
+                              { borderColor: activeColor + '55' },
+                            ],
                           ]}
                         >
                           <Text style={[styles.badgeIcon, !isUnlocked && styles.badgeIconLocked]}>
@@ -189,7 +185,10 @@ export function BadgesModal({ visible, onClose, colors, badges, language, t }: B
           </ScrollView>
 
           {/* Close button */}
-          <TouchableOpacity style={[styles.closeBtn, { backgroundColor: activeColor }]} onPress={onClose}>
+          <TouchableOpacity
+            style={[styles.closeBtn, { backgroundColor: activeColor }]}
+            onPress={onClose}
+          >
             <Text style={styles.closeBtnText}>{t.ok}</Text>
           </TouchableOpacity>
         </View>

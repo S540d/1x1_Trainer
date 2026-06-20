@@ -124,9 +124,17 @@ describe('theme.ts - Theme Color Selection', () => {
       const darkColors = getThemeColors(true);
 
       const stringKeys: (keyof typeof lightColors)[] = [
-        'background', 'text', 'textSecondary', 'border', 'card',
-        'cardCorrect', 'cardIncorrect', 'buttonInactive', 'buttonInactiveText',
-        'settingsOverlay', 'settingsMenu',
+        'background',
+        'text',
+        'textSecondary',
+        'border',
+        'card',
+        'cardCorrect',
+        'cardIncorrect',
+        'buttonInactive',
+        'buttonInactiveText',
+        'settingsOverlay',
+        'settingsMenu',
       ];
 
       stringKeys.forEach((key) => {

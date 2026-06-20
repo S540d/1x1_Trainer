@@ -39,10 +39,10 @@ export function getStreakDays(records: SessionRecord[]): number {
 
 export function countPerfectSessions(records: SessionRecord[]): number {
   return records.filter(
-    r =>
+    (r) =>
       r.difficultyMode !== DifficultyMode.CHALLENGE &&
       r.totalTasks >= 10 &&
-      r.correctTasks === r.totalTasks,
+      r.correctTasks === r.totalTasks
   ).length;
 }
 
@@ -53,14 +53,14 @@ export function hasAllOperationsPerfect(records: SessionRecord[]): boolean {
     Operation.MULTIPLICATION,
     Operation.DIVISION,
   ];
-  return ops.every(op =>
+  return ops.every((op) =>
     records.some(
-      r =>
+      (r) =>
         r.difficultyMode !== DifficultyMode.CHALLENGE &&
         r.totalTasks >= 10 &&
         r.correctTasks === r.totalTasks &&
-        r.operations.includes(op),
-    ),
+        r.operations.includes(op)
+    )
   );
 }
 
@@ -71,7 +71,7 @@ export function computeNewlyUnlocked(
   allRecords: SessionRecord[],
   challengeHighScore: number,
   existing: BadgeStore,
-  streakDays?: number,
+  streakDays?: number
 ): string[] {
   const result: string[] = [];
   const unlock = (id: string) => {
@@ -79,8 +79,8 @@ export function computeNewlyUnlocked(
   };
 
   const streak = streakDays ?? getStreakDays(allRecords);
-  if (streak >= 3)  unlock('streak_3');
-  if (streak >= 7)  unlock('streak_7');
+  if (streak >= 3) unlock('streak_3');
+  if (streak >= 7) unlock('streak_7');
   if (streak >= 30) unlock('streak_30');
 
   const perfects = countPerfectSessions(allRecords);
@@ -131,7 +131,7 @@ export function useBadges() {
   const [newlyUnlocked, setNewlyUnlocked] = useState<string[]>([]);
 
   useEffect(() => {
-    getBadges().then(b => {
+    getBadges().then((b) => {
       setBadges(b);
       setIsLoaded(true);
     });
@@ -150,7 +150,7 @@ export function useBadges() {
       allRecords,
       challengeHighScore,
       existing,
-      streakData.currentStreak,
+      streakData.currentStreak
     );
     if (newIds.length === 0) return;
 

@@ -130,10 +130,8 @@ export function usePreferences() {
 
   // Toggle operation in multi-select
   const toggleOperation = (op: Operation) => {
-    setOperations(prev => {
-      const newOps = prev.includes(op)
-        ? prev.filter(o => o !== op)
-        : [...prev, op];
+    setOperations((prev) => {
+      const newOps = prev.includes(op) ? prev.filter((o) => o !== op) : [...prev, op];
 
       // Ensure at least one operation is always enabled
       if (newOps.length === 0) return prev;
@@ -179,9 +177,7 @@ export function usePreferences() {
     setThemeMode,
     themeName,
     setThemeName,
-    operation: operations.length > 0
-      ? operations[0]
-      : Operation.MULTIPLICATION, // First selected operation as primary
+    operation: operations.length > 0 ? operations[0] : Operation.MULTIPLICATION, // First selected operation as primary
     operations,
     setOperations,
     toggleOperation,
