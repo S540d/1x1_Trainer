@@ -5,7 +5,7 @@
 
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { STORAGE_KEYS } from './constants';
+import { STORAGE_KEYS, AVATAR_COLORS } from './constants';
 import {
   ThemeMode,
   ThemeName,
@@ -16,6 +16,7 @@ import {
   SessionRecord,
   TaskStat,
   StreakData,
+  ChildProfile,
 } from '../types/game';
 
 /**
@@ -64,7 +65,117 @@ export const removeStorageItem = async (key: string): Promise<void> => {
   }
 };
 
+// ============================================================================
+// Profile management
+// ============================================================================
+
+function generateId(): string {
+  const s4 = () =>
+    Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .slice(1);
+  return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
+}
+
+export function profileKey(baseKey: string, profileId: string): string {
+  return `${baseKey}-${profileId}`;
+}
+
+function resolveKey(baseKey: string, profileId?: string): string {
+  return profileId ? profileKey(baseKey, profileId) : baseKey;
+}
+
+export const getProfiles = async (): Promise<ChildProfile[]> => {
+  const value = await getStorageItem(STORAGE_KEYS.PROFILES);
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return parsed as ChildProfile[];
+  } catch {
+    /* ignore */
+  }
+  return [];
+};
+
+export const saveProfiles = async (profiles: ChildProfile[]): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.PROFILES, JSON.stringify(profiles));
+};
+
+export const getActiveProfileId = async (): Promise<string | null> => {
+  return getStorageItem(STORAGE_KEYS.ACTIVE_PROFILE_ID);
+};
+
+export const setActiveProfileId = async (id: string): Promise<void> => {
+  await setStorageItem(STORAGE_KEYS.ACTIVE_PROFILE_ID, id);
+};
+
+export const createProfile = async (name: string, avatarColor: string): Promise<ChildProfile> => {
+  const profile: ChildProfile = {
+    id: generateId(),
+    name: name.trim(),
+    avatarColor,
+    createdAt: new Date().toISOString(),
+  };
+  const profiles = await getProfiles();
+  profiles.push(profile);
+  await saveProfiles(profiles);
+  return profile;
+};
+
+export const deleteProfileData = async (profileId: string): Promise<void> => {
+  const keysToDelete = [
+    STORAGE_KEYS.STREAK,
+    STORAGE_KEYS.TASK_STATS,
+    STORAGE_KEYS.PARENT_STATS,
+    STORAGE_KEYS.BADGES,
+    STORAGE_KEYS.TOTAL_TASKS,
+    STORAGE_KEYS.CHALLENGE_HIGHSCORE,
+    STORAGE_KEYS.OPERATIONS,
+    STORAGE_KEYS.NUMBER_RANGE,
+  ];
+  await Promise.all(keysToDelete.map((k) => removeStorageItem(profileKey(k, profileId))));
+};
+
+// Run once on first launch with profiles: copies existing global data into a default profile.
+export const migrateToProfiles = async (): Promise<ChildProfile> => {
+  const existing = await getProfiles();
+  if (existing.length > 0) return existing[0];
+
+  const defaultProfile: ChildProfile = {
+    id: generateId(),
+    name: 'Kind 1',
+    avatarColor: AVATAR_COLORS[0],
+    createdAt: new Date().toISOString(),
+  };
+
+  // Copy all per-profile global keys to profile-keyed keys
+  const keysToCopy = [
+    STORAGE_KEYS.STREAK,
+    STORAGE_KEYS.TASK_STATS,
+    STORAGE_KEYS.PARENT_STATS,
+    STORAGE_KEYS.BADGES,
+    STORAGE_KEYS.TOTAL_TASKS,
+    STORAGE_KEYS.CHALLENGE_HIGHSCORE,
+    STORAGE_KEYS.OPERATIONS,
+    STORAGE_KEYS.NUMBER_RANGE,
+  ];
+  await Promise.all(
+    keysToCopy.map(async (k) => {
+      const value = await getStorageItem(k);
+      if (value !== null) {
+        await setStorageItem(profileKey(k, defaultProfile.id), value);
+      }
+    })
+  );
+
+  await saveProfiles([defaultProfile]);
+  await setActiveProfileId(defaultProfile.id);
+  return defaultProfile;
+};
+
+// ============================================================================
 // Typed storage helpers
+// ============================================================================
 
 export const saveLanguage = async (language: Language): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.LANGUAGE, language);
@@ -108,12 +219,16 @@ export const getThemeName = async (): Promise<ThemeName | null> => {
   return null;
 };
 
-export const saveOperations = async (operations: Operation[]): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.OPERATIONS, JSON.stringify(operations));
+export const saveOperations = async (
+  operations: Operation[],
+  profileId?: string
+): Promise<void> => {
+  await setStorageItem(resolveKey(STORAGE_KEYS.OPERATIONS, profileId), JSON.stringify(operations));
 };
 
-export const getOperations = async (): Promise<Operation[]> => {
-  const value = await getStorageItem(STORAGE_KEYS.OPERATIONS);
+export const getOperations = async (profileId?: string): Promise<Operation[]> => {
+  const key = resolveKey(STORAGE_KEYS.OPERATIONS, profileId);
+  const value = await getStorageItem(key);
   if (value) {
     try {
       const parsed = JSON.parse(value);
@@ -128,12 +243,14 @@ export const getOperations = async (): Promise<Operation[]> => {
     }
   }
 
-  // Migration: try old single-operation storage
-  const oldValue = await getStorageItem(STORAGE_KEYS.OPERATION);
-  if (oldValue === 'ADDITION' || oldValue === 'SUBTRACTION' || oldValue === 'MULTIPLICATION') {
-    const migratedOps = [oldValue as Operation];
-    await saveOperations(migratedOps);
-    return migratedOps;
+  // Migration: try old single-operation storage (global key only)
+  if (!profileId) {
+    const oldValue = await getStorageItem(STORAGE_KEYS.OPERATION);
+    if (oldValue === 'ADDITION' || oldValue === 'SUBTRACTION' || oldValue === 'MULTIPLICATION') {
+      const migratedOps = [oldValue as Operation];
+      await saveOperations(migratedOps);
+      return migratedOps;
+    }
   }
 
   // Default: multiplication only
@@ -153,12 +270,12 @@ export const getOperation = async (): Promise<Operation | null> => {
   return null;
 };
 
-export const saveTotalTasks = async (total: number): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.TOTAL_TASKS, total.toString());
+export const saveTotalTasks = async (total: number, profileId?: string): Promise<void> => {
+  await setStorageItem(resolveKey(STORAGE_KEYS.TOTAL_TASKS, profileId), total.toString());
 };
 
-export const getTotalTasks = async (): Promise<number | null> => {
-  const value = await getStorageItem(STORAGE_KEYS.TOTAL_TASKS);
+export const getTotalTasks = async (profileId?: string): Promise<number | null> => {
+  const value = await getStorageItem(resolveKey(STORAGE_KEYS.TOTAL_TASKS, profileId));
   if (value) {
     const parsed = parseInt(value, 10);
     return isNaN(parsed) ? null : parsed;
@@ -166,12 +283,12 @@ export const getTotalTasks = async (): Promise<number | null> => {
   return null;
 };
 
-export const saveChallengeHighScore = async (score: number): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.CHALLENGE_HIGHSCORE, score.toString());
+export const saveChallengeHighScore = async (score: number, profileId?: string): Promise<void> => {
+  await setStorageItem(resolveKey(STORAGE_KEYS.CHALLENGE_HIGHSCORE, profileId), score.toString());
 };
 
-export const getChallengeHighScore = async (): Promise<number> => {
-  const value = await getStorageItem(STORAGE_KEYS.CHALLENGE_HIGHSCORE);
+export const getChallengeHighScore = async (profileId?: string): Promise<number> => {
+  const value = await getStorageItem(resolveKey(STORAGE_KEYS.CHALLENGE_HIGHSCORE, profileId));
   if (value) {
     const parsed = parseInt(value, 10);
     return isNaN(parsed) ? 0 : parsed;
@@ -208,8 +325,9 @@ function pruneOldRecords(records: SessionRecord[], now: number): SessionRecord[]
   return records.filter((r) => now - r.timestamp < FOUR_WEEKS_MS);
 }
 
-export const getSessionRecords = async (): Promise<SessionRecord[]> => {
-  const value = await getStorageItem(STORAGE_KEYS.PARENT_STATS);
+export const getSessionRecords = async (profileId?: string): Promise<SessionRecord[]> => {
+  const key = resolveKey(STORAGE_KEYS.PARENT_STATS, profileId);
+  const value = await getStorageItem(key);
   if (!value) return [];
   try {
     const parsed = JSON.parse(value);
@@ -217,7 +335,7 @@ export const getSessionRecords = async (): Promise<SessionRecord[]> => {
     const valid = parsed.filter(isValidSessionRecord);
     const pruned = pruneOldRecords(valid, Date.now());
     if (pruned.length < valid.length) {
-      await setStorageItem(STORAGE_KEYS.PARENT_STATS, JSON.stringify(pruned));
+      await setStorageItem(key, JSON.stringify(pruned));
     }
     return pruned;
   } catch {
@@ -225,10 +343,13 @@ export const getSessionRecords = async (): Promise<SessionRecord[]> => {
   }
 };
 
-export const saveSessionRecord = async (record: SessionRecord): Promise<void> => {
-  const records = await getSessionRecords();
+export const saveSessionRecord = async (
+  record: SessionRecord,
+  profileId?: string
+): Promise<void> => {
+  const records = await getSessionRecords(profileId);
   records.push(record);
-  await setStorageItem(STORAGE_KEYS.PARENT_STATS, JSON.stringify(records));
+  await setStorageItem(resolveKey(STORAGE_KEYS.PARENT_STATS, profileId), JSON.stringify(records));
 };
 
 // Returns true when onboarding is done (value = 'true').
@@ -260,8 +381,8 @@ function isValidTaskStat(r: unknown): r is TaskStat {
   );
 }
 
-export const getTaskStats = async (): Promise<TaskStat[]> => {
-  const value = await getStorageItem(STORAGE_KEYS.TASK_STATS);
+export const getTaskStats = async (profileId?: string): Promise<TaskStat[]> => {
+  const value = await getStorageItem(resolveKey(STORAGE_KEYS.TASK_STATS, profileId));
   if (!value) return [];
   try {
     const parsed = JSON.parse(value);
@@ -272,8 +393,8 @@ export const getTaskStats = async (): Promise<TaskStat[]> => {
   }
 };
 
-export const saveTaskStats = async (stats: TaskStat[]): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.TASK_STATS, JSON.stringify(stats));
+export const saveTaskStats = async (stats: TaskStat[], profileId?: string): Promise<void> => {
+  await setStorageItem(resolveKey(STORAGE_KEYS.TASK_STATS, profileId), JSON.stringify(stats));
 };
 
 let taskStatsQueue: Promise<void> = Promise.resolve();
@@ -282,10 +403,11 @@ export const recordTaskResult = async (
   num1: number,
   num2: number,
   operation: Operation,
-  isCorrect: boolean
+  isCorrect: boolean,
+  profileId?: string
 ): Promise<void> => {
   taskStatsQueue = taskStatsQueue.then(async () => {
-    const stats = await getTaskStats();
+    const stats = await getTaskStats(profileId);
     const existing = stats.find(
       (s) => s.num1 === num1 && s.num2 === num2 && s.operation === operation
     );
@@ -303,7 +425,7 @@ export const recordTaskResult = async (
         lastSeen: new Date().toISOString(),
       });
     }
-    await saveTaskStats(stats);
+    await saveTaskStats(stats, profileId);
   });
   return taskStatsQueue;
 };
@@ -329,8 +451,8 @@ export const getWeakTasks = (
 // Badge storage – maps badgeId → unlock timestamp
 export type BadgeStore = Record<string, number>;
 
-export const getBadges = async (): Promise<BadgeStore> => {
-  const value = await getStorageItem(STORAGE_KEYS.BADGES);
+export const getBadges = async (profileId?: string): Promise<BadgeStore> => {
+  const value = await getStorageItem(resolveKey(STORAGE_KEYS.BADGES, profileId));
   if (!value) return {};
   try {
     const parsed = JSON.parse(value);
@@ -349,8 +471,8 @@ export const getBadges = async (): Promise<BadgeStore> => {
   return {};
 };
 
-export const saveBadges = async (badges: BadgeStore): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.BADGES, JSON.stringify(badges));
+export const saveBadges = async (badges: BadgeStore, profileId?: string): Promise<void> => {
+  await setStorageItem(resolveKey(STORAGE_KEYS.BADGES, profileId), JSON.stringify(badges));
 };
 
 // Streak storage helpers
@@ -373,8 +495,8 @@ function isLocalDateString(v: unknown): v is string {
   return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
 }
 
-export const getStreakData = async (): Promise<StreakData> => {
-  const value = await getStorageItem(STORAGE_KEYS.STREAK);
+export const getStreakData = async (profileId?: string): Promise<StreakData> => {
+  const value = await getStorageItem(resolveKey(STORAGE_KEYS.STREAK, profileId));
   if (!value) return STREAK_DEFAULT;
   try {
     const parsed = JSON.parse(value);
@@ -391,13 +513,13 @@ export const getStreakData = async (): Promise<StreakData> => {
   return STREAK_DEFAULT;
 };
 
-export const saveStreakData = async (data: StreakData): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.STREAK, JSON.stringify(data));
+export const saveStreakData = async (data: StreakData, profileId?: string): Promise<void> => {
+  await setStorageItem(resolveKey(STORAGE_KEYS.STREAK, profileId), JSON.stringify(data));
 };
 
-export const updateStreakAfterSession = async (): Promise<StreakData> => {
+export const updateStreakAfterSession = async (profileId?: string): Promise<StreakData> => {
   const today = getLocalDateString();
-  const data = await getStreakData();
+  const data = await getStreakData(profileId);
 
   if (data.lastPlayedDate === today) {
     return data;
@@ -415,16 +537,17 @@ export const updateStreakAfterSession = async (): Promise<StreakData> => {
     longestStreak: Math.max(newStreak, data.longestStreak),
   };
 
-  await saveStreakData(updated);
+  await saveStreakData(updated, profileId);
   return updated;
 };
 
-export const saveNumberRange = async (range: NumberRange): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.NUMBER_RANGE, range);
+export const saveNumberRange = async (range: NumberRange, profileId?: string): Promise<void> => {
+  await setStorageItem(resolveKey(STORAGE_KEYS.NUMBER_RANGE, profileId), range);
 };
 
-export const getNumberRange = async (): Promise<NumberRange> => {
-  const value = await getStorageItem(STORAGE_KEYS.NUMBER_RANGE);
+export const getNumberRange = async (profileId?: string): Promise<NumberRange> => {
+  const key = resolveKey(STORAGE_KEYS.NUMBER_RANGE, profileId);
+  const value = await getStorageItem(key);
 
   // Handle new format
   if (
@@ -436,21 +559,23 @@ export const getNumberRange = async (): Promise<NumberRange> => {
     return value as NumberRange;
   }
 
-  // Migration: handle old format
-  if (value === 'SMALL') {
-    const migratedValue = NumberRange.RANGE_10;
-    await saveNumberRange(migratedValue);
-    return migratedValue;
-  }
-  if (value === 'MEDIUM') {
-    const migratedValue = NumberRange.RANGE_20;
-    await saveNumberRange(migratedValue);
-    return migratedValue;
-  }
-  if (value === 'LARGE') {
-    const migratedValue = NumberRange.RANGE_100;
-    await saveNumberRange(migratedValue);
-    return migratedValue;
+  // Migration: handle old format (global key only)
+  if (!profileId) {
+    if (value === 'SMALL') {
+      const migratedValue = NumberRange.RANGE_10;
+      await saveNumberRange(migratedValue);
+      return migratedValue;
+    }
+    if (value === 'MEDIUM') {
+      const migratedValue = NumberRange.RANGE_20;
+      await saveNumberRange(migratedValue);
+      return migratedValue;
+    }
+    if (value === 'LARGE') {
+      const migratedValue = NumberRange.RANGE_100;
+      await saveNumberRange(migratedValue);
+      return migratedValue;
+    }
   }
 
   // Default: 1-100 for existing users

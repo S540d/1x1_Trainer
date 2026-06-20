@@ -30,7 +30,18 @@ export const STORAGE_KEYS = {
   STREAK: 'app-streak',
   SOUNDS_ENABLED: 'app-sounds-enabled',
   SOUNDS_VOLUME: 'app-sounds-volume',
+  PROFILES: 'app-profiles',
+  ACTIVE_PROFILE_ID: 'app-active-profile-id',
 } as const;
+
+export const AVATAR_COLORS = [
+  '#FF6B6B',
+  '#4ECDC4',
+  '#45B7D1',
+  '#96CEB4',
+  '#FFEAA7',
+  '#DDA0DD',
+] as const;
 
 export type BadgeCategory = 'streak' | 'performance' | 'challenge' | 'explorer';
 

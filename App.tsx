@@ -38,6 +38,7 @@ import { OnboardingModal } from './components/OnboardingModal';
 import { BadgesModal } from './components/BadgesModal';
 import { BadgeUnlockToast } from './components/BadgeUnlockToast';
 import { FloatingStars } from './components/FloatingStars';
+import { ProfilePickerModal } from './components/ProfilePickerModal';
 import {
   saveSessionRecord,
   getStreakData,
@@ -50,9 +51,12 @@ import {
   setOnboardingDone,
   resetOnboarding,
   getStorageItem,
+  migrateToProfiles,
+  getProfiles,
+  setActiveProfileId,
 } from './utils/storage';
 import { useSounds } from './hooks/useSounds';
-import { SessionRecord, StreakData, TaskStat, Operation } from './types/game';
+import { ChildProfile, SessionRecord, StreakData, TaskStat, Operation } from './types/game';
 import { useBadges } from './hooks/useBadges';
 import {
   ANIMATION_DURATIONS,
@@ -75,6 +79,7 @@ export default function App() {
   const [personalizeVisible, setPersonalizeVisible] = useState(false);
   const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
   const [badgesVisible, setBadgesVisible] = useState(false);
+  const [profilePickerVisible, setProfilePickerVisible] = useState(false);
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationScore, setMotivationScore] = useState(0);
   const [streakData, setStreakData] = useState<StreakData>({
@@ -85,6 +90,14 @@ export default function App() {
   const [streakWarningVisible, setStreakWarningVisible] = useState(false);
   const [onboardingVisible, setOnboardingVisible] = useState(false);
   const [taskStats, setTaskStats] = useState<TaskStat[]>([]);
+
+  // Profile state
+  const [activeProfile, setActiveProfile] = useState<ChildProfile | null>(null);
+  const [profiles, setProfiles] = useState<ChildProfile[]>([]);
+  // Ref so callbacks always see the current profileId without stale closures
+  const activeProfileIdRef = useRef<string | undefined>(undefined);
+  activeProfileIdRef.current = activeProfile?.id;
+
   const weakTaskCount = useMemo(() => getWeakTasks(taskStats, 3, 0.3).length, [taskStats]);
 
   // Reduced motion preference — centralized in utils/animations.ts
@@ -92,9 +105,19 @@ export default function App() {
     return initReducedMotionListener();
   }, []);
 
+  // Migrate global storage → profile-keyed storage on first launch; idempotent after that
   useEffect(() => {
-    getTaskStats().then(setTaskStats);
+    migrateToProfiles().then(async (defaultProfile) => {
+      const allProfiles = await getProfiles();
+      setProfiles(allProfiles);
+      setActiveProfile(defaultProfile);
+    });
   }, []);
+
+  useEffect(() => {
+    if (!activeProfile) return;
+    getTaskStats(activeProfile.id).then(setTaskStats);
+  }, [activeProfile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Animation values
   const cardScale = useRef(new Animated.Value(1)).current;
@@ -103,10 +126,10 @@ export default function App() {
   const menuOpacity = useRef(new Animated.Value(0)).current;
 
   // Use custom hooks
-  const preferences = usePreferences();
+  const preferences = usePreferences(activeProfile?.id);
   const theme = useTheme(preferences.themeMode, preferences.themeName);
   const sounds = useSounds(preferences.soundEnabled, preferences.soundVolume);
-  const badgeSystem = useBadges();
+  const badgeSystem = useBadges(activeProfile?.id);
   const game = useGameLogic({
     initialOperation: preferences.operation,
     initialOperations: preferences.operations,
@@ -120,9 +143,10 @@ export default function App() {
       if (record.correctTasks === record.totalTasks) {
         sounds.playSound('perfect');
       }
-      saveSessionRecord(record)
+      const pid = activeProfileIdRef.current;
+      saveSessionRecord(record, pid)
         .then(async () => {
-          const updatedStreak = await updateStreakAfterSession();
+          const updatedStreak = await updateStreakAfterSession(pid);
           setStreakData(updatedStreak);
           await badgeSystem.checkAndUnlock(record);
         })
@@ -155,7 +179,7 @@ export default function App() {
           },
         ];
       });
-      recordTaskResult(num1, num2, operation, isCorrect);
+      recordTaskResult(num1, num2, operation, isCorrect, activeProfileIdRef.current);
     },
     numberRange: preferences.numberRange,
     challengeHighScore: preferences.challengeHighScore,
@@ -253,7 +277,8 @@ export default function App() {
 
   // Load streak data and show warning when appropriate
   useEffect(() => {
-    getStreakData().then((data) => {
+    if (!activeProfile) return;
+    getStreakData(activeProfile.id).then((data) => {
       setStreakData(data);
       const now = new Date();
       const isEvening = now.getHours() >= 20;
@@ -263,7 +288,7 @@ export default function App() {
         setStreakWarningVisible(true);
       }
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeProfile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sound + card feedback on answer check
   useEffect(() => {
@@ -392,6 +417,10 @@ export default function App() {
             setOnboardingVisible(true);
           }}
           onOpenBadges={() => setBadgesVisible(true)}
+          onOpenProfiles={() => {
+            setProfilePickerVisible(true);
+            hideMenu();
+          }}
           t={t}
         />
       )}
@@ -457,6 +486,30 @@ export default function App() {
       <ParentDashboard
         visible={parentDashboardVisible}
         onClose={() => setParentDashboardVisible(false)}
+        colors={colors}
+        t={t}
+      />
+
+      <ProfilePickerModal
+        visible={profilePickerVisible}
+        onClose={() => setProfilePickerVisible(false)}
+        profiles={profiles}
+        activeProfileId={activeProfile?.id}
+        onSwitchProfile={async (profile) => {
+          setActiveProfile(profile);
+          await setActiveProfileId(profile.id);
+          setProfilePickerVisible(false);
+        }}
+        onProfilesChange={(updated) => {
+          setProfiles(updated);
+          // If active profile was deleted, switch to first remaining
+          if (activeProfile && !updated.find((p) => p.id === activeProfile.id)) {
+            if (updated.length > 0) {
+              setActiveProfile(updated[0]);
+              setActiveProfileId(updated[0].id);
+            }
+          }
+        }}
         colors={colors}
         t={t}
       />

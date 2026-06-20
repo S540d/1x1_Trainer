@@ -150,6 +150,19 @@ export interface TranslationStrings {
   badgeRange100Desc: string;
   badgeCreativeModeDesc: string;
   badgeNewUnlocked: string;
+  // Profiles
+  profiles: string;
+  profilesMenu: string;
+  profilesSubtitle: string;
+  addProfile: string;
+  createProfile: string;
+  profileNamePlaceholder: string;
+  saveProfile: string;
+  cancel: string;
+  deleteProfile: string;
+  deleteProfileConfirm: string;
+  maxProfilesReached: string;
+  profileActive: string;
   // Onboarding
   onboardingWelcomeTitle: string;
   onboardingWelcomeBody: string;
@@ -331,6 +344,19 @@ export const translations: Record<Language, TranslationStrings> = {
     onboardingStart: 'Start',
     onboardingSkip: 'Skip',
     resetOnboarding: 'Restart tutorial',
+    // Profiles
+    profiles: 'Profiles',
+    profilesMenu: 'Profiles',
+    profilesSubtitle: 'Tap to switch active profile',
+    addProfile: 'Add Profile',
+    createProfile: 'New Profile',
+    profileNamePlaceholder: "Child's name",
+    saveProfile: 'Save',
+    cancel: 'Cancel',
+    deleteProfile: 'Delete Profile',
+    deleteProfileConfirm: 'This will permanently delete all data for this profile.',
+    maxProfilesReached: 'Maximum of 6 profiles reached',
+    profileActive: 'Active',
   },
   de: {
     // Settings Menu
@@ -495,5 +521,18 @@ export const translations: Record<Language, TranslationStrings> = {
     onboardingStart: 'Loslegen',
     onboardingSkip: 'Überspringen',
     resetOnboarding: 'Tutorial zurücksetzen',
+    // Profiles
+    profiles: 'Profile',
+    profilesMenu: 'Profile',
+    profilesSubtitle: 'Tippe zum Profilwechsel',
+    addProfile: 'Profil hinzufügen',
+    createProfile: 'Neues Profil',
+    profileNamePlaceholder: 'Name des Kindes',
+    saveProfile: 'Speichern',
+    cancel: 'Abbrechen',
+    deleteProfile: 'Profil löschen',
+    deleteProfileConfirm: 'Damit werden alle Daten dieses Profils dauerhaft gelöscht.',
+    maxProfilesReached: 'Maximal 6 Profile möglich',
+    profileActive: 'Aktiv',
   },
 };
