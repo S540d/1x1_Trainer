@@ -83,25 +83,27 @@ npm run test:coverage # Coverage
 
 ---
 
-## Aktueller Stand (2026-06-18)
+## Aktueller Stand (2026-06-20)
 
 - Version: **1.3.8** / versionCode 28
-- Branches: `testing` vorn (`dceba71`); `main` auf `91cf92d` (sync v1.3.8)
-- Offene PRs: #242 (fix Sounds), #243 (Orientation), #245 (CLAUDE.md), gegen `testing`
-- Offene Issues: #156, #187, #131, #100, #96, #220, #231
+- Branches: `testing` vorn (inkl. #242, #243, #246, #247); `main` auf `91cf92d` (sync v1.3.8)
+- Offene PRs: #245 (CLAUDE.md docs), gegen `testing`
+- Offene Issues: #156, #231, #96
 - APK v1.3.8 via CI
 
 ### Zuletzt gemergt / gepusht
 
-| PR / Commit  | Was                                                                         |
-| ------------ | --------------------------------------------------------------------------- |
-| #245 (offen) | docs: CLAUDE.md 2026-06-18                                                  |
-| #244 ✅      | build: app.config.js für APP_PACKAGE env-var (Issue #233 ✅ geschlossen)    |
-| #243 (offen) | feat: Orientation "default" für Tablet/Foldable (Issue #235 ✅ geschlossen) |
-| #242 (offen) | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241 ✅ geschlossen)     |
-| #240         | ci: Cache-Cleanup-Workflow                                                  |
-| #239         | chore: Review-Modell v2                                                     |
-| #234         | sync: testing → main (v1.3.8 + googleServicesFile fix)                      |
+| PR / Commit  | Was                                                                              |
+| ------------ | -------------------------------------------------------------------------------- |
+| #247 ✅      | feat: Mehrere Kinderprofile (Issue #187 ✅ geschlossen)                          |
+| #246 ✅      | chore: Prettier + pre-push Hook (Issue #220 ✅ geschlossen)                      |
+| #245 (offen) | docs: CLAUDE.md 2026-06-18                                                       |
+| #244 ✅      | build: app.config.js für APP_PACKAGE env-var (Issue #233 ✅ geschlossen)         |
+| #243 ✅      | feat: Orientation "default" für Tablet/Foldable (Issue #235 ✅ geschlossen)      |
+| #242 ✅      | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241 ✅ geschlossen)          |
+| #240 ✅      | ci: Cache-Cleanup-Workflow                                                       |
+| #239 ✅      | chore: Review-Modell v2                                                          |
+| #234 ✅      | sync: testing → main (v1.3.8 + googleServicesFile fix)                           |
 
 ---
 
@@ -111,17 +113,19 @@ npm run test:coverage # Coverage
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `utils/constants.ts`              | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS, `THEMES` (alle 5 Farbthemes mit LIGHT/DARK-Varianten)                                                                                                                                                                                                    |
 | `utils/theme.ts`                  | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'`                                                                                                                                                                                                                                     |
-| `utils/storage.ts`                | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `saveThemeName` / `getThemeName`, `saveSoundsEnabled` / `getSoundsEnabled`, `saveSoundsVolume` / `getSoundsVolume`, `FOUR_WEEKS_MS` |
-| `utils/animations.ts`             | `prefersReducedMotion()` — liest Accessibility-Einstellung                                                                                                                                                                                                                                                            |
-| `types/game.ts`                   | ThemeColors (inkl. `gradientPrimary`), GameState, Enums, SessionRecord, `ThemeName`                                                                                                                                                                                                                                   |
-| `i18n/translations.ts`            | DE/EN Übersetzungen, `TranslationStrings`-Interface                                                                                                                                                                                                                                                                   |
-| `hooks/useGameLogic.ts`           | Gesamte Spiellogik, `onSessionComplete`-Callback                                                                                                                                                                                                                                                                      |
-| `hooks/usePreferences.ts`         | Persistierte User-Einstellungen (Sprache, ThemeMode, ThemeName, soundEnabled, soundVolume)                                                                                                                                                                                                                            |
-| `hooks/useSounds.ts`              | Sound-Hook: `playSound(event)` — Web: AudioContext-Oszillatoren, Native: expo-audio (`createAudioPlayer`) + WAV-Assets                                                                                                                                                                                                |
+| `utils/storage.ts`                | Storage-Helfer + Profile-Management (`migrateToProfiles`, `createProfile`, `deleteProfileData`, `getProfiles`/`saveProfiles`, `setActiveProfileId`). Alle per-Profil-Funktionen haben optionalen `profileId?`-Parameter (Suffix-Pattern `{key}-{profileId}`). `profileKey()` / `resolveKey()` intern. |
+| `utils/animations.ts`             | `prefersReducedMotion()` — liest Accessibility-Einstellung                                                                                                                                                                                                                                            |
+| `types/game.ts`                   | ThemeColors (inkl. `gradientPrimary`), GameState, Enums, SessionRecord, `ThemeName`, `ChildProfile`                                                                                                                                                                                                   |
+| `i18n/translations.ts`            | DE/EN Übersetzungen, `TranslationStrings`-Interface (inkl. 12 Profil-Strings)                                                                                                                                                                                                                         |
+| `hooks/useGameLogic.ts`           | Gesamte Spiellogik, `onSessionComplete`-Callback                                                                                                                                                                                                                                                      |
+| `hooks/usePreferences.ts`         | `usePreferences(profileId?)` — globale Prefs (Sprache, Theme, Sounds) + per-Profil-Prefs (Operations, NumberRange, TotalTasks, HighScore); lädt per-Profil-Daten neu bei Profilwechsel                                                                                                               |
+| `hooks/useBadges.ts`              | `useBadges(profileId?)` — Badge-Lesen/Schreiben auf aktives Profil beschränkt                                                                                                                                                                                                                        |
+| `hooks/useSounds.ts`              | Sound-Hook: `playSound(event)` — Web: AudioContext-Oszillatoren, Native: expo-audio (`createAudioPlayer`) + WAV-Assets                                                                                                                                                                               |
 | `assets/sounds/`                  | WAV-Assets: correct / incorrect / perfect / level_up / badge_unlock (je 8–17 KB)                                                                                                                                                                                                                                      |
 | `scripts/generate-sounds.js`      | Generator für WAV-Assets (`node scripts/generate-sounds.js`)                                                                                                                                                                                                                                                          |
 | `components/PersonalizeModal.tsx` | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache, Sound An/Aus + Lautstärke)                                                                                                                                                                                                                              |
 | `components/ParentDashboard.tsx`  | Eltern-Dashboard Modal (Beta)                                                                                                                                                                                                                                                                                         |
+| `components/ProfilePickerModal.tsx` | Bottom-Sheet-Modal für Profilauswahl/-erstellung/-löschung (max. 6 Profile, Farbauswahl, Bestätigungs-Alert bei Löschen)                                                                                                                                                                                           |
 | `components/GameCard.tsx`         | Hauptspielansicht (alle 3 Antwortmodi)                                                                                                                                                                                                                                                                                |
 | `styles/modalStyles.ts`           | Gemeinsame Modal-Styles                                                                                                                                                                                                                                                                                               |
 | `app.config.js`                   | Dynamische Expo-Konfiguration: überschreibt `android.package` via `APP_PACKAGE` env-var (Issue #233)                                                                                                                                                                                                                  |
@@ -199,9 +203,11 @@ npm run test:coverage # Coverage
 
 - ✅ **expo-av → expo-audio Migration erledigt** (Issue #214 / PR #215) — lokaler Build wieder lauffähig (mit JDK 17)
 - ✅ **Paketname-Diskrepanz gelöst** (Issue #233 / PR #244) — `app.config.js` mit `APP_PACKAGE` env-var
+- ✅ **Orientation auf `"default"` gesetzt** (Issue #235 / PR #243) — Tablet/Foldable Landscape-Support
+- ✅ **Prettier + pre-push Hook** (Issue #220 / PR #246) — einheitliches Code-Formatting
+- ✅ **Mehrere Kinderprofile** (Issue #187 / PR #247) — bis zu 6 Profile, je eigene Spieldaten
 - Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 - Reanimated wurde durch `Animated` core ersetzt (Web-Kompatibilität) — Issue #131
-- **Orientation auf `"default"` gesetzt** (Issue #235 / PR #243 offen) — Tablet/Foldable Landscape-Support
 
 ## Sound-Effekte — Hinweise
 
@@ -213,6 +219,22 @@ npm run test:coverage # Coverage
 - Linting: `window.*` in `useSounds.ts` muss `// platform-safe` Kommentar tragen (CI-Check)
 - WAV-Assets bei Bedarf neu generieren: `node scripts/generate-sounds.js`
 - Hintergrundmusik: bewusst nicht implementiert (erfordert Lizenz-freie Loop-Audiodatei), separates Follow-up
+
+## Mehrere Kinderprofile — Hinweise
+
+- `ChildProfile` (`types/game.ts`): `id`, `name`, `avatarColor`, `createdAt`
+- Storage Keys: `app-profiles` (Liste), `app-active-profile-id` (aktives Profil)
+- `AVATAR_COLORS` (6 Farben) + `MAX_PROFILES = 6` in `utils/constants.ts`
+- **Suffix-Pattern:** alle per-Profil-Daten unter `{storageKey}-{profileId}` (z. B. `app-streak-abc123`); globale Keys (Sprache, Theme, Sounds) bleiben unverändert
+- `resolveKey(baseKey, profileId?)` intern: mit profileId → Suffix, ohne → globaler Key (Rückwärtskompatibilität)
+- **Migration** `migrateToProfiles()`: kopiert 8 globale Keys auf profil-spezifische Keys beim ersten Start; idempotent (kehrt sofort zurück wenn Profile bereits existieren)
+- **Stale-Closure-Vermeidung:** `activeProfileIdRef.current = activeProfile?.id` wird jeden Render synchron aktualisiert (nicht in useEffect); Callbacks lesen `ref.current` statt captured value
+- **usePreferences(profileId?):** zwei Load-Effects — globale Prefs `[]` einmalig; per-Profil-Prefs `[profileId]` mit Cancellation-Token; Auto-Save nutzt `profileIdRef.current`
+- **useBadges(profileId?):** Badge-Load/-Write per Profil; `useCallback([profileId])` stellt sicher dass Checks auf richtiges Profil schreiben
+- **ProfilePickerModal:** Bottom-Sheet (animationType="slide"); Profilwechsel setzt `activeProfile` + `setActiveProfileId()`; Löschen mit `Alert.alert`-Bestätigung
+- **SettingsMenu:** "Profile"-Button öffnet `ProfilePickerModal` via `onOpenProfiles`-Prop
+- `usePreferences` setzt `isLoaded = false` bei Profilwechsel → verhindert Auto-Save-Race zwischen altem und neuem Profil
+- Aufgabenstatistiken, Streak, Badges, HighScore, Operations, NumberRange, SessionRecords — alle per Profil getrennt
 
 ## Firebase Crashlytics
 
