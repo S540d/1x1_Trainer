@@ -101,6 +101,23 @@ describe('useSounds – web platform', () => {
     });
     expect(AudioContextMock).toHaveBeenCalledTimes(1);
   });
+
+  it('stops playing after soundEnabled changes from true to false', () => {
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) => useSounds(enabled, 80),
+      { initialProps: { enabled: true } }
+    );
+    act(() => {
+      result.current.playSound('correct');
+    });
+    expect(AudioContextMock).toHaveBeenCalledTimes(1);
+
+    rerender({ enabled: false });
+    act(() => {
+      result.current.playSound('correct');
+    });
+    expect(AudioContextMock).toHaveBeenCalledTimes(1); // no additional call
+  });
 });
 
 type MockPlayer = {
@@ -162,6 +179,21 @@ describe('useSounds – native platform', () => {
     unmount();
     for (const p of players) {
       expect(p.remove).toHaveBeenCalled();
+    }
+  });
+
+  it('pauses all native players when soundEnabled changes to false', () => {
+    const { rerender } = renderHook(({ enabled }: { enabled: boolean }) => useSounds(enabled, 80), {
+      initialProps: { enabled: true },
+    });
+    const players = mockCreateAudioPlayer.mock.results.map((r) => r.value as MockPlayer);
+
+    act(() => {
+      rerender({ enabled: false });
+    });
+
+    for (const p of players) {
+      expect(p.pause).toHaveBeenCalled();
     }
   });
 });
