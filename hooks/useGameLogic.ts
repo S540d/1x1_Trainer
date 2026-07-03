@@ -232,6 +232,9 @@ export function useGameLogic({
       difficultyMode: gameState.difficultyMode,
       numberRange: effectiveRange,
     };
+    if (gameState.difficultyMode === DifficultyMode.CHALLENGE) {
+      record.challengeFlawlessLevel3 = gameState.challengeState?.flawlessLevel3 === true;
+    }
     onSessionComplete(record);
   };
 
@@ -527,6 +530,10 @@ export function useGameLogic({
         newState.challengeState = {
           ...prev.challengeState,
           level: newLevel,
+          // Level 3 reached without losing a life → challenge_no_errors badge (#253)
+          flawlessLevel3:
+            prev.challengeState.flawlessLevel3 ||
+            (newLevel >= 3 && prev.challengeState.errors === 0),
         };
       }
 
