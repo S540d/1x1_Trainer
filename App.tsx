@@ -56,7 +56,15 @@ import {
   setActiveProfileId,
 } from './utils/storage';
 import { useSounds } from './hooks/useSounds';
-import { ChildProfile, SessionRecord, StreakData, TaskStat, Operation } from './types/game';
+import { useKeyboardInput } from './hooks/useKeyboardInput';
+import {
+  AnswerMode,
+  ChildProfile,
+  SessionRecord,
+  StreakData,
+  TaskStat,
+  Operation,
+} from './types/game';
 import { useBadges } from './hooks/useBadges';
 import {
   ANIMATION_DURATIONS,
@@ -184,6 +192,44 @@ export default function App() {
     numberRange: preferences.numberRange,
     challengeHighScore: preferences.challengeHighScore,
     onChallengeHighScoreChange: preferences.setChallengeHighScore,
+  });
+
+  // Physical keyboard on web (#258) — inactive while any overlay is open
+  const overlayOpen =
+    menuRendered ||
+    aboutVisible ||
+    personalizeVisible ||
+    parentDashboardVisible ||
+    badgesVisible ||
+    profilePickerVisible ||
+    showMotivation ||
+    streakWarningVisible ||
+    onboardingVisible ||
+    game.gameState.showResult;
+  useKeyboardInput({
+    enabled: !overlayOpen,
+    onDigit: (digit) => {
+      if (game.gameState.answerMode === AnswerMode.INPUT) {
+        game.handleNumberClick(digit);
+      }
+    },
+    onBackspace: () => {
+      if (game.gameState.answerMode === AnswerMode.INPUT) {
+        game.handleNumberClick(-1);
+      }
+    },
+    onClear: () => {
+      if (game.gameState.answerMode === AnswerMode.INPUT) {
+        game.handleNumberClick(-2);
+      }
+    },
+    onSubmit: () => {
+      if (game.gameState.isAnswerChecked) {
+        game.nextQuestion();
+      } else {
+        game.checkAnswer();
+      }
+    },
   });
 
   const t = translations[preferences.language];
