@@ -43,7 +43,7 @@ import {
   saveSessionRecord,
   getStreakData,
   updateStreakAfterSession,
-  getLocalDateString,
+  getYesterdayDateString,
   recordTaskResult,
   getTaskStats,
   getWeakTasks,
@@ -328,9 +328,12 @@ export default function App() {
       setStreakData(data);
       const now = new Date();
       const isEvening = now.getHours() >= 20;
-      const hasStreakToProtect = data.currentStreak > 0;
-      const hasNotPlayedToday = data.lastPlayedDate !== getLocalDateString();
-      if (isEvening && hasStreakToProtect && hasNotPlayedToday) {
+      // Warn only while the streak is actually still savable: last play was
+      // exactly yesterday. For older dates the streak is already broken and
+      // the warning would promise something the user can no longer save (#255).
+      const streakStillSavable =
+        data.currentStreak > 0 && data.lastPlayedDate === getYesterdayDateString();
+      if (isEvening && streakStillSavable) {
         setStreakWarningVisible(true);
       }
     });

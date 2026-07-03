@@ -781,11 +781,45 @@ describe('Streak Storage', () => {
     expect(result).toEqual({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
   });
 
-  it('returns saved streak data', async () => {
-    const data: StreakData = { currentStreak: 5, lastPlayedDate: '2024-06-15', longestStreak: 10 };
+  it('returns saved streak data when played today', async () => {
+    const data: StreakData = {
+      currentStreak: 5,
+      lastPlayedDate: getLocalDateString(),
+      longestStreak: 10,
+    };
     await saveStreakData(data);
     const result = await getStreakData();
     expect(result).toEqual(data);
+  });
+
+  it('returns saved streak data when played yesterday (streak still savable)', async () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const data: StreakData = {
+      currentStreak: 5,
+      lastPlayedDate: getLocalDateString(yesterday),
+      longestStreak: 10,
+    };
+    await saveStreakData(data);
+    const result = await getStreakData();
+    expect(result).toEqual(data);
+  });
+
+  // Regression: #255 — a streak whose last play is older than yesterday is
+  // broken; it must not be displayed as active anymore.
+  it('reports currentStreak 0 for a broken streak (last play older than yesterday)', async () => {
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    const data: StreakData = {
+      currentStreak: 12,
+      lastPlayedDate: getLocalDateString(threeDaysAgo),
+      longestStreak: 12,
+    };
+    await saveStreakData(data);
+    const result = await getStreakData();
+    expect(result.currentStreak).toBe(0);
+    expect(result.longestStreak).toBe(12);
+    expect(result.lastPlayedDate).toBe(getLocalDateString(threeDaysAgo));
   });
 
   it('returns default for corrupted JSON', async () => {
