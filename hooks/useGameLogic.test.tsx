@@ -774,6 +774,47 @@ describe('useGameLogic Hook', () => {
       expect(result.current.gameState.selectedOperations.has(Operation.MULTIPLICATION)).toBe(true);
       expect(result.current.gameState.selectedOperations.size).toBe(1);
     });
+
+    // Regression: #252 — preferences load asynchronously, so the useState
+    // initializer only ever sees the defaults; the saved selection must be
+    // adopted when initialOperations changes.
+    it('should adopt initialOperations arriving after mount (async preference load)', () => {
+      const { result, rerender } = renderHook((props) => useGameLogic(props), {
+        initialProps: defaultProps as Parameters<typeof useGameLogic>[0],
+      });
+
+      expect(result.current.gameState.selectedOperations).toEqual(
+        new Set([Operation.MULTIPLICATION])
+      );
+
+      rerender({
+        ...defaultProps,
+        initialOperations: [Operation.ADDITION, Operation.DIVISION],
+      });
+
+      expect(result.current.gameState.selectedOperations).toEqual(
+        new Set([Operation.ADDITION, Operation.DIVISION])
+      );
+
+      // The pending question is regenerated with the adopted operations
+      act(() => {
+        jest.runAllTimers();
+      });
+      expect([Operation.ADDITION, Operation.DIVISION]).toContain(
+        result.current.gameState.operation
+      );
+    });
+
+    it('should not reset state when initialOperations matches the current selection', () => {
+      const { result, rerender } = renderHook((props) => useGameLogic(props), {
+        initialProps: defaultProps as Parameters<typeof useGameLogic>[0],
+      });
+
+      const stateBefore = result.current.gameState;
+      rerender({ ...defaultProps, initialOperations: [Operation.MULTIPLICATION] });
+
+      expect(result.current.gameState).toBe(stateBefore);
+    });
   });
 
   describe('getCorrectAnswer', () => {
@@ -1357,11 +1398,14 @@ describe('useGameLogic Hook', () => {
       expect(secondNum2).toBeLessThanOrEqual(10);
     });
 
-    it('should call onMotivationShow after every 10 tasks', () => {
-      const { result } = renderHook(() => useGameLogic(defaultProps));
+    it('should call onMotivationShow when the 10-task boundary falls mid-round', () => {
+      // totalSolvedTasks starts at 5, so the boundary (10) is reached at task 5
+      // of the round — not the last task.
+      const { result } = renderHook(() =>
+        useGameLogic({ ...defaultProps, initialTotalSolvedTasks: 5 })
+      );
 
-      // Move through 9 tasks (totalSolvedTasks goes from 0 to 9)
-      for (let i = 1; i <= 9; i++) {
+      for (let i = 1; i <= 4; i++) {
         act(() => {
           result.current.nextQuestion();
           jest.runAllTimers();
@@ -1370,7 +1414,7 @@ describe('useGameLogic Hook', () => {
 
       expect(mockOnMotivationShow).not.toHaveBeenCalled();
 
-      // The 10th call to nextQuestion makes totalSolvedTasks = 10
+      // The 5th call makes totalSolvedTasks = 10 (mid-round)
       act(() => {
         result.current.nextQuestion();
         jest.runAllTimers();
@@ -1378,6 +1422,23 @@ describe('useGameLogic Hook', () => {
 
       expect(mockOnMotivationShow).toHaveBeenCalledTimes(1);
       expect(mockOnMotivationShow).toHaveBeenCalledWith(result.current.gameState.score);
+    });
+
+    // Regression: #254 — when the boundary coincides with the last task, the
+    // result modal opens; the motivation modal must not stack on top of it.
+    it('should NOT call onMotivationShow at round end (result modal opens instead)', () => {
+      const { result } = renderHook(() => useGameLogic(defaultProps));
+
+      // Complete the full 10-task round (totalSolvedTasks 0 → 10)
+      for (let i = 1; i <= 10; i++) {
+        act(() => {
+          result.current.nextQuestion();
+          jest.runAllTimers();
+        });
+      }
+
+      expect(result.current.gameState.showResult).toBe(true);
+      expect(mockOnMotivationShow).not.toHaveBeenCalled();
     });
   });
 
@@ -2326,6 +2387,126 @@ describe('useGameLogic Hook', () => {
       // Run is still alive — but the new record is already persisted
       expect(result.current.gameState.showResult).toBe(false);
       expect(mockHighScoreChange).toHaveBeenCalledWith(2);
+    });
+
+    // Regression: #253 — challenge records always end with 3 errors, so the
+    // challenge_no_errors badge is driven by reaching level 3 with all lives.
+    it('should flag the session record flawless when level 3 is reached with all lives', () => {
+      const onSessionComplete = jest.fn();
+      const { result } = renderHook(() => useGameLogic({ ...challengeProps, onSessionComplete }));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      flushAllTimers();
+
+      // 10 correct answers → level 3 with all lives intact
+      for (let i = 0; i < 10; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      expect(result.current.gameState.challengeState?.flawlessLevel3).toBe(true);
+
+      // Lose all 3 lives → game over fires the session record
+      for (let i = 0; i < 3; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        enterWrongAnswer(result);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        if (i < 2) {
+          act(() => {
+            result.current.nextQuestion();
+          });
+          flushAllTimers();
+        }
+      }
+
+      expect(onSessionComplete).toHaveBeenCalledTimes(1);
+      expect(onSessionComplete.mock.calls[0][0].challengeFlawlessLevel3).toBe(true);
+    });
+
+    it('should not flag the record flawless when an error happened before level 3', () => {
+      const onSessionComplete = jest.fn();
+      const { result } = renderHook(() => useGameLogic({ ...challengeProps, onSessionComplete }));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      flushAllTimers();
+
+      // One early error before reaching level 3
+      act(() => {
+        result.current.generateQuestion();
+      });
+      flushAllTimers();
+      enterWrongAnswer(result);
+      act(() => {
+        result.current.checkAnswer();
+      });
+      act(() => {
+        result.current.nextQuestion();
+      });
+      flushAllTimers();
+
+      // 10 correct answers → level 3, but a life is already gone
+      for (let i = 0; i < 10; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      expect(result.current.gameState.challengeState?.flawlessLevel3).toBe(false);
+
+      // Lose the remaining 2 lives → game over
+      for (let i = 0; i < 2; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        enterWrongAnswer(result);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        if (i < 1) {
+          act(() => {
+            result.current.nextQuestion();
+          });
+          flushAllTimers();
+        }
+      }
+
+      expect(onSessionComplete).toHaveBeenCalledTimes(1);
+      expect(onSessionComplete.mock.calls[0][0].challengeFlawlessLevel3).toBe(false);
     });
 
     it('should not show new high score banner on tie', () => {

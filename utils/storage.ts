@@ -177,6 +177,8 @@ export const migrateToProfiles = async (): Promise<ChildProfile> => {
 // Typed storage helpers
 // ============================================================================
 
+const VALID_OPERATIONS = new Set<string>(Object.values(Operation));
+
 export const saveLanguage = async (language: Language): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.LANGUAGE, language);
 };
@@ -234,7 +236,8 @@ export const getOperations = async (profileId?: string): Promise<Operation[]> =>
       const parsed = JSON.parse(value);
       if (
         Array.isArray(parsed) &&
-        parsed.every((op) => ['ADDITION', 'SUBTRACTION', 'MULTIPLICATION'].includes(op))
+        parsed.length > 0 &&
+        parsed.every((op) => typeof op === 'string' && VALID_OPERATIONS.has(op))
       ) {
         return parsed as Operation[];
       }
@@ -246,7 +249,7 @@ export const getOperations = async (profileId?: string): Promise<Operation[]> =>
   // Migration: try old single-operation storage (global key only)
   if (!profileId) {
     const oldValue = await getStorageItem(STORAGE_KEYS.OPERATION);
-    if (oldValue === 'ADDITION' || oldValue === 'SUBTRACTION' || oldValue === 'MULTIPLICATION') {
+    if (oldValue !== null && VALID_OPERATIONS.has(oldValue)) {
       const migratedOps = [oldValue as Operation];
       await saveOperations(migratedOps);
       return migratedOps;
@@ -264,7 +267,7 @@ export const saveOperation = async (operation: Operation): Promise<void> => {
 
 export const getOperation = async (): Promise<Operation | null> => {
   const value = await getStorageItem(STORAGE_KEYS.OPERATION);
-  if (value === 'ADDITION' || value === 'SUBTRACTION' || value === 'MULTIPLICATION') {
+  if (value !== null && VALID_OPERATIONS.has(value)) {
     return value as Operation;
   }
   return null;
@@ -298,7 +301,6 @@ export const getChallengeHighScore = async (profileId?: string): Promise<number>
 
 export const FOUR_WEEKS_MS = 28 * 24 * 60 * 60 * 1000;
 
-const VALID_OPERATIONS = new Set<string>(Object.values(Operation));
 const VALID_DIFFICULTY_MODES = new Set<string>(Object.values(DifficultyMode));
 const VALID_NUMBER_RANGES = new Set<string>(Object.values(NumberRange));
 
@@ -485,6 +487,12 @@ export function getLocalDateString(date?: Date): string {
   return `${y}-${m}-${day}`;
 }
 
+export function getYesterdayDateString(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return getLocalDateString(d);
+}
+
 const STREAK_DEFAULT: StreakData = { currentStreak: 0, lastPlayedDate: '', longestStreak: 0 };
 
 function isNonNegInt(v: unknown): v is number {
@@ -505,7 +513,18 @@ export const getStreakData = async (profileId?: string): Promise<StreakData> => 
       isLocalDateString(parsed.lastPlayedDate) &&
       isNonNegInt(parsed.longestStreak)
     ) {
-      return parsed as StreakData;
+      const data = parsed as StreakData;
+      // A streak is only alive if the last play was today or yesterday.
+      // Report 0 for older dates so the UI never shows an already-broken
+      // streak (#255); longestStreak is preserved and the stored record is
+      // normalized on the next session via updateStreakAfterSession.
+      if (
+        data.lastPlayedDate === getLocalDateString() ||
+        data.lastPlayedDate === getYesterdayDateString()
+      ) {
+        return data;
+      }
+      return { ...data, currentStreak: 0 };
     }
   } catch {
     // fall through
@@ -525,11 +544,7 @@ export const updateStreakAfterSession = async (profileId?: string): Promise<Stre
     return data;
   }
 
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = getLocalDateString(yesterday);
-
-  const newStreak = data.lastPlayedDate === yesterdayStr ? data.currentStreak + 1 : 1;
+  const newStreak = data.lastPlayedDate === getYesterdayDateString() ? data.currentStreak + 1 : 1;
 
   const updated: StreakData = {
     currentStreak: newStreak,

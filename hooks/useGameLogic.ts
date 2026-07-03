@@ -232,6 +232,9 @@ export function useGameLogic({
       difficultyMode: gameState.difficultyMode,
       numberRange: effectiveRange,
     };
+    if (gameState.difficultyMode === DifficultyMode.CHALLENGE) {
+      record.challengeFlawlessLevel3 = gameState.challengeState?.flawlessLevel3 === true;
+    }
     onSessionComplete(record);
   };
 
@@ -423,6 +426,30 @@ export function useGameLogic({
     }));
   };
 
+  // Adopt persisted operations when they arrive (async preference load or
+  // profile switch). The useState initializer above only sees the pre-load
+  // defaults, so without this the saved selection never reaches the game.
+  const selectedOpsKey = selectedOps.join(',');
+  useEffect(() => {
+    setGameState((prev) => {
+      const same =
+        prev.selectedOperations.size === selectedOps.length &&
+        selectedOps.every((op) => prev.selectedOperations.has(op));
+      if (same || prev.difficultyMode === DifficultyMode.CHALLENGE) return prev;
+      const newSet = new Set(selectedOps);
+      setTimeout(() => generateQuestion(prev.gameMode, newSet), 0);
+      return {
+        ...prev,
+        selectedOperations: newSet,
+        operation: selectedOps[0],
+        currentTask: 1,
+        score: 0,
+        showResult: false,
+      };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOpsKey]);
+
   // Handle user input (for input mode)
   const onUserInput = (input: string) => {
     if (!gameState.isAnswerChecked) {
@@ -541,6 +568,10 @@ export function useGameLogic({
         newState.challengeState = {
           ...prev.challengeState,
           level: newLevel,
+          // Level 3 reached without losing a life → challenge_no_errors badge (#253)
+          flawlessLevel3:
+            prev.challengeState.flawlessLevel3 ||
+            (newLevel >= 3 && prev.challengeState.errors === 0),
         };
       }
 
@@ -582,14 +613,15 @@ export function useGameLogic({
 
     if (isLastTask) {
       fireSessionComplete(gameState.score, gameState.totalTasks, gameState.selectedOperations);
+    } else if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
+      // Show motivation message after every 10 tasks — but never at round end,
+      // where the result modal already opens; two stacked modals would collide (#254).
+      // Called outside the setState updater: side effects in updaters run twice
+      // in StrictMode.
+      onMotivationShow(gameState.score);
     }
 
     setGameState((prev) => {
-      // Show motivation message after every 10 tasks
-      if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
-        onMotivationShow(prev.score);
-      }
-
       if (isLastTask) {
         return {
           ...prev,

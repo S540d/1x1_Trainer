@@ -42,6 +42,9 @@ export interface ChallengeState {
   errors: number;
   highScore: number;
   isNewHighScore?: boolean;
+  // True once level 3 was reached while all lives were still intact —
+  // basis for the challenge_no_errors badge (#253)
+  flawlessLevel3?: boolean;
 }
 
 export type ThemeMode = 'light' | 'dark' | 'system';
@@ -88,6 +91,8 @@ export interface SessionRecord {
   errorRate: number;
   difficultyMode: DifficultyMode;
   numberRange: NumberRange;
+  // Challenge only: level 3 was reached with all lives intact (#253)
+  challengeFlawlessLevel3?: boolean;
 }
 
 export interface AchievementBadge {

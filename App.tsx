@@ -43,7 +43,7 @@ import {
   saveSessionRecord,
   getStreakData,
   updateStreakAfterSession,
-  getLocalDateString,
+  getYesterdayDateString,
   recordTaskResult,
   getTaskStats,
   getWeakTasks,
@@ -56,7 +56,15 @@ import {
   setActiveProfileId,
 } from './utils/storage';
 import { useSounds } from './hooks/useSounds';
-import { ChildProfile, SessionRecord, StreakData, TaskStat, Operation } from './types/game';
+import { useKeyboardInput } from './hooks/useKeyboardInput';
+import {
+  AnswerMode,
+  ChildProfile,
+  SessionRecord,
+  StreakData,
+  TaskStat,
+  Operation,
+} from './types/game';
 import { useBadges } from './hooks/useBadges';
 import {
   ANIMATION_DURATIONS,
@@ -186,6 +194,44 @@ export default function App() {
     onChallengeHighScoreChange: preferences.setChallengeHighScore,
   });
 
+  // Physical keyboard on web (#258) — inactive while any overlay is open
+  const overlayOpen =
+    menuRendered ||
+    aboutVisible ||
+    personalizeVisible ||
+    parentDashboardVisible ||
+    badgesVisible ||
+    profilePickerVisible ||
+    showMotivation ||
+    streakWarningVisible ||
+    onboardingVisible ||
+    game.gameState.showResult;
+  useKeyboardInput({
+    enabled: !overlayOpen,
+    onDigit: (digit) => {
+      if (game.gameState.answerMode === AnswerMode.INPUT) {
+        game.handleNumberClick(digit);
+      }
+    },
+    onBackspace: () => {
+      if (game.gameState.answerMode === AnswerMode.INPUT) {
+        game.handleNumberClick(-1);
+      }
+    },
+    onClear: () => {
+      if (game.gameState.answerMode === AnswerMode.INPUT) {
+        game.handleNumberClick(-2);
+      }
+    },
+    onSubmit: () => {
+      if (game.gameState.isAnswerChecked) {
+        game.nextQuestion();
+      } else {
+        game.checkAnswer();
+      }
+    },
+  });
+
   const t = translations[preferences.language];
   const { colors, isDarkMode } = theme;
   const { height: screenHeight } = useWindowDimensions();
@@ -282,9 +328,12 @@ export default function App() {
       setStreakData(data);
       const now = new Date();
       const isEvening = now.getHours() >= 20;
-      const hasStreakToProtect = data.currentStreak > 0;
-      const hasNotPlayedToday = data.lastPlayedDate !== getLocalDateString();
-      if (isEvening && hasStreakToProtect && hasNotPlayedToday) {
+      // Warn only while the streak is actually still savable: last play was
+      // exactly yesterday. For older dates the streak is already broken and
+      // the warning would promise something the user can no longer save (#255).
+      const streakStillSavable =
+        data.currentStreak > 0 && data.lastPlayedDate === getYesterdayDateString();
+      if (isEvening && streakStillSavable) {
         setStreakWarningVisible(true);
       }
     });
@@ -360,10 +409,17 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preferences.isLoaded]);
 
-  // Sync operation changes to preferences
+  // Sync operation changes to preferences.
+  // Deliberately NOT keyed on preferences.isLoaded: on the load commit the game
+  // still holds the pre-load defaults, and saving those would clobber the stored
+  // selection before useGameLogic adopts it.
   useEffect(() => {
-    if (preferences.isLoaded && !preferences.operations.includes(game.gameState.operation)) {
-      const newOps = Array.from(game.gameState.selectedOperations);
+    if (!preferences.isLoaded) return;
+    const newOps = Array.from(game.gameState.selectedOperations);
+    const unchanged =
+      newOps.length === preferences.operations.length &&
+      newOps.every((op) => preferences.operations.includes(op));
+    if (!unchanged) {
       preferences.setOperations(newOps);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
