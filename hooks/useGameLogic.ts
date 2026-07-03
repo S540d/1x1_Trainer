@@ -509,6 +509,20 @@ export function useGameLogic({
     onTaskResult?.(gameState.num1, gameState.num2, gameState.operation, isCorrect);
 
     const newScore = isCorrect ? gameState.score + 1 : gameState.score;
+
+    // Persist a beaten high score immediately, not only at game over, so it
+    // survives closing the app or leaving challenge mode mid-run (#257).
+    // challengeState.highScore keeps the start-of-run baseline: the game-over
+    // comparison below still detects a new record and sets isNewHighScore.
+    if (
+      gameState.difficultyMode === DifficultyMode.CHALLENGE &&
+      gameState.challengeState &&
+      isCorrect &&
+      newScore > Math.max(challengeHighScore, gameState.challengeState.highScore)
+    ) {
+      onChallengeHighScoreChange?.(newScore);
+    }
+
     const challengeGameOver =
       gameState.difficultyMode === DifficultyMode.CHALLENGE &&
       gameState.challengeState !== undefined &&

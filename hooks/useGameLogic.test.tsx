@@ -2349,6 +2349,46 @@ describe('useGameLogic Hook', () => {
       expect(result.current.gameState.challengeState?.isNewHighScore).toBe(true);
     });
 
+    // Regression: #257 — the high score is persisted as soon as it is beaten,
+    // not only at game over, so quitting the app mid-run cannot lose it.
+    it('should persist a beaten high score immediately, before game over', () => {
+      const mockHighScoreChange = jest.fn();
+      const { result } = renderHook(() =>
+        useGameLogic({
+          ...challengeProps,
+          challengeHighScore: 1,
+          onChallengeHighScoreChange: mockHighScoreChange,
+        })
+      );
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      flushAllTimers();
+
+      // Two correct answers: score 2 beats the stored high score of 1
+      for (let i = 0; i < 2; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      // Run is still alive — but the new record is already persisted
+      expect(result.current.gameState.showResult).toBe(false);
+      expect(mockHighScoreChange).toHaveBeenCalledWith(2);
+    });
+
     // Regression: #253 — challenge records always end with 3 errors, so the
     // challenge_no_errors badge is driven by reaching level 3 with all lives.
     it('should flag the session record flawless when level 3 is reached with all lives', () => {
