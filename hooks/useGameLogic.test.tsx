@@ -1357,11 +1357,14 @@ describe('useGameLogic Hook', () => {
       expect(secondNum2).toBeLessThanOrEqual(10);
     });
 
-    it('should call onMotivationShow after every 10 tasks', () => {
-      const { result } = renderHook(() => useGameLogic(defaultProps));
+    it('should call onMotivationShow when the 10-task boundary falls mid-round', () => {
+      // totalSolvedTasks starts at 5, so the boundary (10) is reached at task 5
+      // of the round — not the last task.
+      const { result } = renderHook(() =>
+        useGameLogic({ ...defaultProps, initialTotalSolvedTasks: 5 })
+      );
 
-      // Move through 9 tasks (totalSolvedTasks goes from 0 to 9)
-      for (let i = 1; i <= 9; i++) {
+      for (let i = 1; i <= 4; i++) {
         act(() => {
           result.current.nextQuestion();
           jest.runAllTimers();
@@ -1370,7 +1373,7 @@ describe('useGameLogic Hook', () => {
 
       expect(mockOnMotivationShow).not.toHaveBeenCalled();
 
-      // The 10th call to nextQuestion makes totalSolvedTasks = 10
+      // The 5th call makes totalSolvedTasks = 10 (mid-round)
       act(() => {
         result.current.nextQuestion();
         jest.runAllTimers();
@@ -1378,6 +1381,23 @@ describe('useGameLogic Hook', () => {
 
       expect(mockOnMotivationShow).toHaveBeenCalledTimes(1);
       expect(mockOnMotivationShow).toHaveBeenCalledWith(result.current.gameState.score);
+    });
+
+    // Regression: #254 — when the boundary coincides with the last task, the
+    // result modal opens; the motivation modal must not stack on top of it.
+    it('should NOT call onMotivationShow at round end (result modal opens instead)', () => {
+      const { result } = renderHook(() => useGameLogic(defaultProps));
+
+      // Complete the full 10-task round (totalSolvedTasks 0 → 10)
+      for (let i = 1; i <= 10; i++) {
+        act(() => {
+          result.current.nextQuestion();
+          jest.runAllTimers();
+        });
+      }
+
+      expect(result.current.gameState.showResult).toBe(true);
+      expect(mockOnMotivationShow).not.toHaveBeenCalled();
     });
   });
 
