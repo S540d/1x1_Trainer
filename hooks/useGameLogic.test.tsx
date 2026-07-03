@@ -2288,6 +2288,46 @@ describe('useGameLogic Hook', () => {
       expect(result.current.gameState.challengeState?.isNewHighScore).toBe(true);
     });
 
+    // Regression: #257 — the high score is persisted as soon as it is beaten,
+    // not only at game over, so quitting the app mid-run cannot lose it.
+    it('should persist a beaten high score immediately, before game over', () => {
+      const mockHighScoreChange = jest.fn();
+      const { result } = renderHook(() =>
+        useGameLogic({
+          ...challengeProps,
+          challengeHighScore: 1,
+          onChallengeHighScoreChange: mockHighScoreChange,
+        })
+      );
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      flushAllTimers();
+
+      // Two correct answers: score 2 beats the stored high score of 1
+      for (let i = 0; i < 2; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      // Run is still alive — but the new record is already persisted
+      expect(result.current.gameState.showResult).toBe(false);
+      expect(mockHighScoreChange).toHaveBeenCalledWith(2);
+    });
+
     it('should not show new high score banner on tie', () => {
       const mockHighScoreChange = jest.fn();
       // Start with existing high score of 2
