@@ -485,6 +485,12 @@ export function getLocalDateString(date?: Date): string {
   return `${y}-${m}-${day}`;
 }
 
+export function getYesterdayDateString(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return getLocalDateString(d);
+}
+
 const STREAK_DEFAULT: StreakData = { currentStreak: 0, lastPlayedDate: '', longestStreak: 0 };
 
 function isNonNegInt(v: unknown): v is number {
@@ -505,7 +511,18 @@ export const getStreakData = async (profileId?: string): Promise<StreakData> => 
       isLocalDateString(parsed.lastPlayedDate) &&
       isNonNegInt(parsed.longestStreak)
     ) {
-      return parsed as StreakData;
+      const data = parsed as StreakData;
+      // A streak is only alive if the last play was today or yesterday.
+      // Report 0 for older dates so the UI never shows an already-broken
+      // streak (#255); longestStreak is preserved and the stored record is
+      // normalized on the next session via updateStreakAfterSession.
+      if (
+        data.lastPlayedDate === getLocalDateString() ||
+        data.lastPlayedDate === getYesterdayDateString()
+      ) {
+        return data;
+      }
+      return { ...data, currentStreak: 0 };
     }
   } catch {
     // fall through
@@ -525,11 +542,7 @@ export const updateStreakAfterSession = async (profileId?: string): Promise<Stre
     return data;
   }
 
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = getLocalDateString(yesterday);
-
-  const newStreak = data.lastPlayedDate === yesterdayStr ? data.currentStreak + 1 : 1;
+  const newStreak = data.lastPlayedDate === getYesterdayDateString() ? data.currentStreak + 1 : 1;
 
   const updated: StreakData = {
     currentStreak: newStreak,
