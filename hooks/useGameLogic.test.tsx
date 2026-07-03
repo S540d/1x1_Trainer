@@ -774,6 +774,47 @@ describe('useGameLogic Hook', () => {
       expect(result.current.gameState.selectedOperations.has(Operation.MULTIPLICATION)).toBe(true);
       expect(result.current.gameState.selectedOperations.size).toBe(1);
     });
+
+    // Regression: #252 — preferences load asynchronously, so the useState
+    // initializer only ever sees the defaults; the saved selection must be
+    // adopted when initialOperations changes.
+    it('should adopt initialOperations arriving after mount (async preference load)', () => {
+      const { result, rerender } = renderHook((props) => useGameLogic(props), {
+        initialProps: defaultProps as Parameters<typeof useGameLogic>[0],
+      });
+
+      expect(result.current.gameState.selectedOperations).toEqual(
+        new Set([Operation.MULTIPLICATION])
+      );
+
+      rerender({
+        ...defaultProps,
+        initialOperations: [Operation.ADDITION, Operation.DIVISION],
+      });
+
+      expect(result.current.gameState.selectedOperations).toEqual(
+        new Set([Operation.ADDITION, Operation.DIVISION])
+      );
+
+      // The pending question is regenerated with the adopted operations
+      act(() => {
+        jest.runAllTimers();
+      });
+      expect([Operation.ADDITION, Operation.DIVISION]).toContain(
+        result.current.gameState.operation
+      );
+    });
+
+    it('should not reset state when initialOperations matches the current selection', () => {
+      const { result, rerender } = renderHook((props) => useGameLogic(props), {
+        initialProps: defaultProps as Parameters<typeof useGameLogic>[0],
+      });
+
+      const stateBefore = result.current.gameState;
+      rerender({ ...defaultProps, initialOperations: [Operation.MULTIPLICATION] });
+
+      expect(result.current.gameState).toBe(stateBefore);
+    });
   });
 
   describe('getCorrectAnswer', () => {

@@ -423,6 +423,30 @@ export function useGameLogic({
     }));
   };
 
+  // Adopt persisted operations when they arrive (async preference load or
+  // profile switch). The useState initializer above only sees the pre-load
+  // defaults, so without this the saved selection never reaches the game.
+  const selectedOpsKey = selectedOps.join(',');
+  useEffect(() => {
+    setGameState((prev) => {
+      const same =
+        prev.selectedOperations.size === selectedOps.length &&
+        selectedOps.every((op) => prev.selectedOperations.has(op));
+      if (same || prev.difficultyMode === DifficultyMode.CHALLENGE) return prev;
+      const newSet = new Set(selectedOps);
+      setTimeout(() => generateQuestion(prev.gameMode, newSet), 0);
+      return {
+        ...prev,
+        selectedOperations: newSet,
+        operation: selectedOps[0],
+        currentTask: 1,
+        score: 0,
+        showResult: false,
+      };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOpsKey]);
+
   // Handle user input (for input mode)
   const onUserInput = (input: string) => {
     if (!gameState.isAnswerChecked) {

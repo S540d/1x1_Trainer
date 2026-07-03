@@ -360,10 +360,17 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preferences.isLoaded]);
 
-  // Sync operation changes to preferences
+  // Sync operation changes to preferences.
+  // Deliberately NOT keyed on preferences.isLoaded: on the load commit the game
+  // still holds the pre-load defaults, and saving those would clobber the stored
+  // selection before useGameLogic adopts it.
   useEffect(() => {
-    if (preferences.isLoaded && !preferences.operations.includes(game.gameState.operation)) {
-      const newOps = Array.from(game.gameState.selectedOperations);
+    if (!preferences.isLoaded) return;
+    const newOps = Array.from(game.gameState.selectedOperations);
+    const unchanged =
+      newOps.length === preferences.operations.length &&
+      newOps.every((op) => preferences.operations.includes(op));
+    if (!unchanged) {
       preferences.setOperations(newOps);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
