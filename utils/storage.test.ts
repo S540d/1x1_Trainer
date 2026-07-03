@@ -252,6 +252,27 @@ describe('storage.ts - Typed Storage Helpers', () => {
       expect(operations).toEqual(ops);
     });
 
+    // Regression: #251 — DIVISION was missing from the validation whitelist,
+    // so any stored selection containing it fell back to [MULTIPLICATION].
+    it('should save and retrieve DIVISION (survives restart)', async () => {
+      await saveOperations([Operation.DIVISION]);
+      const operations = await getOperations();
+      expect(operations).toEqual([Operation.DIVISION]);
+    });
+
+    it('should retrieve a mixed selection including DIVISION without dropping it', async () => {
+      const ops = [Operation.ADDITION, Operation.DIVISION];
+      await saveOperations(ops);
+      const operations = await getOperations();
+      expect(operations).toEqual(ops);
+    });
+
+    it('should fall back to default for an empty stored array', async () => {
+      mockLocalStorage['app-operations'] = JSON.stringify([]);
+      const operations = await getOperations();
+      expect(operations).toEqual([Operation.MULTIPLICATION]);
+    });
+
     it('should return default (MULTIPLICATION) if no operations stored', async () => {
       const operations = await getOperations();
       expect(operations).toEqual([Operation.MULTIPLICATION]);
@@ -266,6 +287,12 @@ describe('storage.ts - Typed Storage Helpers', () => {
 
       // Verify migration saved new format
       expect(mockLocalStorage['app-operations']).toBe(JSON.stringify([Operation.ADDITION]));
+    });
+
+    it('should migrate legacy DIVISION value', async () => {
+      mockLocalStorage['app-operation'] = Operation.DIVISION;
+      const operations = await getOperations();
+      expect(operations).toEqual([Operation.DIVISION]);
     });
 
     it('should handle corrupted JSON gracefully', async () => {
@@ -292,6 +319,12 @@ describe('storage.ts - Typed Storage Helpers', () => {
       mockLocalStorage['app-operation'] = Operation.SUBTRACTION;
       const operation = await getOperation();
       expect(operation).toBe(Operation.SUBTRACTION);
+    });
+
+    it('should retrieve legacy DIVISION operation', async () => {
+      mockLocalStorage['app-operation'] = Operation.DIVISION;
+      const operation = await getOperation();
+      expect(operation).toBe(Operation.DIVISION);
     });
 
     it('should return null if no legacy operation stored', async () => {
