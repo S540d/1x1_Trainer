@@ -10,7 +10,6 @@ interface ResultModalProps {
   difficultyMode: DifficultyMode;
   challengeState?: ChallengeState;
   score: number;
-  totalTasks: number;
   onRestart: () => void;
   onContinue: () => void;
   t: {
@@ -19,10 +18,12 @@ interface ResultModalProps {
     challengeResult: string;
     highScore: string;
     tryAgain: string;
-    great: string;
-    youSolved: string;
-    of: string;
-    tasksCorrectly: string;
+    motivationTitleLowScore: string;
+    motivationMessageLowScore: string;
+    motivationTitleMediumScore: string;
+    motivationMessageMediumScore: string;
+    motivationTitleHighScore: string;
+    motivationMessageHighScore: string;
     newRound: string;
     continueGame: string;
   };
@@ -34,7 +35,6 @@ export function ResultModal({
   difficultyMode,
   challengeState,
   score,
-  totalTasks,
   onRestart,
   onContinue,
   t,
@@ -71,9 +71,19 @@ export function ResultModal({
             </>
           ) : (
             <>
-              <Text style={[modalStyles.title, { color: colors.text }]}>{t.great}</Text>
+              <Text style={[modalStyles.title, { color: colors.text }]}>
+                {score <= 3
+                  ? t.motivationTitleLowScore
+                  : score <= 6
+                    ? t.motivationTitleMediumScore
+                    : t.motivationTitleHighScore}
+              </Text>
               <Text style={[modalStyles.text, { color: colors.text }]}>
-                {t.youSolved} {score} {t.of} {totalTasks} {t.tasksCorrectly}.
+                {score <= 3
+                  ? t.motivationMessageLowScore
+                  : score <= 6
+                    ? t.motivationMessageMediumScore
+                    : t.motivationMessageHighScore}
               </Text>
               <View style={styles.modalButtonRow}>
                 <View style={styles.modalButtonWrap}>
