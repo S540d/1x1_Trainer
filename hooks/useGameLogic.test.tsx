@@ -2288,6 +2288,126 @@ describe('useGameLogic Hook', () => {
       expect(result.current.gameState.challengeState?.isNewHighScore).toBe(true);
     });
 
+    // Regression: #253 — challenge records always end with 3 errors, so the
+    // challenge_no_errors badge is driven by reaching level 3 with all lives.
+    it('should flag the session record flawless when level 3 is reached with all lives', () => {
+      const onSessionComplete = jest.fn();
+      const { result } = renderHook(() => useGameLogic({ ...challengeProps, onSessionComplete }));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      flushAllTimers();
+
+      // 10 correct answers → level 3 with all lives intact
+      for (let i = 0; i < 10; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      expect(result.current.gameState.challengeState?.flawlessLevel3).toBe(true);
+
+      // Lose all 3 lives → game over fires the session record
+      for (let i = 0; i < 3; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        enterWrongAnswer(result);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        if (i < 2) {
+          act(() => {
+            result.current.nextQuestion();
+          });
+          flushAllTimers();
+        }
+      }
+
+      expect(onSessionComplete).toHaveBeenCalledTimes(1);
+      expect(onSessionComplete.mock.calls[0][0].challengeFlawlessLevel3).toBe(true);
+    });
+
+    it('should not flag the record flawless when an error happened before level 3', () => {
+      const onSessionComplete = jest.fn();
+      const { result } = renderHook(() => useGameLogic({ ...challengeProps, onSessionComplete }));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      flushAllTimers();
+
+      // One early error before reaching level 3
+      act(() => {
+        result.current.generateQuestion();
+      });
+      flushAllTimers();
+      enterWrongAnswer(result);
+      act(() => {
+        result.current.checkAnswer();
+      });
+      act(() => {
+        result.current.nextQuestion();
+      });
+      flushAllTimers();
+
+      // 10 correct answers → level 3, but a life is already gone
+      for (let i = 0; i < 10; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      expect(result.current.gameState.challengeState?.flawlessLevel3).toBe(false);
+
+      // Lose the remaining 2 lives → game over
+      for (let i = 0; i < 2; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        enterWrongAnswer(result);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        if (i < 1) {
+          act(() => {
+            result.current.nextQuestion();
+          });
+          flushAllTimers();
+        }
+      }
+
+      expect(onSessionComplete).toHaveBeenCalledTimes(1);
+      expect(onSessionComplete.mock.calls[0][0].challengeFlawlessLevel3).toBe(false);
+    });
+
     it('should not show new high score banner on tie', () => {
       const mockHighScoreChange = jest.fn();
       // Start with existing high score of 2

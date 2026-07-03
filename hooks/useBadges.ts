@@ -91,7 +91,10 @@ export function computeNewlyUnlocked(
   const levelNum = getChallengeLevelNumber(challengeHighScore);
   if (levelNum >= 3) unlock('challenge_level_3');
   if (levelNum >= 6) unlock('challenge_level_6');
-  if (record.difficultyMode === DifficultyMode.CHALLENGE && record.errors === 0) {
+  // Challenge runs only end at game over (3 errors), so record.errors === 0 can
+  // never happen. The badge unlocks for reaching level 3 with all lives intact,
+  // carried in the record via challengeFlawlessLevel3 (#253).
+  if (record.difficultyMode === DifficultyMode.CHALLENGE && record.challengeFlawlessLevel3) {
     unlock('challenge_no_errors');
   }
 

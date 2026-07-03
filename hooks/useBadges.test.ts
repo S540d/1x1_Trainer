@@ -125,14 +125,26 @@ describe('computeNewlyUnlocked', () => {
     expect(ids).toContain('creative_mode');
   });
 
-  it('unlocks challenge_no_errors for challenge with 0 errors', () => {
-    const record = makeRecord({ difficultyMode: DifficultyMode.CHALLENGE, errors: 0 });
+  // #253: challenge records always carry 3 errors (game over), so the badge
+  // is based on the challengeFlawlessLevel3 flag instead of errors === 0.
+  it('unlocks challenge_no_errors when level 3 was reached with all lives', () => {
+    const record = makeRecord({
+      difficultyMode: DifficultyMode.CHALLENGE,
+      errors: 3,
+      challengeFlawlessLevel3: true,
+    });
     const ids = computeNewlyUnlocked(record, [record], 0, existing);
     expect(ids).toContain('challenge_no_errors');
   });
 
-  it('does not unlock challenge_no_errors when errors > 0', () => {
-    const record = makeRecord({ difficultyMode: DifficultyMode.CHALLENGE, errors: 1 });
+  it('does not unlock challenge_no_errors without the flawless flag', () => {
+    const record = makeRecord({ difficultyMode: DifficultyMode.CHALLENGE, errors: 3 });
+    const ids = computeNewlyUnlocked(record, [record], 0, existing);
+    expect(ids).not.toContain('challenge_no_errors');
+  });
+
+  it('does not unlock challenge_no_errors for non-challenge records with the flag', () => {
+    const record = makeRecord({ challengeFlawlessLevel3: true });
     const ids = computeNewlyUnlocked(record, [record], 0, existing);
     expect(ids).not.toContain('challenge_no_errors');
   });
