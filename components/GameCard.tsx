@@ -4,7 +4,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors, Operation, AnswerMode, GameState, DifficultyMode } from '../types/game';
 import { DESIGN_TOKENS } from '../utils/constants';
 import { Numpad } from './Numpad';
-import { ProgressDots } from './ProgressDots';
 
 interface GameCardProps {
   gameState: GameState;
@@ -206,8 +205,6 @@ export function GameCard({
           </View>
         </LinearGradient>
       </Animated.View>
-
-      <ProgressDots current={gameState.currentTask - 1} total={gameState.totalTasks} />
     </View>
   );
 }

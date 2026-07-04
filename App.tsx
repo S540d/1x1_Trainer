@@ -31,7 +31,6 @@ import { Header } from './components/Header';
 import { SettingsMenu } from './components/SettingsMenu';
 import { GameCard } from './components/GameCard';
 import { ResultModal } from './components/ResultModal';
-import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
 import { ParentDashboard } from './components/ParentDashboard';
 import { OnboardingModal } from './components/OnboardingModal';
@@ -88,8 +87,6 @@ export default function App() {
   const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
   const [badgesVisible, setBadgesVisible] = useState(false);
   const [profilePickerVisible, setProfilePickerVisible] = useState(false);
-  const [showMotivation, setShowMotivation] = useState(false);
-  const [motivationScore, setMotivationScore] = useState(0);
   const [streakData, setStreakData] = useState<StreakData>({
     currentStreak: 0,
     lastPlayedDate: '',
@@ -143,10 +140,6 @@ export default function App() {
     initialOperations: preferences.operations,
     initialTotalSolvedTasks: preferences.totalSolvedTasks,
     onTotalSolvedTasksChange: preferences.setTotalSolvedTasks,
-    onMotivationShow: (score: number) => {
-      setMotivationScore(score);
-      setShowMotivation(true);
-    },
     onSessionComplete: (record: SessionRecord) => {
       if (record.correctTasks === record.totalTasks) {
         sounds.playSound('perfect');
@@ -202,7 +195,6 @@ export default function App() {
     parentDashboardVisible ||
     badgesVisible ||
     profilePickerVisible ||
-    showMotivation ||
     streakWarningVisible ||
     onboardingVisible ||
     game.gameState.showResult;
@@ -502,17 +494,8 @@ export default function App() {
         difficultyMode={game.gameState.difficultyMode}
         challengeState={game.gameState.challengeState}
         score={game.gameState.score}
-        totalTasks={game.gameState.totalTasks}
         onRestart={game.restartGame}
         onContinue={game.continueGame}
-        t={t}
-      />
-
-      <MotivationModal
-        visible={showMotivation}
-        onClose={() => setShowMotivation(false)}
-        colors={colors}
-        score={motivationScore}
         t={t}
       />
 

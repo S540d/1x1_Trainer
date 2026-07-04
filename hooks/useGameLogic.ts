@@ -29,7 +29,6 @@ interface UseGameLogicProps {
   initialOperations?: Operation[];
   initialTotalSolvedTasks: number;
   onTotalSolvedTasksChange: (total: number) => void;
-  onMotivationShow: (score: number) => void;
   onSessionComplete?: (record: SessionRecord) => void;
   numberRange: NumberRange;
   challengeHighScore?: number;
@@ -155,7 +154,6 @@ export function useGameLogic({
   initialOperations,
   initialTotalSolvedTasks,
   onTotalSolvedTasksChange,
-  onMotivationShow,
   onSessionComplete,
   numberRange,
   challengeHighScore = 0,
@@ -613,12 +611,6 @@ export function useGameLogic({
 
     if (isLastTask) {
       fireSessionComplete(gameState.score, gameState.totalTasks, gameState.selectedOperations);
-    } else if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
-      // Show motivation message after every 10 tasks — but never at round end,
-      // where the result modal already opens; two stacked modals would collide (#254).
-      // Called outside the setState updater: side effects in updaters run twice
-      // in StrictMode.
-      onMotivationShow(gameState.score);
     }
 
     setGameState((prev) => {

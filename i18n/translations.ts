@@ -48,7 +48,6 @@ export interface TranslationStrings {
   // Game UI
   task: string;
   points: string;
-  of: string;
   // Game Modes
   normalMode: string;
   firstMissing: string;
@@ -62,18 +61,13 @@ export interface TranslationStrings {
   continueGame: string;
   encouragement: string; // Motivational text shown below the numpad during input
   practiceModeFeedback: string; // Shown instead of encouragement in PRACTICE mode
-  // Results Modal
-  great: string;
-  youSolved: string;
-  tasksCorrectly: string;
-  // Motivation Message
+  // Results Modal / Motivation Message (shown after every block of 10 tasks)
   motivationTitleLowScore: string;
   motivationMessageLowScore: string;
   motivationTitleMediumScore: string;
   motivationMessageMediumScore: string;
   motivationTitleHighScore: string;
   motivationMessageHighScore: string;
-  motivationButton: string;
   // Challenge Mode
   challenge: string;
   challengeInfo: string;
@@ -105,8 +99,6 @@ export interface TranslationStrings {
   streakWarningButton: string;
   streakInfoTitle: string;
   streakInfoBody: string;
-  scoreInfoTitle: string;
-  scoreInfoBody: string;
   parentWeakTasks: string;
   parentWeakTasksEmpty: string;
   chartSessions: string;
@@ -224,7 +216,6 @@ export const translations: Record<Language, TranslationStrings> = {
     // Game UI
     task: 'Task',
     points: 'Points',
-    of: 'of',
     // Game Modes
     normalMode: 'Normal Tasks',
     firstMissing: 'First Number Missing',
@@ -236,11 +227,7 @@ export const translations: Record<Language, TranslationStrings> = {
     playAgain: 'Play Again',
     newRound: 'New Round',
     continueGame: 'Continue',
-    // Results Modal
-    great: 'Great!',
-    youSolved: 'You solved',
-    tasksCorrectly: 'tasks correctly',
-    // Motivation Message
+    // Results Modal / Motivation Message (shown after every block of 10 tasks)
     motivationTitleLowScore: 'Keep Going!',
     motivationMessageLowScore: "Don't give up! Practice makes perfect. Let's try again!",
     motivationTitleMediumScore: 'Almost There!',
@@ -249,7 +236,6 @@ export const translations: Record<Language, TranslationStrings> = {
     motivationTitleHighScore: 'Great!',
     motivationMessageHighScore:
       "Excellent work! You have already solved 10 tasks. Let's try another round!",
-    motivationButton: 'Continue',
     // Challenge Mode
     challenge: 'Challenge',
     challengeInfo: 'Endless mode: answer until 3 mistakes. Difficulty increases!',
@@ -283,8 +269,6 @@ export const translations: Record<Language, TranslationStrings> = {
     streakWarningButton: "Let's go!",
     streakInfoTitle: 'Streak',
     streakInfoBody: 'days played in a row. Keep it up!',
-    scoreInfoTitle: 'Score',
-    scoreInfoBody: 'Your score for this round',
     parentWeakTasks: 'Weak Areas (Top 5)',
     parentWeakTasksEmpty: 'No weak areas identified yet.',
     chartSessions: 'Sessions · 14 days',
@@ -401,7 +385,6 @@ export const translations: Record<Language, TranslationStrings> = {
     // Game UI
     task: 'Aufgabe',
     points: 'Punkte',
-    of: 'von',
     // Game Modes
     normalMode: 'Normale Aufgaben',
     firstMissing: 'Erste Zahl fehlt',
@@ -413,11 +396,7 @@ export const translations: Record<Language, TranslationStrings> = {
     playAgain: 'Nochmal spielen',
     newRound: 'Neue Runde',
     continueGame: 'Fortsetzen',
-    // Results Modal
-    great: 'Super!',
-    youSolved: 'Du hast',
-    tasksCorrectly: 'Aufgaben richtig gelöst',
-    // Motivation Message
+    // Results Modal / Motivation Message (erscheint nach jedem Block von 10 Aufgaben)
     motivationTitleLowScore: 'Weiter so!',
     motivationMessageLowScore: 'Schade, versuche es nochmal!',
     motivationTitleMediumScore: 'Fast geschafft!',
@@ -426,7 +405,6 @@ export const translations: Record<Language, TranslationStrings> = {
     motivationTitleHighScore: 'Super!',
     motivationMessageHighScore:
       'Toll gemacht! Du hast schon 10 Aufgaben gerechnet. Lass uns noch eine Runde versuchen!',
-    motivationButton: 'Weiter',
     // Challenge Mode
     challenge: 'Herausforderung',
     challengeInfo: 'Endlosmodus: rechne bis 3 Fehler. Es wird immer schwieriger!',
@@ -460,8 +438,6 @@ export const translations: Record<Language, TranslationStrings> = {
     streakWarningButton: "Los geht's!",
     streakInfoTitle: 'Serie',
     streakInfoBody: 'Tage in Folge gespielt. Weiter so!',
-    scoreInfoTitle: 'Punkte',
-    scoreInfoBody: 'Dein Punktestand in dieser Runde',
     parentWeakTasks: 'Schwachstellen (Top 5)',
     parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
     chartSessions: 'Einheiten · 14 Tage',

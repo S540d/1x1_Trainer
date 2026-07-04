@@ -1,8 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors, DifficultyMode, ChallengeState } from '../types/game';
-import { CHALLENGE_MAX_LIVES, DESIGN_TOKENS } from '../utils/constants';
+import { CHALLENGE_MAX_LIVES } from '../utils/constants';
 import { Badge } from './Badge';
 import { ProgressBar } from './ProgressBar';
 
@@ -21,8 +20,6 @@ interface HeaderProps {
     points: string;
     streakInfoTitle: string;
     streakInfoBody: string;
-    scoreInfoTitle: string;
-    scoreInfoBody: string;
   };
 }
 
@@ -53,33 +50,11 @@ export function Header({
           <Badge value={score} variant="default" animated />
         </>
       ) : (
-        <>
-          <View style={styles.progressContainer}>
-            <ProgressBar
-              current={currentTask - 1}
-              total={totalTasks}
-              gradientColors={colors.gradientPrimary}
-            />
-            <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>
-              {currentTask}/{totalTasks}
-            </Text>
-          </View>
-          <TouchableOpacity
-            onPress={() => Alert.alert(t.scoreInfoTitle, t.scoreInfoBody)}
-            activeOpacity={0.7}
-            accessibilityRole="button"
-            accessibilityLabel={`${t.scoreInfoTitle}: ${score}`}
-          >
-            <LinearGradient
-              colors={DESIGN_TOKENS.GRADIENT_GOLD}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.scoreBadge}
-            >
-              <Text style={styles.scoreBadgeText}>⭐ {score}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </>
+        <ProgressBar
+          current={currentTask - 1}
+          total={totalTasks}
+          gradientColors={colors.gradientPrimary}
+        />
       )}
       {!!currentStreak && currentStreak > 0 && (
         <TouchableOpacity
@@ -110,30 +85,6 @@ const styles = StyleSheet.create({
   },
   headerScore: {
     fontSize: 18,
-  },
-  progressContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  progressLabel: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    minWidth: 36,
-    textAlign: 'right',
-  },
-  scoreBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scoreBadgeText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
   },
   settingsButton: {
     padding: 8,

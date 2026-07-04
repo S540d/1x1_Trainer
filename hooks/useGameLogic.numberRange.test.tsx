@@ -33,7 +33,6 @@ describe('Number Range Invariant Tests', () => {
               initialOperations: [Operation.ADDITION],
               initialTotalSolvedTasks: 0,
               onTotalSolvedTasksChange: jest.fn(),
-              onMotivationShow: jest.fn(),
               numberRange: range,
             })
           );
@@ -67,7 +66,6 @@ describe('Number Range Invariant Tests', () => {
               initialOperations: [Operation.SUBTRACTION],
               initialTotalSolvedTasks: 0,
               onTotalSolvedTasksChange: jest.fn(),
-              onMotivationShow: jest.fn(),
               numberRange: range,
             })
           );
@@ -103,7 +101,6 @@ describe('Number Range Invariant Tests', () => {
               initialOperations: [Operation.MULTIPLICATION],
               initialTotalSolvedTasks: 0,
               onTotalSolvedTasksChange: jest.fn(),
-              onMotivationShow: jest.fn(),
               numberRange: range,
             })
           );
@@ -136,7 +133,6 @@ describe('Number Range Invariant Tests', () => {
               initialOperations: [Operation.DIVISION],
               initialTotalSolvedTasks: 0,
               onTotalSolvedTasksChange: jest.fn(),
-              onMotivationShow: jest.fn(),
               numberRange: range,
             })
           );
@@ -326,7 +322,6 @@ describe('Number Range Invariant Tests', () => {
             initialOperations: [operation],
             initialTotalSolvedTasks: 0,
             onTotalSolvedTasksChange: jest.fn(),
-            onMotivationShow: jest.fn(),
             numberRange: NumberRange.RANGE_20,
           })
         );
