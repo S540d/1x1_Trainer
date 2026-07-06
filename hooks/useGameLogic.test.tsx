@@ -9,7 +9,11 @@
 import { renderHook, act } from '@testing-library/react';
 import { generateNumberSequenceForState, useGameLogic } from './useGameLogic';
 import { Operation, GameMode, AnswerMode, DifficultyMode, NumberRange } from '../types/game';
-import { getChallengeLevel, getChallengeLevelNumber, CHALLENGE_MAX_LIVES } from '../utils/constants';
+import {
+  getChallengeLevel,
+  getChallengeLevelNumber,
+  CHALLENGE_MAX_LIVES,
+} from '../utils/constants';
 
 describe('useGameLogic - generateNumberSequenceForState', () => {
   describe('ADDITION operation', () => {
@@ -55,7 +59,7 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       const operation = Operation.ADDITION;
 
       const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
-      
+
       // Check that each element is exactly 1 more than the previous
       for (let i = 1; i < sequence.length; i++) {
         expect(sequence[i]).toBe(sequence[i - 1] + 1);
@@ -95,7 +99,7 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       for (let num2 = 1; num2 <= 10; num2++) {
         const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
         const correctAnswer = num1 + num2;
-        
+
         expect(sequence).toContain(correctAnswer);
       }
     });
@@ -113,7 +117,7 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       // For questionPart=2, base is num1 (5)
       // Sequence should be 5, 10, 15, 20, 25, 30, 35, 40, 45, 50
       const expected = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
-      
+
       expect(sequence).toEqual(expected);
       expect(sequence).toHaveLength(10);
       expect(sequence[0]).toBe(5); // base × 1
@@ -130,7 +134,7 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
 
       // Correct answer is 7 × 4 = 28
       const correctAnswer = num1 * num2;
-      
+
       expect(sequence).toContain(correctAnswer);
       expect(correctAnswer).toBe(28);
     });
@@ -142,7 +146,7 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       const operation = Operation.MULTIPLICATION;
 
       const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
-      
+
       // Check that each element is base more than the previous (multiplication table pattern)
       for (let i = 1; i < sequence.length; i++) {
         expect(sequence[i]).toBe(sequence[i - 1] + num1);
@@ -182,7 +186,7 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       for (let num2 = 1; num2 <= 10; num2++) {
         const sequence = generateNumberSequenceForState(num1, num2, questionPart, operation);
         const correctAnswer = num1 * num2;
-        
+
         expect(sequence).toContain(correctAnswer);
       }
     });
@@ -194,8 +198,18 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       const num2 = 3;
       const questionPart = 2;
 
-      const addSequence = generateNumberSequenceForState(num1, num2, questionPart, Operation.ADDITION);
-      const multSequence = generateNumberSequenceForState(num1, num2, questionPart, Operation.MULTIPLICATION);
+      const addSequence = generateNumberSequenceForState(
+        num1,
+        num2,
+        questionPart,
+        Operation.ADDITION
+      );
+      const multSequence = generateNumberSequenceForState(
+        num1,
+        num2,
+        questionPart,
+        Operation.MULTIPLICATION
+      );
 
       // Sequences should be different
       expect(addSequence).not.toEqual(multSequence);
@@ -216,8 +230,18 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       const num2 = 3;
       const questionPart = 2;
 
-      const addSequence = generateNumberSequenceForState(num1, num2, questionPart, Operation.ADDITION);
-      const multSequence = generateNumberSequenceForState(num1, num2, questionPart, Operation.MULTIPLICATION);
+      const addSequence = generateNumberSequenceForState(
+        num1,
+        num2,
+        questionPart,
+        Operation.ADDITION
+      );
+      const multSequence = generateNumberSequenceForState(
+        num1,
+        num2,
+        questionPart,
+        Operation.MULTIPLICATION
+      );
 
       // Addition sequence around sum (5+3=8): starts at 8-4=4
       expect(addSequence[0]).toBe(4);
@@ -308,14 +332,14 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       // Negative values skipped, so: 1, 2, 3, 4, 5, 6 then fill to 10
       const seq1 = generateNumberSequenceForState(6, 5, questionPart, operation);
       expect(seq1).toHaveLength(10);
-      expect(seq1.every(n => n > 0)).toBe(true);
+      expect(seq1.every((n) => n > 0)).toBe(true);
       expect(seq1).toContain(1); // Correct answer
 
       // For 8-5=3: sequence around 3: (3-4) to (3+5)
       // Skip negatives, then fill: should contain 3
       const seq3 = generateNumberSequenceForState(8, 5, questionPart, operation);
       expect(seq3).toHaveLength(10);
-      expect(seq3.every(n => n > 0)).toBe(true);
+      expect(seq3.every((n) => n > 0)).toBe(true);
       expect(seq3).toContain(3); // Correct answer
     });
 
@@ -332,7 +356,7 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
         expect(sequence).toHaveLength(10);
 
         // All values should be positive
-        expect(sequence.every(n => n > 0)).toBe(true);
+        expect(sequence.every((n) => n > 0)).toBe(true);
 
         // Sequence should contain the correct answer
         expect(sequence).toContain(diff);
@@ -417,8 +441,18 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       const questionPart = 2;
 
       const addSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.ADDITION);
-      const subSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.SUBTRACTION);
-      const multSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.MULTIPLICATION);
+      const subSeq = generateNumberSequenceForState(
+        num1,
+        num2,
+        questionPart,
+        Operation.SUBTRACTION
+      );
+      const multSeq = generateNumberSequenceForState(
+        num1,
+        num2,
+        questionPart,
+        Operation.MULTIPLICATION
+      );
       const divSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.DIVISION);
 
       // All should have 10 elements
@@ -448,7 +482,12 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       const questionPart = 2;
 
       const addSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.ADDITION);
-      const multSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.MULTIPLICATION);
+      const multSeq = generateNumberSequenceForState(
+        num1,
+        num2,
+        questionPart,
+        Operation.MULTIPLICATION
+      );
 
       // Addition: 6 + 7 = 13, sequence is 7-16, so 13 is included
       expect(addSeq).toContain(num1 + num2);
@@ -462,7 +501,12 @@ describe('useGameLogic - generateNumberSequenceForState', () => {
       const num2 = 3;
       const questionPart = 2;
 
-      const subSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.SUBTRACTION);
+      const subSeq = generateNumberSequenceForState(
+        num1,
+        num2,
+        questionPart,
+        Operation.SUBTRACTION
+      );
 
       // Subtraction: 10 - 3 = 7
       // Sequence for base=10: 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
@@ -523,7 +567,12 @@ describe('generateNumberSequenceForState - Extended Coverage (Phase 1 MVP)', () 
       const questionPart = 2;
 
       const addSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.ADDITION);
-      const multSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.MULTIPLICATION);
+      const multSeq = generateNumberSequenceForState(
+        num1,
+        num2,
+        questionPart,
+        Operation.MULTIPLICATION
+      );
 
       // Addition: sum=20, sequence around 20: (20-4) to (20+5) = 16 to 25
       expect(addSeq).toEqual([16, 17, 18, 19, 20, 21, 22, 23, 24, 25]);
@@ -538,12 +587,17 @@ describe('generateNumberSequenceForState - Extended Coverage (Phase 1 MVP)', () 
       const questionPart = 2;
 
       const addSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.ADDITION);
-      const multSeq = generateNumberSequenceForState(num1, num2, questionPart, Operation.MULTIPLICATION);
+      const multSeq = generateNumberSequenceForState(
+        num1,
+        num2,
+        questionPart,
+        Operation.MULTIPLICATION
+      );
 
       // Addition: sum=2, sequence around 2: (2-4) to (2+5) but skip negatives
       // Should have 10 values, all positive
       expect(addSeq).toHaveLength(10);
-      expect(addSeq.every(n => n > 0)).toBe(true);
+      expect(addSeq.every((n) => n > 0)).toBe(true);
       expect(addSeq).toContain(2); // Correct answer
 
       // Multiplication: base=1, sequence 1-10
@@ -612,8 +666,8 @@ describe('generateNumberSequenceForState - Extended Coverage (Phase 1 MVP)', () 
           const addSeq = generateNumberSequenceForState(num1, num2, 2, Operation.ADDITION);
           const multSeq = generateNumberSequenceForState(num1, num2, 2, Operation.MULTIPLICATION);
 
-          expect(addSeq.every(n => n > 0)).toBe(true);
-          expect(multSeq.every(n => n > 0)).toBe(true);
+          expect(addSeq.every((n) => n > 0)).toBe(true);
+          expect(multSeq.every((n) => n > 0)).toBe(true);
         }
       }
     });
@@ -626,14 +680,12 @@ describe('generateNumberSequenceForState - Extended Coverage (Phase 1 MVP)', () 
 
 describe('useGameLogic Hook', () => {
   const mockOnTotalSolvedTasksChange = jest.fn();
-  const mockOnMotivationShow = jest.fn();
 
   const defaultProps = {
     initialOperation: Operation.MULTIPLICATION,
     initialTotalSolvedTasks: 0,
     numberRange: NumberRange.RANGE_10,
     onTotalSolvedTasksChange: mockOnTotalSolvedTasksChange,
-    onMotivationShow: mockOnMotivationShow,
   };
 
   // Helper to enter answer digit by digit
@@ -719,6 +771,47 @@ describe('useGameLogic Hook', () => {
 
       expect(result.current.gameState.selectedOperations.has(Operation.MULTIPLICATION)).toBe(true);
       expect(result.current.gameState.selectedOperations.size).toBe(1);
+    });
+
+    // Regression: #252 — preferences load asynchronously, so the useState
+    // initializer only ever sees the defaults; the saved selection must be
+    // adopted when initialOperations changes.
+    it('should adopt initialOperations arriving after mount (async preference load)', () => {
+      const { result, rerender } = renderHook((props) => useGameLogic(props), {
+        initialProps: defaultProps as Parameters<typeof useGameLogic>[0],
+      });
+
+      expect(result.current.gameState.selectedOperations).toEqual(
+        new Set([Operation.MULTIPLICATION])
+      );
+
+      rerender({
+        ...defaultProps,
+        initialOperations: [Operation.ADDITION, Operation.DIVISION],
+      });
+
+      expect(result.current.gameState.selectedOperations).toEqual(
+        new Set([Operation.ADDITION, Operation.DIVISION])
+      );
+
+      // The pending question is regenerated with the adopted operations
+      act(() => {
+        jest.runAllTimers();
+      });
+      expect([Operation.ADDITION, Operation.DIVISION]).toContain(
+        result.current.gameState.operation
+      );
+    });
+
+    it('should not reset state when initialOperations matches the current selection', () => {
+      const { result, rerender } = renderHook((props) => useGameLogic(props), {
+        initialProps: defaultProps as Parameters<typeof useGameLogic>[0],
+      });
+
+      const stateBefore = result.current.gameState;
+      rerender({ ...defaultProps, initialOperations: [Operation.MULTIPLICATION] });
+
+      expect(result.current.gameState).toBe(stateBefore);
     });
   });
 
@@ -1301,29 +1394,6 @@ describe('useGameLogic Hook', () => {
       expect(secondNum1).toBeLessThanOrEqual(10);
       expect(secondNum2).toBeGreaterThanOrEqual(1);
       expect(secondNum2).toBeLessThanOrEqual(10);
-    });
-
-    it('should call onMotivationShow after every 10 tasks', () => {
-      const { result } = renderHook(() => useGameLogic(defaultProps));
-
-      // Move through 9 tasks (totalSolvedTasks goes from 0 to 9)
-      for (let i = 1; i <= 9; i++) {
-        act(() => {
-          result.current.nextQuestion();
-          jest.runAllTimers();
-        });
-      }
-
-      expect(mockOnMotivationShow).not.toHaveBeenCalled();
-
-      // The 10th call to nextQuestion makes totalSolvedTasks = 10
-      act(() => {
-        result.current.nextQuestion();
-        jest.runAllTimers();
-      });
-
-      expect(mockOnMotivationShow).toHaveBeenCalledTimes(1);
-      expect(mockOnMotivationShow).toHaveBeenCalledWith(result.current.gameState.score);
     });
   });
 
@@ -2234,11 +2304,175 @@ describe('useGameLogic Hook', () => {
       expect(result.current.gameState.challengeState?.isNewHighScore).toBe(true);
     });
 
+    // Regression: #257 — the high score is persisted as soon as it is beaten,
+    // not only at game over, so quitting the app mid-run cannot lose it.
+    it('should persist a beaten high score immediately, before game over', () => {
+      const mockHighScoreChange = jest.fn();
+      const { result } = renderHook(() =>
+        useGameLogic({
+          ...challengeProps,
+          challengeHighScore: 1,
+          onChallengeHighScoreChange: mockHighScoreChange,
+        })
+      );
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      flushAllTimers();
+
+      // Two correct answers: score 2 beats the stored high score of 1
+      for (let i = 0; i < 2; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      // Run is still alive — but the new record is already persisted
+      expect(result.current.gameState.showResult).toBe(false);
+      expect(mockHighScoreChange).toHaveBeenCalledWith(2);
+    });
+
+    // Regression: #253 — challenge records always end with 3 errors, so the
+    // challenge_no_errors badge is driven by reaching level 3 with all lives.
+    it('should flag the session record flawless when level 3 is reached with all lives', () => {
+      const onSessionComplete = jest.fn();
+      const { result } = renderHook(() => useGameLogic({ ...challengeProps, onSessionComplete }));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      flushAllTimers();
+
+      // 10 correct answers → level 3 with all lives intact
+      for (let i = 0; i < 10; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      expect(result.current.gameState.challengeState?.flawlessLevel3).toBe(true);
+
+      // Lose all 3 lives → game over fires the session record
+      for (let i = 0; i < 3; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        enterWrongAnswer(result);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        if (i < 2) {
+          act(() => {
+            result.current.nextQuestion();
+          });
+          flushAllTimers();
+        }
+      }
+
+      expect(onSessionComplete).toHaveBeenCalledTimes(1);
+      expect(onSessionComplete.mock.calls[0][0].challengeFlawlessLevel3).toBe(true);
+    });
+
+    it('should not flag the record flawless when an error happened before level 3', () => {
+      const onSessionComplete = jest.fn();
+      const { result } = renderHook(() => useGameLogic({ ...challengeProps, onSessionComplete }));
+
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.CHALLENGE);
+      });
+      flushAllTimers();
+
+      // One early error before reaching level 3
+      act(() => {
+        result.current.generateQuestion();
+      });
+      flushAllTimers();
+      enterWrongAnswer(result);
+      act(() => {
+        result.current.checkAnswer();
+      });
+      act(() => {
+        result.current.nextQuestion();
+      });
+      flushAllTimers();
+
+      // 10 correct answers → level 3, but a life is already gone
+      for (let i = 0; i < 10; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      expect(result.current.gameState.challengeState?.flawlessLevel3).toBe(false);
+
+      // Lose the remaining 2 lives → game over
+      for (let i = 0; i < 2; i++) {
+        act(() => {
+          result.current.generateQuestion();
+        });
+        flushAllTimers();
+
+        enterWrongAnswer(result);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        if (i < 1) {
+          act(() => {
+            result.current.nextQuestion();
+          });
+          flushAllTimers();
+        }
+      }
+
+      expect(onSessionComplete).toHaveBeenCalledTimes(1);
+      expect(onSessionComplete.mock.calls[0][0].challengeFlawlessLevel3).toBe(false);
+    });
+
     it('should not show new high score banner on tie', () => {
       const mockHighScoreChange = jest.fn();
       // Start with existing high score of 2
       const { result } = renderHook(() =>
-        useGameLogic({ ...challengeProps, challengeHighScore: 2, onChallengeHighScoreChange: mockHighScoreChange })
+        useGameLogic({
+          ...challengeProps,
+          challengeHighScore: 2,
+          onChallengeHighScoreChange: mockHighScoreChange,
+        })
       );
 
       act(() => {
@@ -2305,35 +2539,60 @@ describe('getChallengeLevel', () => {
   it('should return level 2 for score 5', () => {
     const level = getChallengeLevel(5);
     expect(level.numberRange).toBe(NumberRange.RANGE_10);
-    expect(level.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION]);
+    expect(level.operations).toEqual([
+      Operation.ADDITION,
+      Operation.SUBTRACTION,
+      Operation.MULTIPLICATION,
+      Operation.DIVISION,
+    ]);
   });
 
   it('should return level 3 for score 10', () => {
     const level = getChallengeLevel(10);
     expect(level.numberRange).toBe(NumberRange.RANGE_20);
     expect(level.gameMode).toBe(GameMode.NORMAL);
-    expect(level.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION]);
+    expect(level.operations).toEqual([
+      Operation.ADDITION,
+      Operation.SUBTRACTION,
+      Operation.MULTIPLICATION,
+      Operation.DIVISION,
+    ]);
   });
 
   it('should return level 4 for score 15', () => {
     const level = getChallengeLevel(15);
     expect(level.numberRange).toBe(NumberRange.RANGE_20);
     expect(level.gameMode).toBe(GameMode.MIXED);
-    expect(level.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION]);
+    expect(level.operations).toEqual([
+      Operation.ADDITION,
+      Operation.SUBTRACTION,
+      Operation.MULTIPLICATION,
+      Operation.DIVISION,
+    ]);
   });
 
   it('should return level 5 for score 20', () => {
     const level = getChallengeLevel(20);
     expect(level.numberRange).toBe(NumberRange.RANGE_50);
     expect(level.gameMode).toBe(GameMode.MIXED);
-    expect(level.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION]);
+    expect(level.operations).toEqual([
+      Operation.ADDITION,
+      Operation.SUBTRACTION,
+      Operation.MULTIPLICATION,
+      Operation.DIVISION,
+    ]);
   });
 
   it('should return level 6 for score 30+', () => {
     const level = getChallengeLevel(30);
     expect(level.numberRange).toBe(NumberRange.RANGE_100);
     expect(level.gameMode).toBe(GameMode.MIXED);
-    expect(level.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION, Operation.DIVISION]);
+    expect(level.operations).toEqual([
+      Operation.ADDITION,
+      Operation.SUBTRACTION,
+      Operation.MULTIPLICATION,
+      Operation.DIVISION,
+    ]);
   });
 
   it('should return level 6 for very high scores', () => {
@@ -2347,7 +2606,6 @@ describe('useGameLogic - branch coverage', () => {
     initialOperation: Operation.MULTIPLICATION,
     initialTotalSolvedTasks: 0,
     onTotalSolvedTasksChange: jest.fn(),
-    onMotivationShow: jest.fn(),
     numberRange: NumberRange.RANGE_10,
   };
 
@@ -2384,7 +2642,7 @@ describe('useGameLogic - branch coverage', () => {
       const sequence = generateNumberSequenceForState(8, 3, 2, Operation.SUBTRACTION, 10);
       expect(sequence).toHaveLength(10);
       expect(sequence).toContain(5); // correct answer
-      expect(sequence[0]).toBe(1);   // max(1, 5-4)
+      expect(sequence[0]).toBe(1); // max(1, 5-4)
     });
   });
 

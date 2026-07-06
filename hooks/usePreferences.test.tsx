@@ -73,8 +73,12 @@ describe('usePreferences Hook', () => {
   const mockSaveTotalTasks = saveTotalTasks as jest.MockedFunction<typeof saveTotalTasks>;
   const mockGetNumberRange = getNumberRange as jest.MockedFunction<typeof getNumberRange>;
   const mockSaveNumberRange = saveNumberRange as jest.MockedFunction<typeof saveNumberRange>;
-  const mockGetChallengeHighScore = getChallengeHighScore as jest.MockedFunction<typeof getChallengeHighScore>;
-  const mockSaveChallengeHighScore = saveChallengeHighScore as jest.MockedFunction<typeof saveChallengeHighScore>;
+  const mockGetChallengeHighScore = getChallengeHighScore as jest.MockedFunction<
+    typeof getChallengeHighScore
+  >;
+  const mockSaveChallengeHighScore = saveChallengeHighScore as jest.MockedFunction<
+    typeof saveChallengeHighScore
+  >;
   const mockGetSoundsEnabled = getSoundsEnabled as jest.MockedFunction<typeof getSoundsEnabled>;
   const mockGetSoundsVolume = getSoundsVolume as jest.MockedFunction<typeof getSoundsVolume>;
   const mockGetDeviceLanguage = getDeviceLanguage as jest.MockedFunction<typeof getDeviceLanguage>;
@@ -153,7 +157,7 @@ describe('usePreferences Hook', () => {
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Failed to load preferences:',
+        'Failed to load global preferences:',
         expect.any(Error)
       );
 
@@ -429,10 +433,7 @@ describe('usePreferences Hook', () => {
         expect(result.current.isLoaded).toBe(true);
       });
 
-      expect(result.current.operations).toEqual([
-        Operation.ADDITION,
-        Operation.MULTIPLICATION,
-      ]);
+      expect(result.current.operations).toEqual([Operation.ADDITION, Operation.MULTIPLICATION]);
     });
 
     it('should save operations when changed', async () => {
@@ -449,7 +450,7 @@ describe('usePreferences Hook', () => {
       });
 
       await waitFor(() => {
-        expect(mockSaveOperations).toHaveBeenCalledWith(newOperations);
+        expect(mockSaveOperations).toHaveBeenCalledWith(newOperations, undefined);
       });
     });
 
@@ -472,10 +473,7 @@ describe('usePreferences Hook', () => {
     });
 
     it('should toggle operation - remove operation', async () => {
-      mockGetOperations.mockResolvedValue([
-        Operation.MULTIPLICATION,
-        Operation.ADDITION,
-      ]);
+      mockGetOperations.mockResolvedValue([Operation.MULTIPLICATION, Operation.ADDITION]);
 
       const { result } = renderHook(() => usePreferences());
 
@@ -536,10 +534,7 @@ describe('usePreferences Hook', () => {
     });
 
     it('should persist operations across sessions', async () => {
-      mockGetOperations.mockResolvedValue([
-        Operation.ADDITION,
-        Operation.SUBTRACTION,
-      ]);
+      mockGetOperations.mockResolvedValue([Operation.ADDITION, Operation.SUBTRACTION]);
 
       const { result: result1 } = renderHook(() => usePreferences());
 
@@ -547,10 +542,7 @@ describe('usePreferences Hook', () => {
         expect(result1.current.isLoaded).toBe(true);
       });
 
-      expect(result1.current.operations).toEqual([
-        Operation.ADDITION,
-        Operation.SUBTRACTION,
-      ]);
+      expect(result1.current.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION]);
 
       const { result: result2 } = renderHook(() => usePreferences());
 
@@ -558,10 +550,7 @@ describe('usePreferences Hook', () => {
         expect(result2.current.isLoaded).toBe(true);
       });
 
-      expect(result2.current.operations).toEqual([
-        Operation.ADDITION,
-        Operation.SUBTRACTION,
-      ]);
+      expect(result2.current.operations).toEqual([Operation.ADDITION, Operation.SUBTRACTION]);
     });
   });
 
@@ -615,7 +604,7 @@ describe('usePreferences Hook', () => {
       });
 
       await waitFor(() => {
-        expect(mockSaveNumberRange).toHaveBeenCalledWith(NumberRange.RANGE_10);
+        expect(mockSaveNumberRange).toHaveBeenCalledWith(NumberRange.RANGE_10, undefined);
       });
     });
 
@@ -688,7 +677,7 @@ describe('usePreferences Hook', () => {
       });
 
       await waitFor(() => {
-        expect(mockSaveTotalTasks).toHaveBeenCalledWith(100);
+        expect(mockSaveTotalTasks).toHaveBeenCalledWith(100, undefined);
       });
     });
 
@@ -793,7 +782,7 @@ describe('usePreferences Hook', () => {
       });
 
       await waitFor(() => {
-        expect(mockSaveNumberRange).toHaveBeenCalledWith(NumberRange.RANGE_10);
+        expect(mockSaveNumberRange).toHaveBeenCalledWith(NumberRange.RANGE_10, undefined);
       });
     });
 
@@ -811,7 +800,7 @@ describe('usePreferences Hook', () => {
       });
 
       await waitFor(() => {
-        expect(mockSaveTotalTasks).toHaveBeenCalledWith(15);
+        expect(mockSaveTotalTasks).toHaveBeenCalledWith(15, undefined);
       });
     });
 
@@ -854,7 +843,7 @@ describe('usePreferences Hook', () => {
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Failed to load preferences:',
+        'Failed to load global preferences:',
         expect.any(Error)
       );
 
@@ -1069,7 +1058,7 @@ describe('usePreferences Hook', () => {
 
       mockSaveLanguage.mockClear();
 
-      // Change to 'en' 
+      // Change to 'en'
       act(() => {
         result.current.setLanguage('en');
       });

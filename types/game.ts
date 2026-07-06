@@ -30,9 +30,9 @@ export enum DifficultyMode {
 }
 
 export enum NumberRange {
-  RANGE_10 = 'RANGE_10',   // 1-10
-  RANGE_20 = 'RANGE_20',   // 1-20
-  RANGE_50 = 'RANGE_50',   // 1-50
+  RANGE_10 = 'RANGE_10', // 1-10
+  RANGE_20 = 'RANGE_20', // 1-20
+  RANGE_50 = 'RANGE_50', // 1-50
   RANGE_100 = 'RANGE_100', // 1-100
 }
 
@@ -42,6 +42,9 @@ export interface ChallengeState {
   errors: number;
   highScore: number;
   isNewHighScore?: boolean;
+  // True once level 3 was reached while all lives were still intact —
+  // basis for the challenge_no_errors badge (#253)
+  flawlessLevel3?: boolean;
 }
 
 export type ThemeMode = 'light' | 'dark' | 'system';
@@ -88,6 +91,8 @@ export interface SessionRecord {
   errorRate: number;
   difficultyMode: DifficultyMode;
   numberRange: NumberRange;
+  // Challenge only: level 3 was reached with all lives intact (#253)
+  challengeFlawlessLevel3?: boolean;
 }
 
 export interface AchievementBadge {
@@ -99,6 +104,13 @@ export interface StreakData {
   currentStreak: number;
   lastPlayedDate: string; // YYYY-MM-DD (local date)
   longestStreak: number;
+}
+
+export interface ChildProfile {
+  id: string;
+  name: string;
+  avatarColor: string;
+  createdAt: string; // ISO date
 }
 
 export interface ThemeColors {

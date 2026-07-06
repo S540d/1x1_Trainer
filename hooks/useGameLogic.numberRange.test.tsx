@@ -33,7 +33,6 @@ describe('Number Range Invariant Tests', () => {
               initialOperations: [Operation.ADDITION],
               initialTotalSolvedTasks: 0,
               onTotalSolvedTasksChange: jest.fn(),
-              onMotivationShow: jest.fn(),
               numberRange: range,
             })
           );
@@ -67,7 +66,6 @@ describe('Number Range Invariant Tests', () => {
               initialOperations: [Operation.SUBTRACTION],
               initialTotalSolvedTasks: 0,
               onTotalSolvedTasksChange: jest.fn(),
-              onMotivationShow: jest.fn(),
               numberRange: range,
             })
           );
@@ -103,7 +101,6 @@ describe('Number Range Invariant Tests', () => {
               initialOperations: [Operation.MULTIPLICATION],
               initialTotalSolvedTasks: 0,
               onTotalSolvedTasksChange: jest.fn(),
-              onMotivationShow: jest.fn(),
               numberRange: range,
             })
           );
@@ -136,7 +133,6 @@ describe('Number Range Invariant Tests', () => {
               initialOperations: [Operation.DIVISION],
               initialTotalSolvedTasks: 0,
               onTotalSolvedTasksChange: jest.fn(),
-              onMotivationShow: jest.fn(),
               numberRange: range,
             })
           );
@@ -190,7 +186,7 @@ describe('Number Range Invariant Tests', () => {
         const maxExpected = correctAnswer + 5;
 
         // All values should be in range [max(1, correctAnswer-4), correctAnswer+5]
-        sequence.forEach(val => {
+        sequence.forEach((val) => {
           expect(val).toBeGreaterThanOrEqual(Math.max(1, minExpected));
           expect(val).toBeLessThanOrEqual(maxExpected);
         });
@@ -207,7 +203,7 @@ describe('Number Range Invariant Tests', () => {
 
         expect(sequence).toContain(correctAnswer);
         expect(sequence).toHaveLength(10);
-        expect(sequence.every(val => val > 0)).toBe(true);
+        expect(sequence.every((val) => val > 0)).toBe(true);
       });
 
       it('should handle large sums (10+10=20) correctly', () => {
@@ -261,7 +257,7 @@ describe('Number Range Invariant Tests', () => {
 
         expect(sequence).toContain(correctAnswer);
         expect(sequence).toHaveLength(10);
-        expect(sequence.every(val => val > 0)).toBe(true);
+        expect(sequence.every((val) => val > 0)).toBe(true);
       });
 
       it('should handle zero difference (5-5=0) correctly', () => {
@@ -275,7 +271,7 @@ describe('Number Range Invariant Tests', () => {
 
         // Correct answer is 0, sequence should be around 0 but all positive
         expect(sequence).toHaveLength(10);
-        expect(sequence.every(val => val > 0)).toBe(true);
+        expect(sequence.every((val) => val > 0)).toBe(true);
       });
     });
 
@@ -318,7 +314,7 @@ describe('Number Range Invariant Tests', () => {
       Operation.DIVISION,
     ];
 
-    operations.forEach(operation => {
+    operations.forEach((operation) => {
       it(`should validate answers correctly for ${operation} in NORMAL mode`, () => {
         const { result } = renderHook(() =>
           useGameLogic({
@@ -326,7 +322,6 @@ describe('Number Range Invariant Tests', () => {
             initialOperations: [operation],
             initialTotalSolvedTasks: 0,
             onTotalSolvedTasksChange: jest.fn(),
-            onMotivationShow: jest.fn(),
             numberRange: NumberRange.RANGE_20,
           })
         );

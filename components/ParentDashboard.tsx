@@ -8,8 +8,21 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { ThemeColors, SessionRecord, Operation, DifficultyMode, StreakData, TaskStat } from '../types/game';
-import { getSessionRecords, getStreakData, getTaskStats, getWeakTasks, FOUR_WEEKS_MS } from '../utils/storage';
+import {
+  ThemeColors,
+  SessionRecord,
+  Operation,
+  DifficultyMode,
+  StreakData,
+  TaskStat,
+} from '../types/game';
+import {
+  getSessionRecords,
+  getStreakData,
+  getTaskStats,
+  getWeakTasks,
+  FOUR_WEEKS_MS,
+} from '../utils/storage';
 import { DESIGN_TOKENS } from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
 
@@ -63,7 +76,7 @@ function getLast14Days(records: SessionRecord[]): DayChartData[] {
     dayEnd.setDate(dayStart.getDate() + 1);
 
     const dayRecords = records.filter(
-      r => r.timestamp >= dayStart.getTime() && r.timestamp < dayEnd.getTime()
+      (r) => r.timestamp >= dayStart.getTime() && r.timestamp < dayEnd.getTime()
     );
 
     result.push({
@@ -102,13 +115,16 @@ function MiniBarChart({
             valueKey === 'sessions'
               ? d.sessions
               : d.avgErrorRate !== null
-              ? d.avgErrorRate * 100
-              : 0;
+                ? d.avgErrorRate * 100
+                : 0;
           const hasData = valueKey === 'sessions' ? d.sessions > 0 : d.avgErrorRate !== null;
           const barH = maxValue > 0 ? Math.round((raw / maxValue) * BAR_H) : 0;
 
           return (
-            <View key={i} style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-end', height: BAR_H }}>
+            <View
+              key={i}
+              style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-end', height: BAR_H }}
+            >
               <View
                 style={{
                   width: '60%',
@@ -126,7 +142,9 @@ function MiniBarChart({
         {data.map((d, i) => (
           <View key={i} style={{ flex: 1, alignItems: 'center' }}>
             {(i === 0 || i === 6 || i === 13) && (
-              <Text style={[chartStyles.axisLabel, { color: colors.textSecondary }]}>{d.label}</Text>
+              <Text style={[chartStyles.axisLabel, { color: colors.textSecondary }]}>
+                {d.label}
+              </Text>
             )}
           </View>
         ))}
@@ -194,28 +212,34 @@ function errorRateColor(rate: number): string {
 
 export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboardProps) {
   const [records, setRecords] = useState<SessionRecord[]>([]);
-  const [streak, setStreak] = useState<StreakData>({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  const [streak, setStreak] = useState<StreakData>({
+    currentStreak: 0,
+    lastPlayedDate: '',
+    longestStreak: 0,
+  });
   const [weakTasks, setWeakTasks] = useState<TaskStat[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (visible) {
       setLoading(true);
-      Promise.all([getSessionRecords(), getStreakData(), getTaskStats()]).then(([data, streakData, stats]) => {
-        setRecords(data);
-        setStreak(streakData);
-        setWeakTasks(getWeakTasks(stats).slice(0, 5));
-        setLoading(false);
-      });
+      Promise.all([getSessionRecords(), getStreakData(), getTaskStats()]).then(
+        ([data, streakData, stats]) => {
+          setRecords(data);
+          setStreak(streakData);
+          setWeakTasks(getWeakTasks(stats).slice(0, 5));
+          setLoading(false);
+        }
+      );
     }
   }, [visible]);
 
   const grouped = groupByDay(records);
   const chartData = getLast14Days(records);
-  const hasChartData = chartData.some(d => d.sessions > 0);
-  const maxSessions = Math.max(1, ...chartData.map(d => d.sessions));
+  const hasChartData = chartData.some((d) => d.sessions > 0);
+  const maxSessions = Math.max(1, ...chartData.map((d) => d.sessions));
 
-  const recentRecords = records.filter(r => Date.now() - r.timestamp < FOUR_WEEKS_MS);
+  const recentRecords = records.filter((r) => Date.now() - r.timestamp < FOUR_WEEKS_MS);
   const avgErrorRate =
     recentRecords.length > 0
       ? recentRecords.reduce((sum, r) => sum + r.errorRate, 0) / recentRecords.length
@@ -240,7 +264,9 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
                   <Text style={styles.betaText}>BETA</Text>
                 </View>
               </View>
-              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{t.parentDashboardSubtitle}</Text>
+              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+                {t.parentDashboardSubtitle}
+              </Text>
             </View>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <Text style={[styles.closeText, { color: colors.text }]}>✕</Text>
@@ -252,8 +278,12 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
             <View style={[styles.summaryBar, { borderColor: colors.border }]}>
               {records.length > 0 && (
                 <View style={styles.summaryItem}>
-                  <Text style={[styles.summaryValue, { color: colors.text }]}>{recentRecords.length}</Text>
-                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentSessions}</Text>
+                  <Text style={[styles.summaryValue, { color: colors.text }]}>
+                    {recentRecords.length}
+                  </Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>
+                    {t.parentSessions}
+                  </Text>
                 </View>
               )}
               {records.length > 0 && avgErrorRate !== null && (
@@ -264,7 +294,9 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
                   <Text style={[styles.summaryValue, { color: errorRateColor(avgErrorRate) }]}>
                     {Math.round(avgErrorRate * 100)}%
                   </Text>
-                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentAvgError}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>
+                    {t.parentAvgError}
+                  </Text>
                 </View>
               )}
               {streak.currentStreak > 0 && records.length > 0 && (
@@ -272,8 +304,12 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
               )}
               {streak.currentStreak > 0 && (
                 <View style={styles.summaryItem}>
-                  <Text style={[styles.summaryValue, { color: '#F59E0B' }]}>🔥 {streak.currentStreak}</Text>
-                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentCurrentStreak}</Text>
+                  <Text style={[styles.summaryValue, { color: '#F59E0B' }]}>
+                    🔥 {streak.currentStreak}
+                  </Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>
+                    {t.parentCurrentStreak}
+                  </Text>
                 </View>
               )}
               {streak.longestStreak > 0 && (records.length > 0 || streak.currentStreak > 0) && (
@@ -281,8 +317,12 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
               )}
               {streak.longestStreak > 0 && (
                 <View style={styles.summaryItem}>
-                  <Text style={[styles.summaryValue, { color: colors.text }]}>{streak.longestStreak}</Text>
-                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>{t.parentLongestStreak}</Text>
+                  <Text style={[styles.summaryValue, { color: colors.text }]}>
+                    {streak.longestStreak}
+                  </Text>
+                  <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>
+                    {t.parentLongestStreak}
+                  </Text>
                 </View>
               )}
             </View>
@@ -292,13 +332,17 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           {loading ? (
             <ActivityIndicator style={styles.loader} color={colors.gradientPrimary[0]} />
           ) : records.length === 0 ? (
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t.parentNoData}</Text>
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+              {t.parentNoData}
+            </Text>
           ) : (
             <ScrollView style={styles.list} showsVerticalScrollIndicator={false}>
               {/* Charts */}
               {hasChartData && (
                 <View style={[styles.chartsSection, { borderColor: colors.border }]}>
-                  <Text style={[styles.chartTitle, { color: colors.textSecondary }]}>{t.chartSessions}</Text>
+                  <Text style={[styles.chartTitle, { color: colors.textSecondary }]}>
+                    {t.chartSessions}
+                  </Text>
                   <MiniBarChart
                     data={chartData}
                     valueKey="sessions"
@@ -306,14 +350,22 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
                     getBarColor={() => colors.gradientPrimary[0]}
                     colors={colors}
                   />
-                  <Text style={[styles.chartTitle, styles.chartTitleSpaced, { color: colors.textSecondary }]}>
+                  <Text
+                    style={[
+                      styles.chartTitle,
+                      styles.chartTitleSpaced,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
                     {t.chartErrorRate}
                   </Text>
                   <MiniBarChart
                     data={chartData}
                     valueKey="errorRate"
                     maxValue={100}
-                    getBarColor={d => (d.avgErrorRate !== null ? errorRateColor(d.avgErrorRate) : 'transparent')}
+                    getBarColor={(d) =>
+                      d.avgErrorRate !== null ? errorRateColor(d.avgErrorRate) : 'transparent'
+                    }
                     colors={colors}
                   />
                 </View>
@@ -322,7 +374,9 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
               {/* Weak tasks */}
               {weakTasks.length > 0 && (
                 <View style={[styles.weakSection, { borderColor: colors.border }]}>
-                  <Text style={[styles.weakTitle, { color: colors.textSecondary }]}>{t.parentWeakTasks}</Text>
+                  <Text style={[styles.weakTitle, { color: colors.textSecondary }]}>
+                    {t.parentWeakTasks}
+                  </Text>
                   {weakTasks.map((s, i) => {
                     const total = s.correctCount + s.errorCount;
                     const rate = total > 0 ? s.errorCount / total : 0;
@@ -331,7 +385,12 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
                         <Text style={[styles.weakTask, { color: colors.text }]}>
                           {s.num1} {OP_SYMBOL[s.operation]} {s.num2}
                         </Text>
-                        <View style={[styles.errorBadge, { backgroundColor: errorRateColor(rate) + '22' }]}>
+                        <View
+                          style={[
+                            styles.errorBadge,
+                            { backgroundColor: errorRateColor(rate) + '22' },
+                          ]}
+                        >
                           <Text style={[styles.errorBadgeText, { color: errorRateColor(rate) }]}>
                             {Math.round(rate * 100)}%
                           </Text>
@@ -348,18 +407,29 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
               {/* Session log */}
               {grouped.map(({ label, entries }) => (
                 <View key={label}>
-                  <Text style={[styles.dayLabel, { color: colors.textSecondary }]}>{getDayLabel(label)}</Text>
+                  <Text style={[styles.dayLabel, { color: colors.textSecondary }]}>
+                    {getDayLabel(label)}
+                  </Text>
                   {entries.map((r) => (
                     <View key={r.id} style={[styles.row, { borderColor: colors.border }]}>
-                      <Text style={[styles.rowTime, { color: colors.textSecondary }]}>{formatTime(r.timestamp)}</Text>
+                      <Text style={[styles.rowTime, { color: colors.textSecondary }]}>
+                        {formatTime(r.timestamp)}
+                      </Text>
                       <Text style={[styles.rowOps, { color: colors.text }]}>
-                        {r.operations.map(op => OP_SYMBOL[op]).join(' ')}
+                        {r.operations.map((op) => OP_SYMBOL[op]).join(' ')}
                       </Text>
                       <Text style={[styles.rowScore, { color: colors.text }]}>
                         {r.correctTasks}/{r.totalTasks}
                       </Text>
-                      <View style={[styles.errorBadge, { backgroundColor: errorRateColor(r.errorRate) + '22' }]}>
-                        <Text style={[styles.errorBadgeText, { color: errorRateColor(r.errorRate) }]}>
+                      <View
+                        style={[
+                          styles.errorBadge,
+                          { backgroundColor: errorRateColor(r.errorRate) + '22' },
+                        ]}
+                      >
+                        <Text
+                          style={[styles.errorBadgeText, { color: errorRateColor(r.errorRate) }]}
+                        >
                           {Math.round(r.errorRate * 100)}%
                         </Text>
                       </View>
@@ -374,7 +444,10 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           )}
 
           {/* Close button */}
-          <TouchableOpacity style={[styles.closeBtn, { backgroundColor: colors.gradientPrimary[0] }]} onPress={onClose}>
+          <TouchableOpacity
+            style={[styles.closeBtn, { backgroundColor: colors.gradientPrimary[0] }]}
+            onPress={onClose}
+          >
             <Text style={styles.closeBtnText}>{t.ok}</Text>
           </TouchableOpacity>
         </View>

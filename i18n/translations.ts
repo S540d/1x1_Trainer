@@ -48,7 +48,6 @@ export interface TranslationStrings {
   // Game UI
   task: string;
   points: string;
-  of: string;
   // Game Modes
   normalMode: string;
   firstMissing: string;
@@ -62,18 +61,13 @@ export interface TranslationStrings {
   continueGame: string;
   encouragement: string; // Motivational text shown below the numpad during input
   practiceModeFeedback: string; // Shown instead of encouragement in PRACTICE mode
-  // Results Modal
-  great: string;
-  youSolved: string;
-  tasksCorrectly: string;
-  // Motivation Message
+  // Results Modal / Motivation Message (shown after every block of 10 tasks)
   motivationTitleLowScore: string;
   motivationMessageLowScore: string;
   motivationTitleMediumScore: string;
   motivationMessageMediumScore: string;
   motivationTitleHighScore: string;
   motivationMessageHighScore: string;
-  motivationButton: string;
   // Challenge Mode
   challenge: string;
   challengeInfo: string;
@@ -105,8 +99,6 @@ export interface TranslationStrings {
   streakWarningButton: string;
   streakInfoTitle: string;
   streakInfoBody: string;
-  scoreInfoTitle: string;
-  scoreInfoBody: string;
   parentWeakTasks: string;
   parentWeakTasksEmpty: string;
   chartSessions: string;
@@ -150,6 +142,19 @@ export interface TranslationStrings {
   badgeRange100Desc: string;
   badgeCreativeModeDesc: string;
   badgeNewUnlocked: string;
+  // Profiles
+  profiles: string;
+  profilesMenu: string;
+  profilesSubtitle: string;
+  addProfile: string;
+  createProfile: string;
+  profileNamePlaceholder: string;
+  saveProfile: string;
+  cancel: string;
+  deleteProfile: string;
+  deleteProfileConfirm: string;
+  maxProfilesReached: string;
+  profileActive: string;
   // Onboarding
   onboardingWelcomeTitle: string;
   onboardingWelcomeBody: string;
@@ -211,7 +216,6 @@ export const translations: Record<Language, TranslationStrings> = {
     // Game UI
     task: 'Task',
     points: 'Points',
-    of: 'of',
     // Game Modes
     normalMode: 'Normal Tasks',
     firstMissing: 'First Number Missing',
@@ -223,18 +227,15 @@ export const translations: Record<Language, TranslationStrings> = {
     playAgain: 'Play Again',
     newRound: 'New Round',
     continueGame: 'Continue',
-    // Results Modal
-    great: 'Great!',
-    youSolved: 'You solved',
-    tasksCorrectly: 'tasks correctly',
-    // Motivation Message
+    // Results Modal / Motivation Message (shown after every block of 10 tasks)
     motivationTitleLowScore: 'Keep Going!',
-    motivationMessageLowScore: 'Don\'t give up! Practice makes perfect. Let\'s try again!',
+    motivationMessageLowScore: "Don't give up! Practice makes perfect. Let's try again!",
     motivationTitleMediumScore: 'Almost There!',
-    motivationMessageMediumScore: 'You\'re doing well! Just a bit more practice and you\'ll master it!',
+    motivationMessageMediumScore:
+      "You're doing well! Just a bit more practice and you'll master it!",
     motivationTitleHighScore: 'Great!',
-    motivationMessageHighScore: 'Excellent work! You have already solved 10 tasks. Let\'s try another round!',
-    motivationButton: 'Continue',
+    motivationMessageHighScore:
+      "Excellent work! You have already solved 10 tasks. Let's try another round!",
     // Challenge Mode
     challenge: 'Challenge',
     challengeInfo: 'Endless mode: answer until 3 mistakes. Difficulty increases!',
@@ -263,13 +264,11 @@ export const translations: Record<Language, TranslationStrings> = {
     parentCurrentStreak: 'Current Streak',
     parentLongestStreak: 'Longest Streak',
     parentStreakDays: 'Days',
-    streakWarningTitle: 'Don\'t break your streak!',
+    streakWarningTitle: "Don't break your streak!",
     streakWarningMessage: 'Play a quick round today to keep your {days}-day streak going!',
-    streakWarningButton: 'Let\'s go!',
+    streakWarningButton: "Let's go!",
     streakInfoTitle: 'Streak',
     streakInfoBody: 'days played in a row. Keep it up!',
-    scoreInfoTitle: 'Score',
-    scoreInfoBody: 'Your score for this round',
     parentWeakTasks: 'Weak Areas (Top 5)',
     parentWeakTasksEmpty: 'No weak areas identified yet.',
     chartSessions: 'Sessions · 14 days',
@@ -308,17 +307,19 @@ export const translations: Record<Language, TranslationStrings> = {
     badgeAllOpsDesc: 'Perfect round with all 4 operations',
     badgeChallengeLevel3Desc: 'Reached Challenge Level 3',
     badgeChallengeLevel6Desc: 'Reached Challenge Level 6',
-    badgeChallengeNoErrorsDesc: 'Completed a challenge without errors',
+    badgeChallengeNoErrorsDesc: 'Reached level 3 in a challenge with all lives intact',
     badgeRange100Desc: 'Played with numbers up to 100',
     badgeCreativeModeDesc: 'Played in Creative Mode',
     badgeNewUnlocked: 'New badge unlocked!',
     // Onboarding
     onboardingWelcomeTitle: 'Welcome to 1×1 Trainer!',
-    onboardingWelcomeBody: 'Practice multiplication, division, addition and subtraction — fun and easy!',
+    onboardingWelcomeBody:
+      'Practice multiplication, division, addition and subtraction — fun and easy!',
     onboardingDemoTitle: 'Try it out!',
     onboardingDemoTooltip: 'Enter your answer here',
     onboardingSettingsTitle: 'Everything Adjustable',
-    onboardingSettingsBody: 'Tap the menu button to change the operation, difficulty and number range.',
+    onboardingSettingsBody:
+      'Tap the menu button to change the operation, difficulty and number range.',
     onboardingReadyTitle: "You're ready!",
     onboardingReadyBody: 'Have fun practicing!',
     onboardingDemoRetry: 'Not quite — try again!',
@@ -327,6 +328,19 @@ export const translations: Record<Language, TranslationStrings> = {
     onboardingStart: 'Start',
     onboardingSkip: 'Skip',
     resetOnboarding: 'Restart tutorial',
+    // Profiles
+    profiles: 'Profiles',
+    profilesMenu: 'Profiles',
+    profilesSubtitle: 'Tap to switch active profile',
+    addProfile: 'Add Profile',
+    createProfile: 'New Profile',
+    profileNamePlaceholder: "Child's name",
+    saveProfile: 'Save',
+    cancel: 'Cancel',
+    deleteProfile: 'Delete Profile',
+    deleteProfileConfirm: 'This will permanently delete all data for this profile.',
+    maxProfilesReached: 'Maximum of 6 profiles reached',
+    profileActive: 'Active',
   },
   de: {
     // Settings Menu
@@ -371,7 +385,6 @@ export const translations: Record<Language, TranslationStrings> = {
     // Game UI
     task: 'Aufgabe',
     points: 'Punkte',
-    of: 'von',
     // Game Modes
     normalMode: 'Normale Aufgaben',
     firstMissing: 'Erste Zahl fehlt',
@@ -383,18 +396,15 @@ export const translations: Record<Language, TranslationStrings> = {
     playAgain: 'Nochmal spielen',
     newRound: 'Neue Runde',
     continueGame: 'Fortsetzen',
-    // Results Modal
-    great: 'Super!',
-    youSolved: 'Du hast',
-    tasksCorrectly: 'Aufgaben richtig gelöst',
-    // Motivation Message
+    // Results Modal / Motivation Message (erscheint nach jedem Block von 10 Aufgaben)
     motivationTitleLowScore: 'Weiter so!',
     motivationMessageLowScore: 'Schade, versuche es nochmal!',
     motivationTitleMediumScore: 'Fast geschafft!',
-    motivationMessageMediumScore: 'Du machst das schon gut! Noch ein bisschen üben und du schaffst es!',
+    motivationMessageMediumScore:
+      'Du machst das schon gut! Noch ein bisschen üben und du schaffst es!',
     motivationTitleHighScore: 'Super!',
-    motivationMessageHighScore: 'Toll gemacht! Du hast schon 10 Aufgaben gerechnet. Lass uns noch eine Runde versuchen!',
-    motivationButton: 'Weiter',
+    motivationMessageHighScore:
+      'Toll gemacht! Du hast schon 10 Aufgaben gerechnet. Lass uns noch eine Runde versuchen!',
     // Challenge Mode
     challenge: 'Herausforderung',
     challengeInfo: 'Endlosmodus: rechne bis 3 Fehler. Es wird immer schwieriger!',
@@ -425,11 +435,9 @@ export const translations: Record<Language, TranslationStrings> = {
     parentStreakDays: 'Tage',
     streakWarningTitle: 'Brich deine Serie nicht!',
     streakWarningMessage: 'Spiel heute eine Runde, um deine {days}-Tage-Serie zu halten!',
-    streakWarningButton: 'Los geht\'s!',
+    streakWarningButton: "Los geht's!",
     streakInfoTitle: 'Serie',
     streakInfoBody: 'Tage in Folge gespielt. Weiter so!',
-    scoreInfoTitle: 'Punkte',
-    scoreInfoBody: 'Dein Punktestand in dieser Runde',
     parentWeakTasks: 'Schwachstellen (Top 5)',
     parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
     chartSessions: 'Einheiten · 14 Tage',
@@ -468,17 +476,19 @@ export const translations: Record<Language, TranslationStrings> = {
     badgeAllOpsDesc: 'Perfekte Runde mit allen 4 Rechenarten',
     badgeChallengeLevel3Desc: 'Herausforderung Stufe 3 erreicht',
     badgeChallengeLevel6Desc: 'Herausforderung Stufe 6 erreicht',
-    badgeChallengeNoErrorsDesc: 'Herausforderung ohne Fehler abgeschlossen',
+    badgeChallengeNoErrorsDesc: 'Level 3 in einer Challenge mit allen Leben erreicht',
     badgeRange100Desc: 'Mit Zahlen bis 100 gespielt',
     badgeCreativeModeDesc: 'Im Kreativmodus gespielt',
     badgeNewUnlocked: 'Neues Abzeichen freigeschaltet!',
     // Onboarding
     onboardingWelcomeTitle: 'Willkommen beim 1×1 Trainer!',
-    onboardingWelcomeBody: 'Übe Multiplikation, Division, Addition und Subtraktion – Spaß und einfach!',
+    onboardingWelcomeBody:
+      'Übe Multiplikation, Division, Addition und Subtraktion – Spaß und einfach!',
     onboardingDemoTitle: 'Probiere es aus!',
     onboardingDemoTooltip: 'Gib deine Antwort hier ein',
     onboardingSettingsTitle: 'Alles einstellbar',
-    onboardingSettingsBody: 'Tippe auf den Menü-Button, um Rechenart, Schwierigkeit und Zahlenbereich zu ändern.',
+    onboardingSettingsBody:
+      'Tippe auf den Menü-Button, um Rechenart, Schwierigkeit und Zahlenbereich zu ändern.',
     onboardingReadyTitle: 'Du bist bereit!',
     onboardingReadyBody: 'Viel Spaß beim Üben!',
     onboardingDemoRetry: 'Nicht ganz – tippe nochmal!',
@@ -487,5 +497,18 @@ export const translations: Record<Language, TranslationStrings> = {
     onboardingStart: 'Loslegen',
     onboardingSkip: 'Überspringen',
     resetOnboarding: 'Tutorial zurücksetzen',
+    // Profiles
+    profiles: 'Profile',
+    profilesMenu: 'Profile',
+    profilesSubtitle: 'Tippe zum Profilwechsel',
+    addProfile: 'Profil hinzufügen',
+    createProfile: 'Neues Profil',
+    profileNamePlaceholder: 'Name des Kindes',
+    saveProfile: 'Speichern',
+    cancel: 'Abbrechen',
+    deleteProfile: 'Profil löschen',
+    deleteProfileConfirm: 'Damit werden alle Daten dieses Profils dauerhaft gelöscht.',
+    maxProfilesReached: 'Maximal 6 Profile möglich',
+    profileActive: 'Aktiv',
   },
 };

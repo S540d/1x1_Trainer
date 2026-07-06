@@ -21,9 +21,7 @@ describe('Chip', () => {
   it('keeps the active state contrast and remains clickable', () => {
     const colors = getThemeColors(true);
     const onPress = jest.fn();
-    const { getByText } = render(
-      <Chip label="System" active onPress={onPress} colors={colors} />
-    );
+    const { getByText } = render(<Chip label="System" active onPress={onPress} colors={colors} />);
 
     const label = getByText('System');
     const button = label.closest('[role="button"]') ?? label.parentElement;

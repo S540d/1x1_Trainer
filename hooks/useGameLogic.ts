@@ -4,15 +4,31 @@
  */
 
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { GameMode, Operation, AnswerMode, DifficultyMode, GameState, NumberRange, ChallengeState, SessionRecord, TaskStat } from '../types/game';
-import { TOTAL_TASKS, MAX_CHOICE_GENERATION_ATTEMPTS, MAX_RANDOM_ANSWER, CHALLENGE_MAX_LIVES, getChallengeLevel, getChallengeLevelNumber } from '../utils/constants';
+import {
+  GameMode,
+  Operation,
+  AnswerMode,
+  DifficultyMode,
+  GameState,
+  NumberRange,
+  ChallengeState,
+  SessionRecord,
+  TaskStat,
+} from '../types/game';
+import {
+  TOTAL_TASKS,
+  MAX_CHOICE_GENERATION_ATTEMPTS,
+  MAX_RANDOM_ANSWER,
+  CHALLENGE_MAX_LIVES,
+  getChallengeLevel,
+  getChallengeLevelNumber,
+} from '../utils/constants';
 
 interface UseGameLogicProps {
   initialOperation: Operation;
   initialOperations?: Operation[];
   initialTotalSolvedTasks: number;
   onTotalSolvedTasksChange: (total: number) => void;
-  onMotivationShow: (score: number) => void;
   onSessionComplete?: (record: SessionRecord) => void;
   numberRange: NumberRange;
   challengeHighScore?: number;
@@ -138,7 +154,6 @@ export function useGameLogic({
   initialOperations,
   initialTotalSolvedTasks,
   onTotalSolvedTasksChange,
-  onMotivationShow,
   onSessionComplete,
   numberRange,
   challengeHighScore = 0,
@@ -168,9 +183,10 @@ export function useGameLogic({
 
   const maxNumber = getMaxNumber();
   // Use initialOperations if provided, otherwise fallback to single initialOperation
-  const selectedOps = initialOperations && initialOperations.length > 0
-    ? initialOperations
-    : [initialOperation || Operation.MULTIPLICATION];
+  const selectedOps =
+    initialOperations && initialOperations.length > 0
+      ? initialOperations
+      : [initialOperation || Operation.MULTIPLICATION];
 
   const [gameState, setGameState] = useState<GameState>({
     num1: 1,
@@ -192,7 +208,11 @@ export function useGameLogic({
     selectedChoice: null,
   });
 
-  const fireSessionComplete = (finalScore: number, totalTasks: number, selectedOperations: Set<Operation>) => {
+  const fireSessionComplete = (
+    finalScore: number,
+    totalTasks: number,
+    selectedOperations: Set<Operation>
+  ) => {
     if (!onSessionComplete) return;
     const errors = totalTasks - finalScore;
     const effectiveRange =
@@ -210,13 +230,16 @@ export function useGameLogic({
       difficultyMode: gameState.difficultyMode,
       numberRange: effectiveRange,
     };
+    if (gameState.difficultyMode === DifficultyMode.CHALLENGE) {
+      record.challengeFlawlessLevel3 = gameState.challengeState?.flawlessLevel3 === true;
+    }
     onSessionComplete(record);
   };
 
   // Helper: Get correct answer for current question
   const getCorrectAnswer = () => {
     let result: number;
-    
+
     switch (gameState.operation) {
       case Operation.ADDITION:
         result = gameState.num1 + gameState.num2;
@@ -245,7 +268,12 @@ export function useGameLogic({
   };
 
   // Generate a new question with proper number generation for each operation
-  const generateQuestion = (mode: GameMode = gameState.gameMode, operationSet: Set<Operation> = gameState.selectedOperations, overrideMaxNumber?: number, difficultyOverride?: DifficultyMode) => {
+  const generateQuestion = (
+    mode: GameMode = gameState.gameMode,
+    operationSet: Set<Operation> = gameState.selectedOperations,
+    overrideMaxNumber?: number,
+    difficultyOverride?: DifficultyMode
+  ) => {
     const effectiveDifficulty = difficultyOverride ?? gameState.difficultyMode;
 
     let newNum1: number;
@@ -256,7 +284,7 @@ export function useGameLogic({
     let selectedOp: Operation;
     if (effectiveDifficulty === DifficultyMode.PRACTICE) {
       const maxNum = effectiveMaxNumber;
-      const weak = taskStatsRef.current.filter(s => {
+      const weak = taskStatsRef.current.filter((s) => {
         const total = s.correctCount + s.errorCount;
         if (total < 3 || s.errorCount / total <= 0.3) return false;
         if (!operationSet.has(s.operation)) return false;
@@ -350,7 +378,7 @@ export function useGameLogic({
         newNum1 = Math.floor(Math.random() * effectiveMaxNumber) + 1;
         newNum2 = Math.floor(Math.random() * effectiveMaxNumber) + 1;
     }
-    
+
     let newQuestionPart = 2;
 
     switch (mode) {
@@ -371,7 +399,10 @@ export function useGameLogic({
     // In CREATIVE and CHALLENGE modes, randomize answer mode each question
     // NUMBER_SEQUENCE only available when asking for result (questionPart === 2)
     let newAnswerMode = gameState.answerMode;
-    if (effectiveDifficulty === DifficultyMode.CREATIVE || effectiveDifficulty === DifficultyMode.CHALLENGE) {
+    if (
+      effectiveDifficulty === DifficultyMode.CREATIVE ||
+      effectiveDifficulty === DifficultyMode.CHALLENGE
+    ) {
       const availableModes =
         newQuestionPart === 2
           ? [AnswerMode.INPUT, AnswerMode.MULTIPLE_CHOICE, AnswerMode.NUMBER_SEQUENCE]
@@ -392,6 +423,30 @@ export function useGameLogic({
       selectedChoice: null,
     }));
   };
+
+  // Adopt persisted operations when they arrive (async preference load or
+  // profile switch). The useState initializer above only sees the pre-load
+  // defaults, so without this the saved selection never reaches the game.
+  const selectedOpsKey = selectedOps.join(',');
+  useEffect(() => {
+    setGameState((prev) => {
+      const same =
+        prev.selectedOperations.size === selectedOps.length &&
+        selectedOps.every((op) => prev.selectedOperations.has(op));
+      if (same || prev.difficultyMode === DifficultyMode.CHALLENGE) return prev;
+      const newSet = new Set(selectedOps);
+      setTimeout(() => generateQuestion(prev.gameMode, newSet), 0);
+      return {
+        ...prev,
+        selectedOperations: newSet,
+        operation: selectedOps[0],
+        currentTask: 1,
+        score: 0,
+        showResult: false,
+      };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOpsKey]);
 
   // Handle user input (for input mode)
   const onUserInput = (input: string) => {
@@ -452,6 +507,20 @@ export function useGameLogic({
     onTaskResult?.(gameState.num1, gameState.num2, gameState.operation, isCorrect);
 
     const newScore = isCorrect ? gameState.score + 1 : gameState.score;
+
+    // Persist a beaten high score immediately, not only at game over, so it
+    // survives closing the app or leaving challenge mode mid-run (#257).
+    // challengeState.highScore keeps the start-of-run baseline: the game-over
+    // comparison below still detects a new record and sets isNewHighScore.
+    if (
+      gameState.difficultyMode === DifficultyMode.CHALLENGE &&
+      gameState.challengeState &&
+      isCorrect &&
+      newScore > Math.max(challengeHighScore, gameState.challengeState.highScore)
+    ) {
+      onChallengeHighScoreChange?.(newScore);
+    }
+
     const challengeGameOver =
       gameState.difficultyMode === DifficultyMode.CHALLENGE &&
       gameState.challengeState !== undefined &&
@@ -497,6 +566,10 @@ export function useGameLogic({
         newState.challengeState = {
           ...prev.challengeState,
           level: newLevel,
+          // Level 3 reached without losing a life → challenge_no_errors badge (#253)
+          flawlessLevel3:
+            prev.challengeState.flawlessLevel3 ||
+            (newLevel >= 3 && prev.challengeState.errors === 0),
         };
       }
 
@@ -541,11 +614,6 @@ export function useGameLogic({
     }
 
     setGameState((prev) => {
-      // Show motivation message after every 10 tasks
-      if (newTotalSolvedTasks > 0 && newTotalSolvedTasks % 10 === 0) {
-        onMotivationShow(prev.score);
-      }
-
       if (isLastTask) {
         return {
           ...prev,
@@ -630,7 +698,7 @@ export function useGameLogic({
   const toggleOperation = (operation: Operation) => {
     setGameState((prev) => {
       const newSelectedOperations = new Set(prev.selectedOperations);
-      
+
       if (newSelectedOperations.has(operation)) {
         // Prevent deselecting the last operation
         if (newSelectedOperations.size === 1) {
@@ -648,10 +716,10 @@ export function useGameLogic({
         score: 0,
         showResult: false,
       };
-      
+
       // Generate a new question with the updated operations
       setTimeout(() => generateQuestion(prev.gameMode, newSelectedOperations), 0);
-      
+
       return newState;
     });
   };
@@ -762,7 +830,12 @@ export function useGameLogic({
 
     // Ensure we always have 3 choices
     if (choices.length < 3) {
-      const fallbacks = [correctAnswer + 1, correctAnswer + 2, correctAnswer - 1, correctAnswer - 2];
+      const fallbacks = [
+        correctAnswer + 1,
+        correctAnswer + 2,
+        correctAnswer - 1,
+        correctAnswer - 2,
+      ];
       for (const fallback of fallbacks) {
         if (fallback > 0 && fallback !== correctAnswer && !choices.includes(fallback)) {
           choices.push(fallback);
@@ -785,7 +858,13 @@ export function useGameLogic({
   // This is enforced in generateQuestion() lines 85-87. The base calculation handles
   // all questionPart values defensively, but only questionPart===2 will call this function.
   const generateNumberSequence = () => {
-    return generateNumberSequenceForState(gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, maxNumber);
+    return generateNumberSequenceForState(
+      gameState.num1,
+      gameState.num2,
+      gameState.questionPart,
+      gameState.operation,
+      maxNumber
+    );
   };
 
   // Memoize choices and sequence
@@ -795,7 +874,13 @@ export function useGameLogic({
     }
     return [];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, gameState.answerMode]);
+  }, [
+    gameState.num1,
+    gameState.num2,
+    gameState.questionPart,
+    gameState.operation,
+    gameState.answerMode,
+  ]);
 
   const numberSequence = useMemo(() => {
     if (gameState.answerMode === AnswerMode.NUMBER_SEQUENCE) {
@@ -803,7 +888,13 @@ export function useGameLogic({
     }
     return [];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameState.num1, gameState.num2, gameState.questionPart, gameState.operation, gameState.answerMode]);
+  }, [
+    gameState.num1,
+    gameState.num2,
+    gameState.questionPart,
+    gameState.operation,
+    gameState.answerMode,
+  ]);
 
   // Get operator symbol
   const operatorSymbol = () => {

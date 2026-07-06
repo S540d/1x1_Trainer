@@ -39,10 +39,10 @@ export function getStreakDays(records: SessionRecord[]): number {
 
 export function countPerfectSessions(records: SessionRecord[]): number {
   return records.filter(
-    r =>
+    (r) =>
       r.difficultyMode !== DifficultyMode.CHALLENGE &&
       r.totalTasks >= 10 &&
-      r.correctTasks === r.totalTasks,
+      r.correctTasks === r.totalTasks
   ).length;
 }
 
@@ -53,14 +53,14 @@ export function hasAllOperationsPerfect(records: SessionRecord[]): boolean {
     Operation.MULTIPLICATION,
     Operation.DIVISION,
   ];
-  return ops.every(op =>
+  return ops.every((op) =>
     records.some(
-      r =>
+      (r) =>
         r.difficultyMode !== DifficultyMode.CHALLENGE &&
         r.totalTasks >= 10 &&
         r.correctTasks === r.totalTasks &&
-        r.operations.includes(op),
-    ),
+        r.operations.includes(op)
+    )
   );
 }
 
@@ -71,7 +71,7 @@ export function computeNewlyUnlocked(
   allRecords: SessionRecord[],
   challengeHighScore: number,
   existing: BadgeStore,
-  streakDays?: number,
+  streakDays?: number
 ): string[] {
   const result: string[] = [];
   const unlock = (id: string) => {
@@ -79,8 +79,8 @@ export function computeNewlyUnlocked(
   };
 
   const streak = streakDays ?? getStreakDays(allRecords);
-  if (streak >= 3)  unlock('streak_3');
-  if (streak >= 7)  unlock('streak_7');
+  if (streak >= 3) unlock('streak_3');
+  if (streak >= 7) unlock('streak_7');
   if (streak >= 30) unlock('streak_30');
 
   const perfects = countPerfectSessions(allRecords);
@@ -91,7 +91,10 @@ export function computeNewlyUnlocked(
   const levelNum = getChallengeLevelNumber(challengeHighScore);
   if (levelNum >= 3) unlock('challenge_level_3');
   if (levelNum >= 6) unlock('challenge_level_6');
-  if (record.difficultyMode === DifficultyMode.CHALLENGE && record.errors === 0) {
+  // Challenge runs only end at game over (3 errors), so record.errors === 0 can
+  // never happen. The badge unlocks for reaching level 3 with all lives intact,
+  // carried in the record via challengeFlawlessLevel3 (#253).
+  if (record.difficultyMode === DifficultyMode.CHALLENGE && record.challengeFlawlessLevel3) {
     unlock('challenge_no_errors');
   }
 
@@ -125,44 +128,53 @@ export function advanceStreak(current: StreakData): StreakData {
 
 // --- hook ---
 
-export function useBadges() {
+export function useBadges(profileId?: string) {
   const [badges, setBadges] = useState<BadgeStore>({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [newlyUnlocked, setNewlyUnlocked] = useState<string[]>([]);
 
   useEffect(() => {
-    getBadges().then(b => {
-      setBadges(b);
-      setIsLoaded(true);
+    let cancelled = false;
+    getBadges(profileId).then((b) => {
+      if (!cancelled) {
+        setBadges(b);
+        setIsLoaded(true);
+      }
     });
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [profileId]);
 
-  const checkAndUnlock = useCallback(async (record: SessionRecord) => {
-    const [existing, allRecords, challengeHighScore, streakData] = await Promise.all([
-      getBadges(),
-      getSessionRecords(),
-      getChallengeHighScore(),
-      getStreakData(),
-    ]);
+  const checkAndUnlock = useCallback(
+    async (record: SessionRecord) => {
+      const [existing, allRecords, challengeHighScore, streakData] = await Promise.all([
+        getBadges(profileId),
+        getSessionRecords(profileId),
+        getChallengeHighScore(profileId),
+        getStreakData(profileId),
+      ]);
 
-    const newIds = computeNewlyUnlocked(
-      record,
-      allRecords,
-      challengeHighScore,
-      existing,
-      streakData.currentStreak,
-    );
-    if (newIds.length === 0) return;
+      const newIds = computeNewlyUnlocked(
+        record,
+        allRecords,
+        challengeHighScore,
+        existing,
+        streakData.currentStreak
+      );
+      if (newIds.length === 0) return;
 
-    const now = Date.now();
-    const updated: BadgeStore = { ...existing };
-    for (const id of newIds) {
-      updated[id] = now;
-    }
-    await saveBadges(updated);
-    setBadges(updated);
-    setNewlyUnlocked(newIds);
-  }, []);
+      const now = Date.now();
+      const updated: BadgeStore = { ...existing };
+      for (const id of newIds) {
+        updated[id] = now;
+      }
+      await saveBadges(updated, profileId);
+      setBadges(updated);
+      setNewlyUnlocked(newIds);
+    },
+    [profileId]
+  );
 
   const clearNewlyUnlocked = useCallback(() => {
     setNewlyUnlocked([]);

@@ -14,11 +14,11 @@ feature/issue-XXX → testing → main
 
 `staging` wurde entfernt (2026-06-03, Issue #7).
 
-| Branch           | Zweck                                        |
-|------------------|----------------------------------------------|
-| `main`           | Produktion (protected)                       |
-| `testing`        | Integration neuer Features/Fixes             |
-| `feature/issue-XXX` | Kurzlebige Feature-Branches              |
+| Branch              | Zweck                            |
+| ------------------- | -------------------------------- |
+| `main`              | Produktion (protected)           |
+| `testing`           | Integration neuer Features/Fixes |
+| `feature/issue-XXX` | Kurzlebige Feature-Branches      |
 
 - PRs immer gegen `testing` öffnen, nicht `main`
 - `gh pr merge <nr> --squash --delete-branch` für Feature→testing PRs
@@ -41,6 +41,7 @@ git checkout main
 ## Versionsbump-Checkliste
 
 Beim Erhöhen der Version IMMER alle drei Stellen aktualisieren:
+
 1. `package.json` → `version`
 2. `app.json` → `expo.version` + `android.versionCode` (+1)
 3. `utils/constants.ts` → `APP_VERSION`
@@ -54,7 +55,8 @@ Beim Erhöhen der Version IMMER alle drei Stellen aktualisieren:
 
 ## Build-Workflow (Übersicht)
 
-- **APK (Test):** Lokaler Build wieder lauffähig seit expo-audio-Migration (Issue #214, PR #215). **Wichtig: JDK 17 verwenden** (`export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home`) — Default-Java ist 21/25 und bricht den Gradle-Build. Alternativ per GitHub Actions: `gh workflow run build-android.yml --ref staging -f profile=preview -f bump=none`
+- **APK (Test):** Lokaler Build wieder lauffähig seit expo-audio-Migration (Issue #214, PR #215). **Wichtig: JDK 17 verwenden** (`export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home`) — Default-Java ist 21/25 und bricht den Gradle-Build. Alternativ per GitHub Actions: `gh workflow run build-android.yml --ref testing -f profile=preview -f bump=none`
+- **Lokaler AAB mit Store-Paketname:** `APP_PACKAGE=com.sven4321.trainer1x1 npx expo prebuild --platform android --clean && cd android && ./gradlew bundleRelease` — `app.config.js` injiziert den Paketnamen automatisch (Issue #233, PR #244 ✅)
 - **AAB (Play Store):** GitHub Actions → `Build Android` → profile: `production`
 - Workflow: `.github/workflows/build-android.yml`
 
@@ -81,47 +83,54 @@ npm run test:coverage # Coverage
 
 ---
 
-## Aktueller Stand (2026-05-31)
+## Aktueller Stand (2026-06-20)
 
-- Version: **1.3.7** / versionCode 27
-- Tests: 497 total (494 passed, 3 skipped), 15/15 Suites grün
-- Branches: `staging` vorn (`c640120`); `main` noch auf `cac8a3c` (v1.3.6)
-- Offene PRs: #212 (staging → main, wartet auf App-Test auf Gerät)
-- Offene Issues: #214 (expo-av→expo-audio), #156, #187, #131, #100, #96
-- APK v1.3.7 auf Testgerät installiert (via GitHub Actions preview-Build)
+- Version: **1.3.8** / versionCode 28
+- Branches: `testing` vorn (inkl. #242, #243, #246, #247); `main` auf `91cf92d` (sync v1.3.8)
+- Offene PRs: #245 (CLAUDE.md docs), gegen `testing`
+- Offene Issues: #156, #231, #96
+- APK v1.3.8 via CI
 
 ### Zuletzt gemergt / gepusht
 
-| PR / Commit | Was |
-|-------------|-----|
-| `c640120` | fix: expo-av auf ~16.0.8 (SDK-55-kompatibel; 15.0.2 brach lokalen Build) |
-| `3a1d43c` | chore: Version auf 1.3.7 / versionCode 27 |
-| #212 (offen) | staging → main: wartet auf App-Test |
-| #211 | testing → staging: Sound-Effekte, Visuelle Themes, Charts, UX, Jest 30 |
+| PR / Commit  | Was                                                                         |
+| ------------ | --------------------------------------------------------------------------- |
+| #247 ✅      | feat: Mehrere Kinderprofile (Issue #187 ✅ geschlossen)                     |
+| #246 ✅      | chore: Prettier + pre-push Hook (Issue #220 ✅ geschlossen)                 |
+| #245 (offen) | docs: CLAUDE.md 2026-06-18                                                  |
+| #244 ✅      | build: app.config.js für APP_PACKAGE env-var (Issue #233 ✅ geschlossen)    |
+| #243 ✅      | feat: Orientation "default" für Tablet/Foldable (Issue #235 ✅ geschlossen) |
+| #242 ✅      | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241 ✅ geschlossen)     |
+| #240 ✅      | ci: Cache-Cleanup-Workflow                                                  |
+| #239 ✅      | chore: Review-Modell v2                                                     |
+| #234 ✅      | sync: testing → main (v1.3.8 + googleServicesFile fix)                      |
 
 ---
 
 ## Wichtige Dateien
 
-| Datei | Inhalt |
-|-------|--------|
-| `utils/constants.ts` | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS, `THEMES` (alle 5 Farbthemes mit LIGHT/DARK-Varianten) |
-| `utils/theme.ts` | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'` |
-| `utils/storage.ts` | Storage-Helfer, `saveSessionRecord` / `getSessionRecords`, `recordTaskResult` / `getTaskStats` / `getWeakTasks`, `updateStreakAfterSession` / `getStreakData` / `saveStreakData`, `saveThemeName` / `getThemeName`, `saveSoundsEnabled` / `getSoundsEnabled`, `saveSoundsVolume` / `getSoundsVolume`, `FOUR_WEEKS_MS` |
-| `utils/animations.ts` | `prefersReducedMotion()` — liest Accessibility-Einstellung |
-| `types/game.ts` | ThemeColors (inkl. `gradientPrimary`), GameState, Enums, SessionRecord, `ThemeName` |
-| `i18n/translations.ts` | DE/EN Übersetzungen, `TranslationStrings`-Interface |
-| `hooks/useGameLogic.ts` | Gesamte Spiellogik, `onSessionComplete`-Callback |
-| `hooks/usePreferences.ts` | Persistierte User-Einstellungen (Sprache, ThemeMode, ThemeName, soundEnabled, soundVolume) |
-| `hooks/useSounds.ts` | Sound-Hook: `playSound(event)` — Web: AudioContext-Oszillatoren, Native: expo-audio (`createAudioPlayer`) + WAV-Assets |
-| `assets/sounds/` | WAV-Assets: correct / incorrect / perfect / level_up / badge_unlock (je 8–17 KB) |
-| `scripts/generate-sounds.js` | Generator für WAV-Assets (`node scripts/generate-sounds.js`) |
-| `components/PersonalizeModal.tsx` | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache, Sound An/Aus + Lautstärke) |
-| `components/ParentDashboard.tsx` | Eltern-Dashboard Modal (Beta) |
-| `components/GameCard.tsx` | Hauptspielansicht (alle 3 Antwortmodi) |
-| `styles/modalStyles.ts` | Gemeinsame Modal-Styles |
-| `jest.config.js` | Jest-Konfiguration |
-| `docs/private/CLAUDE.md` | Sensible Build/Keystore-Details (gitignored) |
+| Datei                               | Inhalt                                                                                                                                                                                                                                                                                                |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `utils/constants.ts`                | THEME_COLORS, DESIGN_TOKENS, STORAGE_KEYS, CHALLENGE_LEVELS, `THEMES` (alle 5 Farbthemes mit LIGHT/DARK-Varianten)                                                                                                                                                                                    |
+| `utils/theme.ts`                    | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'`                                                                                                                                                                                                                     |
+| `utils/storage.ts`                  | Storage-Helfer + Profile-Management (`migrateToProfiles`, `createProfile`, `deleteProfileData`, `getProfiles`/`saveProfiles`, `setActiveProfileId`). Alle per-Profil-Funktionen haben optionalen `profileId?`-Parameter (Suffix-Pattern `{key}-{profileId}`). `profileKey()` / `resolveKey()` intern. |
+| `utils/animations.ts`               | `prefersReducedMotion()` — liest Accessibility-Einstellung                                                                                                                                                                                                                                            |
+| `types/game.ts`                     | ThemeColors (inkl. `gradientPrimary`), GameState, Enums, SessionRecord, `ThemeName`, `ChildProfile`                                                                                                                                                                                                   |
+| `i18n/translations.ts`              | DE/EN Übersetzungen, `TranslationStrings`-Interface (inkl. 12 Profil-Strings)                                                                                                                                                                                                                         |
+| `hooks/useGameLogic.ts`             | Gesamte Spiellogik, `onSessionComplete`-Callback                                                                                                                                                                                                                                                      |
+| `hooks/usePreferences.ts`           | `usePreferences(profileId?)` — globale Prefs (Sprache, Theme, Sounds) + per-Profil-Prefs (Operations, NumberRange, TotalTasks, HighScore); lädt per-Profil-Daten neu bei Profilwechsel                                                                                                                |
+| `hooks/useBadges.ts`                | `useBadges(profileId?)` — Badge-Lesen/Schreiben auf aktives Profil beschränkt                                                                                                                                                                                                                         |
+| `hooks/useSounds.ts`                | Sound-Hook: `playSound(event)` — Web: AudioContext-Oszillatoren, Native: expo-audio (`createAudioPlayer`) + WAV-Assets                                                                                                                                                                                |
+| `assets/sounds/`                    | WAV-Assets: correct / incorrect / perfect / level_up / badge_unlock (je 8–17 KB)                                                                                                                                                                                                                      |
+| `scripts/generate-sounds.js`        | Generator für WAV-Assets (`node scripts/generate-sounds.js`)                                                                                                                                                                                                                                          |
+| `components/PersonalizeModal.tsx`   | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache, Sound An/Aus + Lautstärke)                                                                                                                                                                                                              |
+| `components/ParentDashboard.tsx`    | Eltern-Dashboard Modal (Beta)                                                                                                                                                                                                                                                                         |
+| `components/ProfilePickerModal.tsx` | Bottom-Sheet-Modal für Profilauswahl/-erstellung/-löschung (max. 6 Profile, Farbauswahl, Bestätigungs-Alert bei Löschen)                                                                                                                                                                              |
+| `components/GameCard.tsx`           | Hauptspielansicht (alle 3 Antwortmodi)                                                                                                                                                                                                                                                                |
+| `styles/modalStyles.ts`             | Gemeinsame Modal-Styles                                                                                                                                                                                                                                                                               |
+| `app.config.js`                     | Dynamische Expo-Konfiguration: überschreibt `android.package` via `APP_PACKAGE` env-var (Issue #233)                                                                                                                                                                                                  |
+| `jest.config.js`                    | Jest-Konfiguration                                                                                                                                                                                                                                                                                    |
+| `docs/private/CLAUDE.md`            | Sensible Build/Keystore-Details (gitignored)                                                                                                                                                                                                                                                          |
 
 ---
 
@@ -193,6 +202,10 @@ npm run test:coverage # Coverage
 ## Offene TODOs / Bekannte Einschränkungen
 
 - ✅ **expo-av → expo-audio Migration erledigt** (Issue #214 / PR #215) — lokaler Build wieder lauffähig (mit JDK 17)
+- ✅ **Paketname-Diskrepanz gelöst** (Issue #233 / PR #244) — `app.config.js` mit `APP_PACKAGE` env-var
+- ✅ **Orientation auf `"default"` gesetzt** (Issue #235 / PR #243) — Tablet/Foldable Landscape-Support
+- ✅ **Prettier + pre-push Hook** (Issue #220 / PR #246) — einheitliches Code-Formatting
+- ✅ **Mehrere Kinderprofile** (Issue #187 / PR #247) — bis zu 6 Profile, je eigene Spieldaten
 - Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 - Reanimated wurde durch `Animated` core ersetzt (Web-Kompatibilität) — Issue #131
 
@@ -201,11 +214,27 @@ npm run test:coverage # Coverage
 - `SoundEvent = 'correct' | 'incorrect' | 'perfect' | 'level_up' | 'badge_unlock'`
 - Storage Keys: `app-sounds-enabled` / `app-sounds-volume` (Default: true / 75)
 - Web: `AudioContext`-Oszillatoren (`playWebTone`), keine Dateien nötig
-- Native: `expo-audio` (`createAudioPlayer` → `player.seekTo(0)` + `player.play()`, `player.volume`, `player.remove()`) + WAV-Assets aus `assets/sounds/`; `setAudioModeAsync({ playsInSilentMode: false })`
+- Native: `expo-audio` (`createAudioPlayer` → `player.seekTo(0)` + `player.play()`, `player.volume`, `player.remove()`) + WAV-Assets aus `assets/sounds/`; `setAudioModeAsync({ playsInSilentMode: false })`; bei `soundEnabled → false` werden alle Player sofort pausiert (PR #242)
 - **`enableBackgroundPlayback: false`** in `app.json` bewusst gesetzt — verhindert `FOREGROUND_SERVICE_MEDIA_PLAYBACK` Permission im Play Store (die App nutzt nur kurze UI-Sounds, kein Hintergrund-Audio)
 - Linting: `window.*` in `useSounds.ts` muss `// platform-safe` Kommentar tragen (CI-Check)
 - WAV-Assets bei Bedarf neu generieren: `node scripts/generate-sounds.js`
 - Hintergrundmusik: bewusst nicht implementiert (erfordert Lizenz-freie Loop-Audiodatei), separates Follow-up
+
+## Mehrere Kinderprofile — Hinweise
+
+- `ChildProfile` (`types/game.ts`): `id`, `name`, `avatarColor`, `createdAt`
+- Storage Keys: `app-profiles` (Liste), `app-active-profile-id` (aktives Profil)
+- `AVATAR_COLORS` (6 Farben) + `MAX_PROFILES = 6` in `utils/constants.ts`
+- **Suffix-Pattern:** alle per-Profil-Daten unter `{storageKey}-{profileId}` (z. B. `app-streak-abc123`); globale Keys (Sprache, Theme, Sounds) bleiben unverändert
+- `resolveKey(baseKey, profileId?)` intern: mit profileId → Suffix, ohne → globaler Key (Rückwärtskompatibilität)
+- **Migration** `migrateToProfiles()`: kopiert 8 globale Keys auf profil-spezifische Keys beim ersten Start; idempotent (kehrt sofort zurück wenn Profile bereits existieren)
+- **Stale-Closure-Vermeidung:** `activeProfileIdRef.current = activeProfile?.id` wird jeden Render synchron aktualisiert (nicht in useEffect); Callbacks lesen `ref.current` statt captured value
+- **usePreferences(profileId?):** zwei Load-Effects — globale Prefs `[]` einmalig; per-Profil-Prefs `[profileId]` mit Cancellation-Token; Auto-Save nutzt `profileIdRef.current`
+- **useBadges(profileId?):** Badge-Load/-Write per Profil; `useCallback([profileId])` stellt sicher dass Checks auf richtiges Profil schreiben
+- **ProfilePickerModal:** Bottom-Sheet (animationType="slide"); Profilwechsel setzt `activeProfile` + `setActiveProfileId()`; Löschen mit `Alert.alert`-Bestätigung
+- **SettingsMenu:** "Profile"-Button öffnet `ProfilePickerModal` via `onOpenProfiles`-Prop
+- `usePreferences` setzt `isLoaded = false` bei Profilwechsel → verhindert Auto-Save-Race zwischen altem und neuem Profil
+- Aufgabenstatistiken, Streak, Badges, HighScore, Operations, NumberRange, SessionRecords — alle per Profil getrennt
 
 ## Firebase Crashlytics
 

@@ -1,12 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Modal,
-  Animated,
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Modal, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors } from '../types/game';
 import { modalStyles } from '../styles/modalStyles';
@@ -54,7 +47,7 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
 
   const handleNext = () => {
     if (step < TOTAL_STEPS - 1) {
-      setStep(s => s + 1);
+      setStep((s) => s + 1);
     } else {
       handleClose();
     }
@@ -83,8 +76,9 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={modalStyles.overlay}>
-        <View style={[modalStyles.content, styles.container, { backgroundColor: colors.settingsMenu }]}>
-
+        <View
+          style={[modalStyles.content, styles.container, { backgroundColor: colors.settingsMenu }]}
+        >
           {/* Progress dots */}
           <View style={styles.dotsRow}>
             {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
@@ -104,15 +98,27 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
             <View style={styles.stepContent}>
               <Text style={styles.emoji}>🎉</Text>
               <Text style={[styles.title, { color: colors.text }]}>{t.onboardingWelcomeTitle}</Text>
-              <Text style={[styles.body, { color: colors.textSecondary }]}>{t.onboardingWelcomeBody}</Text>
+              <Text style={[styles.body, { color: colors.textSecondary }]}>
+                {t.onboardingWelcomeBody}
+              </Text>
             </View>
           )}
 
           {step === 1 && (
             <View style={styles.stepContent}>
               <Text style={[styles.title, { color: colors.text }]}>{t.onboardingDemoTitle}</Text>
-              <Animated.View style={[styles.demoCard, { backgroundColor: colors.card, transform: [{ translateX: shakeAnim }] }]}>
-                <Text style={[styles.demoEquation, { color: colors.text, fontFamily: DESIGN_TOKENS.FONT_NUMBER }]}>
+              <Animated.View
+                style={[
+                  styles.demoCard,
+                  { backgroundColor: colors.card, transform: [{ translateX: shakeAnim }] },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.demoEquation,
+                    { color: colors.text, fontFamily: DESIGN_TOKENS.FONT_NUMBER },
+                  ]}
+                >
                   2 × 3 = ?
                 </Text>
               </Animated.View>
@@ -120,7 +126,7 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
                 ↑ {t.onboardingDemoTooltip}
               </Text>
               <View style={styles.choicesRow}>
-                {DEMO_CHOICES.map(choice => {
+                {DEMO_CHOICES.map((choice) => {
                   const isSelected = demoAnswer === choice;
                   const isCorrectChoice = choice === DEMO_CORRECT;
                   let bg = colors.buttonInactive;
@@ -142,16 +148,19 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
                       onPress={() => handleDemoChoice(choice)}
                       disabled={demoAnswer !== null}
                     >
-                      <Text style={[styles.choiceText, { color: textColor, fontFamily: DESIGN_TOKENS.FONT_NUMBER }]}>
+                      <Text
+                        style={[
+                          styles.choiceText,
+                          { color: textColor, fontFamily: DESIGN_TOKENS.FONT_NUMBER },
+                        ]}
+                      >
                         {choice}
                       </Text>
                     </TouchableOpacity>
                   );
                 })}
               </View>
-              {demoCorrect && (
-                <Text style={styles.feedbackCorrect}>✓</Text>
-              )}
+              {demoCorrect && <Text style={styles.feedbackCorrect}>✓</Text>}
               {demoWrong && (
                 <Text style={[styles.body, { color: colors.textSecondary }]}>
                   {t.onboardingDemoRetry}
@@ -163,8 +172,12 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
           {step === 2 && (
             <View style={styles.stepContent}>
               <Text style={styles.emoji}>⚙️</Text>
-              <Text style={[styles.title, { color: colors.text }]}>{t.onboardingSettingsTitle}</Text>
-              <Text style={[styles.body, { color: colors.textSecondary }]}>{t.onboardingSettingsBody}</Text>
+              <Text style={[styles.title, { color: colors.text }]}>
+                {t.onboardingSettingsTitle}
+              </Text>
+              <Text style={[styles.body, { color: colors.textSecondary }]}>
+                {t.onboardingSettingsBody}
+              </Text>
               <LinearGradient
                 colors={colors.gradientPrimary}
                 start={{ x: 0, y: 0 }}
@@ -173,7 +186,9 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
               >
                 <Text style={styles.menuHintText}>☰</Text>
               </LinearGradient>
-              <Text style={[styles.tooltip, { color: colors.textSecondary }]}>{t.onboardingSettingsLabel}</Text>
+              <Text style={[styles.tooltip, { color: colors.textSecondary }]}>
+                {t.onboardingSettingsLabel}
+              </Text>
             </View>
           )}
 
@@ -181,14 +196,18 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
             <View style={styles.stepContent}>
               <Text style={styles.emoji}>🚀</Text>
               <Text style={[styles.title, { color: colors.text }]}>{t.onboardingReadyTitle}</Text>
-              <Text style={[styles.body, { color: colors.textSecondary }]}>{t.onboardingReadyBody}</Text>
+              <Text style={[styles.body, { color: colors.textSecondary }]}>
+                {t.onboardingReadyBody}
+              </Text>
             </View>
           )}
 
           {/* Buttons */}
           <View style={styles.buttonsRow}>
             <TouchableOpacity style={styles.skipButton} onPress={handleClose}>
-              <Text style={[styles.skipText, { color: colors.textSecondary }]}>{t.onboardingSkip}</Text>
+              <Text style={[styles.skipText, { color: colors.textSecondary }]}>
+                {t.onboardingSkip}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.nextButton, !canProceedStep1 && styles.nextButtonDisabled]}
@@ -207,7 +226,6 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
               </LinearGradient>
             </TouchableOpacity>
           </View>
-
         </View>
       </View>
     </Modal>

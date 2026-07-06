@@ -17,10 +17,7 @@ import {
   Nunito_800ExtraBold,
   Nunito_900Black,
 } from '@expo-google-fonts/nunito';
-import {
-  Baloo2_700Bold,
-  Baloo2_800ExtraBold,
-} from '@expo-google-fonts/baloo-2';
+import { Baloo2_700Bold, Baloo2_800ExtraBold } from '@expo-google-fonts/baloo-2';
 
 // Local imports
 import { translations } from './i18n/translations';
@@ -34,18 +31,45 @@ import { Header } from './components/Header';
 import { SettingsMenu } from './components/SettingsMenu';
 import { GameCard } from './components/GameCard';
 import { ResultModal } from './components/ResultModal';
-import { MotivationModal } from './components/MotivationModal';
 import { AboutModal } from './components/AboutModal';
 import { ParentDashboard } from './components/ParentDashboard';
 import { OnboardingModal } from './components/OnboardingModal';
 import { BadgesModal } from './components/BadgesModal';
 import { BadgeUnlockToast } from './components/BadgeUnlockToast';
 import { FloatingStars } from './components/FloatingStars';
-import { saveSessionRecord, getStreakData, updateStreakAfterSession, getLocalDateString, recordTaskResult, getTaskStats, getWeakTasks, getOnboardingDone, setOnboardingDone, resetOnboarding, getStorageItem } from './utils/storage';
+import { ProfilePickerModal } from './components/ProfilePickerModal';
+import {
+  saveSessionRecord,
+  getStreakData,
+  updateStreakAfterSession,
+  getYesterdayDateString,
+  recordTaskResult,
+  getTaskStats,
+  getWeakTasks,
+  getOnboardingDone,
+  setOnboardingDone,
+  resetOnboarding,
+  getStorageItem,
+  migrateToProfiles,
+  getProfiles,
+  setActiveProfileId,
+} from './utils/storage';
 import { useSounds } from './hooks/useSounds';
-import { SessionRecord, StreakData, TaskStat, Operation } from './types/game';
+import { useKeyboardInput } from './hooks/useKeyboardInput';
+import {
+  AnswerMode,
+  ChildProfile,
+  SessionRecord,
+  StreakData,
+  TaskStat,
+  Operation,
+} from './types/game';
 import { useBadges } from './hooks/useBadges';
-import { ANIMATION_DURATIONS, initReducedMotionListener, prefersReducedMotion } from './utils/animations';
+import {
+  ANIMATION_DURATIONS,
+  initReducedMotionListener,
+  prefersReducedMotion,
+} from './utils/animations';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -62,12 +86,23 @@ export default function App() {
   const [personalizeVisible, setPersonalizeVisible] = useState(false);
   const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
   const [badgesVisible, setBadgesVisible] = useState(false);
-  const [showMotivation, setShowMotivation] = useState(false);
-  const [motivationScore, setMotivationScore] = useState(0);
-  const [streakData, setStreakData] = useState<StreakData>({ currentStreak: 0, lastPlayedDate: '', longestStreak: 0 });
+  const [profilePickerVisible, setProfilePickerVisible] = useState(false);
+  const [streakData, setStreakData] = useState<StreakData>({
+    currentStreak: 0,
+    lastPlayedDate: '',
+    longestStreak: 0,
+  });
   const [streakWarningVisible, setStreakWarningVisible] = useState(false);
   const [onboardingVisible, setOnboardingVisible] = useState(false);
   const [taskStats, setTaskStats] = useState<TaskStat[]>([]);
+
+  // Profile state
+  const [activeProfile, setActiveProfile] = useState<ChildProfile | null>(null);
+  const [profiles, setProfiles] = useState<ChildProfile[]>([]);
+  // Ref so callbacks always see the current profileId without stale closures
+  const activeProfileIdRef = useRef<string | undefined>(undefined);
+  activeProfileIdRef.current = activeProfile?.id;
+
   const weakTaskCount = useMemo(() => getWeakTasks(taskStats, 3, 0.3).length, [taskStats]);
 
   // Reduced motion preference — centralized in utils/animations.ts
@@ -75,9 +110,19 @@ export default function App() {
     return initReducedMotionListener();
   }, []);
 
+  // Migrate global storage → profile-keyed storage on first launch; idempotent after that
   useEffect(() => {
-    getTaskStats().then(setTaskStats);
+    migrateToProfiles().then(async (defaultProfile) => {
+      const allProfiles = await getProfiles();
+      setProfiles(allProfiles);
+      setActiveProfile(defaultProfile);
+    });
   }, []);
+
+  useEffect(() => {
+    if (!activeProfile) return;
+    getTaskStats(activeProfile.id).then(setTaskStats);
+  }, [activeProfile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Animation values
   const cardScale = useRef(new Animated.Value(1)).current;
@@ -86,26 +131,23 @@ export default function App() {
   const menuOpacity = useRef(new Animated.Value(0)).current;
 
   // Use custom hooks
-  const preferences = usePreferences();
+  const preferences = usePreferences(activeProfile?.id);
   const theme = useTheme(preferences.themeMode, preferences.themeName);
   const sounds = useSounds(preferences.soundEnabled, preferences.soundVolume);
-  const badgeSystem = useBadges();
+  const badgeSystem = useBadges(activeProfile?.id);
   const game = useGameLogic({
     initialOperation: preferences.operation,
     initialOperations: preferences.operations,
     initialTotalSolvedTasks: preferences.totalSolvedTasks,
     onTotalSolvedTasksChange: preferences.setTotalSolvedTasks,
-    onMotivationShow: (score: number) => {
-      setMotivationScore(score);
-      setShowMotivation(true);
-    },
     onSessionComplete: (record: SessionRecord) => {
       if (record.correctTasks === record.totalTasks) {
         sounds.playSound('perfect');
       }
-      saveSessionRecord(record)
+      const pid = activeProfileIdRef.current;
+      saveSessionRecord(record, pid)
         .then(async () => {
-          const updatedStreak = await updateStreakAfterSession();
+          const updatedStreak = await updateStreakAfterSession(pid);
           setStreakData(updatedStreak);
           await badgeSystem.checkAndUnlock(record);
         })
@@ -113,8 +155,10 @@ export default function App() {
     },
     taskStats,
     onTaskResult: (num1: number, num2: number, operation: Operation, isCorrect: boolean) => {
-      setTaskStats(prev => {
-        const idx = prev.findIndex(s => s.num1 === num1 && s.num2 === num2 && s.operation === operation);
+      setTaskStats((prev) => {
+        const idx = prev.findIndex(
+          (s) => s.num1 === num1 && s.num2 === num2 && s.operation === operation
+        );
         if (idx >= 0) {
           const updated = { ...prev[idx] };
           if (isCorrect) updated.correctCount++;
@@ -124,18 +168,60 @@ export default function App() {
           next[idx] = updated;
           return next;
         }
-        return [...prev, {
-          num1, num2, operation,
-          correctCount: isCorrect ? 1 : 0,
-          errorCount: isCorrect ? 0 : 1,
-          lastSeen: new Date().toISOString(),
-        }];
+        return [
+          ...prev,
+          {
+            num1,
+            num2,
+            operation,
+            correctCount: isCorrect ? 1 : 0,
+            errorCount: isCorrect ? 0 : 1,
+            lastSeen: new Date().toISOString(),
+          },
+        ];
       });
-      recordTaskResult(num1, num2, operation, isCorrect);
+      recordTaskResult(num1, num2, operation, isCorrect, activeProfileIdRef.current);
     },
     numberRange: preferences.numberRange,
     challengeHighScore: preferences.challengeHighScore,
     onChallengeHighScoreChange: preferences.setChallengeHighScore,
+  });
+
+  // Physical keyboard on web (#258) — inactive while any overlay is open
+  const overlayOpen =
+    menuRendered ||
+    aboutVisible ||
+    personalizeVisible ||
+    parentDashboardVisible ||
+    badgesVisible ||
+    profilePickerVisible ||
+    streakWarningVisible ||
+    onboardingVisible ||
+    game.gameState.showResult;
+  useKeyboardInput({
+    enabled: !overlayOpen,
+    onDigit: (digit) => {
+      if (game.gameState.answerMode === AnswerMode.INPUT) {
+        game.handleNumberClick(digit);
+      }
+    },
+    onBackspace: () => {
+      if (game.gameState.answerMode === AnswerMode.INPUT) {
+        game.handleNumberClick(-1);
+      }
+    },
+    onClear: () => {
+      if (game.gameState.answerMode === AnswerMode.INPUT) {
+        game.handleNumberClick(-2);
+      }
+    },
+    onSubmit: () => {
+      if (game.gameState.isAnswerChecked) {
+        game.nextQuestion();
+      } else {
+        game.checkAnswer();
+      }
+    },
   });
 
   const t = translations[preferences.language];
@@ -144,10 +230,7 @@ export default function App() {
 
   // Animated styles
   const cardAnimatedStyle = {
-    transform: [
-      { scale: cardScale },
-      { translateX: cardShakeX },
-    ],
+    transform: [{ scale: cardScale }, { translateX: cardShakeX }],
   };
 
   const menuAnimatedStyle = {
@@ -220,7 +303,11 @@ export default function App() {
   const prevChallengeLevel = useRef<number | undefined>(undefined);
   useEffect(() => {
     const level = game.gameState.challengeState?.level;
-    if (level !== undefined && prevChallengeLevel.current !== undefined && level > prevChallengeLevel.current) {
+    if (
+      level !== undefined &&
+      prevChallengeLevel.current !== undefined &&
+      level > prevChallengeLevel.current
+    ) {
       sounds.playSound('level_up');
     }
     prevChallengeLevel.current = level;
@@ -228,17 +315,21 @@ export default function App() {
 
   // Load streak data and show warning when appropriate
   useEffect(() => {
-    getStreakData().then((data) => {
+    if (!activeProfile) return;
+    getStreakData(activeProfile.id).then((data) => {
       setStreakData(data);
       const now = new Date();
       const isEvening = now.getHours() >= 20;
-      const hasStreakToProtect = data.currentStreak > 0;
-      const hasNotPlayedToday = data.lastPlayedDate !== getLocalDateString();
-      if (isEvening && hasStreakToProtect && hasNotPlayedToday) {
+      // Warn only while the streak is actually still savable: last play was
+      // exactly yesterday. For older dates the streak is already broken and
+      // the warning would promise something the user can no longer save (#255).
+      const streakStillSavable =
+        data.currentStreak > 0 && data.lastPlayedDate === getYesterdayDateString();
+      if (isEvening && streakStillSavable) {
         setStreakWarningVisible(true);
       }
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeProfile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sound + card feedback on answer check
   useEffect(() => {
@@ -310,10 +401,17 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preferences.isLoaded]);
 
-  // Sync operation changes to preferences
+  // Sync operation changes to preferences.
+  // Deliberately NOT keyed on preferences.isLoaded: on the load commit the game
+  // still holds the pre-load defaults, and saving those would clobber the stored
+  // selection before useGameLogic adopts it.
   useEffect(() => {
-    if (preferences.isLoaded && !preferences.operations.includes(game.gameState.operation)) {
-      const newOps = Array.from(game.gameState.selectedOperations);
+    if (!preferences.isLoaded) return;
+    const newOps = Array.from(game.gameState.selectedOperations);
+    const unchanged =
+      newOps.length === preferences.operations.length &&
+      newOps.every((op) => preferences.operations.includes(op));
+    if (!unchanged) {
       preferences.setOperations(newOps);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -367,6 +465,10 @@ export default function App() {
             setOnboardingVisible(true);
           }}
           onOpenBadges={() => setBadgesVisible(true)}
+          onOpenProfiles={() => {
+            setProfilePickerVisible(true);
+            hideMenu();
+          }}
           t={t}
         />
       )}
@@ -392,17 +494,8 @@ export default function App() {
         difficultyMode={game.gameState.difficultyMode}
         challengeState={game.gameState.challengeState}
         score={game.gameState.score}
-        totalTasks={game.gameState.totalTasks}
         onRestart={game.restartGame}
         onContinue={game.continueGame}
-        t={t}
-      />
-
-      <MotivationModal
-        visible={showMotivation}
-        onClose={() => setShowMotivation(false)}
-        colors={colors}
-        score={motivationScore}
         t={t}
       />
 
@@ -436,11 +529,42 @@ export default function App() {
         t={t}
       />
 
-      <Modal visible={streakWarningVisible} transparent animationType="fade" onRequestClose={() => setStreakWarningVisible(false)}>
+      <ProfilePickerModal
+        visible={profilePickerVisible}
+        onClose={() => setProfilePickerVisible(false)}
+        profiles={profiles}
+        activeProfileId={activeProfile?.id}
+        onSwitchProfile={async (profile) => {
+          setActiveProfile(profile);
+          await setActiveProfileId(profile.id);
+          setProfilePickerVisible(false);
+        }}
+        onProfilesChange={(updated) => {
+          setProfiles(updated);
+          // If active profile was deleted, switch to first remaining
+          if (activeProfile && !updated.find((p) => p.id === activeProfile.id)) {
+            if (updated.length > 0) {
+              setActiveProfile(updated[0]);
+              setActiveProfileId(updated[0].id);
+            }
+          }
+        }}
+        colors={colors}
+        t={t}
+      />
+
+      <Modal
+        visible={streakWarningVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setStreakWarningVisible(false)}
+      >
         <View style={styles.streakOverlay}>
           <View style={[styles.streakWarningCard, { backgroundColor: colors.settingsMenu }]}>
             <Text style={styles.streakWarningEmoji}>🔥</Text>
-            <Text style={[styles.streakWarningTitle, { color: colors.text }]}>{t.streakWarningTitle}</Text>
+            <Text style={[styles.streakWarningTitle, { color: colors.text }]}>
+              {t.streakWarningTitle}
+            </Text>
             <Text style={[styles.streakWarningMessage, { color: colors.textSecondary }]}>
               {t.streakWarningMessage.replace('{days}', String(streakData.currentStreak))}
             </Text>

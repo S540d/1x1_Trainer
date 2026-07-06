@@ -11,7 +11,11 @@ interface BadgeUnlockToastProps {
 
 const DISPLAY_DURATION = 2400;
 
-export function BadgeUnlockToast({ badgeIds, onDone, badgeNewUnlockedLabel }: BadgeUnlockToastProps) {
+export function BadgeUnlockToast({
+  badgeIds,
+  onDone,
+  badgeNewUnlockedLabel,
+}: BadgeUnlockToastProps) {
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(40)).current;
 
@@ -65,7 +69,7 @@ export function BadgeUnlockToast({ badgeIds, onDone, badgeNewUnlockedLabel }: Ba
 
   if (badgeIds.length === 0) return null;
 
-  const first = BADGE_DEFINITIONS.find(b => b.id === badgeIds[0]);
+  const first = BADGE_DEFINITIONS.find((b) => b.id === badgeIds[0]);
   const icon = first?.icon ?? '🏅';
   const extra = badgeIds.length > 1 ? ` +${badgeIds.length - 1}` : '';
 

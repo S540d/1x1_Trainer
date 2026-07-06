@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Modal,
-} from 'react-native';
+import { StyleSheet, Text, View, Modal } from 'react-native';
 import { ThemeColors, DifficultyMode, ChallengeState } from '../types/game';
 import { modalStyles } from '../styles/modalStyles';
 import { Button } from './Button';
@@ -15,7 +10,6 @@ interface ResultModalProps {
   difficultyMode: DifficultyMode;
   challengeState?: ChallengeState;
   score: number;
-  totalTasks: number;
   onRestart: () => void;
   onContinue: () => void;
   t: {
@@ -24,10 +18,12 @@ interface ResultModalProps {
     challengeResult: string;
     highScore: string;
     tryAgain: string;
-    great: string;
-    youSolved: string;
-    of: string;
-    tasksCorrectly: string;
+    motivationTitleLowScore: string;
+    motivationMessageLowScore: string;
+    motivationTitleMediumScore: string;
+    motivationMessageMediumScore: string;
+    motivationTitleHighScore: string;
+    motivationMessageHighScore: string;
     newRound: string;
     continueGame: string;
   };
@@ -39,7 +35,6 @@ export function ResultModal({
   difficultyMode,
   challengeState,
   score,
-  totalTasks,
   onRestart,
   onContinue,
   t,
@@ -52,7 +47,9 @@ export function ResultModal({
             <>
               <Text style={[modalStyles.title, { color: colors.text }]}>{t.challengeOver}</Text>
               {challengeState.isNewHighScore && (
-                <Text style={[styles.newHighScoreText, { color: '#F59E0B' }]}>{t.newHighScore}</Text>
+                <Text style={[styles.newHighScoreText, { color: '#F59E0B' }]}>
+                  {t.newHighScore}
+                </Text>
               )}
               <Text style={[modalStyles.text, { color: colors.text }]}>
                 {t.challengeResult
@@ -64,20 +61,48 @@ export function ResultModal({
                   {t.highScore}: {challengeState.highScore}
                 </Text>
               )}
-              <Button label={t.tryAgain} onPress={onRestart} variant="primary" fullWidth colors={colors} />
+              <Button
+                label={t.tryAgain}
+                onPress={onRestart}
+                variant="primary"
+                fullWidth
+                colors={colors}
+              />
             </>
           ) : (
             <>
-              <Text style={[modalStyles.title, { color: colors.text }]}>{t.great}</Text>
+              <Text style={[modalStyles.title, { color: colors.text }]}>
+                {score <= 3
+                  ? t.motivationTitleLowScore
+                  : score <= 6
+                    ? t.motivationTitleMediumScore
+                    : t.motivationTitleHighScore}
+              </Text>
               <Text style={[modalStyles.text, { color: colors.text }]}>
-                {t.youSolved} {score} {t.of} {totalTasks} {t.tasksCorrectly}.
+                {score <= 3
+                  ? t.motivationMessageLowScore
+                  : score <= 6
+                    ? t.motivationMessageMediumScore
+                    : t.motivationMessageHighScore}
               </Text>
               <View style={styles.modalButtonRow}>
                 <View style={styles.modalButtonWrap}>
-                  <Button label={t.newRound} onPress={onRestart} variant="primary" fullWidth colors={colors} />
+                  <Button
+                    label={t.newRound}
+                    onPress={onRestart}
+                    variant="primary"
+                    fullWidth
+                    colors={colors}
+                  />
                 </View>
                 <View style={styles.modalButtonWrap}>
-                  <Button label={t.continueGame} onPress={onContinue} variant="secondary" fullWidth colors={colors} />
+                  <Button
+                    label={t.continueGame}
+                    onPress={onContinue}
+                    variant="secondary"
+                    fullWidth
+                    colors={colors}
+                  />
                 </View>
               </View>
             </>
