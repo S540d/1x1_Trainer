@@ -97,8 +97,8 @@ export interface TranslationStrings {
   streakWarningTitle: string;
   streakWarningMessage: string;
   streakWarningButton: string;
-  streakInfoTitle: string;
-  streakInfoBody: string;
+  roundsInfoTitle: string;
+  roundsInfoBody: string;
   parentWeakTasks: string;
   parentWeakTasksEmpty: string;
   chartSessions: string;
@@ -267,8 +267,8 @@ export const translations: Record<Language, TranslationStrings> = {
     streakWarningTitle: "Don't break your streak!",
     streakWarningMessage: 'Play a quick round today to keep your {days}-day streak going!',
     streakWarningButton: "Let's go!",
-    streakInfoTitle: 'Streak',
-    streakInfoBody: 'days played in a row. Keep it up!',
+    roundsInfoTitle: 'Rounds today',
+    roundsInfoBody: 'rounds completed today. Keep it up!',
     parentWeakTasks: 'Weak Areas (Top 5)',
     parentWeakTasksEmpty: 'No weak areas identified yet.',
     chartSessions: 'Sessions · 14 days',
@@ -436,8 +436,8 @@ export const translations: Record<Language, TranslationStrings> = {
     streakWarningTitle: 'Brich deine Serie nicht!',
     streakWarningMessage: 'Spiel heute eine Runde, um deine {days}-Tage-Serie zu halten!',
     streakWarningButton: "Los geht's!",
-    streakInfoTitle: 'Serie',
-    streakInfoBody: 'Tage in Folge gespielt. Weiter so!',
+    roundsInfoTitle: 'Durchläufe heute',
+    roundsInfoBody: 'Durchläufe heute abgeschlossen. Weiter so!',
     parentWeakTasks: 'Schwachstellen (Top 5)',
     parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
     chartSessions: 'Einheiten · 14 Tage',

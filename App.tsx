@@ -43,6 +43,8 @@ import {
   getStreakData,
   updateStreakAfterSession,
   getYesterdayDateString,
+  getLocalDateString,
+  getSessionRecords,
   recordTaskResult,
   getTaskStats,
   getWeakTasks,
@@ -95,6 +97,7 @@ export default function App() {
   const [streakWarningVisible, setStreakWarningVisible] = useState(false);
   const [onboardingVisible, setOnboardingVisible] = useState(false);
   const [taskStats, setTaskStats] = useState<TaskStat[]>([]);
+  const [roundsToday, setRoundsToday] = useState(0);
 
   // Profile state
   const [activeProfile, setActiveProfile] = useState<ChildProfile | null>(null);
@@ -149,6 +152,7 @@ export default function App() {
         .then(async () => {
           const updatedStreak = await updateStreakAfterSession(pid);
           setStreakData(updatedStreak);
+          setRoundsToday((prev) => prev + 1);
           await badgeSystem.checkAndUnlock(record);
         })
         .catch((err) => console.error('Session save / badge unlock failed:', err));
@@ -331,6 +335,18 @@ export default function App() {
     });
   }, [activeProfile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Load today's completed rounds count (replaces the streak flame badge in the header)
+  useEffect(() => {
+    if (!activeProfile) return;
+    const today = getLocalDateString();
+    getSessionRecords(activeProfile.id).then((records) => {
+      const count = records.filter(
+        (r) => getLocalDateString(new Date(r.timestamp)) === today
+      ).length;
+      setRoundsToday(count);
+    });
+  }, [activeProfile?.id]);
+
   // Sound + card feedback on answer check
   useEffect(() => {
     if (!game.gameState.isAnswerChecked) return;
@@ -431,9 +447,8 @@ export default function App() {
         difficultyMode={game.gameState.difficultyMode}
         challengeState={game.gameState.challengeState}
         score={game.gameState.score}
-        currentTask={game.gameState.currentTask}
-        totalTasks={game.gameState.totalTasks}
-        currentStreak={streakData.currentStreak}
+        answerHistory={game.gameState.answerHistory}
+        roundsToday={roundsToday}
         onShowMenu={showMenu}
         t={t}
       />

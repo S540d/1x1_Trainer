@@ -10,16 +10,15 @@ interface HeaderProps {
   difficultyMode: DifficultyMode;
   challengeState?: ChallengeState;
   score: number;
-  currentTask: number;
-  totalTasks: number;
-  currentStreak?: number;
+  answerHistory: (boolean | null)[];
+  roundsToday?: number;
   onShowMenu: () => void;
   t: {
     level: string;
     task: string;
     points: string;
-    streakInfoTitle: string;
-    streakInfoBody: string;
+    roundsInfoTitle: string;
+    roundsInfoBody: string;
   };
 }
 
@@ -28,9 +27,8 @@ export function Header({
   difficultyMode,
   challengeState,
   score,
-  currentTask,
-  totalTasks,
-  currentStreak,
+  answerHistory,
+  roundsToday,
   onShowMenu,
   t,
 }: HeaderProps) {
@@ -50,21 +48,19 @@ export function Header({
           <Badge value={score} variant="default" animated />
         </>
       ) : (
-        <ProgressBar
-          current={currentTask - 1}
-          total={totalTasks}
-          gradientColors={colors.gradientPrimary}
-        />
+        <ProgressBar history={answerHistory} />
       )}
-      {!!currentStreak && currentStreak > 0 && (
+      {!!roundsToday && roundsToday > 0 && (
         <TouchableOpacity
-          onPress={() => Alert.alert(t.streakInfoTitle, `${currentStreak} ${t.streakInfoBody}`)}
+          onPress={() => Alert.alert(t.roundsInfoTitle, `${roundsToday} ${t.roundsInfoBody}`)}
           activeOpacity={0.7}
-          style={styles.streakBadge}
+          style={[styles.roundsBadge, { backgroundColor: colors.buttonInactive }]}
           accessibilityRole="button"
-          accessibilityLabel={`${t.streakInfoTitle}: ${currentStreak}`}
+          accessibilityLabel={`${t.roundsInfoTitle}: ${roundsToday}`}
         >
-          <Text style={styles.streakText}>🔥 {currentStreak}</Text>
+          <Text style={[styles.roundsText, { color: colors.buttonInactiveText }]}>
+            {roundsToday}
+          </Text>
         </TouchableOpacity>
       )}
       <TouchableOpacity onPress={onShowMenu} style={styles.settingsButton} aria-label="Settings">
@@ -97,17 +93,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'normal',
   },
-  streakBadge: {
+  roundsBadge: {
+    minWidth: 28,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 14,
-    backgroundColor: 'rgba(249,212,35,0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  streakText: {
+  roundsText: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#F59E0B',
   },
 });

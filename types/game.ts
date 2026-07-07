@@ -70,6 +70,9 @@ export interface GameState {
   totalSolvedTasks: number; // Track total tasks solved for motivation message
   selectedChoice: number | null; // For multiple choice and number sequence modes
   challengeState?: ChallengeState; // Challenge mode state
+  // Per-task result of the current round, indexed by task position (0-based).
+  // null = not answered yet. Drives the segmented progress bar.
+  answerHistory: (boolean | null)[];
 }
 
 export interface TaskStat {
