@@ -188,6 +188,8 @@ export function useGameLogic({
       ? initialOperations
       : [initialOperation || Operation.MULTIPLICATION];
 
+  const emptyAnswerHistory = (): (boolean | null)[] => Array(TOTAL_TASKS).fill(null);
+
   const [gameState, setGameState] = useState<GameState>({
     num1: 1,
     num2: 1,
@@ -206,6 +208,7 @@ export function useGameLogic({
     isAnswerChecked: false,
     totalSolvedTasks: initialTotalSolvedTasks,
     selectedChoice: null,
+    answerHistory: emptyAnswerHistory(),
   });
 
   const fireSessionComplete = (
@@ -443,6 +446,7 @@ export function useGameLogic({
         currentTask: 1,
         score: 0,
         showResult: false,
+        answerHistory: emptyAnswerHistory(),
       };
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -532,11 +536,18 @@ export function useGameLogic({
     }
 
     setGameState((prev) => {
+      const answerIndex = prev.currentTask - 1;
+      const newHistory = [...prev.answerHistory];
+      if (answerIndex >= 0 && answerIndex < newHistory.length) {
+        newHistory[answerIndex] = isCorrect;
+      }
+
       const newState: GameState = {
         ...prev,
         lastAnswerCorrect: isCorrect,
         score: newScore,
         isAnswerChecked: true,
+        answerHistory: newHistory,
       };
 
       // Challenge mode: update lives on wrong answer
@@ -656,6 +667,7 @@ export function useGameLogic({
         currentTask: 1,
         showResult: false,
         challengeState: newChallengeState,
+        answerHistory: emptyAnswerHistory(),
       }));
 
       const level1Ops = new Set([Operation.MULTIPLICATION]);
@@ -668,6 +680,7 @@ export function useGameLogic({
       score: 0,
       currentTask: 1,
       showResult: false,
+      answerHistory: emptyAnswerHistory(),
     }));
     setTimeout(() => generateQuestion(), 0);
   };
@@ -678,6 +691,7 @@ export function useGameLogic({
       ...prev,
       currentTask: 1,
       showResult: false,
+      answerHistory: emptyAnswerHistory(),
     }));
     setTimeout(() => generateQuestion(), 0);
   };
@@ -690,6 +704,7 @@ export function useGameLogic({
       currentTask: 1,
       score: 0,
       showResult: false,
+      answerHistory: emptyAnswerHistory(),
     }));
     setTimeout(() => generateQuestion(newMode), 0);
   };
@@ -715,6 +730,7 @@ export function useGameLogic({
         currentTask: 1,
         score: 0,
         showResult: false,
+        answerHistory: emptyAnswerHistory(),
       };
 
       // Generate a new question with the updated operations
@@ -734,6 +750,7 @@ export function useGameLogic({
       showResult: false,
       userAnswer: '',
       selectedChoice: null,
+      answerHistory: emptyAnswerHistory(),
     }));
     setTimeout(() => generateQuestion(), 0);
   };
@@ -767,6 +784,7 @@ export function useGameLogic({
         userAnswer: '',
         selectedChoice: null,
         challengeState: initialChallengeState,
+        answerHistory: emptyAnswerHistory(),
       }));
 
       // Level 1 starts with multiplication only, range 10
@@ -799,6 +817,7 @@ export function useGameLogic({
       userAnswer: '',
       selectedChoice: null,
       challengeState: undefined,
+      answerHistory: emptyAnswerHistory(),
     }));
     setTimeout(() => generateQuestion(newGameMode, undefined, undefined, newMode), 0);
   };

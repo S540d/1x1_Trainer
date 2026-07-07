@@ -50,6 +50,7 @@ const baseGameState: GameState = {
   isAnswerChecked: false,
   totalSolvedTasks: 0,
   selectedChoice: null,
+  answerHistory: Array(10).fill(null),
 };
 
 const defaultProps = {
