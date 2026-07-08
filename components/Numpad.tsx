@@ -11,7 +11,6 @@ interface NumpadProps {
   isAnswerChecked: boolean;
   checkLabel: string;
   nextLabel: string;
-  encouragement: string;
   gradientPrimary: readonly [string, string];
 }
 
@@ -22,7 +21,6 @@ export function Numpad({
   isAnswerChecked,
   checkLabel,
   nextLabel,
-  encouragement,
   gradientPrimary,
 }: NumpadProps) {
   const canCheck = userAnswer !== '' || isAnswerChecked;
@@ -90,7 +88,6 @@ export function Numpad({
           </Animated.View>
         </View>
       </View>
-      <Text style={styles.motivationText}>{encouragement}</Text>
     </View>
   );
 }
@@ -205,12 +202,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
-  },
-  motivationText: {
-    textAlign: 'center',
-    fontSize: 14,
-    color: DESIGN_TOKENS.NUMPAD_ICON_COLOR,
-    fontWeight: 'bold',
-    paddingTop: 4,
   },
 });
