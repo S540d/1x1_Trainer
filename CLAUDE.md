@@ -83,27 +83,28 @@ npm run test:coverage # Coverage
 
 ---
 
-## Aktueller Stand (2026-06-20)
+## Aktueller Stand (2026-07-07)
 
-- Version: **1.3.8** / versionCode 28
-- Branches: `testing` vorn (inkl. #242, #243, #246, #247); `main` auf `91cf92d` (sync v1.3.8)
-- Offene PRs: #245 (CLAUDE.md docs), gegen `testing`
+- Version: **1.4.0** / versionCode 30
+- Branches: `testing` vorn; `main` auf `91cf92d` (sync v1.3.8)
+- Offene PRs: #272 (Fortschrittsbalken-Segmente + Durchlauf-Zähler), #245 (CLAUDE.md docs), gegen `testing`
 - Offene Issues: #156, #231, #96
 - APK v1.3.8 via CI
 
 ### Zuletzt gemergt / gepusht
 
-| PR / Commit  | Was                                                                         |
-| ------------ | --------------------------------------------------------------------------- |
-| #247 ✅      | feat: Mehrere Kinderprofile (Issue #187 ✅ geschlossen)                     |
-| #246 ✅      | chore: Prettier + pre-push Hook (Issue #220 ✅ geschlossen)                 |
-| #245 (offen) | docs: CLAUDE.md 2026-06-18                                                  |
-| #244 ✅      | build: app.config.js für APP_PACKAGE env-var (Issue #233 ✅ geschlossen)    |
-| #243 ✅      | feat: Orientation "default" für Tablet/Foldable (Issue #235 ✅ geschlossen) |
-| #242 ✅      | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241 ✅ geschlossen)     |
-| #240 ✅      | ci: Cache-Cleanup-Workflow                                                  |
-| #239 ✅      | chore: Review-Modell v2                                                     |
-| #234 ✅      | sync: testing → main (v1.3.8 + googleServicesFile fix)                      |
+| PR / Commit  | Was                                                                                            |
+| ------------ | ---------------------------------------------------------------------------------------------- |
+| #272 (offen) | feat: Fortschrittsbalken in 10 Segmente (grün/rot pro Aufgabe) + Durchlauf-Zähler statt Flamme |
+| #247 ✅      | feat: Mehrere Kinderprofile (Issue #187 ✅ geschlossen)                                        |
+| #246 ✅      | chore: Prettier + pre-push Hook (Issue #220 ✅ geschlossen)                                    |
+| #245 (offen) | docs: CLAUDE.md 2026-06-18                                                                     |
+| #244 ✅      | build: app.config.js für APP_PACKAGE env-var (Issue #233 ✅ geschlossen)                       |
+| #243 ✅      | feat: Orientation "default" für Tablet/Foldable (Issue #235 ✅ geschlossen)                    |
+| #242 ✅      | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241 ✅ geschlossen)                        |
+| #240 ✅      | ci: Cache-Cleanup-Workflow                                                                     |
+| #239 ✅      | chore: Review-Modell v2                                                                        |
+| #234 ✅      | sync: testing → main (v1.3.8 + googleServicesFile fix)                                         |
 
 ---
 
@@ -115,7 +116,7 @@ npm run test:coverage # Coverage
 | `utils/theme.ts`                    | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'`                                                                                                                                                                                                                     |
 | `utils/storage.ts`                  | Storage-Helfer + Profile-Management (`migrateToProfiles`, `createProfile`, `deleteProfileData`, `getProfiles`/`saveProfiles`, `setActiveProfileId`). Alle per-Profil-Funktionen haben optionalen `profileId?`-Parameter (Suffix-Pattern `{key}-{profileId}`). `profileKey()` / `resolveKey()` intern. |
 | `utils/animations.ts`               | `prefersReducedMotion()` — liest Accessibility-Einstellung                                                                                                                                                                                                                                            |
-| `types/game.ts`                     | ThemeColors (inkl. `gradientPrimary`), GameState, Enums, SessionRecord, `ThemeName`, `ChildProfile`                                                                                                                                                                                                   |
+| `types/game.ts`                     | ThemeColors (inkl. `gradientPrimary`), GameState (inkl. `answerHistory`), Enums, SessionRecord, `ThemeName`, `ChildProfile`                                                                                                                                                                           |
 | `i18n/translations.ts`              | DE/EN Übersetzungen, `TranslationStrings`-Interface (inkl. 12 Profil-Strings)                                                                                                                                                                                                                         |
 | `hooks/useGameLogic.ts`             | Gesamte Spiellogik, `onSessionComplete`-Callback                                                                                                                                                                                                                                                      |
 | `hooks/usePreferences.ts`           | `usePreferences(profileId?)` — globale Prefs (Sprache, Theme, Sounds) + per-Profil-Prefs (Operations, NumberRange, TotalTasks, HighScore); lädt per-Profil-Daten neu bei Profilwechsel                                                                                                                |
@@ -127,6 +128,8 @@ npm run test:coverage # Coverage
 | `components/ParentDashboard.tsx`    | Eltern-Dashboard Modal (Beta)                                                                                                                                                                                                                                                                         |
 | `components/ProfilePickerModal.tsx` | Bottom-Sheet-Modal für Profilauswahl/-erstellung/-löschung (max. 6 Profile, Farbauswahl, Bestätigungs-Alert bei Löschen)                                                                                                                                                                              |
 | `components/GameCard.tsx`           | Hauptspielansicht (alle 3 Antwortmodi)                                                                                                                                                                                                                                                                |
+| `components/Header.tsx`             | Score/Level/Lives, segmentierte `ProgressBar`, Durchlauf-Zähler (`roundsToday`, ersetzt seit PR #272 die Streak-Flamme)                                                                                                                                                                               |
+| `components/ProgressBar.tsx`        | 10 Segmente statt Gradient-Fill; `history: (boolean \| null)[]` → grün/rot/grau pro Aufgabe                                                                                                                                                                                                           |
 | `styles/modalStyles.ts`             | Gemeinsame Modal-Styles                                                                                                                                                                                                                                                                               |
 | `app.config.js`                     | Dynamische Expo-Konfiguration: überschreibt `android.package` via `APP_PACKAGE` env-var (Issue #233)                                                                                                                                                                                                  |
 | `jest.config.js`                    | Jest-Konfiguration                                                                                                                                                                                                                                                                                    |
@@ -166,10 +169,19 @@ npm run test:coverage # Coverage
 - `updateStreakAfterSession()` in `utils/storage.ts`: DST-sicherer Vergleich via `getLocalDateString()` — kein UTC-Offset-Problem
 - Streak-Logik: gleicher Tag → kein Update; Folgetag → +1; Lücke → Reset auf 1 (longestStreak bleibt)
 - `isNonNegInt` / `isLocalDateString`: Validatoren in storage.ts verhindern korrupte Werte (NaN, negativ, falsches Format)
-- Header zeigt 🔥 {n} Badge wenn `currentStreak > 0` (via `currentStreak`-Prop in Header.tsx)
+- **Seit PR #272 kein 🔥-Badge mehr im Header** — dort steht jetzt der Durchlauf-Zähler (`roundsToday`), siehe eigener Abschnitt unten. Die Streak-Daten selbst laufen unverändert weiter und werden nur noch im ParentDashboard + der Abend-Warnung angezeigt
 - Abend-Warnung: Modal bei App-Öffnung wenn `hour >= 20` + Streak aktiv + heute noch nicht gespielt
 - ParentDashboard: currentStreak + longestStreak im Summary-Bar (inkl. korrekter Divider-Logik)
 - `streakWarningMessage` enthält `{days}` Platzhalter → wird via `.replace('{days}', ...)` in App.tsx ersetzt
+
+## Fortschrittsbalken / Durchlauf-Zähler — Hinweise (PR #272)
+
+- `GameState.answerHistory: (boolean | null)[]` (`types/game.ts`) — Ergebnis pro Aufgabe der aktuellen Runde, Länge `TOTAL_TASKS` (10); `null` = noch nicht beantwortet
+- `useGameLogic.checkAnswer()` schreibt `isCorrect` an Index `currentTask - 1`; `emptyAnswerHistory()` setzt bei jedem Rundenstart zurück (`restartGame`, `continueGame`, `changeGameMode`, `toggleOperation`, `changeAnswerMode`, `changeDifficultyMode`, Operationswechsel-Effect)
+- `components/ProgressBar.tsx`: kein animierter Gradient-Fill mehr, sondern 10 einzelne Segmente (`history`-Prop); grün `#10B981` = richtig, rot `#EF4444` = falsch, grau `#E2E8F0` = offen
+- Im Challenge-Modus wird statt der ProgressBar weiterhin die Lives-Anzeige gerendert (unverändert)
+- `App.tsx`: neuer `roundsToday`-State — beim Profilwechsel aus `getSessionRecords()` (gefiltert auf `getLocalDateString()` == heute) geladen, bei jedem `onSessionComplete` hochgezählt; **kein eigener Storage-Key**, reine Ableitung aus SessionRecords, setzt sich also automatisch täglich zurück
+- `i18n/translations.ts`: `roundsInfoTitle` / `roundsInfoBody` (DE/EN) ersetzen die entfernten `streakInfoTitle` / `streakInfoBody`
 
 ## Adaptives Lernen / Übungsmodus (PRACTICE) — Hinweise
 

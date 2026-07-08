@@ -2,7 +2,7 @@
   "expo": {
     "name": "1x1 Trainer",
     "slug": "1x1-trainer",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -20,7 +20,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 30,
+      "versionCode": 31,
       "jsEngine": "hermes",
       "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,

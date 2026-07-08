@@ -1,46 +1,33 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { DESIGN_TOKENS } from '../utils/constants';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 
 interface ProgressBarProps {
-  current: number;
-  total: number;
-  gradientColors?: readonly [string, string];
+  history: (boolean | null)[];
 }
 
-export function ProgressBar({ current, total, gradientColors }: ProgressBarProps) {
-  const widthAnim = useRef(new Animated.Value(0)).current;
+const CORRECT_COLOR = '#10B981';
+const INCORRECT_COLOR = '#EF4444';
+const NEUTRAL_COLOR = '#E2E8F0';
 
-  useEffect(() => {
-    const pct = total > 0 ? Math.min(current / total, 1) : 0;
-    Animated.timing(widthAnim, {
-      toValue: pct,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  }, [current, total, widthAnim]);
-
+export function ProgressBar({ history }: ProgressBarProps) {
   return (
     <View style={styles.track}>
-      <Animated.View
-        style={[
-          styles.fill,
-          {
-            width: widthAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: ['0%', '100%'],
-            }),
-          },
-        ]}
-      >
-        <LinearGradient
-          colors={gradientColors ?? DESIGN_TOKENS.GRADIENT_PRIMARY}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={StyleSheet.absoluteFill}
+      {history.map((result, index) => (
+        <View
+          key={index}
+          style={[
+            styles.segment,
+            {
+              backgroundColor:
+                result === true
+                  ? CORRECT_COLOR
+                  : result === false
+                    ? INCORRECT_COLOR
+                    : NEUTRAL_COLOR,
+            },
+          ]}
         />
-      </Animated.View>
+      ))}
     </View>
   );
 }
@@ -48,14 +35,13 @@ export function ProgressBar({ current, total, gradientColors }: ProgressBarProps
 const styles = StyleSheet.create({
   track: {
     flex: 1,
+    flexDirection: 'row',
     height: 10,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 5,
-    overflow: 'hidden',
+    gap: 3,
   },
-  fill: {
+  segment: {
+    flex: 1,
     height: '100%',
-    borderRadius: 5,
-    overflow: 'hidden',
+    borderRadius: 3,
   },
 });

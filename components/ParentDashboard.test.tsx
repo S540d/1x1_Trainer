@@ -119,7 +119,8 @@ describe('ParentDashboard', () => {
       <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
     );
     await waitFor(() => {
-      expect(getByText('1')).toBeTruthy();
+      const sessionLabel = getByText(t.parentSessions);
+      expect(within(sessionLabel.parentElement!).getByText('1')).toBeTruthy();
     });
   });
 
