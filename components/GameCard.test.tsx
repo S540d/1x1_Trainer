@@ -371,4 +371,3 @@ describe('GameCard - Button accessibility', () => {
     });
   });
 });
-
