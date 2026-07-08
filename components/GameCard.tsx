@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ThemeColors, Operation, AnswerMode, GameState, DifficultyMode } from '../types/game';
+import { ThemeColors, Operation, AnswerMode, GameState } from '../types/game';
 import { DESIGN_TOKENS } from '../utils/constants';
 import { Numpad } from './Numpad';
 
@@ -22,8 +22,6 @@ interface GameCardProps {
   t: {
     nextQuestion: string;
     check: string;
-    encouragement: string;
-    practiceModeFeedback: string;
   };
 }
 
@@ -112,11 +110,6 @@ export function GameCard({
                 isAnswerChecked={gameState.isAnswerChecked}
                 checkLabel={t.check}
                 nextLabel={t.nextQuestion}
-                encouragement={
-                  gameState.difficultyMode === DifficultyMode.PRACTICE
-                    ? t.practiceModeFeedback
-                    : t.encouragement
-                }
                 gradientPrimary={colors.gradientPrimary}
               />
             )}

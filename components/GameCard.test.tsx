@@ -69,8 +69,6 @@ const defaultProps = {
   t: {
     nextQuestion: 'Weiter →',
     check: 'Prüfen',
-    encouragement: 'Du schaffst das! 💪',
-    practiceModeFeedback: 'Du übst deine schwierigen Aufgaben!',
   },
 };
 
@@ -374,34 +372,3 @@ describe('GameCard - Button accessibility', () => {
   });
 });
 
-describe('GameCard - Practice mode encouragement text', () => {
-  it('shows encouragement text in SIMPLE mode', () => {
-    const { getByText } = render(
-      <GameCard
-        {...defaultProps}
-        gameState={{ ...baseGameState, difficultyMode: DifficultyMode.SIMPLE }}
-      />
-    );
-    expect(getByText('Du schaffst das! 💪')).toBeTruthy();
-  });
-
-  it('shows practiceModeFeedback text in PRACTICE mode', () => {
-    const { getByText } = render(
-      <GameCard
-        {...defaultProps}
-        gameState={{ ...baseGameState, difficultyMode: DifficultyMode.PRACTICE }}
-      />
-    );
-    expect(getByText('Du übst deine schwierigen Aufgaben!')).toBeTruthy();
-  });
-
-  it('shows encouragement text in CREATIVE mode', () => {
-    const { getByText } = render(
-      <GameCard
-        {...defaultProps}
-        gameState={{ ...baseGameState, difficultyMode: DifficultyMode.CREATIVE }}
-      />
-    );
-    expect(getByText('Du schaffst das! 💪')).toBeTruthy();
-  });
-});
