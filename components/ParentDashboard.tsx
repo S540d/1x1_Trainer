@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -54,6 +54,16 @@ interface ParentDashboardProps {
     parentWeakTasksEmpty: string;
     chartSessions: string;
     chartErrorRate: string;
+    parentEmptyTitle: string;
+    parentWeeklyReview: string;
+    parentWeeklySessions: string;
+    parentWeeklyVsLastWeek: string;
+    parentWeeklyMinutes: string;
+    parentWeeklyMinutesUnit: string;
+    parentRowAccuracy: string;
+    parentWeeklyRecommendation: string;
+    parentRecommendationText: string;
+    parentRecommendationEmpty: string;
     ok: string;
   };
 }
@@ -210,6 +220,77 @@ function errorRateColor(rate: number): string {
   return '#EF4444';
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const TIMES_TABLE_ROWS = Array.from({ length: 10 }, (_, i) => i + 1);
+
+// Rolling window ending `offsetDays` ago (0 = up to now), matching the
+// rolling-14-days convention used by getLast14Days rather than calendar weeks.
+function recordsInLastNDays(
+  records: SessionRecord[],
+  days: number,
+  offsetDays = 0
+): SessionRecord[] {
+  const now = Date.now();
+  const windowEnd = now - offsetDays * DAY_MS;
+  const windowStart = windowEnd - days * DAY_MS;
+  return records.filter((r) => r.timestamp >= windowStart && r.timestamp < windowEnd);
+}
+
+function computeTrend(current: number, previous: number): 'up' | 'down' | 'flat' | null {
+  if (current === 0 && previous === 0) return null;
+  if (current > previous) return 'up';
+  if (current < previous) return 'down';
+  return 'flat';
+}
+
+function practicedMinutes(records: SessionRecord[]): number | null {
+  const withDuration = records.filter((r) => typeof r.durationMs === 'number');
+  if (withDuration.length === 0) return null;
+  const totalMs = withDuration.reduce((sum, r) => sum + (r.durationMs ?? 0), 0);
+  return Math.round(totalMs / 60000);
+}
+
+interface RowAccuracy {
+  row: number;
+  correct: number;
+  total: number;
+}
+
+// All-time accuracy per times-table row, derived from TaskStat (no per-attempt
+// timestamps exist, so this can't be windowed to "this week" like the rest of
+// the review).
+function computeRowAccuracy(stats: TaskStat[]): RowAccuracy[] {
+  const byRow = new Map<number, RowAccuracy>(
+    TIMES_TABLE_ROWS.map((row) => [row, { row, correct: 0, total: 0 }])
+  );
+  for (const s of stats) {
+    if (s.operation !== Operation.MULTIPLICATION) continue;
+    const total = s.correctCount + s.errorCount;
+    for (const row of new Set([s.num1, s.num2])) {
+      const entry = byRow.get(row);
+      if (entry) {
+        entry.correct += s.correctCount;
+        entry.total += total;
+      }
+    }
+  }
+  return TIMES_TABLE_ROWS.map((row) => byRow.get(row)!);
+}
+
+function recommendWeakestRow(
+  rows: RowAccuracy[],
+  minAttempts = 5,
+  minErrorRate = 0.2
+): RowAccuracy | null {
+  const candidates = rows.filter((r) => r.total >= minAttempts);
+  if (candidates.length === 0) return null;
+  const worst = [...candidates].sort(
+    (a, b) => (b.total - b.correct) / b.total - (a.total - a.correct) / a.total
+  )[0];
+  const rate = (worst.total - worst.correct) / worst.total;
+  return rate > minErrorRate ? worst : null;
+}
+
 export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboardProps) {
   const [records, setRecords] = useState<SessionRecord[]>([]);
   const [streak, setStreak] = useState<StreakData>({
@@ -217,7 +298,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
     lastPlayedDate: '',
     longestStreak: 0,
   });
-  const [weakTasks, setWeakTasks] = useState<TaskStat[]>([]);
+  const [taskStats, setTaskStats] = useState<TaskStat[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -227,12 +308,14 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
         ([data, streakData, stats]) => {
           setRecords(data);
           setStreak(streakData);
-          setWeakTasks(getWeakTasks(stats).slice(0, 5));
+          setTaskStats(stats);
           setLoading(false);
         }
       );
     }
   }, [visible]);
+
+  const weakTasks = useMemo(() => getWeakTasks(taskStats).slice(0, 5), [taskStats]);
 
   const grouped = groupByDay(records);
   const chartData = getLast14Days(records);
@@ -244,6 +327,13 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
     recentRecords.length > 0
       ? recentRecords.reduce((sum, r) => sum + r.errorRate, 0) / recentRecords.length
       : null;
+
+  const thisWeekRecords = recordsInLastNDays(records, 7, 0);
+  const lastWeekRecords = recordsInLastNDays(records, 7, 7);
+  const sessionsTrend = computeTrend(thisWeekRecords.length, lastWeekRecords.length);
+  const weeklyMinutes = practicedMinutes(thisWeekRecords);
+  const rowAccuracy = useMemo(() => computeRowAccuracy(taskStats), [taskStats]);
+  const recommendation = useMemo(() => recommendWeakestRow(rowAccuracy), [rowAccuracy]);
 
   const getDayLabel = (key: string) => {
     if (key === '__today__') return t.parentToday;
@@ -258,12 +348,7 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           {/* Header */}
           <View style={styles.header}>
             <View>
-              <View style={styles.titleRow}>
-                <Text style={[styles.title, { color: colors.text }]}>{t.parentDashboard}</Text>
-                <View style={styles.betaBadge}>
-                  <Text style={styles.betaText}>BETA</Text>
-                </View>
-              </View>
+              <Text style={[styles.title, { color: colors.text }]}>{t.parentDashboard}</Text>
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
                 {t.parentDashboardSubtitle}
               </Text>
@@ -332,11 +417,110 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
           {loading ? (
             <ActivityIndicator style={styles.loader} color={colors.gradientPrimary[0]} />
           ) : records.length === 0 ? (
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-              {t.parentNoData}
-            </Text>
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyEmoji}>📊</Text>
+              <Text style={[styles.emptyTitle, { color: colors.text }]}>{t.parentEmptyTitle}</Text>
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                {t.parentNoData}
+              </Text>
+            </View>
           ) : (
             <ScrollView style={styles.list} showsVerticalScrollIndicator={false}>
+              {/* Weekly review */}
+              <View style={[styles.weeklySection, { borderColor: colors.border }]}>
+                <Text style={[styles.weeklyTitle, { color: colors.textSecondary }]}>
+                  {t.parentWeeklyReview}
+                </Text>
+                <View style={styles.weeklyRow}>
+                  <Text style={[styles.weeklyLabel, { color: colors.text }]}>
+                    {t.parentWeeklySessions}: {thisWeekRecords.length}
+                  </Text>
+                  {sessionsTrend && (
+                    <Text
+                      style={[
+                        styles.weeklyTrend,
+                        {
+                          color:
+                            sessionsTrend === 'up'
+                              ? '#10B981'
+                              : sessionsTrend === 'down'
+                                ? '#F59E0B'
+                                : colors.textSecondary,
+                        },
+                      ]}
+                    >
+                      {sessionsTrend === 'up' ? '▲' : sessionsTrend === 'down' ? '▼' : '→'}{' '}
+                      {t.parentWeeklyVsLastWeek}
+                    </Text>
+                  )}
+                </View>
+                {weeklyMinutes !== null && (
+                  <Text style={[styles.weeklyLabel, { color: colors.text }]}>
+                    {t.parentWeeklyMinutes}: {weeklyMinutes} {t.parentWeeklyMinutesUnit}
+                  </Text>
+                )}
+
+                <Text
+                  style={[
+                    styles.weeklySubtitle,
+                    styles.weeklySubtitleSpaced,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {t.parentRowAccuracy}
+                </Text>
+                <View style={styles.rowAccuracyRow}>
+                  {rowAccuracy.map(({ row, correct, total }) => {
+                    const rate = total > 0 ? (total - correct) / total : null;
+                    return (
+                      <View
+                        key={row}
+                        style={[
+                          styles.rowChip,
+                          {
+                            backgroundColor:
+                              rate !== null ? errorRateColor(rate) + '33' : colors.buttonInactive,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.rowChipText,
+                            { color: rate !== null ? errorRateColor(rate) : colors.textSecondary },
+                          ]}
+                        >
+                          {row}
+                        </Text>
+                      </View>
+                    );
+                  })}
+                </View>
+
+                <Text
+                  style={[
+                    styles.weeklySubtitle,
+                    styles.weeklySubtitleSpaced,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {t.parentWeeklyRecommendation}
+                </Text>
+                <Text style={[styles.weeklyLabel, { color: colors.text }]}>
+                  {recommendation
+                    ? t.parentRecommendationText
+                        .replace('{row}', recommendation.row.toString())
+                        .replace(
+                          '{rate}',
+                          Math.round(
+                            ((recommendation.total - recommendation.correct) /
+                              recommendation.total) *
+                              100
+                          ).toString()
+                        )
+                    : t.parentRecommendationEmpty}
+                </Text>
+              </View>
+
               {/* Charts */}
               {hasChartData && (
                 <View style={[styles.chartsSection, { borderColor: colors.border }]}>
@@ -475,26 +659,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 14,
   },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   title: {
     fontSize: 18,
     fontFamily: DESIGN_TOKENS.FONT_UI,
-  },
-  betaBadge: {
-    backgroundColor: '#F59E0B22',
-    borderRadius: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-  },
-  betaText: {
-    fontSize: 10,
-    fontFamily: DESIGN_TOKENS.FONT_UI,
-    color: '#F59E0B',
-    letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 11,
@@ -540,15 +707,83 @@ const styles = StyleSheet.create({
   loader: {
     marginVertical: 32,
   },
+  emptyState: {
+    alignItems: 'center',
+    marginVertical: 32,
+    gap: 6,
+  },
+  emptyEmoji: {
+    fontSize: 40,
+    marginBottom: 4,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    textAlign: 'center',
+  },
   emptyText: {
     textAlign: 'center',
     fontSize: 14,
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    marginVertical: 32,
   },
   list: {
     flex: 1,
     marginBottom: 12,
+  },
+  weeklySection: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    gap: 4,
+  },
+  weeklyTitle: {
+    fontSize: 10,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  weeklyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  weeklyLabel: {
+    fontSize: 13,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+  },
+  weeklyTrend: {
+    fontSize: 12,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+  },
+  weeklySubtitle: {
+    fontSize: 10,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  weeklySubtitleSpaced: {
+    marginTop: 8,
+  },
+  rowAccuracyRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 4,
+  },
+  rowChip: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rowChipText: {
+    fontSize: 12,
+    fontFamily: DESIGN_TOKENS.FONT_NUMBER,
   },
   chartsSection: {
     borderWidth: 1,

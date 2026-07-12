@@ -96,6 +96,8 @@ export interface SessionRecord {
   numberRange: NumberRange;
   // Challenge only: level 3 was reached with all lives intact (#253)
   challengeFlawlessLevel3?: boolean;
+  // Wall-clock time spent on the round; absent on sessions recorded before #277
+  durationMs?: number;
 }
 
 export interface AchievementBadge {
