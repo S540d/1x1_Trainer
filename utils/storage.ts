@@ -319,7 +319,8 @@ function isValidSessionRecord(r: unknown): r is SessionRecord {
     typeof obj.difficultyMode === 'string' &&
     VALID_DIFFICULTY_MODES.has(obj.difficultyMode) &&
     typeof obj.numberRange === 'string' &&
-    VALID_NUMBER_RANGES.has(obj.numberRange)
+    VALID_NUMBER_RANGES.has(obj.numberRange) &&
+    (obj.durationMs === undefined || typeof obj.durationMs === 'number')
   );
 }
 

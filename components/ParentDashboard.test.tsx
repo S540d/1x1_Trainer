@@ -32,6 +32,16 @@ const t = {
   parentStreakDays: 'Tage',
   chartSessions: 'Einheiten · 14 Tage',
   chartErrorRate: 'Fehlerquote · 14 Tage',
+  parentEmptyTitle: "Los geht's!",
+  parentWeeklyReview: 'Wochenrückblick',
+  parentWeeklySessions: 'Einheiten diese Woche',
+  parentWeeklyVsLastWeek: 'vs. letzte Woche',
+  parentWeeklyMinutes: 'Übungszeit diese Woche',
+  parentWeeklyMinutesUnit: 'Min',
+  parentRowAccuracy: 'Genauigkeit pro Malreihe',
+  parentWeeklyRecommendation: 'Übungsempfehlung der Woche',
+  parentRecommendationText: 'Die {row}er-Reihe üben (Fehlerquote {rate}%)',
+  parentRecommendationEmpty: 'Keine Schwachstelle erkannt – weiter so!',
   ok: 'OK',
 };
 
@@ -58,22 +68,22 @@ describe('ParentDashboard', () => {
     mockGetTaskStats.mockResolvedValue([]);
   });
 
-  it('shows empty state when no records', async () => {
+  it('shows friendly empty state illustration when no records', async () => {
     const { getByText } = render(
       <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
     );
     await waitFor(() => {
+      expect(getByText(t.parentEmptyTitle)).toBeTruthy();
       expect(getByText(t.parentNoData)).toBeTruthy();
     });
   });
 
-  it('shows title and beta badge', async () => {
+  it('shows title', async () => {
     const { getByText } = render(
       <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
     );
     await waitFor(() => {
       expect(getByText(t.parentDashboard)).toBeTruthy();
-      expect(getByText('BETA')).toBeTruthy();
     });
   });
 
@@ -190,6 +200,71 @@ describe('ParentDashboard', () => {
     await waitFor(() => {
       expect(getByText(t.chartSessions)).toBeTruthy();
       expect(getByText(t.chartErrorRate)).toBeTruthy();
+    });
+  });
+
+  it('shows weekly session count in the weekly review section', async () => {
+    mockGetSessionRecords.mockResolvedValue([
+      makeRecord({ timestamp: Date.now() }),
+      makeRecord({ timestamp: Date.now() - 2 * 24 * 60 * 60 * 1000 }),
+    ]);
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => {
+      expect(getByText(t.parentWeeklyReview)).toBeTruthy();
+      expect(getByText(`${t.parentWeeklySessions}: 2`)).toBeTruthy();
+    });
+  });
+
+  it('shows practiced minutes when session durations are recorded', async () => {
+    mockGetSessionRecords.mockResolvedValue([
+      makeRecord({ timestamp: Date.now(), durationMs: 90000 }),
+    ]);
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => {
+      expect(getByText(`${t.parentWeeklyMinutes}: 2 ${t.parentWeeklyMinutesUnit}`)).toBeTruthy();
+    });
+  });
+
+  it('recommends the weakest times-table row when one is clearly weak', async () => {
+    mockGetSessionRecords.mockResolvedValue([makeRecord()]);
+    mockGetTaskStats.mockResolvedValue([
+      {
+        num1: 6,
+        num2: 7,
+        operation: 'MULTIPLICATION',
+        correctCount: 1,
+        errorCount: 5,
+        lastSeen: new Date().toISOString(),
+      },
+      {
+        num1: 6,
+        num2: 8,
+        operation: 'MULTIPLICATION',
+        correctCount: 0,
+        errorCount: 3,
+        lastSeen: new Date().toISOString(),
+      },
+    ]);
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => {
+      expect(getByText('Die 6er-Reihe üben (Fehlerquote 89%)')).toBeTruthy();
+    });
+  });
+
+  it('shows the empty recommendation message when no row is weak', async () => {
+    mockGetSessionRecords.mockResolvedValue([makeRecord()]);
+    mockGetTaskStats.mockResolvedValue([]);
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => {
+      expect(getByText(t.parentRecommendationEmpty)).toBeTruthy();
     });
   });
 

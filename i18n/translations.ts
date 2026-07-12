@@ -101,6 +101,16 @@ export interface TranslationStrings {
   parentWeakTasksEmpty: string;
   chartSessions: string;
   chartErrorRate: string;
+  parentEmptyTitle: string;
+  parentWeeklyReview: string;
+  parentWeeklySessions: string;
+  parentWeeklyVsLastWeek: string;
+  parentWeeklyMinutes: string;
+  parentWeeklyMinutesUnit: string;
+  parentRowAccuracy: string;
+  parentWeeklyRecommendation: string;
+  parentRecommendationText: string;
+  parentRecommendationEmpty: string;
   colorTheme: string;
   // Sounds
   sounds: string;
@@ -248,7 +258,7 @@ export const translations: Record<Language, TranslationStrings> = {
     ok: 'OK',
     // Parent Dashboard
     parentDashboard: 'Parent Dashboard',
-    parentDashboardMenu: 'Parent Dashboard (Beta)',
+    parentDashboardMenu: 'Parent Dashboard',
     parentDashboardSubtitle: 'Last 4 weeks · tap ✕ to close',
     parentNoData: 'No sessions recorded yet. Play a few rounds first!',
     parentSessions: 'Sessions (4 weeks)',
@@ -269,6 +279,16 @@ export const translations: Record<Language, TranslationStrings> = {
     parentWeakTasksEmpty: 'No weak areas identified yet.',
     chartSessions: 'Sessions · 14 days',
     chartErrorRate: 'Error rate · 14 days',
+    parentEmptyTitle: "Let's get started!",
+    parentWeeklyReview: 'Weekly Review',
+    parentWeeklySessions: 'Sessions this week',
+    parentWeeklyVsLastWeek: 'vs. last week',
+    parentWeeklyMinutes: 'Practice time this week',
+    parentWeeklyMinutesUnit: 'min',
+    parentRowAccuracy: 'Accuracy by times table',
+    parentWeeklyRecommendation: "This week's practice tip",
+    parentRecommendationText: 'Practice the {row} times table (error rate {rate}%)',
+    parentRecommendationEmpty: 'No weak spot found — keep it up!',
     colorTheme: 'COLOR THEME',
     sounds: 'SOUNDS',
     soundsOn: 'On',
@@ -415,7 +435,7 @@ export const translations: Record<Language, TranslationStrings> = {
     ok: 'OK',
     // Parent Dashboard
     parentDashboard: 'Eltern-Dashboard',
-    parentDashboardMenu: 'Eltern-Dashboard (Beta)',
+    parentDashboardMenu: 'Eltern-Dashboard',
     parentDashboardSubtitle: 'Letzte 4 Wochen · ✕ zum Schließen',
     parentNoData: 'Noch keine Einheiten gespeichert. Spielt zuerst ein paar Runden!',
     parentSessions: 'Einheiten (4 Wochen)',
@@ -436,6 +456,16 @@ export const translations: Record<Language, TranslationStrings> = {
     parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
     chartSessions: 'Einheiten · 14 Tage',
     chartErrorRate: 'Fehlerquote · 14 Tage',
+    parentEmptyTitle: "Los geht's!",
+    parentWeeklyReview: 'Wochenrückblick',
+    parentWeeklySessions: 'Einheiten diese Woche',
+    parentWeeklyVsLastWeek: 'vs. letzte Woche',
+    parentWeeklyMinutes: 'Übungszeit diese Woche',
+    parentWeeklyMinutesUnit: 'Min',
+    parentRowAccuracy: 'Genauigkeit pro Malreihe',
+    parentWeeklyRecommendation: 'Übungsempfehlung der Woche',
+    parentRecommendationText: 'Die {row}er-Reihe üben (Fehlerquote {rate}%)',
+    parentRecommendationEmpty: 'Keine Schwachstelle erkannt – weiter so!',
     colorTheme: 'FARBTHEMA',
     sounds: 'TÖNE',
     soundsOn: 'An',
