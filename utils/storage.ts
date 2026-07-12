@@ -372,6 +372,16 @@ export const resetOnboarding = async (): Promise<void> => {
   await setStorageItem(STORAGE_KEYS.ONBOARDING_DONE, 'pending');
 };
 
+// Lernreise intro is per-profile: each child profile sees it once on first entry.
+export const getLernreiseIntroDone = async (profileId?: string): Promise<boolean> => {
+  const value = await getStorageItem(resolveKey(STORAGE_KEYS.LERNREISE_INTRO_DONE, profileId));
+  return value === 'true';
+};
+
+export const setLernreiseIntroDone = async (profileId?: string): Promise<void> => {
+  await setStorageItem(resolveKey(STORAGE_KEYS.LERNREISE_INTRO_DONE, profileId), 'true');
+};
+
 function isValidTaskStat(r: unknown): r is TaskStat {
   if (!r || typeof r !== 'object') return false;
   const obj = r as Record<string, unknown>;

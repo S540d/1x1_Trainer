@@ -189,6 +189,10 @@ export interface TranslationStrings {
   lernreiseResultBronze: string;
   lernreiseResultRetry: string;
   lernreiseBackToMap: string;
+  lernreiseIntroTitle: string;
+  lernreiseIntroBody: string;
+  lernreiseIntroPracticeHint: string;
+  lernreiseIntroStart: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -366,6 +370,12 @@ export const translations: Record<Language, TranslationStrings> = {
     lernreiseResultBronze: 'Bronze! Well done!',
     lernreiseResultRetry: 'Not quite yet — give it another try!',
     lernreiseBackToMap: 'Back to Learning Journey',
+    lernreiseIntroTitle: 'Welcome to your Learning Journey!',
+    lernreiseIntroBody:
+      'Work through the times tables one by one, from 1 to 12. Pass a table’s test to unlock the next one and earn Bronze, Silver, or Gold.',
+    lernreiseIntroPracticeHint:
+      'Tip: use Practice Mode afterwards to automatically drill the tasks you find tricky.',
+    lernreiseIntroStart: "Let's go!",
     // Profiles
     profiles: 'Profiles',
     profilesMenu: 'Profiles',
@@ -554,6 +564,12 @@ export const translations: Record<Language, TranslationStrings> = {
     lernreiseResultBronze: 'Bronze! Gut gemacht!',
     lernreiseResultRetry: 'Noch nicht ganz – versuch es nochmal!',
     lernreiseBackToMap: 'Zurück zur Lernreise',
+    lernreiseIntroTitle: 'Willkommen zu deiner Lernreise!',
+    lernreiseIntroBody:
+      'Arbeite dich Malreihe für Malreihe von 1 bis 12 vor. Bestehe den Test einer Reihe, um die nächste freizuschalten und Bronze, Silber oder Gold zu verdienen.',
+    lernreiseIntroPracticeHint:
+      'Tipp: Nutze danach den Übungsmodus, um automatisch die Aufgaben zu festigen, die dir noch schwerfallen.',
+    lernreiseIntroStart: "Los geht's!",
     // Profiles
     profiles: 'Profile',
     profilesMenu: 'Profile',
