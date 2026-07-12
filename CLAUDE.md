@@ -83,18 +83,19 @@ npm run test:coverage # Coverage
 
 ---
 
-## Aktueller Stand (2026-07-07)
+## Aktueller Stand (2026-07-12)
 
-- Version: **1.4.0** / versionCode 30
-- Branches: `testing` vorn; `main` auf `91cf92d` (sync v1.3.8)
+- Version: **1.4.1** / versionCode 31
+- Branches: `testing` vorn (inkl. PR #278 Expo-SDK-57); `main` auf `91cf92d` (sync v1.3.8)
 - Offene PRs: #272 (Fortschrittsbalken-Segmente + Durchlauf-Zähler), #245 (CLAUDE.md docs), gegen `testing`
-- Offene Issues: #156, #231, #96
+- Offene Issues: #156, #231, #96, #276 (npm-audit-Vulnerabilities — SDK-Upgrade-Teilaufgabe erledigt, Rest bleibt offen, siehe unten), #277 (Wachstumsplan)
 - APK v1.3.8 via CI
 
 ### Zuletzt gemergt / gepusht
 
 | PR / Commit  | Was                                                                                            |
 | ------------ | ---------------------------------------------------------------------------------------------- |
+| #278 ✅      | build: Expo SDK 55 → 57 (React Native 0.86, React 19.2.3) — Issue #276 (Teil 1/3 erledigt)     |
 | #272 (offen) | feat: Fortschrittsbalken in 10 Segmente (grün/rot pro Aufgabe) + Durchlauf-Zähler statt Flamme |
 | #247 ✅      | feat: Mehrere Kinderprofile (Issue #187 ✅ geschlossen)                                        |
 | #246 ✅      | chore: Prettier + pre-push Hook (Issue #220 ✅ geschlossen)                                    |
@@ -151,6 +152,8 @@ npm run test:coverage # Coverage
 - **Merge-Konflikt staging→main:** temporäre Workflow-Dateien können kollidieren → staging-Version bevorzugen
 - **Expo-Pakete in Jest:** Neue Pakete immer in `transformIgnorePatterns` **und** `moduleNameMapper` eintragen
 - **expo-audio statt expo-av (gelöst, Issue #214 / PR #215):** expo-av brach auf SDK 55 (`resolveView` aus Legacy-UIManager entfernt). Migration auf `expo-audio ~55.0.14` behebt den lokalen Build. **JDK 17 zwingend** für `./gradlew assembleRelease` — Default-Java (21/25) bricht ab.
+- **Expo SDK 55 → 57 (2026-07-12, PR #278, Issue #276):** Upgrade in zwei Schritten (55→56→57) anhand `bundledNativeModules.json` der jeweiligen `expo`-Version, da `expo install --fix` / `expo-doctor` in der CI/Remote-Umgebung durch den Proxy blockiert werden können (nur `registry.npmjs.org` erreichbar, nicht `exp.host`). React Native 0.83.2 → 0.86.0, React/React-DOM 19.2.0 → 19.2.3, `react-native-safe-area-context` ~5.6.2 → ~5.7.0, alle Expo-Pakete (`expo-audio`, `expo-font`, `expo-linear-gradient`, `expo-localization`, `expo-status-bar`) auf ~57.0.0. Keine Breaking Changes für dieses Projekt relevant (kein `@expo/vector-icons`, `expo-file-system`, `expo-router` oder `EXPO_PUBLIC_`-Env-Vars im Code). `npx expo config --type public` validiert `app.json` ohne Warnungen — keine Config-Änderungen nötig.
+- **npm-audit-Findings NICHT durch SDK-Upgrade behoben (Issue #276):** `npm audit` zeigt nach dem Sprung auf SDK 57 weiterhin 12 moderate Vulnerabilities (vorher 11, `@expo/inline-modules` kam neu dazu) — Root-Ursache ist `uuid <11.1.1` als transitive Build-Time-Dependency von `xcode` → `@expo/config-plugins` → dem gesamten `@expo/*`-Toolchain-Baum, unabhängig von der installierten SDK-Version. `npm audit fix` (non-force) findet weiterhin 0 behebbare Treffer. Betrifft nur Prebuild/Config-Plugins, nicht den ausgelieferten App-Code. `@react-native-firebase/*` bleibt bei `^24.1.0` (Finding `>=17.4.3` betrifft praktisch jede Version). Fix liegt bei Expo/Firebase upstream — Issue #276 bleibt deshalb offen.
 
 ---
 
