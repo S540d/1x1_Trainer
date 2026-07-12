@@ -178,6 +178,17 @@ export interface TranslationStrings {
   onboardingStart: string;
   onboardingSkip: string;
   resetOnboarding: string;
+  // Lernreise / Reihen-Meisterschaft
+  lernreiseMenu: string;
+  lernreiseTitle: string;
+  lernreiseSubtitle: string;
+  lernreiseRowLabel: string;
+  lernreiseResultScore: string;
+  lernreiseResultGold: string;
+  lernreiseResultSilver: string;
+  lernreiseResultBronze: string;
+  lernreiseResultRetry: string;
+  lernreiseBackToMap: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -344,6 +355,17 @@ export const translations: Record<Language, TranslationStrings> = {
     onboardingStart: 'Start',
     onboardingSkip: 'Skip',
     resetOnboarding: 'Restart tutorial',
+    // Lernreise / Times-Table Mastery
+    lernreiseMenu: 'Learning Journey',
+    lernreiseTitle: 'Learning Journey',
+    lernreiseSubtitle: 'Master every times table — Bronze, Silver, Gold',
+    lernreiseRowLabel: '{row} Times Table',
+    lernreiseResultScore: '{score}/10 correct',
+    lernreiseResultGold: 'Gold! Perfectly mastered!',
+    lernreiseResultSilver: 'Silver! Great job!',
+    lernreiseResultBronze: 'Bronze! Well done!',
+    lernreiseResultRetry: 'Not quite yet — give it another try!',
+    lernreiseBackToMap: 'Back to Learning Journey',
     // Profiles
     profiles: 'Profiles',
     profilesMenu: 'Profiles',
@@ -521,6 +543,17 @@ export const translations: Record<Language, TranslationStrings> = {
     onboardingStart: 'Loslegen',
     onboardingSkip: 'Überspringen',
     resetOnboarding: 'Tutorial zurücksetzen',
+    // Lernreise / Reihen-Meisterschaft
+    lernreiseMenu: 'Lernreise',
+    lernreiseTitle: 'Lernreise',
+    lernreiseSubtitle: 'Meistere jede Malreihe – Bronze, Silber, Gold',
+    lernreiseRowLabel: '{row}er-Reihe',
+    lernreiseResultScore: '{score}/10 richtig',
+    lernreiseResultGold: 'Gold! Perfekt gemeistert!',
+    lernreiseResultSilver: 'Silber! Toll gemacht!',
+    lernreiseResultBronze: 'Bronze! Gut gemacht!',
+    lernreiseResultRetry: 'Noch nicht ganz – versuch es nochmal!',
+    lernreiseBackToMap: 'Zurück zur Lernreise',
     // Profiles
     profiles: 'Profile',
     profilesMenu: 'Profile',

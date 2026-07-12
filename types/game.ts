@@ -84,6 +84,15 @@ export interface TaskStat {
   lastSeen: string; // ISO date
 }
 
+// Lernreise / Reihen-Meisterschaft (Issue #277 1a)
+export type RowMasteryStatus = 'bronze' | 'silver' | 'gold';
+
+export interface RowMastery {
+  row: number;
+  bestScore: number;
+  status: RowMasteryStatus | null;
+}
+
 export interface SessionRecord {
   id: string;
   timestamp: number;

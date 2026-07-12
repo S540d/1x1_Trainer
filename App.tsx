@@ -38,6 +38,7 @@ import { BadgesModal } from './components/BadgesModal';
 import { BadgeUnlockToast } from './components/BadgeUnlockToast';
 import { FloatingStars } from './components/FloatingStars';
 import { ProfilePickerModal } from './components/ProfilePickerModal';
+import { LernreiseModal } from './components/LernreiseModal';
 import {
   saveSessionRecord,
   getStreakData,
@@ -89,6 +90,7 @@ export default function App() {
   const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
   const [badgesVisible, setBadgesVisible] = useState(false);
   const [profilePickerVisible, setProfilePickerVisible] = useState(false);
+  const [lernreiseVisible, setLernreiseVisible] = useState(false);
   const [streakData, setStreakData] = useState<StreakData>({
     currentStreak: 0,
     lastPlayedDate: '',
@@ -199,6 +201,7 @@ export default function App() {
     parentDashboardVisible ||
     badgesVisible ||
     profilePickerVisible ||
+    lernreiseVisible ||
     streakWarningVisible ||
     onboardingVisible ||
     game.gameState.showResult;
@@ -484,6 +487,7 @@ export default function App() {
             setProfilePickerVisible(true);
             hideMenu();
           }}
+          onOpenLernreise={() => setLernreiseVisible(true)}
           t={t}
         />
       )}
@@ -616,6 +620,14 @@ export default function App() {
         badgeIds={badgeSystem.newlyUnlocked}
         onDone={badgeSystem.clearNewlyUnlocked}
         badgeNewUnlockedLabel={t.badgeNewUnlocked}
+      />
+
+      <LernreiseModal
+        visible={lernreiseVisible}
+        onClose={() => setLernreiseVisible(false)}
+        colors={colors}
+        profileId={activeProfile?.id}
+        t={t}
       />
     </SafeAreaView>
   );
