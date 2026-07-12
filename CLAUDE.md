@@ -86,15 +86,18 @@ npm run test:coverage # Coverage
 ## Aktueller Stand (2026-07-12)
 
 - Version: **1.4.1** / versionCode 31
-- Branches: `testing` vorn (inkl. PR #278 Expo-SDK-57); `main` auf `91cf92d` (sync v1.3.8)
+- Branches: `testing` vorn (inkl. #278 Expo-SDK-57, #279 Wochenrückblick/Empty-States, #280 resizeableActivity, #281 Lernreise); `main` auf `91cf92d` (sync v1.3.8)
 - Offene PRs: #272 (Fortschrittsbalken-Segmente + Durchlauf-Zähler), #245 (CLAUDE.md docs), gegen `testing`
-- Offene Issues: #156, #231, #96, #276 (npm-audit-Vulnerabilities — SDK-Upgrade-Teilaufgabe erledigt, Rest bleibt offen, siehe unten), #277 (Wachstumsplan)
+- Offene Issues: #156, #231, #96, #276 (npm-audit-Vulnerabilities — SDK-Upgrade-Teilaufgabe erledigt, Rest bleibt offen, siehe unten), #275 (Code-Fix in #280 erledigt, letzter To-Do „Neubuild + AAB-Upload" bleibt manuell offen), #277 (Wachstumsplan — 1a/1d/2d erledigt, siehe unten)
 - APK v1.3.8 via CI
 
 ### Zuletzt gemergt / gepusht
 
 | PR / Commit  | Was                                                                                            |
 | ------------ | ---------------------------------------------------------------------------------------------- |
+| #281 ✅      | feat: Lernreise / Reihen-Meisterschaft mit Bronze/Silber/Gold — Issue #277 1a                  |
+| #280 ✅      | fix: android:resizeableActivity="true" via Config-Plugin — Issue #275                          |
+| #279 ✅      | feat: Wochenrückblick im Eltern-Dashboard + freundlicher Empty-State — Issue #277 1d/2d        |
 | #278 ✅      | build: Expo SDK 55 → 57 (React Native 0.86, React 19.2.3) — Issue #276 (Teil 1/3 erledigt)     |
 | #272 (offen) | feat: Fortschrittsbalken in 10 Segmente (grün/rot pro Aufgabe) + Durchlauf-Zähler statt Flamme |
 | #247 ✅      | feat: Mehrere Kinderprofile (Issue #187 ✅ geschlossen)                                        |
@@ -117,7 +120,7 @@ npm run test:coverage # Coverage
 | `utils/theme.ts`                    | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'`                                                                                                                                                                                                                     |
 | `utils/storage.ts`                  | Storage-Helfer + Profile-Management (`migrateToProfiles`, `createProfile`, `deleteProfileData`, `getProfiles`/`saveProfiles`, `setActiveProfileId`). Alle per-Profil-Funktionen haben optionalen `profileId?`-Parameter (Suffix-Pattern `{key}-{profileId}`). `profileKey()` / `resolveKey()` intern. |
 | `utils/animations.ts`               | `prefersReducedMotion()` — liest Accessibility-Einstellung                                                                                                                                                                                                                                            |
-| `types/game.ts`                     | ThemeColors (inkl. `gradientPrimary`), GameState (inkl. `answerHistory`), Enums, SessionRecord, `ThemeName`, `ChildProfile`                                                                                                                                                                           |
+| `types/game.ts`                     | ThemeColors (inkl. `gradientPrimary`), GameState (inkl. `answerHistory`), Enums, SessionRecord (inkl. optionalem `durationMs`), `ThemeName`, `ChildProfile`, `RowMastery`/`RowMasteryStatus`                                                                                                          |
 | `i18n/translations.ts`              | DE/EN Übersetzungen, `TranslationStrings`-Interface (inkl. 12 Profil-Strings)                                                                                                                                                                                                                         |
 | `hooks/useGameLogic.ts`             | Gesamte Spiellogik, `onSessionComplete`-Callback                                                                                                                                                                                                                                                      |
 | `hooks/usePreferences.ts`           | `usePreferences(profileId?)` — globale Prefs (Sprache, Theme, Sounds) + per-Profil-Prefs (Operations, NumberRange, TotalTasks, HighScore); lädt per-Profil-Daten neu bei Profilwechsel                                                                                                                |
@@ -126,13 +129,15 @@ npm run test:coverage # Coverage
 | `assets/sounds/`                    | WAV-Assets: correct / incorrect / perfect / level_up / badge_unlock (je 8–17 KB)                                                                                                                                                                                                                      |
 | `scripts/generate-sounds.js`        | Generator für WAV-Assets (`node scripts/generate-sounds.js`)                                                                                                                                                                                                                                          |
 | `components/PersonalizeModal.tsx`   | Aussehen-Modal (Light/Dark/System, Farbtheme-Picker, Sprache, Sound An/Aus + Lautstärke)                                                                                                                                                                                                              |
-| `components/ParentDashboard.tsx`    | Eltern-Dashboard Modal (Beta)                                                                                                                                                                                                                                                                         |
+| `components/ParentDashboard.tsx`    | Eltern-Dashboard Modal (seit PR #279 kein „(Beta)"-Label mehr) inkl. Wochenrückblick (Trend, Übungszeit, Genauigkeit pro Malreihe, Übungsempfehlung) und freundlichem Empty-State                                                                                                                     |
 | `components/ProfilePickerModal.tsx` | Bottom-Sheet-Modal für Profilauswahl/-erstellung/-löschung (max. 6 Profile, Farbauswahl, Bestätigungs-Alert bei Löschen)                                                                                                                                                                              |
 | `components/GameCard.tsx`           | Hauptspielansicht (alle 3 Antwortmodi)                                                                                                                                                                                                                                                                |
 | `components/Header.tsx`             | Score/Level/Lives, segmentierte `ProgressBar`, Durchlauf-Zähler (`roundsToday`, ersetzt seit PR #272 die Streak-Flamme)                                                                                                                                                                               |
 | `components/ProgressBar.tsx`        | 10 Segmente statt Gradient-Fill; `history: (boolean \| null)[]` → grün/rot/grau pro Aufgabe                                                                                                                                                                                                           |
+| `components/LernreiseModal.tsx`     | Lernreise / Reihen-Meisterschaft (PR #281, Issue #277 1a): Malreihen-Landkarte + Abschlusstest pro Reihe (Numpad/ProgressBar wiederverwendet) + Bronze/Silber/Gold-Ergebnis                                                                                                                           |
+| `plugins/withResizeableActivity.js` | Lokales Expo-Config-Plugin (PR #280, Issue #275): setzt `android:resizeableActivity="true"` im generierten `AndroidManifest.xml`, da `android/` nicht versioniert wird                                                                                                                                |
 | `styles/modalStyles.ts`             | Gemeinsame Modal-Styles                                                                                                                                                                                                                                                                               |
-| `app.config.js`                     | Dynamische Expo-Konfiguration: überschreibt `android.package` via `APP_PACKAGE` env-var (Issue #233)                                                                                                                                                                                                  |
+| `app.config.js`                     | Dynamische Expo-Konfiguration: überschreibt `android.package` via `APP_PACKAGE` env-var (Issue #233); hängt `withResizeableActivity` an die Plugin-Liste an (Issue #275)                                                                                                                              |
 | `jest.config.js`                    | Jest-Konfiguration                                                                                                                                                                                                                                                                                    |
 | `docs/private/CLAUDE.md`            | Sensible Build/Keystore-Details (gitignored)                                                                                                                                                                                                                                                          |
 
@@ -154,16 +159,24 @@ npm run test:coverage # Coverage
 - **expo-audio statt expo-av (gelöst, Issue #214 / PR #215):** expo-av brach auf SDK 55 (`resolveView` aus Legacy-UIManager entfernt). Migration auf `expo-audio ~55.0.14` behebt den lokalen Build. **JDK 17 zwingend** für `./gradlew assembleRelease` — Default-Java (21/25) bricht ab.
 - **Expo SDK 55 → 57 (2026-07-12, PR #278, Issue #276):** Upgrade in zwei Schritten (55→56→57) anhand `bundledNativeModules.json` der jeweiligen `expo`-Version, da `expo install --fix` / `expo-doctor` in der CI/Remote-Umgebung durch den Proxy blockiert werden können (nur `registry.npmjs.org` erreichbar, nicht `exp.host`). React Native 0.83.2 → 0.86.0, React/React-DOM 19.2.0 → 19.2.3, `react-native-safe-area-context` ~5.6.2 → ~5.7.0, alle Expo-Pakete (`expo-audio`, `expo-font`, `expo-linear-gradient`, `expo-localization`, `expo-status-bar`) auf ~57.0.0. Keine Breaking Changes für dieses Projekt relevant (kein `@expo/vector-icons`, `expo-file-system`, `expo-router` oder `EXPO_PUBLIC_`-Env-Vars im Code). `npx expo config --type public` validiert `app.json` ohne Warnungen — keine Config-Änderungen nötig.
 - **npm-audit-Findings NICHT durch SDK-Upgrade behoben (Issue #276):** `npm audit` zeigt nach dem Sprung auf SDK 57 weiterhin 12 moderate Vulnerabilities (vorher 11, `@expo/inline-modules` kam neu dazu) — Root-Ursache ist `uuid <11.1.1` als transitive Build-Time-Dependency von `xcode` → `@expo/config-plugins` → dem gesamten `@expo/*`-Toolchain-Baum, unabhängig von der installierten SDK-Version. `npm audit fix` (non-force) findet weiterhin 0 behebbare Treffer. Betrifft nur Prebuild/Config-Plugins, nicht den ausgelieferten App-Code. `@react-native-firebase/*` bleibt bei `^24.1.0` (Finding `>=17.4.3` betrifft praktisch jede Version). Fix liegt bei Expo/Firebase upstream — Issue #276 bleibt deshalb offen.
+- **`android/` ist nicht versioniert (gitignored, per `expo prebuild` generiert):** Manifest-Änderungen wie `android:resizeableActivity="true"` (Issue #275, PR #280) können nicht direkt in einer Datei gepflegt werden, sondern brauchen ein Expo-Config-Plugin (`plugins/withResizeableActivity.js`, via `withAndroidManifest` aus `expo/config-plugins`, in `app.config.js` an die Plugin-Liste angehängt). Verifizieren mit `npx expo prebuild --platform android --clean` + `grep` im generierten `AndroidManifest.xml`; danach `android/` wieder löschen (gitignored). Für den lokalen Test wird zusätzlich eine (gitignorete) Platzhalter-`google-services.json` benötigt, sonst bricht der Firebase-Copy-Schritt des Prebuilds unabhängig von der eigentlichen Änderung ab.
 
 ---
 
-## Eltern-Dashboard (Beta) — Hinweise
+## Eltern-Dashboard — Hinweise
 
 - `SessionRecord` wird nach jeder Runde (Normal, Kreativ, Challenge) gespeichert
 - Challenge-Sessions: `operations` kommt aus `getChallengeLevel(score).operations`, nicht aus `selectedOperations`
 - `getSessionRecords()` bereinigt automatisch Einträge älter als 28 Tage und schreibt zurück
 - `FOUR_WEEKS_MS` ist in `utils/storage.ts` exportiert — nicht duplizieren
 - `isValidSessionRecord` validiert alle Felder gegen Enum-Werte
+- **Seit PR #279 kein „(Beta)"-Label mehr** — Titel/Menüeintrag heißen schlicht „Eltern-Dashboard"; `parentDashboardMenu` in `i18n/translations.ts` entsprechend ohne Suffix
+- **Wochenrückblick (PR #279, Issue #277 1d):** eigene Sektion oberhalb der 14-Tage-Charts in `ParentDashboard.tsx`
+  - `SessionRecord.durationMs?: number` — optionales Feld, von `useGameLogic` pro Runde erfasst (`sessionStartRef`, zurückgesetzt bei jedem Rundenstart über `beginNewRound()` statt `emptyAnswerHistory()`); ältere Sessions ohne das Feld werden bei der Anzeige übersprungen statt falsche Werte zu zeigen
+  - Einheiten diese Woche + Trend-Pfeil vs. Vorwoche: rollierende 7-Tage-Fenster (`recordsInLastNDays()`), keine Kalenderwochen
+  - Genauigkeit pro Malreihe (1–10): All-Time-Aggregation aus `TaskStat` (`computeRowAccuracy()`), keine Wochenfilterung möglich (TaskStat hat keine Pro-Versuch-Zeitstempel)
+  - Übungsempfehlung der Woche: schwächste Malreihe via `recommendWeakestRow()` (analog `getWeakTasks()`-Schwellen), freundlicher Fallback-Text wenn nichts schwach ist
+- **Freundlicher Empty-State (PR #279, Issue #277 2d):** Emoji + Titel (`parentEmptyTitle`) + Text statt reinem Fließtext, wenn noch keine Sessions vorhanden sind
 
 ## Streak-Tracker — Hinweise
 
@@ -197,6 +210,18 @@ npm run test:coverage # Coverage
 - ParentDashboard zeigt Top-5-Schwachstellen — unabhängig von vorhandenen Session-Records
 - CI: `npm test --ci` läuft jetzt automatisch bei jedem PR (`.github/workflows/ci-cd.yml`, Job `test`)
 
+## Lernreise / Reihen-Meisterschaft — Hinweise (PR #281, Issue #277 1a)
+
+- Neuer Einstiegspunkt „Lernreise" im Einstellungsmenü (`onOpenLernreise`-Prop, `components/SettingsMenu.tsx`) → `components/LernreiseModal.tsx`
+- `RowMastery` (`types/game.ts`): `{ row: number; bestScore: number; status: RowMasteryStatus | null }`, `RowMasteryStatus = 'bronze' | 'silver' | 'gold'`
+- Storage Key: `app-row-mastery` (Suffix-Pattern, profilgetrennt); `getRowMastery`/`saveRowMastery`/`recordRowTestResult` in `utils/storage.ts`, immer 12 Einträge (`LERNREISE_ROW_COUNT` in `utils/constants.ts`)
+- **Landkarte:** 12 Knoten (1er–12er-Reihe); Reihe 1 immer offen, Reihe N schaltet sich frei sobald Reihe N−1 mindestens einmal einen Status erreicht hat (`isRowUnlocked()`, reine Funktion)
+- **Abschlusstest pro Reihe:** 10 Aufgaben mit gemischten Faktoren 1–10 (`shuffledFactors()`), UI nutzt die bestehenden `Numpad`- und `ProgressBar`-Komponenten aus dem Hauptspiel
+- **Status-Schwellen** (`statusForRowScore()`): Gold = 10/10, Silber ≥ 8/10, Bronze ≥ 6/10, sonst kein Status. Ein einmal erreichter Status kann durch einen schwächeren späteren Versuch nicht sinken (`recordRowTestResult()` vergleicht Rang), `bestScore` wird aber immer aktualisiert
+- Bewusste Design-Entscheidung: Status wird **pro Testversuch** vergeben, nicht aus der langfristig kumulierten `TaskStat`-Fehlerquote — macht das Freischalten nachvollziehbar (bestanden/nicht bestanden) statt von organischem Übungsverhalten außerhalb der Lernreise abhängig
+- Jede Testantwort läuft trotzdem ganz normal über `recordTaskResult()` in die bestehende `TaskStat`-Infrastruktur ein → Übungsmodus und Eltern-Dashboard (Genauigkeit pro Malreihe) profitieren automatisch mit
+- Bewusst noch nicht umgesetzt (siehe Issue #277 1a, „perspektivisch"): Ersetzen/Bündeln des separaten Übungsmodus (PRACTICE) durch die Lernreise
+
 ---
 
 ## Visuelle Themes / App-Skins — Hinweise
@@ -221,6 +246,9 @@ npm run test:coverage # Coverage
 - ✅ **Orientation auf `"default"` gesetzt** (Issue #235 / PR #243) — Tablet/Foldable Landscape-Support
 - ✅ **Prettier + pre-push Hook** (Issue #220 / PR #246) — einheitliches Code-Formatting
 - ✅ **Mehrere Kinderprofile** (Issue #187 / PR #247) — bis zu 6 Profile, je eigene Spieldaten
+- ✅ **Wochenrückblick + Empty-States im Eltern-Dashboard** (Issue #277 1d/2d / PR #279) — „(Beta)"-Label entfernt
+- ✅ **Large-Screen-Kompatibilität `resizeableActivity`** (Issue #275 / PR #280) — Code-Fix erledigt, letzter Schritt (Neubuild + AAB-Upload an den Play Store) bleibt manuell
+- ✅ **Lernreise / Reihen-Meisterschaft** (Issue #277 1a / PR #281) — Malreihen-Landkarte mit Bronze/Silber/Gold
 - Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 - Reanimated wurde durch `Animated` core ersetzt (Web-Kompatibilität) — Issue #131
 
