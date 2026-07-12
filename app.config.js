@@ -7,5 +7,6 @@ module.exports = {
       ...base.expo.android,
       package: process.env.APP_PACKAGE || base.expo.android.package,
     },
+    plugins: [...base.expo.plugins, './plugins/withResizeableActivity'],
   },
 };
