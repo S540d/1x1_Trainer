@@ -33,6 +33,7 @@ export const STORAGE_KEYS = {
   PROFILES: 'app-profiles',
   ACTIVE_PROFILE_ID: 'app-active-profile-id',
   ROW_MASTERY: 'app-row-mastery',
+  LERNREISE_INTRO_DONE: 'app-lernreise-intro-done',
 } as const;
 
 // Lernreise / Reihen-Meisterschaft (Issue #277 1a): one node per times table

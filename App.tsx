@@ -39,6 +39,7 @@ import { BadgeUnlockToast } from './components/BadgeUnlockToast';
 import { FloatingStars } from './components/FloatingStars';
 import { ProfilePickerModal } from './components/ProfilePickerModal';
 import { LernreiseModal } from './components/LernreiseModal';
+import { LernreiseIntroModal } from './components/LernreiseIntroModal';
 import {
   saveSessionRecord,
   getStreakData,
@@ -52,6 +53,8 @@ import {
   getOnboardingDone,
   setOnboardingDone,
   resetOnboarding,
+  getLernreiseIntroDone,
+  setLernreiseIntroDone,
   getStorageItem,
   migrateToProfiles,
   getProfiles,
@@ -91,6 +94,7 @@ export default function App() {
   const [badgesVisible, setBadgesVisible] = useState(false);
   const [profilePickerVisible, setProfilePickerVisible] = useState(false);
   const [lernreiseVisible, setLernreiseVisible] = useState(false);
+  const [lernreiseIntroVisible, setLernreiseIntroVisible] = useState(false);
   const [streakData, setStreakData] = useState<StreakData>({
     currentStreak: 0,
     lastPlayedDate: '',
@@ -202,6 +206,7 @@ export default function App() {
     badgesVisible ||
     profilePickerVisible ||
     lernreiseVisible ||
+    lernreiseIntroVisible ||
     streakWarningVisible ||
     onboardingVisible ||
     game.gameState.showResult;
@@ -487,7 +492,14 @@ export default function App() {
             setProfilePickerVisible(true);
             hideMenu();
           }}
-          onOpenLernreise={() => setLernreiseVisible(true)}
+          onOpenLernreise={async () => {
+            const introDone = await getLernreiseIntroDone(activeProfileIdRef.current);
+            if (introDone) {
+              setLernreiseVisible(true);
+            } else {
+              setLernreiseIntroVisible(true);
+            }
+          }}
           t={t}
         />
       )}
@@ -627,6 +639,17 @@ export default function App() {
         onClose={() => setLernreiseVisible(false)}
         colors={colors}
         profileId={activeProfile?.id}
+        t={t}
+      />
+
+      <LernreiseIntroModal
+        visible={lernreiseIntroVisible}
+        onClose={async () => {
+          await setLernreiseIntroDone(activeProfileIdRef.current);
+          setLernreiseIntroVisible(false);
+          setLernreiseVisible(true);
+        }}
+        colors={colors}
         t={t}
       />
     </SafeAreaView>
