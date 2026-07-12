@@ -32,7 +32,11 @@ export const STORAGE_KEYS = {
   SOUNDS_VOLUME: 'app-sounds-volume',
   PROFILES: 'app-profiles',
   ACTIVE_PROFILE_ID: 'app-active-profile-id',
+  ROW_MASTERY: 'app-row-mastery',
 } as const;
+
+// Lernreise / Reihen-Meisterschaft (Issue #277 1a): one node per times table
+export const LERNREISE_ROW_COUNT = 12;
 
 export const AVATAR_COLORS = [
   '#FF6B6B',

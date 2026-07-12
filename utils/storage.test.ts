@@ -34,6 +34,11 @@ import {
   saveTaskStats,
   recordTaskResult,
   getWeakTasks,
+  getRowMastery,
+  saveRowMastery,
+  recordRowTestResult,
+  isRowUnlocked,
+  statusForRowScore,
 } from './storage';
 import {
   Operation,
@@ -44,6 +49,7 @@ import {
   SessionRecord,
   StreakData,
   TaskStat,
+  RowMastery,
 } from '../types/game';
 
 // Mock react-native Platform
@@ -749,6 +755,131 @@ describe('getWeakTasks', () => {
     const stats = [makeStat(7, 8, 1, 1)];
     expect(getWeakTasks(stats, 2, 0.4)).toHaveLength(1);
     expect(getWeakTasks(stats, 3, 0.4)).toHaveLength(0);
+  });
+});
+
+describe('statusForRowScore', () => {
+  it('returns gold for a perfect score', () => {
+    expect(statusForRowScore(10, 10)).toBe('gold');
+  });
+
+  it('returns silver for >= 80%', () => {
+    expect(statusForRowScore(8, 10)).toBe('silver');
+  });
+
+  it('returns bronze for >= 60%', () => {
+    expect(statusForRowScore(6, 10)).toBe('bronze');
+  });
+
+  it('returns null below the bronze threshold', () => {
+    expect(statusForRowScore(5, 10)).toBeNull();
+  });
+
+  it('returns null when total is zero', () => {
+    expect(statusForRowScore(0, 0)).toBeNull();
+  });
+});
+
+describe('isRowUnlocked', () => {
+  const mastery = (overrides: Partial<Record<number, RowMastery['status']>>): RowMastery[] =>
+    Array.from({ length: 12 }, (_, i) => ({
+      row: i + 1,
+      bestScore: 0,
+      status: overrides[i + 1] ?? null,
+    }));
+
+  it('row 1 is always unlocked', () => {
+    expect(isRowUnlocked(mastery({}), 1)).toBe(true);
+  });
+
+  it('row N is locked when row N-1 has no status yet', () => {
+    expect(isRowUnlocked(mastery({}), 2)).toBe(false);
+  });
+
+  it('row N unlocks once row N-1 has any status', () => {
+    expect(isRowUnlocked(mastery({ 1: 'bronze' }), 2)).toBe(true);
+  });
+});
+
+describe('Row Mastery Storage', () => {
+  let mockStore: { [key: string]: string };
+
+  beforeEach(() => {
+    mockStore = {};
+    jest
+      .spyOn(Storage.prototype, 'getItem')
+      .mockImplementation((key: string) => mockStore[key] || null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => {
+      mockStore[key] = value;
+    });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('returns 12 empty rows when nothing stored', async () => {
+    const result = await getRowMastery();
+    expect(result).toHaveLength(12);
+    expect(result.every((m) => m.status === null && m.bestScore === 0)).toBe(true);
+  });
+
+  it('returns empty rows for corrupted JSON', async () => {
+    mockStore['app-row-mastery'] = '{invalid}';
+    const result = await getRowMastery();
+    expect(result).toHaveLength(12);
+  });
+
+  it('fills in missing rows from partial/corrupt stored data', async () => {
+    mockStore['app-row-mastery'] = JSON.stringify([{ row: 3, bestScore: 9, status: 'silver' }]);
+    const result = await getRowMastery();
+    expect(result).toHaveLength(12);
+    expect(result.find((m) => m.row === 3)).toEqual({ row: 3, bestScore: 9, status: 'silver' });
+    expect(result.find((m) => m.row === 1)).toEqual({ row: 1, bestScore: 0, status: null });
+  });
+
+  it('saves and retrieves row mastery', async () => {
+    const mastery = await getRowMastery();
+    mastery[0].status = 'gold';
+    mastery[0].bestScore = 10;
+    await saveRowMastery(mastery);
+    const result = await getRowMastery();
+    expect(result[0]).toEqual({ row: 1, bestScore: 10, status: 'gold' });
+  });
+
+  it('recordRowTestResult sets status on first pass', async () => {
+    const result = await recordRowTestResult(4, 8, 10);
+    const row4 = result.find((m) => m.row === 4)!;
+    expect(row4.status).toBe('silver');
+    expect(row4.bestScore).toBe(8);
+  });
+
+  it('recordRowTestResult never downgrades an existing status', async () => {
+    await recordRowTestResult(4, 10, 10); // gold
+    const result = await recordRowTestResult(4, 6, 10); // bronze-level attempt
+    const row4 = result.find((m) => m.row === 4)!;
+    expect(row4.status).toBe('gold');
+    expect(row4.bestScore).toBe(10);
+  });
+
+  it('recordRowTestResult keeps the best score even if status does not improve', async () => {
+    await recordRowTestResult(4, 6, 10);
+    const result = await recordRowTestResult(4, 7, 10);
+    const row4 = result.find((m) => m.row === 4)!;
+    expect(row4.bestScore).toBe(7);
+    expect(row4.status).toBe('bronze');
+  });
+
+  it('a failed attempt does not unlock the next row', async () => {
+    await recordRowTestResult(1, 3, 10);
+    const result = await getRowMastery();
+    expect(isRowUnlocked(result, 2)).toBe(false);
+  });
+
+  it('a passed attempt unlocks the next row', async () => {
+    await recordRowTestResult(1, 6, 10);
+    const result = await getRowMastery();
+    expect(isRowUnlocked(result, 2)).toBe(true);
   });
 });
 

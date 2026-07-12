@@ -5,7 +5,7 @@
 
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { STORAGE_KEYS, AVATAR_COLORS } from './constants';
+import { STORAGE_KEYS, AVATAR_COLORS, LERNREISE_ROW_COUNT } from './constants';
 import {
   ThemeMode,
   ThemeName,
@@ -17,6 +17,8 @@ import {
   TaskStat,
   StreakData,
   ChildProfile,
+  RowMastery,
+  RowMasteryStatus,
 } from '../types/game';
 
 /**
@@ -449,6 +451,89 @@ export const getWeakTasks = (
       const rateB = b.errorCount / (b.correctCount + b.errorCount);
       return rateB - rateA;
     });
+};
+
+// Lernreise / Reihen-Meisterschaft (Issue #277 1a)
+const VALID_ROW_MASTERY_STATUSES = new Set<string>(['bronze', 'silver', 'gold']);
+
+function isValidRowMastery(r: unknown): r is RowMastery {
+  if (!r || typeof r !== 'object') return false;
+  const obj = r as Record<string, unknown>;
+  return (
+    typeof obj.row === 'number' &&
+    obj.row >= 1 &&
+    obj.row <= LERNREISE_ROW_COUNT &&
+    typeof obj.bestScore === 'number' &&
+    (obj.status === null ||
+      (typeof obj.status === 'string' && VALID_ROW_MASTERY_STATUSES.has(obj.status)))
+  );
+}
+
+function emptyRowMastery(): RowMastery[] {
+  return Array.from({ length: LERNREISE_ROW_COUNT }, (_, i) => ({
+    row: i + 1,
+    bestScore: 0,
+    status: null,
+  }));
+}
+
+export const getRowMastery = async (profileId?: string): Promise<RowMastery[]> => {
+  const value = await getStorageItem(resolveKey(STORAGE_KEYS.ROW_MASTERY, profileId));
+  if (!value) return emptyRowMastery();
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return emptyRowMastery();
+    const byRow = new Map(parsed.filter(isValidRowMastery).map((m) => [m.row, m]));
+    return Array.from(
+      { length: LERNREISE_ROW_COUNT },
+      (_, i) => byRow.get(i + 1) ?? { row: i + 1, bestScore: 0, status: null }
+    );
+  } catch {
+    return emptyRowMastery();
+  }
+};
+
+export const saveRowMastery = async (mastery: RowMastery[], profileId?: string): Promise<void> => {
+  await setStorageItem(resolveKey(STORAGE_KEYS.ROW_MASTERY, profileId), JSON.stringify(mastery));
+};
+
+const ROW_MASTERY_RANK: Record<RowMasteryStatus, number> = { bronze: 1, silver: 2, gold: 3 };
+
+export function statusForRowScore(score: number, total: number): RowMasteryStatus | null {
+  if (total <= 0) return null;
+  const rate = score / total;
+  if (rate === 1) return 'gold';
+  if (rate >= 0.8) return 'silver';
+  if (rate >= 0.6) return 'bronze';
+  return null;
+}
+
+// A row unlocks once the previous row has been passed at least once (any status).
+// Row 1 is always unlocked.
+export function isRowUnlocked(mastery: RowMastery[], row: number): boolean {
+  if (row <= 1) return true;
+  const previous = mastery.find((m) => m.row === row - 1);
+  return previous?.status != null;
+}
+
+export const recordRowTestResult = async (
+  row: number,
+  score: number,
+  total: number,
+  profileId?: string
+): Promise<RowMastery[]> => {
+  const mastery = await getRowMastery(profileId);
+  const achievedStatus = statusForRowScore(score, total);
+  const updated = mastery.map((m) => {
+    if (m.row !== row) return m;
+    const bestScore = Math.max(m.bestScore, score);
+    const currentRank = m.status ? ROW_MASTERY_RANK[m.status] : 0;
+    const achievedRank = achievedStatus ? ROW_MASTERY_RANK[achievedStatus] : 0;
+    const status = achievedRank > currentRank ? achievedStatus : m.status;
+    return { ...m, bestScore, status };
+  });
+  await saveRowMastery(updated, profileId);
+  return updated;
 };
 
 // Badge storage – maps badgeId → unlock timestamp
