@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, waitFor, within } from '@testing-library/react';
+import { render, waitFor, within, fireEvent } from '@testing-library/react';
+import { Alert } from 'react-native';
 import { ParentDashboard } from './ParentDashboard';
 import { getThemeColors } from '../utils/theme';
 import { Operation, DifficultyMode, NumberRange } from '../types/game';
@@ -9,11 +10,13 @@ jest.mock('../utils/storage', () => ({
   ...jest.requireActual('../utils/storage'),
   getSessionRecords: jest.fn(),
   getTaskStats: jest.fn(),
+  resetRowMastery: jest.fn(),
 }));
 
-import { getSessionRecords, getTaskStats } from '../utils/storage';
+import { getSessionRecords, getTaskStats, resetRowMastery } from '../utils/storage';
 const mockGetSessionRecords = getSessionRecords as jest.Mock;
 const mockGetTaskStats = getTaskStats as jest.Mock;
+const mockResetRowMastery = resetRowMastery as jest.Mock;
 
 const t = {
   parentDashboard: 'Eltern-Dashboard',
@@ -42,6 +45,11 @@ const t = {
   parentWeeklyRecommendation: 'Übungsempfehlung der Woche',
   parentRecommendationText: 'Die {row}er-Reihe üben (Fehlerquote {rate}%)',
   parentRecommendationEmpty: 'Keine Schwachstelle erkannt – weiter so!',
+  parentResetLernreise: 'Lernreise zurücksetzen',
+  parentResetLernreiseConfirm:
+    'Damit werden alle erreichten Bronze/Silber/Gold-Abzeichen und der Freischalt-Fortschritt der Lernreise-Landkarte zurückgesetzt.',
+  parentResetLernreiseDone: 'Die Lernreise wurde zurückgesetzt.',
+  cancel: 'Abbrechen',
   ok: 'OK',
 };
 
@@ -66,6 +74,8 @@ describe('ParentDashboard', () => {
     mockGetSessionRecords.mockResolvedValue([]);
     mockGetTaskStats.mockClear();
     mockGetTaskStats.mockResolvedValue([]);
+    mockResetRowMastery.mockClear();
+    mockResetRowMastery.mockResolvedValue([]);
   });
 
   it('shows friendly empty state illustration when no records', async () => {
@@ -266,6 +276,33 @@ describe('ParentDashboard', () => {
     await waitFor(() => {
       expect(getByText(t.parentRecommendationEmpty)).toBeTruthy();
     });
+  });
+
+  it('resets Lernreise progress after confirming the alert', async () => {
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((_title, _msg, buttons) => {
+      const confirmButton = buttons?.find((b) => b.style === 'destructive');
+      confirmButton?.onPress?.();
+    });
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} profileId="abc" t={t} />
+    );
+    await waitFor(() => expect(getByText(t.parentResetLernreise)).toBeTruthy());
+    fireEvent.click(getByText(t.parentResetLernreise));
+
+    await waitFor(() => expect(mockResetRowMastery).toHaveBeenCalledWith('abc'));
+    alertSpy.mockRestore();
+  });
+
+  it('does not reset Lernreise progress when the alert is cancelled', async () => {
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => expect(getByText(t.parentResetLernreise)).toBeTruthy());
+    fireEvent.click(getByText(t.parentResetLernreise));
+
+    expect(mockResetRowMastery).not.toHaveBeenCalled();
+    alertSpy.mockRestore();
   });
 
   it('calls onClose when OK button is pressed', async () => {

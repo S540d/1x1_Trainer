@@ -576,6 +576,7 @@ export default function App() {
         visible={parentDashboardVisible}
         onClose={() => setParentDashboardVisible(false)}
         colors={colors}
+        profileId={activeProfile?.id}
         t={t}
       />
 

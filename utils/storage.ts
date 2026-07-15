@@ -507,6 +507,12 @@ export const saveRowMastery = async (mastery: RowMastery[], profileId?: string):
   await setStorageItem(resolveKey(STORAGE_KEYS.ROW_MASTERY, profileId), JSON.stringify(mastery));
 };
 
+export const resetRowMastery = async (profileId?: string): Promise<RowMastery[]> => {
+  const reset = emptyRowMastery();
+  await saveRowMastery(reset, profileId);
+  return reset;
+};
+
 const ROW_MASTERY_RANK: Record<RowMasteryStatus, number> = { bronze: 1, silver: 2, gold: 3 };
 
 export function statusForRowScore(score: number, total: number): RowMasteryStatus | null {

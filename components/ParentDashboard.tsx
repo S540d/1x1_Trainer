@@ -7,6 +7,7 @@ import {
   Modal,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {
   ThemeColors,
@@ -21,6 +22,7 @@ import {
   getStreakData,
   getTaskStats,
   getWeakTasks,
+  resetRowMastery,
   FOUR_WEEKS_MS,
 } from '../utils/storage';
 import { DESIGN_TOKENS } from '../utils/constants';
@@ -37,6 +39,7 @@ interface ParentDashboardProps {
   visible: boolean;
   onClose: () => void;
   colors: ThemeColors;
+  profileId?: string;
   t: {
     parentDashboard: string;
     parentDashboardSubtitle: string;
@@ -64,6 +67,10 @@ interface ParentDashboardProps {
     parentWeeklyRecommendation: string;
     parentRecommendationText: string;
     parentRecommendationEmpty: string;
+    parentResetLernreise: string;
+    parentResetLernreiseConfirm: string;
+    parentResetLernreiseDone: string;
+    cancel: string;
     ok: string;
   };
 }
@@ -291,7 +298,7 @@ function recommendWeakestRow(
   return rate > minErrorRate ? worst : null;
 }
 
-export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboardProps) {
+export function ParentDashboard({ visible, onClose, colors, profileId, t }: ParentDashboardProps) {
   const [records, setRecords] = useState<SessionRecord[]>([]);
   const [streak, setStreak] = useState<StreakData>({
     currentStreak: 0,
@@ -339,6 +346,20 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
     if (key === '__today__') return t.parentToday;
     if (key === '__yesterday__') return t.parentYesterday;
     return key;
+  };
+
+  const handleResetLernreise = () => {
+    Alert.alert(t.parentResetLernreise, t.parentResetLernreiseConfirm, [
+      { text: t.cancel, style: 'cancel' },
+      {
+        text: t.parentResetLernreise,
+        style: 'destructive',
+        onPress: async () => {
+          await resetRowMastery(profileId);
+          Alert.alert(t.parentResetLernreise, t.parentResetLernreiseDone);
+        },
+      },
+    ]);
   };
 
   return (
@@ -627,6 +648,15 @@ export function ParentDashboard({ visible, onClose, colors, t }: ParentDashboard
             </ScrollView>
           )}
 
+          <TouchableOpacity
+            style={[styles.resetBtn, { borderColor: colors.border }]}
+            onPress={handleResetLernreise}
+          >
+            <Text style={[styles.resetBtnText, { color: colors.textSecondary }]}>
+              {t.parentResetLernreise}
+            </Text>
+          </TouchableOpacity>
+
           {/* Close button */}
           <TouchableOpacity
             style={[styles.closeBtn, { backgroundColor: colors.gradientPrimary[0] }]}
@@ -892,6 +922,17 @@ const styles = StyleSheet.create({
   closeBtnText: {
     color: '#fff',
     fontSize: 15,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+  },
+  resetBtn: {
+    borderWidth: 1,
+    borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  resetBtnText: {
+    fontSize: 13,
     fontFamily: DESIGN_TOKENS.FONT_UI,
   },
 });

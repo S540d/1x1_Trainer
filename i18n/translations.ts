@@ -111,6 +111,9 @@ export interface TranslationStrings {
   parentWeeklyRecommendation: string;
   parentRecommendationText: string;
   parentRecommendationEmpty: string;
+  parentResetLernreise: string;
+  parentResetLernreiseConfirm: string;
+  parentResetLernreiseDone: string;
   colorTheme: string;
   // Sounds
   sounds: string;
@@ -304,6 +307,10 @@ export const translations: Record<Language, TranslationStrings> = {
     parentWeeklyRecommendation: "This week's practice tip",
     parentRecommendationText: 'Practice the {row} times table (error rate {rate}%)',
     parentRecommendationEmpty: 'No weak spot found — keep it up!',
+    parentResetLernreise: 'Reset Learning Journey',
+    parentResetLernreiseConfirm:
+      'This will reset all earned Bronze/Silver/Gold badges and locked progress on the Learning Journey map.',
+    parentResetLernreiseDone: 'Learning Journey has been reset.',
     colorTheme: 'COLOR THEME',
     sounds: 'SOUNDS',
     soundsOn: 'On',
@@ -498,6 +505,10 @@ export const translations: Record<Language, TranslationStrings> = {
     parentWeeklyRecommendation: 'Übungsempfehlung der Woche',
     parentRecommendationText: 'Die {row}er-Reihe üben (Fehlerquote {rate}%)',
     parentRecommendationEmpty: 'Keine Schwachstelle erkannt – weiter so!',
+    parentResetLernreise: 'Lernreise zurücksetzen',
+    parentResetLernreiseConfirm:
+      'Damit werden alle erreichten Bronze/Silber/Gold-Abzeichen und der Freischalt-Fortschritt der Lernreise-Landkarte zurückgesetzt.',
+    parentResetLernreiseDone: 'Die Lernreise wurde zurückgesetzt.',
     colorTheme: 'FARBTHEMA',
     sounds: 'TÖNE',
     soundsOn: 'An',
