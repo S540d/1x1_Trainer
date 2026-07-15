@@ -277,10 +277,7 @@ export function SettingsMenu({
                   { backgroundColor: buttonBg, borderColor: buttonBorder },
                   difficultyMode === DifficultyMode.CHALLENGE && activeStyle,
                 ]}
-                onPress={() => {
-                  onChangeDifficultyMode(DifficultyMode.CHALLENGE);
-                  onHideMenu();
-                }}
+                onPress={() => onChangeDifficultyMode(DifficultyMode.CHALLENGE)}
               >
                 <Text
                   style={[

@@ -139,9 +139,14 @@ export const deleteProfileData = async (profileId: string): Promise<void> => {
 };
 
 // Run once on first launch with profiles: copies existing global data into a default profile.
+// On subsequent launches, resolves the last active profile (falling back to the
+// first one if it was deleted or never set) rather than always returning existing[0].
 export const migrateToProfiles = async (): Promise<ChildProfile> => {
   const existing = await getProfiles();
-  if (existing.length > 0) return existing[0];
+  if (existing.length > 0) {
+    const lastActiveId = await getActiveProfileId();
+    return existing.find((p) => p.id === lastActiveId) ?? existing[0];
+  }
 
   const defaultProfile: ChildProfile = {
     id: generateId(),

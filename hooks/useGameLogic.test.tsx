@@ -1991,13 +1991,19 @@ describe('useGameLogic Hook', () => {
       expect(onLernreiseRoundComplete).toHaveBeenCalledWith(3, 10, 10);
       expect(result.current.gameState.showResult).toBe(true);
 
-      // After the round ends, restarting should generate normal (non-Lernreise) questions again
+      // After the round ends, restarting should generate normal (non-Lernreise) questions
+      // again instead of being permanently pinned to row 3. Force Math.random() to 0 so the
+      // random-generation branch deterministically picks the first multiplication pair (1×1)
+      // rather than a value that could coincidentally also be 3.
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
       act(() => {
         result.current.restartGame();
       });
       flushAllTimers();
+      randomSpy.mockRestore();
 
-      expect(result.current.gameState.num1).not.toBe(3);
+      expect(result.current.gameState.num1).toBe(1);
+      expect(result.current.gameState.num2).toBe(1);
     });
   });
 

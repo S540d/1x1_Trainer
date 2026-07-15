@@ -115,6 +115,9 @@ export default function App() {
   // Profile state
   const [activeProfile, setActiveProfile] = useState<ChildProfile | null>(null);
   const [profiles, setProfiles] = useState<ChildProfile[]>([]);
+  // Forces the "who is playing?" picker on every launch when >1 profile exists,
+  // instead of silently resuming the last active one.
+  const [forceProfileSelectVisible, setForceProfileSelectVisible] = useState(false);
   // Ref so callbacks always see the current profileId without stale closures
   const activeProfileIdRef = useRef<string | undefined>(undefined);
   activeProfileIdRef.current = activeProfile?.id;
@@ -132,6 +135,9 @@ export default function App() {
       const allProfiles = await getProfiles();
       setProfiles(allProfiles);
       setActiveProfile(defaultProfile);
+      if (allProfiles.length > 1) {
+        setForceProfileSelectVisible(true);
+      }
     });
   }, []);
 
@@ -221,6 +227,7 @@ export default function App() {
     lernreiseIntroVisible ||
     streakWarningVisible ||
     onboardingVisible ||
+    forceProfileSelectVisible ||
     game.gameState.showResult;
   useKeyboardInput({
     enabled: !overlayOpen,
@@ -406,9 +413,11 @@ export default function App() {
     }
   }, [game.gameState.isAnswerChecked, game.gameState.lastAnswerCorrect]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Show onboarding for new users; silently skip for existing users (migration)
+  // Show onboarding for new users; silently skip for existing users (migration).
+  // Waits for the forced profile picker to resolve first, so onboarding always
+  // refers to the profile the user actually picked.
   useEffect(() => {
-    if (!preferences.isLoaded) return;
+    if (!preferences.isLoaded || forceProfileSelectVisible) return;
     (async () => {
       const shown = await getOnboardingDone();
       if (shown) return;
@@ -427,7 +436,7 @@ export default function App() {
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preferences.isLoaded]);
+  }, [preferences.isLoaded, forceProfileSelectVisible]);
 
   // Generate first question on mount
   useEffect(() => {
@@ -581,7 +590,8 @@ export default function App() {
       />
 
       <ProfilePickerModal
-        visible={profilePickerVisible}
+        visible={profilePickerVisible || forceProfileSelectVisible}
+        dismissible={!forceProfileSelectVisible}
         onClose={() => setProfilePickerVisible(false)}
         profiles={profiles}
         activeProfileId={activeProfile?.id}
@@ -589,6 +599,7 @@ export default function App() {
           setActiveProfile(profile);
           await setActiveProfileId(profile.id);
           setProfilePickerVisible(false);
+          setForceProfileSelectVisible(false);
         }}
         onProfilesChange={(updated) => {
           setProfiles(updated);

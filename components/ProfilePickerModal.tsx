@@ -18,6 +18,9 @@ const MAX_PROFILES = 6;
 
 interface ProfilePickerModalProps {
   visible: boolean;
+  // When false, the modal can't be dismissed without picking a profile —
+  // used to force the "who is playing?" choice on app start.
+  dismissible?: boolean;
   onClose: () => void;
   profiles: ChildProfile[];
   activeProfileId: string | undefined;
@@ -41,6 +44,7 @@ interface ProfilePickerModalProps {
 
 export function ProfilePickerModal({
   visible,
+  dismissible = true,
   onClose,
   profiles,
   activeProfileId,
@@ -55,6 +59,7 @@ export function ProfilePickerModal({
   const [isSaving, setIsSaving] = useState(false);
 
   const handleClose = () => {
+    if (!dismissible) return;
     setShowCreateForm(false);
     setNewName('');
     setSelectedColor(AVATAR_COLORS[0]);
@@ -108,9 +113,11 @@ export function ProfilePickerModal({
             style={styles.header}
           >
             <Text style={styles.headerTitle}>{t.profiles}</Text>
-            <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-              <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
+            {dismissible && (
+              <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            )}
           </LinearGradient>
 
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
