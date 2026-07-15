@@ -1934,6 +1934,73 @@ describe('useGameLogic Hook', () => {
     });
   });
 
+  describe('startLernreiseRound', () => {
+    it('forces multiplication with num1 fixed to the given row for all 10 tasks', () => {
+      const { result } = renderHook(() => useGameLogic(defaultProps));
+
+      act(() => {
+        result.current.startLernreiseRound(7);
+      });
+      flushAllTimers();
+
+      const seenFactors = new Set<number>();
+      for (let i = 0; i < 10; i++) {
+        expect(result.current.gameState.operation).toBe(Operation.MULTIPLICATION);
+        expect(result.current.gameState.num1).toBe(7);
+        expect(result.current.gameState.currentTask).toBe(i + 1);
+        seenFactors.add(result.current.gameState.num2);
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      // One full pass through factors 1-10, no repeats
+      expect(seenFactors).toEqual(new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
+    });
+
+    it('reports the round result via onLernreiseRoundComplete and stops forcing the row afterwards', () => {
+      const onLernreiseRoundComplete = jest.fn();
+      const { result } = renderHook(() =>
+        useGameLogic({ ...defaultProps, onLernreiseRoundComplete })
+      );
+
+      act(() => {
+        result.current.startLernreiseRound(3);
+      });
+      flushAllTimers();
+
+      for (let i = 0; i < 10; i++) {
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      expect(onLernreiseRoundComplete).toHaveBeenCalledWith(3, 10, 10);
+      expect(result.current.gameState.showResult).toBe(true);
+
+      // After the round ends, restarting should generate normal (non-Lernreise) questions again
+      act(() => {
+        result.current.restartGame();
+      });
+      flushAllTimers();
+
+      expect(result.current.gameState.num1).not.toBe(3);
+    });
+  });
+
   describe('operatorSymbol', () => {
     it('should return + for ADDITION', () => {
       const { result } = renderHook(() =>

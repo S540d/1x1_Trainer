@@ -35,6 +35,16 @@ interface UseGameLogicProps {
   onChallengeHighScoreChange?: (score: number) => void;
   taskStats?: TaskStat[];
   onTaskResult?: (num1: number, num2: number, operation: Operation, isCorrect: boolean) => void;
+  onLernreiseRoundComplete?: (row: number, correctTasks: number, totalTasks: number) => void;
+}
+
+function shuffledFactors(): number[] {
+  const factors = Array.from({ length: 10 }, (_, i) => i + 1);
+  for (let i = factors.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [factors[i], factors[j]] = [factors[j], factors[i]];
+  }
+  return factors;
 }
 
 /**
@@ -160,11 +170,18 @@ export function useGameLogic({
   onChallengeHighScoreChange,
   taskStats,
   onTaskResult,
+  onLernreiseRoundComplete,
 }: UseGameLogicProps) {
   const taskStatsRef = useRef<TaskStat[]>(taskStats ?? []);
   useEffect(() => {
     taskStatsRef.current = taskStats ?? [];
   }, [taskStats]);
+
+  // Lernreise: when set, generateQuestion() is forced to multiplication with
+  // num1 fixed to this row instead of picking randomly. Ref-based to avoid
+  // stale closures inside the setTimeout(() => generateQuestion(), 0) callbacks.
+  const lernreiseRowRef = useRef<number | null>(null);
+  const lernreiseFactorsRef = useRef<number[]>([]);
   // Helper: Get max number based on number range
   const getMaxNumber = (range: NumberRange = numberRange) => {
     switch (range) {
@@ -223,6 +240,10 @@ export function useGameLogic({
     totalTasks: number,
     selectedOperations: Set<Operation>
   ) => {
+    if (lernreiseRowRef.current !== null) {
+      onLernreiseRoundComplete?.(lernreiseRowRef.current, finalScore, totalTasks);
+      lernreiseRowRef.current = null;
+    }
     if (!onSessionComplete) return;
     const errors = totalTasks - finalScore;
     const effectiveRange =
@@ -323,6 +344,28 @@ export function useGameLogic({
         }));
         return;
       }
+    }
+
+    // Lernreise: force multiplication with num1 fixed to the selected row,
+    // num2 drawn from a pre-shuffled 1-10 sequence (one full pass per round).
+    // Reads prev.currentTask inside the updater (not the outer gameState
+    // closure) since this runs via setTimeout(..., 0) right after a
+    // currentTask update — the outer closure would still see the old value.
+    if (lernreiseRowRef.current !== null) {
+      const fixedRow = lernreiseRowRef.current;
+      setGameState((prev) => ({
+        ...prev,
+        num1: fixedRow,
+        num2: lernreiseFactorsRef.current[prev.currentTask - 1] ?? 1,
+        operation: Operation.MULTIPLICATION,
+        userAnswer: '',
+        questionPart: 2,
+        answerMode: AnswerMode.INPUT,
+        lastAnswerCorrect: null,
+        isAnswerChecked: false,
+        selectedChoice: null,
+      }));
+      return;
     }
 
     // Normal random generation
@@ -704,6 +747,27 @@ export function useGameLogic({
     setTimeout(() => generateQuestion(), 0);
   };
 
+  // Lernreise: start a round restricted to a single multiplication row
+  const startLernreiseRound = (row: number) => {
+    lernreiseRowRef.current = row;
+    lernreiseFactorsRef.current = shuffledFactors();
+
+    setGameState((prev) => ({
+      ...prev,
+      difficultyMode: DifficultyMode.SIMPLE,
+      gameMode: GameMode.NORMAL,
+      answerMode: AnswerMode.INPUT,
+      score: 0,
+      currentTask: 1,
+      showResult: false,
+      userAnswer: '',
+      selectedChoice: null,
+      challengeState: undefined,
+      answerHistory: beginNewRound(),
+    }));
+    setTimeout(() => generateQuestion(GameMode.NORMAL, new Set([Operation.MULTIPLICATION])), 0);
+  };
+
   // Change game mode
   const changeGameMode = (newMode: GameMode) => {
     setGameState((prev) => ({
@@ -946,6 +1010,7 @@ export function useGameLogic({
     nextQuestion,
     restartGame,
     continueGame,
+    startLernreiseRound,
     changeGameMode,
     toggleOperation,
     changeAnswerMode,

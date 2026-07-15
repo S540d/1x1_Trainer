@@ -55,6 +55,8 @@ import {
   resetOnboarding,
   getLernreiseIntroDone,
   setLernreiseIntroDone,
+  recordRowTestResult,
+  statusForRowScore,
   getStorageItem,
   migrateToProfiles,
   getProfiles,
@@ -69,6 +71,7 @@ import {
   StreakData,
   TaskStat,
   Operation,
+  RowMasteryStatus,
 } from './types/game';
 import { useBadges } from './hooks/useBadges';
 import {
@@ -95,6 +98,10 @@ export default function App() {
   const [profilePickerVisible, setProfilePickerVisible] = useState(false);
   const [lernreiseVisible, setLernreiseVisible] = useState(false);
   const [lernreiseIntroVisible, setLernreiseIntroVisible] = useState(false);
+  const [lernreiseResult, setLernreiseResult] = useState<{
+    row: number;
+    status: RowMasteryStatus | null;
+  } | null>(null);
   const [streakData, setStreakData] = useState<StreakData>({
     currentStreak: 0,
     lastPlayedDate: '',
@@ -195,6 +202,11 @@ export default function App() {
     numberRange: preferences.numberRange,
     challengeHighScore: preferences.challengeHighScore,
     onChallengeHighScoreChange: preferences.setChallengeHighScore,
+    onLernreiseRoundComplete: (row, correctTasks, totalTasks) => {
+      recordRowTestResult(row, correctTasks, totalTasks, activeProfileIdRef.current).then(() => {
+        setLernreiseResult({ row, status: statusForRowScore(correctTasks, totalTasks) });
+      });
+    },
   });
 
   // Physical keyboard on web (#258) — inactive while any overlay is open
@@ -525,8 +537,15 @@ export default function App() {
         difficultyMode={game.gameState.difficultyMode}
         challengeState={game.gameState.challengeState}
         score={game.gameState.score}
-        onRestart={game.restartGame}
-        onContinue={game.continueGame}
+        lernreiseResult={lernreiseResult}
+        onRestart={() => {
+          setLernreiseResult(null);
+          game.restartGame();
+        }}
+        onContinue={() => {
+          setLernreiseResult(null);
+          game.continueGame();
+        }}
         t={t}
       />
 
@@ -637,6 +656,7 @@ export default function App() {
       <LernreiseModal
         visible={lernreiseVisible}
         onClose={() => setLernreiseVisible(false)}
+        onSelectRow={(row) => game.startLernreiseRound(row)}
         colors={colors}
         profileId={activeProfile?.id}
         t={t}

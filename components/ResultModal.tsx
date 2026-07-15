@@ -1,8 +1,19 @@
 import React from 'react';
 import { StyleSheet, Text, View, Modal } from 'react-native';
-import { ThemeColors, DifficultyMode, ChallengeState } from '../types/game';
+import { ThemeColors, DifficultyMode, ChallengeState, RowMasteryStatus } from '../types/game';
 import { modalStyles } from '../styles/modalStyles';
 import { Button } from './Button';
+
+const STATUS_EMOJI: Record<RowMasteryStatus, string> = {
+  bronze: '🥉',
+  silver: '🥈',
+  gold: '🥇',
+};
+
+interface LernreiseResult {
+  row: number;
+  status: RowMasteryStatus | null;
+}
 
 interface ResultModalProps {
   visible: boolean;
@@ -10,6 +21,7 @@ interface ResultModalProps {
   difficultyMode: DifficultyMode;
   challengeState?: ChallengeState;
   score: number;
+  lernreiseResult?: LernreiseResult | null;
   onRestart: () => void;
   onContinue: () => void;
   t: {
@@ -26,6 +38,11 @@ interface ResultModalProps {
     motivationMessageHighScore: string;
     newRound: string;
     continueGame: string;
+    lernreiseRowLabel: string;
+    lernreiseResultGold: string;
+    lernreiseResultSilver: string;
+    lernreiseResultBronze: string;
+    lernreiseResultRetry: string;
   };
 }
 
@@ -35,6 +52,7 @@ export function ResultModal({
   difficultyMode,
   challengeState,
   score,
+  lernreiseResult,
   onRestart,
   onContinue,
   t,
@@ -71,20 +89,42 @@ export function ResultModal({
             </>
           ) : (
             <>
-              <Text style={[modalStyles.title, { color: colors.text }]}>
-                {score <= 3
-                  ? t.motivationTitleLowScore
-                  : score <= 6
-                    ? t.motivationTitleMediumScore
-                    : t.motivationTitleHighScore}
-              </Text>
-              <Text style={[modalStyles.text, { color: colors.text }]}>
-                {score <= 3
-                  ? t.motivationMessageLowScore
-                  : score <= 6
-                    ? t.motivationMessageMediumScore
-                    : t.motivationMessageHighScore}
-              </Text>
+              {lernreiseResult ? (
+                <>
+                  <Text style={styles.lernreiseEmoji}>
+                    {lernreiseResult.status ? STATUS_EMOJI[lernreiseResult.status] : '💪'}
+                  </Text>
+                  <Text style={[modalStyles.title, { color: colors.text }]}>
+                    {t.lernreiseRowLabel.replace('{row}', String(lernreiseResult.row))}
+                  </Text>
+                  <Text style={[modalStyles.text, { color: colors.text }]}>
+                    {lernreiseResult.status === 'gold'
+                      ? t.lernreiseResultGold
+                      : lernreiseResult.status === 'silver'
+                        ? t.lernreiseResultSilver
+                        : lernreiseResult.status === 'bronze'
+                          ? t.lernreiseResultBronze
+                          : t.lernreiseResultRetry}
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text style={[modalStyles.title, { color: colors.text }]}>
+                    {score <= 3
+                      ? t.motivationTitleLowScore
+                      : score <= 6
+                        ? t.motivationTitleMediumScore
+                        : t.motivationTitleHighScore}
+                  </Text>
+                  <Text style={[modalStyles.text, { color: colors.text }]}>
+                    {score <= 3
+                      ? t.motivationMessageLowScore
+                      : score <= 6
+                        ? t.motivationMessageMediumScore
+                        : t.motivationMessageHighScore}
+                  </Text>
+                </>
+              )}
               <View style={styles.modalButtonRow}>
                 <View style={styles.modalButtonWrap}>
                   <Button
@@ -130,5 +170,10 @@ const styles = StyleSheet.create({
   highScoreText: {
     fontSize: 14,
     marginBottom: 16,
+  },
+  lernreiseEmoji: {
+    fontSize: 48,
+    textAlign: 'center',
+    marginBottom: 4,
   },
 });

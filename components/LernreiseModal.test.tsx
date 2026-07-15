@@ -7,39 +7,20 @@ import { RowMastery } from '../types/game';
 jest.mock('../utils/storage', () => ({
   ...jest.requireActual('../utils/storage'),
   getRowMastery: jest.fn(),
-  recordRowTestResult: jest.fn(),
-  recordTaskResult: jest.fn(),
 }));
 
-import { getRowMastery, recordRowTestResult } from '../utils/storage';
+import { getRowMastery } from '../utils/storage';
 const mockGetRowMastery = getRowMastery as jest.Mock;
-const mockRecordRowTestResult = recordRowTestResult as jest.Mock;
 
 const t = {
   lernreiseTitle: 'Lernreise',
   lernreiseSubtitle: 'Meistere jede Malreihe – Bronze, Silber, Gold',
   lernreiseRowLabel: '{row}er-Reihe',
-  lernreiseResultScore: '{score}/10 richtig',
-  lernreiseResultGold: 'Gold! Perfekt gemeistert!',
-  lernreiseResultSilver: 'Silber! Toll gemacht!',
-  lernreiseResultBronze: 'Bronze! Gut gemacht!',
-  lernreiseResultRetry: 'Noch nicht ganz – versuch es nochmal!',
-  lernreiseBackToMap: 'Zurück zur Lernreise',
-  check: 'Prüfen',
-  nextQuestion: 'Weiter →',
   ok: 'OK',
 };
 
 function emptyMastery(): RowMastery[] {
   return Array.from({ length: 12 }, (_, i) => ({ row: i + 1, bestScore: 0, status: null }));
-}
-
-// Clicks the digit's Numpad button. When a digit is already echoed in the
-// answer box, getAllByText returns both; the Numpad button is always the
-// last DOM match since it renders after the question row.
-function clickDigit(getAllByText: (text: string) => HTMLElement[], digit: string) {
-  const matches = getAllByText(digit);
-  fireEvent.click(matches[matches.length - 1]);
 }
 
 describe('LernreiseModal', () => {
@@ -48,12 +29,11 @@ describe('LernreiseModal', () => {
   beforeEach(() => {
     mockGetRowMastery.mockReset();
     mockGetRowMastery.mockResolvedValue(emptyMastery());
-    mockRecordRowTestResult.mockReset();
   });
 
   it('shows the title and subtitle', async () => {
     const { getByText } = render(
-      <LernreiseModal visible onClose={jest.fn()} colors={colors} t={t} />
+      <LernreiseModal visible onClose={jest.fn()} onSelectRow={jest.fn()} colors={colors} t={t} />
     );
     await waitFor(() => {
       expect(getByText(t.lernreiseTitle)).toBeTruthy();
@@ -62,13 +42,21 @@ describe('LernreiseModal', () => {
   });
 
   it('does not fetch mastery when not visible', () => {
-    render(<LernreiseModal visible={false} onClose={jest.fn()} colors={colors} t={t} />);
+    render(
+      <LernreiseModal
+        visible={false}
+        onClose={jest.fn()}
+        onSelectRow={jest.fn()}
+        colors={colors}
+        t={t}
+      />
+    );
     expect(mockGetRowMastery).not.toHaveBeenCalled();
   });
 
   it('shows row 1 as playable and row 2 as locked initially', async () => {
     const { getByText } = render(
-      <LernreiseModal visible onClose={jest.fn()} colors={colors} t={t} />
+      <LernreiseModal visible onClose={jest.fn()} onSelectRow={jest.fn()} colors={colors} t={t} />
     );
     await waitFor(() => expect(getByText('1er-Reihe')).toBeTruthy());
     const row1Icon = getByText('1er-Reihe').parentElement!.firstChild as HTMLElement;
@@ -82,7 +70,7 @@ describe('LernreiseModal', () => {
     mastery[0] = { row: 1, bestScore: 9, status: 'silver' };
     mockGetRowMastery.mockResolvedValue(mastery);
     const { getByText } = render(
-      <LernreiseModal visible onClose={jest.fn()} colors={colors} t={t} />
+      <LernreiseModal visible onClose={jest.fn()} onSelectRow={jest.fn()} colors={colors} t={t} />
     );
     await waitFor(() => {
       const row1Icon = getByText('1er-Reihe').parentElement!.firstChild as HTMLElement;
@@ -93,62 +81,41 @@ describe('LernreiseModal', () => {
     expect(row2Icon.textContent).toBe('▶');
   });
 
-  it('tapping a locked row does not start a test', async () => {
-    const { getByText, queryByText } = render(
-      <LernreiseModal visible onClose={jest.fn()} colors={colors} t={t} />
+  it('tapping a locked row does not call onSelectRow or onClose', async () => {
+    const onSelectRow = jest.fn();
+    const onClose = jest.fn();
+    const { getByText } = render(
+      <LernreiseModal visible onClose={onClose} onSelectRow={onSelectRow} colors={colors} t={t} />
     );
     await waitFor(() => expect(getByText('2er-Reihe')).toBeTruthy());
     fireEvent.click(getByText('2er-Reihe'));
-    expect(queryByText(t.check)).toBeNull();
+    expect(onSelectRow).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
   });
 
-  it('tapping an unlocked row starts the test view', async () => {
+  it('tapping an unlocked row closes the modal and selects the row', async () => {
+    const onSelectRow = jest.fn();
+    const onClose = jest.fn();
     const { getByText } = render(
-      <LernreiseModal visible onClose={jest.fn()} colors={colors} t={t} />
+      <LernreiseModal visible onClose={onClose} onSelectRow={onSelectRow} colors={colors} t={t} />
     );
     await waitFor(() => expect(getByText('1er-Reihe')).toBeTruthy());
     fireEvent.click(getByText('1er-Reihe'));
-    expect(getByText(t.check)).toBeTruthy();
-  });
-
-  it('completes a perfect row test, awards gold, and unlocks the next row', async () => {
-    mockRecordRowTestResult.mockImplementation(async (row: number, score: number) => {
-      const result = emptyMastery();
-      result[row - 1] = { row, bestScore: score, status: 'gold' };
-      return result;
-    });
-
-    const { getByText, getAllByText } = render(
-      <LernreiseModal visible onClose={jest.fn()} colors={colors} t={t} />
-    );
-    await waitFor(() => expect(getByText('1er-Reihe')).toBeTruthy());
-    fireEvent.click(getByText('1er-Reihe'));
-
-    for (let i = 0; i < 10; i++) {
-      const equation = getAllByText(/^1 × \d+ =$/)[0].textContent!;
-      const factor = parseInt(equation.match(/× (\d+) =/)![1], 10);
-      for (const digit of (1 * factor).toString()) {
-        clickDigit(getAllByText, digit);
-      }
-      fireEvent.click(getByText(t.check));
-      fireEvent.click(getByText(t.nextQuestion));
-    }
-
-    await waitFor(() => {
-      expect(getByText('10/10 richtig')).toBeTruthy();
-      expect(getByText(t.lernreiseResultGold)).toBeTruthy();
-    });
-    expect(mockRecordRowTestResult).toHaveBeenCalledWith(1, 10, 10, undefined);
-
-    fireEvent.click(getByText(t.lernreiseBackToMap));
-    await waitFor(() => {
-      expect(getByText('🥇')).toBeTruthy();
-      expect(getByText('▶')).toBeTruthy(); // row 2 unlocked
-    });
+    expect(onClose).toHaveBeenCalled();
+    expect(onSelectRow).toHaveBeenCalledWith(1);
   });
 
   it('passes profileId through to storage calls', async () => {
-    render(<LernreiseModal visible onClose={jest.fn()} colors={colors} t={t} profileId="abc" />);
+    render(
+      <LernreiseModal
+        visible
+        onClose={jest.fn()}
+        onSelectRow={jest.fn()}
+        colors={colors}
+        t={t}
+        profileId="abc"
+      />
+    );
     await waitFor(() => expect(mockGetRowMastery).toHaveBeenCalledWith('abc'));
   });
 });
