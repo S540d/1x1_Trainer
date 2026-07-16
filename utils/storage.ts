@@ -512,9 +512,12 @@ export const saveRowMastery = async (mastery: RowMastery[], profileId?: string):
   await setStorageItem(resolveKey(STORAGE_KEYS.ROW_MASTERY, profileId), JSON.stringify(mastery));
 };
 
+let rowMasteryQueue: Promise<void> = Promise.resolve();
+
 export const resetRowMastery = async (profileId?: string): Promise<RowMastery[]> => {
   const reset = emptyRowMastery();
-  await saveRowMastery(reset, profileId);
+  rowMasteryQueue = rowMasteryQueue.then(() => saveRowMastery(reset, profileId));
+  await rowMasteryQueue;
   return reset;
 };
 
@@ -543,17 +546,21 @@ export const recordRowTestResult = async (
   total: number,
   profileId?: string
 ): Promise<RowMastery[]> => {
-  const mastery = await getRowMastery(profileId);
-  const achievedStatus = statusForRowScore(score, total);
-  const updated = mastery.map((m) => {
-    if (m.row !== row) return m;
-    const bestScore = Math.max(m.bestScore, score);
-    const currentRank = m.status ? ROW_MASTERY_RANK[m.status] : 0;
-    const achievedRank = achievedStatus ? ROW_MASTERY_RANK[achievedStatus] : 0;
-    const status = achievedRank > currentRank ? achievedStatus : m.status;
-    return { ...m, bestScore, status };
+  let updated!: RowMastery[];
+  rowMasteryQueue = rowMasteryQueue.then(async () => {
+    const mastery = await getRowMastery(profileId);
+    const achievedStatus = statusForRowScore(score, total);
+    updated = mastery.map((m) => {
+      if (m.row !== row) return m;
+      const bestScore = Math.max(m.bestScore, score);
+      const currentRank = m.status ? ROW_MASTERY_RANK[m.status] : 0;
+      const achievedRank = achievedStatus ? ROW_MASTERY_RANK[achievedStatus] : 0;
+      const status = achievedRank > currentRank ? achievedStatus : m.status;
+      return { ...m, bestScore, status };
+    });
+    await saveRowMastery(updated, profileId);
   });
-  await saveRowMastery(updated, profileId);
+  await rowMasteryQueue;
   return updated;
 };
 

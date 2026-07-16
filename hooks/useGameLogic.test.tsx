@@ -2005,6 +2005,47 @@ describe('useGameLogic Hook', () => {
       expect(result.current.gameState.num1).toBe(1);
       expect(result.current.gameState.num2).toBe(1);
     });
+
+    it('stops forcing the row when the settings are changed mid-round instead of finishing it', () => {
+      const { result } = renderHook(() => useGameLogic(defaultProps));
+
+      act(() => {
+        result.current.startLernreiseRound(9);
+      });
+      flushAllTimers();
+
+      // Abandon the round before answering all 10 tasks — e.g. the user opened
+      // the settings menu and switched difficulty instead of finishing.
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.SIMPLE);
+      });
+      flushAllTimers();
+      randomSpy.mockRestore();
+
+      expect(result.current.gameState.num1).not.toBe(9);
+    });
+
+    it('stops forcing the row when toggling operations mid-round', () => {
+      const { result } = renderHook(() => useGameLogic(defaultProps));
+
+      act(() => {
+        result.current.startLernreiseRound(9);
+      });
+      flushAllTimers();
+
+      // Add addition alongside multiplication — if the Lernreise row lock were
+      // still active, the next question would ignore this and stay pinned to
+      // 9× multiplication instead of possibly drawing an addition task.
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
+      act(() => {
+        result.current.toggleOperation(Operation.ADDITION);
+      });
+      flushAllTimers();
+      randomSpy.mockRestore();
+
+      expect(result.current.gameState.num1).not.toBe(9);
+    });
   });
 
   describe('operatorSymbol', () => {

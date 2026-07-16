@@ -25,7 +25,7 @@ import {
   resetRowMastery,
   FOUR_WEEKS_MS,
 } from '../utils/storage';
-import { DESIGN_TOKENS } from '../utils/constants';
+import { DESIGN_TOKENS, LERNREISE_ROW_COUNT } from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
 
 const OP_SYMBOL: Record<Operation, string> = {
@@ -228,7 +228,7 @@ function errorRateColor(rate: number): string {
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const TIMES_TABLE_ROWS = Array.from({ length: 10 }, (_, i) => i + 1);
+const TIMES_TABLE_ROWS = Array.from({ length: LERNREISE_ROW_COUNT }, (_, i) => i + 1);
 
 // Rolling window ending `offsetDays` ago (0 = up to now), matching the
 // rolling-14-days convention used by getLast14Days rather than calendar weeks.

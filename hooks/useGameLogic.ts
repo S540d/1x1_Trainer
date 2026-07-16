@@ -702,6 +702,9 @@ export function useGameLogic({
 
   // Restart game
   const restartGame = () => {
+    lernreiseRowRef.current = null;
+    lernreiseFactorsRef.current = [];
+
     if (gameState.difficultyMode === DifficultyMode.CHALLENGE) {
       // Restart challenge with fresh lives
       const newChallengeState: ChallengeState = {
@@ -738,6 +741,9 @@ export function useGameLogic({
 
   // Continue game (keep score, reset to task 1)
   const continueGame = () => {
+    lernreiseRowRef.current = null;
+    lernreiseFactorsRef.current = [];
+
     setGameState((prev) => ({
       ...prev,
       currentTask: 1,
@@ -777,6 +783,9 @@ export function useGameLogic({
 
   // Change game mode
   const changeGameMode = (newMode: GameMode) => {
+    lernreiseRowRef.current = null;
+    lernreiseFactorsRef.current = [];
+
     setGameState((prev) => ({
       ...prev,
       gameMode: newMode,
@@ -790,6 +799,9 @@ export function useGameLogic({
 
   // Toggle operation selection (allow multiple operations)
   const toggleOperation = (operation: Operation) => {
+    lernreiseRowRef.current = null;
+    lernreiseFactorsRef.current = [];
+
     setGameState((prev) => {
       const newSelectedOperations = new Set(prev.selectedOperations);
 
@@ -821,6 +833,9 @@ export function useGameLogic({
 
   // Change answer mode
   const changeAnswerMode = (newMode: AnswerMode) => {
+    lernreiseRowRef.current = null;
+    lernreiseFactorsRef.current = [];
+
     setGameState((prev) => ({
       ...prev,
       answerMode: newMode,
@@ -836,6 +851,9 @@ export function useGameLogic({
 
   // Change difficulty mode
   const changeDifficultyMode = (newMode: DifficultyMode) => {
+    lernreiseRowRef.current = null;
+    lernreiseFactorsRef.current = [];
+
     let newGameMode: GameMode;
     let newAnswerMode: AnswerMode;
 
