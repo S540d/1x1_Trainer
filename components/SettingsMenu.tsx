@@ -150,25 +150,27 @@ export function SettingsMenu({
                 {t.parentDashboardMenu}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.personalizeButton, { borderColor: activeColor }]}
-              onPress={() => {
-                onOpenBadges();
-                onHideMenu();
-              }}
-            >
-              <Text style={[styles.personalizeButtonText, { color: activeColor }]}>
-                {t.badgesMenu}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.personalizeButton, { borderColor: activeColor }]}
-              onPress={onOpenProfiles}
-            >
-              <Text style={[styles.personalizeButtonText, { color: activeColor }]}>
-                {t.profilesMenu}
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.topButtonsPairRow}>
+              <TouchableOpacity
+                style={[styles.personalizeButton, { borderColor: activeColor }]}
+                onPress={() => {
+                  onOpenBadges();
+                  onHideMenu();
+                }}
+              >
+                <Text style={[styles.personalizeButtonText, { color: activeColor }]}>
+                  {t.badgesMenu}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.personalizeButton, { borderColor: activeColor }]}
+                onPress={onOpenProfiles}
+              >
+                <Text style={[styles.personalizeButtonText, { color: activeColor }]}>
+                  {t.profilesMenu}
+                </Text>
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity
               style={[styles.personalizeButton, { borderColor: activeColor }]}
               onPress={() => {
@@ -476,6 +478,11 @@ const styles = StyleSheet.create({
     gap: 8,
     flexDirection: 'row',
     flexWrap: 'wrap',
+  },
+  topButtonsPairRow: {
+    flexDirection: 'row',
+    gap: 8,
+    width: '100%',
   },
   personalizeButton: {
     flex: 1,

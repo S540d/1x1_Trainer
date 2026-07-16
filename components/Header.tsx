@@ -50,19 +50,22 @@ export function Header({
       ) : (
         <ProgressBar history={answerHistory} />
       )}
-      {!!roundsToday && roundsToday > 0 && (
-        <TouchableOpacity
-          onPress={() => Alert.alert(t.roundsInfoTitle, `${roundsToday} ${t.roundsInfoBody}`)}
-          activeOpacity={0.7}
-          style={[styles.roundsBadge, { backgroundColor: colors.buttonInactive }]}
-          accessibilityRole="button"
-          accessibilityLabel={`${t.roundsInfoTitle}: ${roundsToday}`}
-        >
-          <Text style={[styles.roundsText, { color: colors.buttonInactiveText }]}>
-            {roundsToday}
-          </Text>
-        </TouchableOpacity>
-      )}
+      {!!roundsToday &&
+        roundsToday > 0 &&
+        difficultyMode !== DifficultyMode.CHALLENGE &&
+        difficultyMode !== DifficultyMode.CREATIVE && (
+          <TouchableOpacity
+            onPress={() => Alert.alert(t.roundsInfoTitle, `${roundsToday} ${t.roundsInfoBody}`)}
+            activeOpacity={0.7}
+            style={[styles.roundsBadge, { backgroundColor: colors.buttonInactive }]}
+            accessibilityRole="button"
+            accessibilityLabel={`${t.roundsInfoTitle}: ${roundsToday}`}
+          >
+            <Text style={[styles.roundsText, { color: colors.buttonInactiveText }]}>
+              {roundsToday}
+            </Text>
+          </TouchableOpacity>
+        )}
       <TouchableOpacity onPress={onShowMenu} style={styles.settingsButton} aria-label="Settings">
         <Text style={[styles.settingsButtonText, { color: colors.text }]}>⋮</Text>
       </TouchableOpacity>
