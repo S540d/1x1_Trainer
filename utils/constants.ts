@@ -4,7 +4,7 @@
 
 import { GameMode, NumberRange, Operation, ThemeName } from '../types/game';
 
-export const APP_VERSION = '1.4.1';
+export const APP_VERSION = '1.5.0';
 export const APP_NAME = '1×1 Trainer';
 export const CONTACT_EMAIL = 'devsven@posteo.de';
 
@@ -32,7 +32,12 @@ export const STORAGE_KEYS = {
   SOUNDS_VOLUME: 'app-sounds-volume',
   PROFILES: 'app-profiles',
   ACTIVE_PROFILE_ID: 'app-active-profile-id',
+  ROW_MASTERY: 'app-row-mastery',
+  LERNREISE_INTRO_DONE: 'app-lernreise-intro-done',
 } as const;
+
+// Lernreise / Reihen-Meisterschaft (Issue #277 1a): one node per times table
+export const LERNREISE_ROW_COUNT = 12;
 
 export const AVATAR_COLORS = [
   '#FF6B6B',

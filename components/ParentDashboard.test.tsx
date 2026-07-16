@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, waitFor, within } from '@testing-library/react';
+import { render, waitFor, within, fireEvent } from '@testing-library/react';
+import { Alert } from 'react-native';
 import { ParentDashboard } from './ParentDashboard';
 import { getThemeColors } from '../utils/theme';
 import { Operation, DifficultyMode, NumberRange } from '../types/game';
@@ -9,11 +10,13 @@ jest.mock('../utils/storage', () => ({
   ...jest.requireActual('../utils/storage'),
   getSessionRecords: jest.fn(),
   getTaskStats: jest.fn(),
+  resetRowMastery: jest.fn(),
 }));
 
-import { getSessionRecords, getTaskStats } from '../utils/storage';
+import { getSessionRecords, getTaskStats, resetRowMastery } from '../utils/storage';
 const mockGetSessionRecords = getSessionRecords as jest.Mock;
 const mockGetTaskStats = getTaskStats as jest.Mock;
+const mockResetRowMastery = resetRowMastery as jest.Mock;
 
 const t = {
   parentDashboard: 'Eltern-Dashboard',
@@ -32,6 +35,21 @@ const t = {
   parentStreakDays: 'Tage',
   chartSessions: 'Einheiten · 14 Tage',
   chartErrorRate: 'Fehlerquote · 14 Tage',
+  parentEmptyTitle: "Los geht's!",
+  parentWeeklyReview: 'Wochenrückblick',
+  parentWeeklySessions: 'Einheiten diese Woche',
+  parentWeeklyVsLastWeek: 'vs. letzte Woche',
+  parentWeeklyMinutes: 'Übungszeit diese Woche',
+  parentWeeklyMinutesUnit: 'Min',
+  parentRowAccuracy: 'Genauigkeit pro Malreihe',
+  parentWeeklyRecommendation: 'Übungsempfehlung der Woche',
+  parentRecommendationText: 'Die {row}er-Reihe üben (Fehlerquote {rate}%)',
+  parentRecommendationEmpty: 'Keine Schwachstelle erkannt – weiter so!',
+  parentResetLernreise: 'Lernreise zurücksetzen',
+  parentResetLernreiseConfirm:
+    'Damit werden alle erreichten Bronze/Silber/Gold-Abzeichen und der Freischalt-Fortschritt der Lernreise-Landkarte zurückgesetzt.',
+  parentResetLernreiseDone: 'Die Lernreise wurde zurückgesetzt.',
+  cancel: 'Abbrechen',
   ok: 'OK',
 };
 
@@ -56,24 +74,26 @@ describe('ParentDashboard', () => {
     mockGetSessionRecords.mockResolvedValue([]);
     mockGetTaskStats.mockClear();
     mockGetTaskStats.mockResolvedValue([]);
+    mockResetRowMastery.mockClear();
+    mockResetRowMastery.mockResolvedValue([]);
   });
 
-  it('shows empty state when no records', async () => {
+  it('shows friendly empty state illustration when no records', async () => {
     const { getByText } = render(
       <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
     );
     await waitFor(() => {
+      expect(getByText(t.parentEmptyTitle)).toBeTruthy();
       expect(getByText(t.parentNoData)).toBeTruthy();
     });
   });
 
-  it('shows title and beta badge', async () => {
+  it('shows title', async () => {
     const { getByText } = render(
       <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
     );
     await waitFor(() => {
       expect(getByText(t.parentDashboard)).toBeTruthy();
-      expect(getByText('BETA')).toBeTruthy();
     });
   });
 
@@ -191,6 +211,98 @@ describe('ParentDashboard', () => {
       expect(getByText(t.chartSessions)).toBeTruthy();
       expect(getByText(t.chartErrorRate)).toBeTruthy();
     });
+  });
+
+  it('shows weekly session count in the weekly review section', async () => {
+    mockGetSessionRecords.mockResolvedValue([
+      makeRecord({ timestamp: Date.now() }),
+      makeRecord({ timestamp: Date.now() - 2 * 24 * 60 * 60 * 1000 }),
+    ]);
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => {
+      expect(getByText(t.parentWeeklyReview)).toBeTruthy();
+      expect(getByText(`${t.parentWeeklySessions}: 2`)).toBeTruthy();
+    });
+  });
+
+  it('shows practiced minutes when session durations are recorded', async () => {
+    mockGetSessionRecords.mockResolvedValue([
+      makeRecord({ timestamp: Date.now(), durationMs: 90000 }),
+    ]);
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => {
+      expect(getByText(`${t.parentWeeklyMinutes}: 2 ${t.parentWeeklyMinutesUnit}`)).toBeTruthy();
+    });
+  });
+
+  it('recommends the weakest times-table row when one is clearly weak', async () => {
+    mockGetSessionRecords.mockResolvedValue([makeRecord()]);
+    mockGetTaskStats.mockResolvedValue([
+      {
+        num1: 6,
+        num2: 7,
+        operation: 'MULTIPLICATION',
+        correctCount: 1,
+        errorCount: 5,
+        lastSeen: new Date().toISOString(),
+      },
+      {
+        num1: 6,
+        num2: 8,
+        operation: 'MULTIPLICATION',
+        correctCount: 0,
+        errorCount: 3,
+        lastSeen: new Date().toISOString(),
+      },
+    ]);
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => {
+      expect(getByText('Die 6er-Reihe üben (Fehlerquote 89%)')).toBeTruthy();
+    });
+  });
+
+  it('shows the empty recommendation message when no row is weak', async () => {
+    mockGetSessionRecords.mockResolvedValue([makeRecord()]);
+    mockGetTaskStats.mockResolvedValue([]);
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => {
+      expect(getByText(t.parentRecommendationEmpty)).toBeTruthy();
+    });
+  });
+
+  it('resets Lernreise progress after confirming the alert', async () => {
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((_title, _msg, buttons) => {
+      const confirmButton = buttons?.find((b) => b.style === 'destructive');
+      confirmButton?.onPress?.();
+    });
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} profileId="abc" t={t} />
+    );
+    await waitFor(() => expect(getByText(t.parentResetLernreise)).toBeTruthy());
+    fireEvent.click(getByText(t.parentResetLernreise));
+
+    await waitFor(() => expect(mockResetRowMastery).toHaveBeenCalledWith('abc'));
+    alertSpy.mockRestore();
+  });
+
+  it('does not reset Lernreise progress when the alert is cancelled', async () => {
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    const { getByText } = render(
+      <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => expect(getByText(t.parentResetLernreise)).toBeTruthy());
+    fireEvent.click(getByText(t.parentResetLernreise));
+
+    expect(mockResetRowMastery).not.toHaveBeenCalled();
+    alertSpy.mockRestore();
   });
 
   it('calls onClose when OK button is pressed', async () => {

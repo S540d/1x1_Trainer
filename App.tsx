@@ -38,6 +38,8 @@ import { BadgesModal } from './components/BadgesModal';
 import { BadgeUnlockToast } from './components/BadgeUnlockToast';
 import { FloatingStars } from './components/FloatingStars';
 import { ProfilePickerModal } from './components/ProfilePickerModal';
+import { LernreiseModal } from './components/LernreiseModal';
+import { LernreiseIntroModal } from './components/LernreiseIntroModal';
 import {
   saveSessionRecord,
   getStreakData,
@@ -51,6 +53,10 @@ import {
   getOnboardingDone,
   setOnboardingDone,
   resetOnboarding,
+  getLernreiseIntroDone,
+  setLernreiseIntroDone,
+  recordRowTestResult,
+  statusForRowScore,
   getStorageItem,
   migrateToProfiles,
   getProfiles,
@@ -65,6 +71,7 @@ import {
   StreakData,
   TaskStat,
   Operation,
+  RowMasteryStatus,
 } from './types/game';
 import { useBadges } from './hooks/useBadges';
 import {
@@ -89,6 +96,12 @@ export default function App() {
   const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
   const [badgesVisible, setBadgesVisible] = useState(false);
   const [profilePickerVisible, setProfilePickerVisible] = useState(false);
+  const [lernreiseVisible, setLernreiseVisible] = useState(false);
+  const [lernreiseIntroVisible, setLernreiseIntroVisible] = useState(false);
+  const [lernreiseResult, setLernreiseResult] = useState<{
+    row: number;
+    status: RowMasteryStatus | null;
+  } | null>(null);
   const [streakData, setStreakData] = useState<StreakData>({
     currentStreak: 0,
     lastPlayedDate: '',
@@ -102,6 +115,9 @@ export default function App() {
   // Profile state
   const [activeProfile, setActiveProfile] = useState<ChildProfile | null>(null);
   const [profiles, setProfiles] = useState<ChildProfile[]>([]);
+  // Forces the "who is playing?" picker on every launch when >1 profile exists,
+  // instead of silently resuming the last active one.
+  const [forceProfileSelectVisible, setForceProfileSelectVisible] = useState(false);
   // Ref so callbacks always see the current profileId without stale closures
   const activeProfileIdRef = useRef<string | undefined>(undefined);
   activeProfileIdRef.current = activeProfile?.id;
@@ -119,6 +135,9 @@ export default function App() {
       const allProfiles = await getProfiles();
       setProfiles(allProfiles);
       setActiveProfile(defaultProfile);
+      if (allProfiles.length > 1) {
+        setForceProfileSelectVisible(true);
+      }
     });
   }, []);
 
@@ -189,6 +208,11 @@ export default function App() {
     numberRange: preferences.numberRange,
     challengeHighScore: preferences.challengeHighScore,
     onChallengeHighScoreChange: preferences.setChallengeHighScore,
+    onLernreiseRoundComplete: (row, correctTasks, totalTasks) => {
+      recordRowTestResult(row, correctTasks, totalTasks, activeProfileIdRef.current).then(() => {
+        setLernreiseResult({ row, status: statusForRowScore(correctTasks, totalTasks) });
+      });
+    },
   });
 
   // Physical keyboard on web (#258) — inactive while any overlay is open
@@ -199,8 +223,11 @@ export default function App() {
     parentDashboardVisible ||
     badgesVisible ||
     profilePickerVisible ||
+    lernreiseVisible ||
+    lernreiseIntroVisible ||
     streakWarningVisible ||
     onboardingVisible ||
+    forceProfileSelectVisible ||
     game.gameState.showResult;
   useKeyboardInput({
     enabled: !overlayOpen,
@@ -386,9 +413,11 @@ export default function App() {
     }
   }, [game.gameState.isAnswerChecked, game.gameState.lastAnswerCorrect]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Show onboarding for new users; silently skip for existing users (migration)
+  // Show onboarding for new users; silently skip for existing users (migration).
+  // Waits for the forced profile picker to resolve first, so onboarding always
+  // refers to the profile the user actually picked.
   useEffect(() => {
-    if (!preferences.isLoaded) return;
+    if (!preferences.isLoaded || forceProfileSelectVisible) return;
     (async () => {
       const shown = await getOnboardingDone();
       if (shown) return;
@@ -407,7 +436,7 @@ export default function App() {
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preferences.isLoaded]);
+  }, [preferences.isLoaded, forceProfileSelectVisible]);
 
   // Generate first question on mount
   useEffect(() => {
@@ -484,6 +513,14 @@ export default function App() {
             setProfilePickerVisible(true);
             hideMenu();
           }}
+          onOpenLernreise={async () => {
+            const introDone = await getLernreiseIntroDone(activeProfileIdRef.current);
+            if (introDone) {
+              setLernreiseVisible(true);
+            } else {
+              setLernreiseIntroVisible(true);
+            }
+          }}
           t={t}
         />
       )}
@@ -509,8 +546,27 @@ export default function App() {
         difficultyMode={game.gameState.difficultyMode}
         challengeState={game.gameState.challengeState}
         score={game.gameState.score}
-        onRestart={game.restartGame}
-        onContinue={game.continueGame}
+        lernreiseResult={lernreiseResult}
+        onRestart={() => {
+          if (lernreiseResult) {
+            const row = lernreiseResult.row;
+            setLernreiseResult(null);
+            game.startLernreiseRound(row);
+          } else {
+            setLernreiseResult(null);
+            game.restartGame();
+          }
+        }}
+        onContinue={() => {
+          if (lernreiseResult) {
+            setLernreiseResult(null);
+            game.closeResult();
+            setLernreiseVisible(true);
+          } else {
+            setLernreiseResult(null);
+            game.continueGame();
+          }
+        }}
         t={t}
       />
 
@@ -541,11 +597,13 @@ export default function App() {
         visible={parentDashboardVisible}
         onClose={() => setParentDashboardVisible(false)}
         colors={colors}
+        profileId={activeProfile?.id}
         t={t}
       />
 
       <ProfilePickerModal
-        visible={profilePickerVisible}
+        visible={profilePickerVisible || forceProfileSelectVisible}
+        dismissible={!forceProfileSelectVisible}
         onClose={() => setProfilePickerVisible(false)}
         profiles={profiles}
         activeProfileId={activeProfile?.id}
@@ -553,6 +611,7 @@ export default function App() {
           setActiveProfile(profile);
           await setActiveProfileId(profile.id);
           setProfilePickerVisible(false);
+          setForceProfileSelectVisible(false);
         }}
         onProfilesChange={(updated) => {
           setProfiles(updated);
@@ -616,6 +675,26 @@ export default function App() {
         badgeIds={badgeSystem.newlyUnlocked}
         onDone={badgeSystem.clearNewlyUnlocked}
         badgeNewUnlockedLabel={t.badgeNewUnlocked}
+      />
+
+      <LernreiseModal
+        visible={lernreiseVisible}
+        onClose={() => setLernreiseVisible(false)}
+        onSelectRow={(row) => game.startLernreiseRound(row)}
+        colors={colors}
+        profileId={activeProfile?.id}
+        t={t}
+      />
+
+      <LernreiseIntroModal
+        visible={lernreiseIntroVisible}
+        onClose={async () => {
+          await setLernreiseIntroDone(activeProfileIdRef.current);
+          setLernreiseIntroVisible(false);
+          setLernreiseVisible(true);
+        }}
+        colors={colors}
+        t={t}
       />
     </SafeAreaView>
   );

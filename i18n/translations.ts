@@ -101,6 +101,19 @@ export interface TranslationStrings {
   parentWeakTasksEmpty: string;
   chartSessions: string;
   chartErrorRate: string;
+  parentEmptyTitle: string;
+  parentWeeklyReview: string;
+  parentWeeklySessions: string;
+  parentWeeklyVsLastWeek: string;
+  parentWeeklyMinutes: string;
+  parentWeeklyMinutesUnit: string;
+  parentRowAccuracy: string;
+  parentWeeklyRecommendation: string;
+  parentRecommendationText: string;
+  parentRecommendationEmpty: string;
+  parentResetLernreise: string;
+  parentResetLernreiseConfirm: string;
+  parentResetLernreiseDone: string;
   colorTheme: string;
   // Sounds
   sounds: string;
@@ -168,6 +181,21 @@ export interface TranslationStrings {
   onboardingStart: string;
   onboardingSkip: string;
   resetOnboarding: string;
+  // Lernreise / Reihen-Meisterschaft
+  lernreiseMenu: string;
+  lernreiseTitle: string;
+  lernreiseSubtitle: string;
+  lernreiseRowLabel: string;
+  lernreiseResultScore: string;
+  lernreiseResultGold: string;
+  lernreiseResultSilver: string;
+  lernreiseResultBronze: string;
+  lernreiseResultRetry: string;
+  lernreiseBackToMap: string;
+  lernreiseIntroTitle: string;
+  lernreiseIntroBody: string;
+  lernreiseIntroPracticeHint: string;
+  lernreiseIntroStart: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -248,7 +276,7 @@ export const translations: Record<Language, TranslationStrings> = {
     ok: 'OK',
     // Parent Dashboard
     parentDashboard: 'Parent Dashboard',
-    parentDashboardMenu: 'Parent Dashboard (Beta)',
+    parentDashboardMenu: 'Parent Dashboard',
     parentDashboardSubtitle: 'Last 4 weeks · tap ✕ to close',
     parentNoData: 'No sessions recorded yet. Play a few rounds first!',
     parentSessions: 'Sessions (4 weeks)',
@@ -269,6 +297,20 @@ export const translations: Record<Language, TranslationStrings> = {
     parentWeakTasksEmpty: 'No weak areas identified yet.',
     chartSessions: 'Sessions · 14 days',
     chartErrorRate: 'Error rate · 14 days',
+    parentEmptyTitle: "Let's get started!",
+    parentWeeklyReview: 'Weekly Review',
+    parentWeeklySessions: 'Sessions this week',
+    parentWeeklyVsLastWeek: 'vs. last week',
+    parentWeeklyMinutes: 'Practice time this week',
+    parentWeeklyMinutesUnit: 'min',
+    parentRowAccuracy: 'Accuracy by times table',
+    parentWeeklyRecommendation: "This week's practice tip",
+    parentRecommendationText: 'Practice the {row} times table (error rate {rate}%)',
+    parentRecommendationEmpty: 'No weak spot found — keep it up!',
+    parentResetLernreise: 'Reset Learning Journey',
+    parentResetLernreiseConfirm:
+      'This will reset all earned Bronze/Silver/Gold badges and locked progress on the Learning Journey map.',
+    parentResetLernreiseDone: 'Learning Journey has been reset.',
     colorTheme: 'COLOR THEME',
     sounds: 'SOUNDS',
     soundsOn: 'On',
@@ -324,6 +366,23 @@ export const translations: Record<Language, TranslationStrings> = {
     onboardingStart: 'Start',
     onboardingSkip: 'Skip',
     resetOnboarding: 'Restart tutorial',
+    // Lernreise / Times-Table Mastery
+    lernreiseMenu: 'Learning Journey',
+    lernreiseTitle: 'Learning Journey',
+    lernreiseSubtitle: 'Master every times table — Bronze, Silver, Gold',
+    lernreiseRowLabel: '{row} Times Table',
+    lernreiseResultScore: '{score}/10 correct',
+    lernreiseResultGold: 'Gold! Perfectly mastered!',
+    lernreiseResultSilver: 'Silver! Great job!',
+    lernreiseResultBronze: 'Bronze! Well done!',
+    lernreiseResultRetry: 'Not quite yet — give it another try!',
+    lernreiseBackToMap: 'Back to Learning Journey',
+    lernreiseIntroTitle: 'Welcome to your Learning Journey!',
+    lernreiseIntroBody:
+      'Work through the times tables one by one, from 1 to 12. Pass a table’s test to unlock the next one and earn Bronze, Silver, or Gold.',
+    lernreiseIntroPracticeHint:
+      'Tip: use Practice Mode afterwards to automatically drill the tasks you find tricky.',
+    lernreiseIntroStart: "Let's go!",
     // Profiles
     profiles: 'Profiles',
     profilesMenu: 'Profiles',
@@ -415,7 +474,7 @@ export const translations: Record<Language, TranslationStrings> = {
     ok: 'OK',
     // Parent Dashboard
     parentDashboard: 'Eltern-Dashboard',
-    parentDashboardMenu: 'Eltern-Dashboard (Beta)',
+    parentDashboardMenu: 'Eltern-Dashboard',
     parentDashboardSubtitle: 'Letzte 4 Wochen · ✕ zum Schließen',
     parentNoData: 'Noch keine Einheiten gespeichert. Spielt zuerst ein paar Runden!',
     parentSessions: 'Einheiten (4 Wochen)',
@@ -436,6 +495,20 @@ export const translations: Record<Language, TranslationStrings> = {
     parentWeakTasksEmpty: 'Noch keine Schwächen erkannt.',
     chartSessions: 'Einheiten · 14 Tage',
     chartErrorRate: 'Fehlerquote · 14 Tage',
+    parentEmptyTitle: "Los geht's!",
+    parentWeeklyReview: 'Wochenrückblick',
+    parentWeeklySessions: 'Einheiten diese Woche',
+    parentWeeklyVsLastWeek: 'vs. letzte Woche',
+    parentWeeklyMinutes: 'Übungszeit diese Woche',
+    parentWeeklyMinutesUnit: 'Min',
+    parentRowAccuracy: 'Genauigkeit pro Malreihe',
+    parentWeeklyRecommendation: 'Übungsempfehlung der Woche',
+    parentRecommendationText: 'Die {row}er-Reihe üben (Fehlerquote {rate}%)',
+    parentRecommendationEmpty: 'Keine Schwachstelle erkannt – weiter so!',
+    parentResetLernreise: 'Lernreise zurücksetzen',
+    parentResetLernreiseConfirm:
+      'Damit werden alle erreichten Bronze/Silber/Gold-Abzeichen und der Freischalt-Fortschritt der Lernreise-Landkarte zurückgesetzt.',
+    parentResetLernreiseDone: 'Die Lernreise wurde zurückgesetzt.',
     colorTheme: 'FARBTHEMA',
     sounds: 'TÖNE',
     soundsOn: 'An',
@@ -491,6 +564,23 @@ export const translations: Record<Language, TranslationStrings> = {
     onboardingStart: 'Loslegen',
     onboardingSkip: 'Überspringen',
     resetOnboarding: 'Tutorial zurücksetzen',
+    // Lernreise / Reihen-Meisterschaft
+    lernreiseMenu: 'Lernreise',
+    lernreiseTitle: 'Lernreise',
+    lernreiseSubtitle: 'Meistere jede Malreihe – Bronze, Silber, Gold',
+    lernreiseRowLabel: '{row}er-Reihe',
+    lernreiseResultScore: '{score}/10 richtig',
+    lernreiseResultGold: 'Gold! Perfekt gemeistert!',
+    lernreiseResultSilver: 'Silber! Toll gemacht!',
+    lernreiseResultBronze: 'Bronze! Gut gemacht!',
+    lernreiseResultRetry: 'Noch nicht ganz – versuch es nochmal!',
+    lernreiseBackToMap: 'Zurück zur Lernreise',
+    lernreiseIntroTitle: 'Willkommen zu deiner Lernreise!',
+    lernreiseIntroBody:
+      'Arbeite dich Malreihe für Malreihe von 1 bis 12 vor. Bestehe den Test einer Reihe, um die nächste freizuschalten und Bronze, Silber oder Gold zu verdienen.',
+    lernreiseIntroPracticeHint:
+      'Tipp: Nutze danach den Übungsmodus, um automatisch die Aufgaben zu festigen, die dir noch schwerfallen.',
+    lernreiseIntroStart: "Los geht's!",
     // Profiles
     profiles: 'Profile',
     profilesMenu: 'Profile',

@@ -84,6 +84,15 @@ export interface TaskStat {
   lastSeen: string; // ISO date
 }
 
+// Lernreise / Reihen-Meisterschaft (Issue #277 1a)
+export type RowMasteryStatus = 'bronze' | 'silver' | 'gold';
+
+export interface RowMastery {
+  row: number;
+  bestScore: number;
+  status: RowMasteryStatus | null;
+}
+
 export interface SessionRecord {
   id: string;
   timestamp: number;
@@ -96,6 +105,8 @@ export interface SessionRecord {
   numberRange: NumberRange;
   // Challenge only: level 3 was reached with all lives intact (#253)
   challengeFlawlessLevel3?: boolean;
+  // Wall-clock time spent on the round; absent on sessions recorded before #277
+  durationMs?: number;
 }
 
 export interface AchievementBadge {

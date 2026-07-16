@@ -1934,6 +1934,120 @@ describe('useGameLogic Hook', () => {
     });
   });
 
+  describe('startLernreiseRound', () => {
+    it('forces multiplication with num1 fixed to the given row for all 10 tasks', () => {
+      const { result } = renderHook(() => useGameLogic(defaultProps));
+
+      act(() => {
+        result.current.startLernreiseRound(7);
+      });
+      flushAllTimers();
+
+      const seenFactors = new Set<number>();
+      for (let i = 0; i < 10; i++) {
+        expect(result.current.gameState.operation).toBe(Operation.MULTIPLICATION);
+        expect(result.current.gameState.num1).toBe(7);
+        expect(result.current.gameState.currentTask).toBe(i + 1);
+        seenFactors.add(result.current.gameState.num2);
+
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      // One full pass through factors 1-10, no repeats
+      expect(seenFactors).toEqual(new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
+    });
+
+    it('reports the round result via onLernreiseRoundComplete and stops forcing the row afterwards', () => {
+      const onLernreiseRoundComplete = jest.fn();
+      const { result } = renderHook(() =>
+        useGameLogic({ ...defaultProps, onLernreiseRoundComplete })
+      );
+
+      act(() => {
+        result.current.startLernreiseRound(3);
+      });
+      flushAllTimers();
+
+      for (let i = 0; i < 10; i++) {
+        const correctAnswer = result.current.getCorrectAnswer();
+        enterAnswer(result, correctAnswer);
+        act(() => {
+          result.current.checkAnswer();
+        });
+        act(() => {
+          result.current.nextQuestion();
+        });
+        flushAllTimers();
+      }
+
+      expect(onLernreiseRoundComplete).toHaveBeenCalledWith(3, 10, 10);
+      expect(result.current.gameState.showResult).toBe(true);
+
+      // After the round ends, restarting should generate normal (non-Lernreise) questions
+      // again instead of being permanently pinned to row 3. Force Math.random() to 0 so the
+      // random-generation branch deterministically picks the first multiplication pair (1×1)
+      // rather than a value that could coincidentally also be 3.
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
+      act(() => {
+        result.current.restartGame();
+      });
+      flushAllTimers();
+      randomSpy.mockRestore();
+
+      expect(result.current.gameState.num1).toBe(1);
+      expect(result.current.gameState.num2).toBe(1);
+    });
+
+    it('stops forcing the row when the settings are changed mid-round instead of finishing it', () => {
+      const { result } = renderHook(() => useGameLogic(defaultProps));
+
+      act(() => {
+        result.current.startLernreiseRound(9);
+      });
+      flushAllTimers();
+
+      // Abandon the round before answering all 10 tasks — e.g. the user opened
+      // the settings menu and switched difficulty instead of finishing.
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
+      act(() => {
+        result.current.changeDifficultyMode(DifficultyMode.SIMPLE);
+      });
+      flushAllTimers();
+      randomSpy.mockRestore();
+
+      expect(result.current.gameState.num1).not.toBe(9);
+    });
+
+    it('stops forcing the row when toggling operations mid-round', () => {
+      const { result } = renderHook(() => useGameLogic(defaultProps));
+
+      act(() => {
+        result.current.startLernreiseRound(9);
+      });
+      flushAllTimers();
+
+      // Add addition alongside multiplication — if the Lernreise row lock were
+      // still active, the next question would ignore this and stay pinned to
+      // 9× multiplication instead of possibly drawing an addition task.
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
+      act(() => {
+        result.current.toggleOperation(Operation.ADDITION);
+      });
+      flushAllTimers();
+      randomSpy.mockRestore();
+
+      expect(result.current.gameState.num1).not.toBe(9);
+    });
+  });
+
   describe('operatorSymbol', () => {
     it('should return + for ADDITION', () => {
       const { result } = renderHook(() =>
