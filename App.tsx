@@ -548,12 +548,24 @@ export default function App() {
         score={game.gameState.score}
         lernreiseResult={lernreiseResult}
         onRestart={() => {
-          setLernreiseResult(null);
-          game.restartGame();
+          if (lernreiseResult) {
+            const row = lernreiseResult.row;
+            setLernreiseResult(null);
+            game.startLernreiseRound(row);
+          } else {
+            setLernreiseResult(null);
+            game.restartGame();
+          }
         }}
         onContinue={() => {
-          setLernreiseResult(null);
-          game.continueGame();
+          if (lernreiseResult) {
+            setLernreiseResult(null);
+            game.closeResult();
+            setLernreiseVisible(true);
+          } else {
+            setLernreiseResult(null);
+            game.continueGame();
+          }
         }}
         t={t}
       />

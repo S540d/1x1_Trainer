@@ -43,6 +43,7 @@ interface ResultModalProps {
     lernreiseResultSilver: string;
     lernreiseResultBronze: string;
     lernreiseResultRetry: string;
+    lernreiseBackToMap: string;
   };
 }
 
@@ -128,7 +129,7 @@ export function ResultModal({
               <View style={styles.modalButtonRow}>
                 <View style={styles.modalButtonWrap}>
                   <Button
-                    label={t.newRound}
+                    label={lernreiseResult ? t.tryAgain : t.newRound}
                     onPress={onRestart}
                     variant="primary"
                     fullWidth
@@ -137,7 +138,7 @@ export function ResultModal({
                 </View>
                 <View style={styles.modalButtonWrap}>
                   <Button
-                    label={t.continueGame}
+                    label={lernreiseResult ? t.lernreiseBackToMap : t.continueGame}
                     onPress={onContinue}
                     variant="secondary"
                     fullWidth

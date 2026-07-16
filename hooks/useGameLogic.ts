@@ -747,6 +747,13 @@ export function useGameLogic({
     setTimeout(() => generateQuestion(), 0);
   };
 
+  // Close the result modal without starting a new round — used when leaving
+  // a finished Lernreise round back to the row map instead of continuing
+  // into a random round (the map, not the game, decides what comes next).
+  const closeResult = () => {
+    setGameState((prev) => ({ ...prev, showResult: false }));
+  };
+
   // Lernreise: start a round restricted to a single multiplication row
   const startLernreiseRound = (row: number) => {
     lernreiseRowRef.current = row;
@@ -1010,6 +1017,7 @@ export function useGameLogic({
     nextQuestion,
     restartGame,
     continueGame,
+    closeResult,
     startLernreiseRound,
     changeGameMode,
     toggleOperation,
