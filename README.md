@@ -8,7 +8,7 @@ A multiplication table trainer for children — practice all 12 tables with four
 
 ## Play Store
 
-[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/de_badge_web_generic.png" alt="Jetzt bei Google Play" height="60">](https://play.google.com/store/apps/details?id=com.sven4321.trainer1x1)
+[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/de_badge_web_generic.png" alt="Jetzt bei Google Play" height="60">](https://play.google.com/store/apps/details?id=com.sven4321.trainer1x1&referrer=utm_source%3Dgithub_readme%26utm_medium%3Dreferral%26utm_campaign%3Dweb_presence)
 
 ## Tech Stack
 
