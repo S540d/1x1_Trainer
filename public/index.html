@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="utf-8" />
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -9,17 +9,49 @@
     />
     <meta name="screen-orientation" content="portrait" />
     <meta name="x5-orientation" content="portrait" />
-    <title>1x1 Trainer - Learn Multiplication</title>
-    <meta name="description" content="Practice multiplication tables with different game modes" />
-    <meta name="keywords" content="1x1, multiplication, trainer, math, learning, PWA, education" />
+    <title>1x1 Trainer – Einmaleins &amp; Kopfrechnen üben</title>
+    <meta name="description" content="Einmaleins spielerisch lernen: Kostenlos, offline und werbefrei das 1x1 üben für die Grundschule (Klasse 2/3). Auch als App im Play Store." />
+    <meta name="keywords" content="Einmaleins, 1x1 lernen, Kopfrechnen, Mathe Grundschule, Klasse 2, Klasse 3, multiplication, trainer, math, learning, PWA, education" />
     <meta name="author" content="S540d" />
+    <link rel="canonical" href="https://s540d.github.io/1x1_Trainer/" />
+    <link rel="alternate" hreflang="de" href="https://s540d.github.io/1x1_Trainer/" />
+    <link rel="alternate" hreflang="en" href="https://s540d.github.io/1x1_Trainer/?lang=en" />
+    <link rel="alternate" hreflang="x-default" href="https://s540d.github.io/1x1_Trainer/" />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="1x1 Trainer - Learn Multiplication" />
-    <meta property="og:description" content="Practice multiplication tables with different game modes" />
+    <meta property="og:title" content="1x1 Trainer – Einmaleins & Kopfrechnen üben" />
+    <meta property="og:description" content="Einmaleins spielerisch lernen: Kostenlos, offline und werbefrei das 1x1 üben für die Grundschule (Klasse 2/3). Auch als App im Play Store." />
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
     <meta property="og:url" content="https://s540d.github.io/1x1_Trainer/" />
     <meta property="og:image" content="https://s540d.github.io/1x1_Trainer/icon-512.png" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="1x1 Trainer – Einmaleins & Kopfrechnen üben" />
+    <meta name="twitter:description" content="Kostenlos, offline und werbefrei das 1x1 üben für die Grundschule." />
+    <meta name="twitter:image" content="https://s540d.github.io/1x1_Trainer/icon-512.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "1x1 Trainer",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Android, Web",
+        "url": "https://s540d.github.io/1x1_Trainer/",
+        "description": "Einmaleins spielerisch lernen: Kostenlos, offline und werbefrei das 1x1 üben für die Grundschule (Klasse 2/3).",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "EUR"
+        },
+        "sameAs": [
+          "https://play.google.com/store/apps/details?id=com.sven4321.trainer1x1",
+          "https://github.com/S540d/1x1_Trainer"
+        ]
+      }
+    </script>
 
     <link rel="manifest" href="/1x1_Trainer/manifest.json" />
     <link rel="icon" type="image/png" sizes="128x128" href="/1x1_Trainer/icon-128.png" />
@@ -60,6 +92,39 @@
         background-color: #FAFAFA;
         /* Background will be set dynamically by React */
       }
+      #play-store-banner {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 6px 10px;
+        background: rgba(255, 255, 255, 0.92);
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+        font-size: 12px;
+        color: #333;
+        text-align: center;
+      }
+      #play-store-banner a {
+        display: inline-flex;
+        align-items: center;
+      }
+      #play-store-banner img {
+        height: 32px;
+      }
+      #play-store-banner button {
+        border: none;
+        background: transparent;
+        font-size: 14px;
+        line-height: 1;
+        padding: 4px 6px;
+        cursor: pointer;
+        color: #666;
+      }
       @media screen and (orientation: landscape) {
         body::before {
           content: '';
@@ -91,7 +156,31 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="orientation-alert" aria-live="polite" aria-atomic="true" role="status" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
     <div id="root"></div>
+    <div id="play-store-banner" role="complementary">
+      <a href="https://play.google.com/store/apps/details?id=com.sven4321.trainer1x1" aria-label="1x1 Trainer im Google Play Store herunterladen">
+        <img src="https://play.google.com/intl/en_us/badges/static/images/badges/de_badge_web_generic.png" alt="Jetzt bei Google Play" />
+      </a>
+      <button id="play-store-banner-close" type="button" aria-label="Hinweis schließen">✕</button>
+    </div>
     <script src="/pwa-update.js"></script>
+    <script>
+      (function () {
+        var banner = document.getElementById('play-store-banner');
+        var closeButton = document.getElementById('play-store-banner-close');
+        if (!banner || !closeButton) return;
+        try {
+          if (localStorage.getItem('play-store-banner-dismissed') === '1') {
+            banner.style.display = 'none';
+          }
+        } catch (e) {}
+        closeButton.addEventListener('click', function () {
+          banner.style.display = 'none';
+          try {
+            localStorage.setItem('play-store-banner-dismissed', '1');
+          } catch (e) {}
+        });
+      })();
+    </script>
     <script>
       const updateOrientationAnnouncement = () => {
         const mediaQuery = window.matchMedia('(orientation: landscape)');
