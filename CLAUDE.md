@@ -83,18 +83,21 @@ npm run test:coverage # Coverage
 
 ---
 
-## Aktueller Stand (2026-07-12)
+## Aktueller Stand (2026-07-28)
 
-- Version: **1.4.1** / versionCode 31
-- Branches: `testing` vorn (inkl. #278 Expo-SDK-57, #279 Wochenrückblick/Empty-States, #280 resizeableActivity, #281 Lernreise); `main` auf `91cf92d` (sync v1.3.8)
-- Offene PRs: #272 (Fortschrittsbalken-Segmente + Durchlauf-Zähler), #245 (CLAUDE.md docs), gegen `testing`
-- Offene Issues: #156, #231, #96, #276 (npm-audit-Vulnerabilities — SDK-Upgrade-Teilaufgabe erledigt, Rest bleibt offen, siehe unten), #275 (Code-Fix in #280 erledigt, letzter To-Do „Neubuild + AAB-Upload" bleibt manuell offen), #277 (Wachstumsplan — 1a/1d/2d erledigt, siehe unten)
-- APK v1.3.8 via CI
+- Version: **1.5.0** / versionCode 32
+- Branches: `testing` vorn (inkl. #278 Expo-SDK-57, #279 Wochenrückblick/Empty-States, #280 resizeableActivity, #281 Lernreise, #293 Listing-Update Lernreise, #297 Play-Store-Link/SEO, #298 UTM-Referrer); `main` auf `e9f6d63` (sync v1.5.0 via #290)
+- Offene PRs: keine
+- Offene Issues: #256 (Streak-Push-Notification, Retention-Hebel Nr. 1), #276 (npm-audit-Vulnerabilities — SDK-Upgrade-Teilaufgabe erledigt, Rest bleibt offen), #277 (Wachstumsplan — 1a/1d/2d erledigt, siehe unten), #292 (Play-Store-Listing um Lernreise ergänzen), #294 (Android-15-Edge-to-Edge-APIs prüfen), #295 (App-Icon überarbeiten, Ausgliederung aus #277 2c), #296 (Auffindbarkeit außerhalb des Play Stores — Play-Store-Link/SEO in #297/#298 umgesetzt, QR-Code + Repo-Topics bleiben offen)
+- v1.5.0 im Play Store veröffentlicht (Issue #275 geschlossen)
 
 ### Zuletzt gemergt / gepusht
 
 | PR / Commit  | Was                                                                                            |
 | ------------ | ---------------------------------------------------------------------------------------------- |
+| #298 ✅      | feat: UTM-Referrer an Play-Store-Links für Attributions-Messung — Issue #296                   |
+| #297 ✅      | feat: Play-Store-Link + deutschsprachige SEO für die Web-Landingpage — Issue #296              |
+| #293 ✅      | docs: Play-Store-Listing für Lernreise (v1.5.0) + Release Notes — Issue #292 (Texte erledigt, Grafik-Assets bleiben offen) |
 | #281 ✅      | feat: Lernreise / Reihen-Meisterschaft mit Bronze/Silber/Gold — Issue #277 1a                  |
 | #280 ✅      | fix: android:resizeableActivity="true" via Config-Plugin — Issue #275                          |
 | #279 ✅      | feat: Wochenrückblick im Eltern-Dashboard + freundlicher Empty-State — Issue #277 1d/2d        |
