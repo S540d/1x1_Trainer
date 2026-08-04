@@ -103,6 +103,8 @@ Bei Fragen zur Datenschutzerklärung:
 
 - **GitHub Issues:** https://github.com/S540d/1x1_Trainer/issues
 - **Repository:** https://github.com/S540d/1x1_Trainer
+- **Play Store:** https://play.google.com/store/apps/details?id=com.sven4321.trainer1x1&referrer=utm_source%3Dprivacy_policy%26utm_medium%3Dreferral%26utm_campaign%3Dweb_presence
+- **Web-App:** https://s540d.github.io/1x1_Trainer/
 
 ---
 
