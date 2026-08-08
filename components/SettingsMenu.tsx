@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors, Operation, DifficultyMode, NumberRange } from '../types/game';
-import { CONTACT_EMAIL, DESIGN_TOKENS } from '../utils/constants';
+import { CONTACT_EMAIL, PLAY_STORE_URL, DESIGN_TOKENS } from '../utils/constants';
 
 interface SettingsMenuProps {
   colors: ThemeColors;
@@ -65,6 +65,7 @@ interface SettingsMenuProps {
     lernreiseMenu: string;
     feedback: string;
     support: string;
+    playStore: string;
     about: string;
     settings: string;
     resetOnboarding: string;
@@ -399,6 +400,15 @@ export function SettingsMenu({
               <Text style={[styles.settingsMenuLinkText, { color: activeColor }]}>{t.about}</Text>
             </TouchableOpacity>
           </View>
+          <TouchableOpacity
+            style={styles.settingsMenuLinkFlex}
+            onPress={() => {
+              Linking.openURL(PLAY_STORE_URL).catch(() => {});
+              onHideMenu();
+            }}
+          >
+            <Text style={[styles.settingsMenuLinkText, { color: activeColor }]}>{t.playStore}</Text>
+          </TouchableOpacity>
 
           {/* Reset Onboarding */}
           <TouchableOpacity

@@ -39,6 +39,7 @@ export interface TranslationStrings {
   upTo100: string;
   feedback: string;
   support: string;
+  playStore: string;
   about: string;
   aboutDescription: string;
   version: string;
@@ -233,6 +234,7 @@ export const translations: Record<Language, TranslationStrings> = {
     upTo100: '1-100',
     feedback: 'Send Feedback',
     support: 'Support me',
+    playStore: 'Rate on Play Store',
     about: 'ABOUT',
     aboutDescription: 'A math trainer for children with multiple game modes.',
     version: 'Version',
@@ -431,6 +433,7 @@ export const translations: Record<Language, TranslationStrings> = {
     upTo100: '1-100',
     feedback: 'Feedback senden',
     support: 'Support me',
+    playStore: 'Im Play Store bewerten',
     about: 'ÜBER',
     aboutDescription: 'Ein Rechentrainer für Kinder mit verschiedenen Spielmodi.',
     version: 'Version',
