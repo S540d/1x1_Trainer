@@ -7,6 +7,8 @@ import { GameMode, NumberRange, Operation, ThemeName } from '../types/game';
 export const APP_VERSION = '1.5.0';
 export const APP_NAME = '1×1 Trainer';
 export const CONTACT_EMAIL = 'devsven@posteo.de';
+export const PLAY_STORE_URL =
+  'https://play.google.com/store/apps/details?id=com.sven4321.trainer1x1&referrer=utm_source%3Dapp_settings%26utm_medium%3Dreferral%26utm_campaign%3Dweb_presence';
 
 // Game Configuration
 export const TOTAL_TASKS = 10;
