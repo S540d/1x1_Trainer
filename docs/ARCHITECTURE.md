@@ -114,9 +114,37 @@ writes `CHALLENGE_HIGHSCORE` if beaten.
 | Environment  | URL / Target                            | Build                     |
 | ------------ | --------------------------------------- | ------------------------- |
 | Production   | https://s540d.github.io/1x1_Trainer/    | `npm run deploy`          |
-| Play Store   | `com.devsven.x1x1trainer`               | `npm run build:android`   |
+| Play Store   | `com.sven4321.trainer1x1`               | siehe unten               |
 | Local web    | Expo dev server (port printed on start) | `npm run web`             |
 | Local native | Android/iOS device or emulator          | `npm run android` / `ios` |
+
+### Paketnamen
+
+Es gibt zwei Android-Paketnamen, und das ist Absicht:
+
+- `com.sven4321.trainer1x1` — der **Play-Store-Paketname**. Darauf ist auch
+  `google-services.json` (Firebase/Crashlytics) registriert und darauf zeigt
+  `assetlinks.json` für die Deep Links.
+- `com.devsven.x1x1trainer` — der Default in `app.json`, nur für Dev-Builds.
+
+`app.config.js` überschreibt den Namen zur Build-Zeit aus `APP_PACKAGE`:
+
+```js
+package: process.env.APP_PACKAGE || base.expo.android.package,
+```
+
+Store-Builds müssen die Variable also setzen — sonst entsteht ein AAB mit dem
+Dev-Paketnamen, das der Play Store ablehnt und dem Firebase keine Daten
+zuordnet:
+
+```
+APP_PACKAGE=com.sven4321.trainer1x1 npx expo prebuild --platform android --clean
+cd android && ./gradlew bundleRelease
+```
+
+In CI kommt `APP_PACKAGE` aus den Repo-Secrets (`build-android.yml`).
+`npm run build:android` ruft `eas build` auf; die Store-AABs entstehen aktuell
+lokal über den Weg oben. Hintergrund: Issue #233 / PR #244.
 
 ## Testing
 
