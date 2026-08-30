@@ -44,4 +44,14 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!(expo-localization|expo-linear-gradient|expo-font|expo-status-bar|expo-audio|@expo-google-fonts)/)',
   ],
+  // Schutz vor Regression: auf dem gemessenen Stand minus kleinem Puffer.
+  // Bei Verbesserungen nachziehen (Issue project-templates#113).
+  coverageThreshold: {
+    global: {
+      statements: 84,
+      branches: 79,
+      functions: 79,
+      lines: 85,
+    },
+  },
 };
