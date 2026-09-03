@@ -83,18 +83,22 @@ npm run test:coverage # Coverage
 
 ---
 
-## Aktueller Stand (2026-08-08)
+## Aktueller Stand (2026-09-03)
 
-- Version: **1.5.0** / versionCode 32
-- Branches: `testing` vorn (inkl. #278 Expo-SDK-57, #279 Wochenrückblick/Empty-States, #280 resizeableActivity, #281 Lernreise, #293 Listing-Update Lernreise, #297 Play-Store-Link/SEO, #298 UTM-Referrer, #303 In-App-Play-Store-Link/statischer SEO-Text); `main` auf `e9f6d63` (sync v1.5.0 via #290)
+- Version: **1.5.2** / versionCode 34
+- Branches: `testing` vorn auf #333 (async-storage 3.1.1 + Firebase 26.3.2, inkl. #278 Expo-SDK-57, #279 Wochenrückblick/Empty-States, #280 resizeableActivity, #281 Lernreise, #293 Listing-Update Lernreise, #297 Play-Store-Link/SEO, #298 UTM-Referrer, #303 In-App-Play-Store-Link/statischer SEO-Text, #327 Versionsbump 1.5.2); `main` auf `ed24492` (#320, inkl. #330 Release-Sync v1.5.2 testing → main)
 - Offene PRs: keine
-- Offene Issues: #256 (Streak-Push-Notification, Retention-Hebel Nr. 1), #276 (npm-audit-Vulnerabilities — SDK-Upgrade-Teilaufgabe erledigt, Rest bleibt offen), #277 (Wachstumsplan — 1a/1d/2d erledigt, siehe unten), #292 (Play-Store-Listing um Lernreise ergänzen), #294 (Android-15-Edge-to-Edge-APIs prüfen), #295 (App-Icon überarbeiten, Ausgliederung aus #277 2c), #296 (Auffindbarkeit außerhalb des Play Stores — Play-Store-Link/SEO in #297/#298 sowie In-App-Link/statischer SEO-Text in #303 umgesetzt; QR-Code fürs Print-Material + GitHub-Repo-Beschreibung/Topics bleiben offen, Repo-Settings ohne Tool-Zugriff)
+- Offene Issues: #256 (Streak-Push-Notification, Retention-Hebel Nr. 1), #276 (npm-audit-Vulnerabilities — SDK-Upgrade-Teilaufgabe erledigt, Rest bleibt offen), #277 (Wachstumsplan — 1a/1d/2d erledigt, siehe unten), #292 (Play-Store-Listing um Lernreise ergänzen), #294 (Android-15-Edge-to-Edge-APIs prüfen), #295 (App-Icon überarbeiten, Ausgliederung aus #277 2c), #296 (Auffindbarkeit außerhalb des Play Stores — Play-Store-Link/SEO in #297/#298 sowie In-App-Link/statischer SEO-Text in #303 umgesetzt; QR-Code fürs Print-Material + GitHub-Repo-Beschreibung/Topics bleiben offen, Repo-Settings ohne Tool-Zugriff), #325 (TypeScript 7.0.2 Dependabot-Bump — Lint-Fail, große Major-Migration, bewusst zurückgestellt)
 - v1.5.0 im Play Store veröffentlicht (Issue #275 geschlossen)
+- **Dependabot-Aufräumaktion (2026-09-03):** 7 offene PRs abgearbeitet — #319/#320 (CI-Actions-Bumps) direkt nach `main` gemergt; #323/#324/#326 (Firebase 26.3.2 + async-storage 3.1.1, alle mit rotem CI) gefixt und in #333 nach `testing` gemergt; #322 (Draft-Sammel-PR, Build-Fail) und #325 (TypeScript 7.0.2, zu großer Sprung) geschlossen
 
 ### Zuletzt gemergt / gepusht
 
 | PR / Commit | Was                                                                                                                        |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| #333 ✅     | chore: async-storage 2.2.0 → 3.1.1 (Jest-transformIgnorePatterns-Fix) + Firebase app/crashlytics 24.1.0 → 26.3.2 (Migration auf modulare v9-API in `index.ts`) — Fixes für Dependabot-PRs #323/#324/#326 |
+| #319/#320 ✅ | ci: actions/checkout 4→7, actions/setup-node 4→7 (Dependabot, direkt nach `main`)                                        |
+| #327 ✅     | chore: Versionsbump auf 1.5.2 (versionCode 34)                                                                            |
 | #303 ✅     | feat: In-App Play-Store-Link (Einstellungsmenü) + statischer SEO-Fallback-Text in `public/index.html` — Issue #296         |
 | #298 ✅     | feat: UTM-Referrer an Play-Store-Links für Attributions-Messung — Issue #296                                               |
 | #297 ✅     | feat: Play-Store-Link + deutschsprachige SEO für die Web-Landingpage — Issue #296                                          |
