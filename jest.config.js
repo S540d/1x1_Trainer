@@ -42,7 +42,7 @@ module.exports = {
     '\\.(wav|mp3|m4a|ogg)$': '<rootDir>/__mocks__/fileMock.js',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(expo-localization|expo-linear-gradient|expo-font|expo-status-bar|expo-audio|@expo-google-fonts)/)',
+    'node_modules/(?!(expo-localization|expo-linear-gradient|expo-font|expo-status-bar|expo-audio|@expo-google-fonts|@react-native-async-storage/async-storage)/)',
   ],
   // Schutz vor Regression: auf dem gemessenen Stand minus kleinem Puffer.
   // Bei Verbesserungen nachziehen (Issue project-templates#113).
