@@ -94,29 +94,29 @@ npm run test:coverage # Coverage
 
 ### Zuletzt gemergt / gepusht
 
-| PR / Commit | Was                                                                                                                        |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------- |
-| #333 ✅     | chore: async-storage 2.2.0 → 3.1.1 (Jest-transformIgnorePatterns-Fix) + Firebase app/crashlytics 24.1.0 → 26.3.2 (Migration auf modulare v9-API in `index.ts`) — Fixes für Dependabot-PRs #323/#324/#326 |
-| #319/#320 ✅ | ci: actions/checkout 4→7, actions/setup-node 4→7 (Dependabot, direkt nach `main`)                                        |
-| #327 ✅     | chore: Versionsbump auf 1.5.2 (versionCode 34)                                                                            |
-| #303 ✅     | feat: In-App Play-Store-Link (Einstellungsmenü) + statischer SEO-Fallback-Text in `public/index.html` — Issue #296         |
-| #298 ✅     | feat: UTM-Referrer an Play-Store-Links für Attributions-Messung — Issue #296                                               |
-| #297 ✅     | feat: Play-Store-Link + deutschsprachige SEO für die Web-Landingpage — Issue #296                                          |
-| #293 ✅     | docs: Play-Store-Listing für Lernreise (v1.5.0) + Release Notes — Issue #292 (Texte erledigt, Grafik-Assets bleiben offen) |
-| #281 ✅     | feat: Lernreise / Reihen-Meisterschaft mit Bronze/Silber/Gold — Issue #277 1a                                              |
-| #280 ✅     | fix: android:resizeableActivity="true" via Config-Plugin — Issue #275                                                      |
-| #279 ✅     | feat: Wochenrückblick im Eltern-Dashboard + freundlicher Empty-State — Issue #277 1d/2d                                    |
-| #278 ✅     | build: Expo SDK 55 → 57 (React Native 0.86, React 19.2.3) — Issue #276 (Teil 1/3 erledigt)                                 |
-| #272 ✅     | feat: Fortschrittsbalken in 10 Segmente (grün/rot pro Aufgabe) + Durchlauf-Zähler statt Flamme                             |
-| #247 ✅     | feat: Mehrere Kinderprofile (Issue #187 ✅ geschlossen)                                                                    |
-| #246 ✅     | chore: Prettier + pre-push Hook (Issue #220 ✅ geschlossen)                                                                |
-| #245 ✅     | docs: CLAUDE.md 2026-06-18                                                                                                 |
-| #244 ✅     | build: app.config.js für APP_PACKAGE env-var (Issue #233 ✅ geschlossen)                                                   |
-| #243 ✅     | feat: Orientation "default" für Tablet/Foldable (Issue #235 ✅ geschlossen)                                                |
-| #242 ✅     | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241 ✅ geschlossen)                                                    |
-| #240 ✅     | ci: Cache-Cleanup-Workflow                                                                                                 |
-| #239 ✅     | chore: Review-Modell v2                                                                                                    |
-| #234 ✅     | sync: testing → main (v1.3.8 + googleServicesFile fix)                                                                     |
+| PR / Commit  | Was                                                                                                                                                                                                      |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #333 ✅      | chore: async-storage 2.2.0 → 3.1.1 (Jest-transformIgnorePatterns-Fix) + Firebase app/crashlytics 24.1.0 → 26.3.2 (Migration auf modulare v9-API in `index.ts`) — Fixes für Dependabot-PRs #323/#324/#326 |
+| #319/#320 ✅ | ci: actions/checkout 4→7, actions/setup-node 4→7 (Dependabot, direkt nach `main`)                                                                                                                        |
+| #327 ✅      | chore: Versionsbump auf 1.5.2 (versionCode 34)                                                                                                                                                           |
+| #303 ✅      | feat: In-App Play-Store-Link (Einstellungsmenü) + statischer SEO-Fallback-Text in `public/index.html` — Issue #296                                                                                       |
+| #298 ✅      | feat: UTM-Referrer an Play-Store-Links für Attributions-Messung — Issue #296                                                                                                                             |
+| #297 ✅      | feat: Play-Store-Link + deutschsprachige SEO für die Web-Landingpage — Issue #296                                                                                                                        |
+| #293 ✅      | docs: Play-Store-Listing für Lernreise (v1.5.0) + Release Notes — Issue #292 (Texte erledigt, Grafik-Assets bleiben offen)                                                                               |
+| #281 ✅      | feat: Lernreise / Reihen-Meisterschaft mit Bronze/Silber/Gold — Issue #277 1a                                                                                                                            |
+| #280 ✅      | fix: android:resizeableActivity="true" via Config-Plugin — Issue #275                                                                                                                                    |
+| #279 ✅      | feat: Wochenrückblick im Eltern-Dashboard + freundlicher Empty-State — Issue #277 1d/2d                                                                                                                  |
+| #278 ✅      | build: Expo SDK 55 → 57 (React Native 0.86, React 19.2.3) — Issue #276 (Teil 1/3 erledigt)                                                                                                               |
+| #272 ✅      | feat: Fortschrittsbalken in 10 Segmente (grün/rot pro Aufgabe) + Durchlauf-Zähler statt Flamme                                                                                                           |
+| #247 ✅      | feat: Mehrere Kinderprofile (Issue #187 ✅ geschlossen)                                                                                                                                                  |
+| #246 ✅      | chore: Prettier + pre-push Hook (Issue #220 ✅ geschlossen)                                                                                                                                              |
+| #245 ✅      | docs: CLAUDE.md 2026-06-18                                                                                                                                                                               |
+| #244 ✅      | build: app.config.js für APP_PACKAGE env-var (Issue #233 ✅ geschlossen)                                                                                                                                 |
+| #243 ✅      | feat: Orientation "default" für Tablet/Foldable (Issue #235 ✅ geschlossen)                                                                                                                              |
+| #242 ✅      | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241 ✅ geschlossen)                                                                                                                                  |
+| #240 ✅      | ci: Cache-Cleanup-Workflow                                                                                                                                                                               |
+| #239 ✅      | chore: Review-Modell v2                                                                                                                                                                                  |
+| #234 ✅      | sync: testing → main (v1.3.8 + googleServicesFile fix)                                                                                                                                                   |
 
 ---
 
