@@ -2,7 +2,7 @@
   "expo": {
     "name": "1x1 Trainer",
     "slug": "1x1-trainer",
-    "version": "1.5.2",
+    "version": "1.6.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,7 +15,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 34,
+      "versionCode": 35,
       "jsEngine": "hermes",
       "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,
@@ -31,7 +31,10 @@
               "pathPrefix": "/1x1_Trainer"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ],
       "package": "com.devsven.x1x1trainer"
