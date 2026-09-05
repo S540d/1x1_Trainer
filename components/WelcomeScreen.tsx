@@ -37,7 +37,7 @@ export function WelcomeScreen({
       onPress: onSelectLernreise,
     },
     {
-      emoji: '🔢',
+      emoji: '💪',
       title: t.welcomeRowPickTitle,
       body: t.welcomeRowPickBody,
       onPress: onSelectRowPick,

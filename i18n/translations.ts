@@ -419,8 +419,8 @@ export const translations: Record<Language, TranslationStrings> = {
     welcomeTitle: 'What would you like to do?',
     welcomeLernreiseTitle: 'Learn Times Tables',
     welcomeLernreiseBody: 'Master one times table after another on the Learning Journey.',
-    welcomeRowPickTitle: 'Practice a Times Table',
-    welcomeRowPickBody: 'Jump straight to picking the 1×, 2×, 3× ... table.',
+    welcomeRowPickTitle: 'Sharpen Your Skills',
+    welcomeRowPickBody: 'Practice harder problems more often than easy ones.',
     welcomeChallengeTitle: 'Challenge Mode',
     welcomeChallengeBody: 'Endless mode: answer until 3 mistakes, difficulty increases.',
     welcomeSettingsHint:
@@ -632,8 +632,8 @@ export const translations: Record<Language, TranslationStrings> = {
     welcomeTitle: 'Was möchtest du machen?',
     welcomeLernreiseTitle: 'Zahlenreihen lernen',
     welcomeLernreiseBody: 'Meistere auf der Lernreise eine Malreihe nach der anderen.',
-    welcomeRowPickTitle: 'Bestimmte Malreihe üben',
-    welcomeRowPickBody: 'Direkt zur Auswahl der 1er-, 2er-, 3er- ... Reihe springen.',
+    welcomeRowPickTitle: 'Festige dein Können',
+    welcomeRowPickBody: 'Übe schwierigere Aufgaben öfter als leichte Aufgaben.',
     welcomeChallengeTitle: 'Herausforderungsmodus',
     welcomeChallengeBody: 'Endlos-Modus: antworte bis zu 3 Fehlern, die Schwierigkeit steigt.',
     welcomeSettingsHint:

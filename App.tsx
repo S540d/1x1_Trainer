@@ -495,7 +495,7 @@ export default function App() {
           }}
           onSelectRowPick={() => {
             setShowWelcomeScreen(false);
-            openLernreise();
+            game.changeDifficultyMode(DifficultyMode.PRACTICE);
           }}
           onSelectChallenge={() => {
             setShowWelcomeScreen(false);
