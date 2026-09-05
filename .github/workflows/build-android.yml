@@ -223,7 +223,7 @@ jobs:
 
       - name: Upload AAB
         if: inputs.profile == 'production'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: 1x1-trainer-v${{ steps.version.outputs.version }}-release.aab
           path: android/app/build/outputs/bundle/release/*.aab
@@ -231,7 +231,7 @@ jobs:
 
       - name: Upload APK
         if: inputs.profile == 'preview'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: 1x1-trainer-v${{ steps.version.outputs.version }}-preview.apk
           path: android/app/build/outputs/apk/release/*.apk
