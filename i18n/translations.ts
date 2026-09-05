@@ -39,7 +39,6 @@ export interface TranslationStrings {
   upTo100: string;
   feedback: string;
   support: string;
-  playStore: string;
   about: string;
   aboutDescription: string;
   version: string;
@@ -197,6 +196,20 @@ export interface TranslationStrings {
   lernreiseIntroBody: string;
   lernreiseIntroPracticeHint: string;
   lernreiseIntroStart: string;
+  // Splash Screen
+  splashLoading: string;
+  // Task Settings sub-page
+  taskSettingsMenu: string;
+  taskSettingsTitle: string;
+  // Welcome Screen
+  welcomeTitle: string;
+  welcomeLernreiseTitle: string;
+  welcomeLernreiseBody: string;
+  welcomeRowPickTitle: string;
+  welcomeRowPickBody: string;
+  welcomeChallengeTitle: string;
+  welcomeChallengeBody: string;
+  welcomeSettingsHint: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -234,7 +247,6 @@ export const translations: Record<Language, TranslationStrings> = {
     upTo100: '1-100',
     feedback: 'Send Feedback',
     support: 'Support me',
-    playStore: 'Rate on Play Store',
     about: 'ABOUT',
     aboutDescription: 'A math trainer for children with multiple game modes.',
     version: 'Version',
@@ -398,6 +410,21 @@ export const translations: Record<Language, TranslationStrings> = {
     deleteProfileConfirm: 'This will permanently delete all data for this profile.',
     maxProfilesReached: 'Maximum of 6 profiles reached',
     profileActive: 'Active',
+    // Splash Screen
+    splashLoading: 'Loading...',
+    // Task Settings sub-page
+    taskSettingsMenu: 'Set Up Tasks',
+    taskSettingsTitle: 'Set Up Tasks',
+    // Welcome Screen
+    welcomeTitle: 'What would you like to do?',
+    welcomeLernreiseTitle: 'Learn Times Tables',
+    welcomeLernreiseBody: 'Master one times table after another on the Learning Journey.',
+    welcomeRowPickTitle: 'Sharpen Your Skills',
+    welcomeRowPickBody: 'Practice harder problems more often than easy ones.',
+    welcomeChallengeTitle: 'Challenge Mode',
+    welcomeChallengeBody: 'Endless mode: answer until 3 mistakes, difficulty increases.',
+    welcomeSettingsHint:
+      'Tip: fine-tune the tasks (operation, difficulty, number range) under Settings → Set Up Tasks.',
   },
   de: {
     // Settings Menu
@@ -433,7 +460,6 @@ export const translations: Record<Language, TranslationStrings> = {
     upTo100: '1-100',
     feedback: 'Feedback senden',
     support: 'Support me',
-    playStore: 'Im Play Store bewerten',
     about: 'ÜBER',
     aboutDescription: 'Ein Rechentrainer für Kinder mit verschiedenen Spielmodi.',
     version: 'Version',
@@ -597,5 +623,20 @@ export const translations: Record<Language, TranslationStrings> = {
     deleteProfileConfirm: 'Damit werden alle Daten dieses Profils dauerhaft gelöscht.',
     maxProfilesReached: 'Maximal 6 Profile möglich',
     profileActive: 'Aktiv',
+    // Splash Screen
+    splashLoading: 'Wird geladen …',
+    // Aufgaben-Einstellungen (Unterseite)
+    taskSettingsMenu: 'Aufgaben einstellen',
+    taskSettingsTitle: 'Aufgaben einstellen',
+    // Begrüßungsbildschirm
+    welcomeTitle: 'Was möchtest du machen?',
+    welcomeLernreiseTitle: 'Zahlenreihen lernen',
+    welcomeLernreiseBody: 'Meistere auf der Lernreise eine Malreihe nach der anderen.',
+    welcomeRowPickTitle: 'Festige dein Können',
+    welcomeRowPickBody: 'Übe schwierigere Aufgaben öfter als leichte Aufgaben.',
+    welcomeChallengeTitle: 'Herausforderungsmodus',
+    welcomeChallengeBody: 'Endlos-Modus: antworte bis zu 3 Fehlern, die Schwierigkeit steigt.',
+    welcomeSettingsHint:
+      'Tipp: In den Einstellungen → Aufgaben einstellen kannst du Rechenart, Schwierigkeit und Zahlenbereich feiner einstellen.',
   },
 };

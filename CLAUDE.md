@@ -83,36 +83,46 @@ npm run test:coverage # Coverage
 
 ---
 
-## Aktueller Stand (2026-08-08)
+## Aktueller Stand (2026-09-05)
 
-- Version: **1.5.0** / versionCode 32
-- Branches: `testing` vorn (inkl. #278 Expo-SDK-57, #279 Wochenrückblick/Empty-States, #280 resizeableActivity, #281 Lernreise, #293 Listing-Update Lernreise, #297 Play-Store-Link/SEO, #298 UTM-Referrer, #303 In-App-Play-Store-Link/statischer SEO-Text); `main` auf `e9f6d63` (sync v1.5.0 via #290)
+- Version: **1.5.2** / versionCode 34 (unverändert, kein Versionsbump in dieser Session)
+- Branches: `testing` vorn auf #345 (Einstellungsmenü-Umbau, inkl. #339 Play-Store-Footer-Entfernung, #340 System-Font, #344 animierter Splash Screen, #336 Dependabot-Target-Branch-Fix); `main` unverändert auf `ed24492` (#320, inkl. #330 Release-Sync v1.5.2 testing → main) — noch kein neuer Sync `testing` → `main` seitdem
 - Offene PRs: keine
-- Offene Issues: #256 (Streak-Push-Notification, Retention-Hebel Nr. 1), #276 (npm-audit-Vulnerabilities — SDK-Upgrade-Teilaufgabe erledigt, Rest bleibt offen), #277 (Wachstumsplan — 1a/1d/2d erledigt, siehe unten), #292 (Play-Store-Listing um Lernreise ergänzen), #294 (Android-15-Edge-to-Edge-APIs prüfen), #295 (App-Icon überarbeiten, Ausgliederung aus #277 2c), #296 (Auffindbarkeit außerhalb des Play Stores — Play-Store-Link/SEO in #297/#298 sowie In-App-Link/statischer SEO-Text in #303 umgesetzt; QR-Code fürs Print-Material + GitHub-Repo-Beschreibung/Topics bleiben offen, Repo-Settings ohne Tool-Zugriff)
+- Offene Issues: #256 (Streak-Push-Notification, Retention-Hebel Nr. 1), #276 (npm-audit-Vulnerabilities — SDK-Upgrade-Teilaufgabe erledigt, Rest bleibt offen), #277 (Wachstumsplan — 1a/1d/2d erledigt, siehe unten), #292 (Play-Store-Listing um Lernreise ergänzen), #294 (Android-15-Edge-to-Edge-APIs prüfen), #295 (App-Icon überarbeiten, Ausgliederung aus #277 2c), #296 (Auffindbarkeit außerhalb des Play Stores — Play-Store-Link/SEO in #297/#298 sowie In-App-Link/statischer SEO-Text in #303 umgesetzt; QR-Code fürs Print-Material + GitHub-Repo-Beschreibung/Topics bleiben offen, Repo-Settings ohne Tool-Zugriff), #325 (TypeScript 7.0.2 Dependabot-Bump — Lint-Fail, große Major-Migration, bewusst zurückgestellt)
 - v1.5.0 im Play Store veröffentlicht (Issue #275 geschlossen)
+- **Issue-Aufräumaktion (2026-09-05):** #337 (Schriftart → System-Font, PR #340), #338 (Play-Store-Footer entfernt, PR #339), #342 (Splashscreen-Platzhalter — im aktuellen `testing`-Stand nicht reproduzierbar, zusätzlich durch #344 obsolet) kommentiert und geschlossen; #343 (Einstellungsmenü zu komplex) mit PR #345 umgesetzt und geschlossen
+- **Offener Klärungsbedarf aus #343 (siehe PR #345):** Der neue Begrüßungsbildschirm hat drei Kacheln (Lernreise-Übersicht / direkte Malreihen-Auswahl / Herausforderungsmodus). Kachel a) und b) führen aktuell beide in dieselbe `LernreiseModal`-Landkarte, da die bestehende Lernreise bereits die Reihenauswahl ist. Falls sich a) und b) fachlich unterscheiden sollen (z. B. a) = Gesamtübersicht mit Fortschritt, b) = Schnellstart ohne Landkarte), braucht das ein eigenes Folge-Issue mit genauerer Spezifikation.
 
 ### Zuletzt gemergt / gepusht
 
-| PR / Commit | Was                                                                                                                        |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------- |
-| #303 ✅     | feat: In-App Play-Store-Link (Einstellungsmenü) + statischer SEO-Fallback-Text in `public/index.html` — Issue #296         |
-| #298 ✅     | feat: UTM-Referrer an Play-Store-Links für Attributions-Messung — Issue #296                                               |
-| #297 ✅     | feat: Play-Store-Link + deutschsprachige SEO für die Web-Landingpage — Issue #296                                          |
-| #293 ✅     | docs: Play-Store-Listing für Lernreise (v1.5.0) + Release Notes — Issue #292 (Texte erledigt, Grafik-Assets bleiben offen) |
-| #281 ✅     | feat: Lernreise / Reihen-Meisterschaft mit Bronze/Silber/Gold — Issue #277 1a                                              |
-| #280 ✅     | fix: android:resizeableActivity="true" via Config-Plugin — Issue #275                                                      |
-| #279 ✅     | feat: Wochenrückblick im Eltern-Dashboard + freundlicher Empty-State — Issue #277 1d/2d                                    |
-| #278 ✅     | build: Expo SDK 55 → 57 (React Native 0.86, React 19.2.3) — Issue #276 (Teil 1/3 erledigt)                                 |
-| #272 ✅     | feat: Fortschrittsbalken in 10 Segmente (grün/rot pro Aufgabe) + Durchlauf-Zähler statt Flamme                             |
-| #247 ✅     | feat: Mehrere Kinderprofile (Issue #187 ✅ geschlossen)                                                                    |
-| #246 ✅     | chore: Prettier + pre-push Hook (Issue #220 ✅ geschlossen)                                                                |
-| #245 ✅     | docs: CLAUDE.md 2026-06-18                                                                                                 |
-| #244 ✅     | build: app.config.js für APP_PACKAGE env-var (Issue #233 ✅ geschlossen)                                                   |
-| #243 ✅     | feat: Orientation "default" für Tablet/Foldable (Issue #235 ✅ geschlossen)                                                |
-| #242 ✅     | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241 ✅ geschlossen)                                                    |
-| #240 ✅     | ci: Cache-Cleanup-Workflow                                                                                                 |
-| #239 ✅     | chore: Review-Modell v2                                                                                                    |
-| #234 ✅     | sync: testing → main (v1.3.8 + googleServicesFile fix)                                                                     |
+| PR / Commit  | Was                                                                                                                                                                                                      |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #345 ✅      | feat: Einstellungsmenü vereinfacht (zweispaltiges Top-Button-Grid, neue Unterseite „Aufgaben einstellen“) + neuer Begrüßungsbildschirm mit 3 Moduskacheln — Issue #343                                   |
+| #344 ✅      | feat: animierter Splash Screen statt statischem PNG — Issue #328                                                                                                                                         |
+| #340 ✅      | fix: Schriftart auf System-Font vereinfacht (kein Nunito/Baloo2 mehr) — Issue #337                                                                                                                       |
+| #339 ✅      | fix: Play-Store-Footer entfernt (Website-Banner + App-Menüeintrag) — Issue #338                                                                                                                          |
+| #336 ✅      | ci: Dependabot-PRs gegen `testing` statt `main` richten                                                                                                                                                  |
+| #333 ✅      | chore: async-storage 2.2.0 → 3.1.1 (Jest-transformIgnorePatterns-Fix) + Firebase app/crashlytics 24.1.0 → 26.3.2 (Migration auf modulare v9-API in `index.ts`) — Fixes für Dependabot-PRs #323/#324/#326 |
+| #319/#320 ✅ | ci: actions/checkout 4→7, actions/setup-node 4→7 (Dependabot, direkt nach `main`)                                                                                                                        |
+| #327 ✅      | chore: Versionsbump auf 1.5.2 (versionCode 34)                                                                                                                                                           |
+| #303 ✅      | feat: In-App Play-Store-Link (Einstellungsmenü) + statischer SEO-Fallback-Text in `public/index.html` — Issue #296                                                                                       |
+| #298 ✅      | feat: UTM-Referrer an Play-Store-Links für Attributions-Messung — Issue #296                                                                                                                             |
+| #297 ✅      | feat: Play-Store-Link + deutschsprachige SEO für die Web-Landingpage — Issue #296                                                                                                                        |
+| #293 ✅      | docs: Play-Store-Listing für Lernreise (v1.5.0) + Release Notes — Issue #292 (Texte erledigt, Grafik-Assets bleiben offen)                                                                               |
+| #281 ✅      | feat: Lernreise / Reihen-Meisterschaft mit Bronze/Silber/Gold — Issue #277 1a                                                                                                                            |
+| #280 ✅      | fix: android:resizeableActivity="true" via Config-Plugin — Issue #275                                                                                                                                    |
+| #279 ✅      | feat: Wochenrückblick im Eltern-Dashboard + freundlicher Empty-State — Issue #277 1d/2d                                                                                                                  |
+| #278 ✅      | build: Expo SDK 55 → 57 (React Native 0.86, React 19.2.3) — Issue #276 (Teil 1/3 erledigt)                                                                                                               |
+| #272 ✅      | feat: Fortschrittsbalken in 10 Segmente (grün/rot pro Aufgabe) + Durchlauf-Zähler statt Flamme                                                                                                           |
+| #247 ✅      | feat: Mehrere Kinderprofile (Issue #187 ✅ geschlossen)                                                                                                                                                  |
+| #246 ✅      | chore: Prettier + pre-push Hook (Issue #220 ✅ geschlossen)                                                                                                                                              |
+| #245 ✅      | docs: CLAUDE.md 2026-06-18                                                                                                                                                                               |
+| #244 ✅      | build: app.config.js für APP_PACKAGE env-var (Issue #233 ✅ geschlossen)                                                                                                                                 |
+| #243 ✅      | feat: Orientation "default" für Tablet/Foldable (Issue #235 ✅ geschlossen)                                                                                                                              |
+| #242 ✅      | fix: Sounds sofort stoppen wenn deaktiviert (Issue #241 ✅ geschlossen)                                                                                                                                  |
+| #240 ✅      | ci: Cache-Cleanup-Workflow                                                                                                                                                                               |
+| #239 ✅      | chore: Review-Modell v2                                                                                                                                                                                  |
+| #234 ✅      | sync: testing → main (v1.3.8 + googleServicesFile fix)                                                                                                                                                   |
 
 ---
 
@@ -139,6 +149,9 @@ npm run test:coverage # Coverage
 | `components/Header.tsx`             | Score/Level/Lives, segmentierte `ProgressBar`, Durchlauf-Zähler (`roundsToday`, ersetzt seit PR #272 die Streak-Flamme)                                                                                                                                                                               |
 | `components/ProgressBar.tsx`        | 10 Segmente statt Gradient-Fill; `history: (boolean \| null)[]` → grün/rot/grau pro Aufgabe                                                                                                                                                                                                           |
 | `components/LernreiseModal.tsx`     | Lernreise / Reihen-Meisterschaft (PR #281, Issue #277 1a): Malreihen-Landkarte + Abschlusstest pro Reihe (Numpad/ProgressBar wiederverwendet) + Bronze/Silber/Gold-Ergebnis                                                                                                                           |
+| `components/SettingsMenu.tsx`       | Hauptmenü (PR #345, Issue #343): nur noch zweispaltiges Top-Button-Grid (Personalisieren, Eltern-Dashboard, Abzeichen, Profile, Lernreise, „Aufgaben einstellen"), Feedback/Support/About, Reset-Onboarding. Enthält keine Rechenart/Schwierigkeit/Zahlenbereich-Logik mehr.                          |
+| `components/TaskSettingsModal.tsx`  | Neue Unterseite „Aufgaben einstellen" (PR #345, Issue #343): Rechenart/Schwierigkeit/Zahlenbereich, 1:1 aus `SettingsMenu.tsx` ausgelagert, per Button dort erreichbar                                                                                                                                |
+| `components/WelcomeScreen.tsx`      | Neuer Begrüßungsbildschirm (PR #345, Issue #343): wird bei jedem App-Start vor dem Spiel gezeigt, 3 Kacheln (Lernreise-Übersicht, direkte Malreihen-Auswahl → beide öffnen `LernreiseModal`, Herausforderungsmodus) + Hinweis auf „Aufgaben einstellen"                                               |
 | `plugins/withResizeableActivity.js` | Lokales Expo-Config-Plugin (PR #280, Issue #275): setzt `android:resizeableActivity="true"` im generierten `AndroidManifest.xml`, da `android/` nicht versioniert wird                                                                                                                                |
 | `styles/modalStyles.ts`             | Gemeinsame Modal-Styles                                                                                                                                                                                                                                                                               |
 | `app.config.js`                     | Dynamische Expo-Konfiguration: überschreibt `android.package` via `APP_PACKAGE` env-var (Issue #233); hängt `withResizeableActivity` an die Plugin-Liste an (Issue #275)                                                                                                                              |

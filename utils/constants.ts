@@ -7,8 +7,6 @@ import { GameMode, NumberRange, Operation, ThemeName } from '../types/game';
 export const APP_VERSION = '1.5.2';
 export const APP_NAME = '1×1 Trainer';
 export const CONTACT_EMAIL = 'devsven@posteo.de';
-export const PLAY_STORE_URL =
-  'https://play.google.com/store/apps/details?id=com.sven4321.trainer1x1&referrer=utm_source%3Dapp_settings%26utm_medium%3Dreferral%26utm_campaign%3Dweb_presence';
 
 // Game Configuration
 export const TOTAL_TASKS = 10;
@@ -351,6 +349,6 @@ export const DESIGN_TOKENS = {
   DOT_ACTIVE_COLOR: '#764ba2',
   DOT_INACTIVE_COLOR: '#CBD5E1',
 
-  FONT_UI: 'Nunito_700Bold',
-  FONT_NUMBER: 'Baloo2_700Bold',
+  FONT_UI: undefined,
+  FONT_NUMBER: undefined,
 } as const;

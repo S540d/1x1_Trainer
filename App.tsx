@@ -10,14 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { useFonts } from 'expo-font';
-import {
-  Nunito_400Regular,
-  Nunito_700Bold,
-  Nunito_800ExtraBold,
-  Nunito_900Black,
-} from '@expo-google-fonts/nunito';
-import { Baloo2_700Bold, Baloo2_800ExtraBold } from '@expo-google-fonts/baloo-2';
+import * as SplashScreen from 'expo-splash-screen';
 
 // Local imports
 import { translations } from './i18n/translations';
@@ -27,6 +20,7 @@ import { usePreferences } from './hooks/usePreferences';
 import { useGameLogic } from './hooks/useGameLogic';
 import { PersonalizeModal } from './components/PersonalizeModal';
 import { SkeletonLoader } from './components/SkeletonLoader';
+import { AppSplashScreen } from './components/SplashScreen';
 import { Header } from './components/Header';
 import { SettingsMenu } from './components/SettingsMenu';
 import { GameCard } from './components/GameCard';
@@ -40,6 +34,8 @@ import { FloatingStars } from './components/FloatingStars';
 import { ProfilePickerModal } from './components/ProfilePickerModal';
 import { LernreiseModal } from './components/LernreiseModal';
 import { LernreiseIntroModal } from './components/LernreiseIntroModal';
+import { TaskSettingsModal } from './components/TaskSettingsModal';
+import { WelcomeScreen } from './components/WelcomeScreen';
 import {
   saveSessionRecord,
   getStreakData,
@@ -72,6 +68,7 @@ import {
   TaskStat,
   Operation,
   RowMasteryStatus,
+  DifficultyMode,
 } from './types/game';
 import { useBadges } from './hooks/useBadges';
 import {
@@ -80,16 +77,12 @@ import {
   prefersReducedMotion,
 } from './utils/animations';
 
-export default function App() {
-  const [fontsLoaded] = useFonts({
-    Nunito_400Regular,
-    Nunito_700Bold,
-    Nunito_800ExtraBold,
-    Nunito_900Black,
-    Baloo2_700Bold,
-    Baloo2_800ExtraBold,
-  });
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
+export default function App() {
+  const [splashFinished, setSplashFinished] = useState(false);
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
+  const [taskSettingsVisible, setTaskSettingsVisible] = useState(false);
   const [menuRendered, setMenuRendered] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
   const [personalizeVisible, setPersonalizeVisible] = useState(false);
@@ -462,111 +455,155 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game.gameState.selectedOperations]);
 
-  if (!preferences.isLoaded || !fontsLoaded) {
+  if (!splashFinished) {
+    return (
+      <AppSplashScreen
+        colors={colors}
+        language={preferences.language}
+        onFinish={() => {
+          SplashScreen.hideAsync().catch(() => {});
+          setSplashFinished(true);
+        }}
+      />
+    );
+  }
+
+  if (!preferences.isLoaded) {
     return <SkeletonLoader colors={colors} />;
   }
+
+  const openLernreise = async () => {
+    const introDone = await getLernreiseIntroDone(activeProfileIdRef.current);
+    if (introDone) {
+      setLernreiseVisible(true);
+    } else {
+      setLernreiseIntroVisible(true);
+    }
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style={isDarkMode ? 'light' : 'dark'} />
       <FloatingStars />
 
-      <Header
-        colors={colors}
-        difficultyMode={game.gameState.difficultyMode}
-        challengeState={game.gameState.challengeState}
-        score={game.gameState.score}
-        answerHistory={game.gameState.answerHistory}
-        roundsToday={roundsToday}
-        onShowMenu={showMenu}
-        t={t}
-      />
-
-      {menuRendered && (
-        <SettingsMenu
+      {showWelcomeScreen ? (
+        <WelcomeScreen
           colors={colors}
-          screenHeight={screenHeight}
-          menuAnimatedStyle={menuAnimatedStyle}
-          difficultyMode={game.gameState.difficultyMode}
-          selectedOperations={game.gameState.selectedOperations}
-          numberRange={preferences.numberRange}
-          weakTaskCount={weakTaskCount}
-          onToggleOperation={game.toggleOperation}
-          onChangeDifficultyMode={game.changeDifficultyMode}
-          onSetNumberRange={preferences.setNumberRange}
-          onHideMenu={hideMenu}
-          onOpenPersonalize={() => {
-            setPersonalizeVisible(true);
-            hideMenu();
+          onSelectLernreise={() => {
+            setShowWelcomeScreen(false);
+            openLernreise();
           }}
-          onOpenAbout={() => {
-            setAboutVisible(true);
-            hideMenu();
+          onSelectRowPick={() => {
+            setShowWelcomeScreen(false);
+            game.changeDifficultyMode(DifficultyMode.PRACTICE);
           }}
-          onOpenParentDashboard={() => setParentDashboardVisible(true)}
-          onResetOnboarding={async () => {
-            await resetOnboarding();
-            setOnboardingVisible(true);
-          }}
-          onOpenBadges={() => setBadgesVisible(true)}
-          onOpenProfiles={() => {
-            setProfilePickerVisible(true);
-            hideMenu();
-          }}
-          onOpenLernreise={async () => {
-            const introDone = await getLernreiseIntroDone(activeProfileIdRef.current);
-            if (introDone) {
-              setLernreiseVisible(true);
-            } else {
-              setLernreiseIntroVisible(true);
-            }
+          onSelectChallenge={() => {
+            setShowWelcomeScreen(false);
+            game.changeDifficultyMode(DifficultyMode.CHALLENGE);
           }}
           t={t}
         />
+      ) : (
+        <>
+          <Header
+            colors={colors}
+            difficultyMode={game.gameState.difficultyMode}
+            challengeState={game.gameState.challengeState}
+            score={game.gameState.score}
+            answerHistory={game.gameState.answerHistory}
+            roundsToday={roundsToday}
+            onShowMenu={showMenu}
+            t={t}
+          />
+
+          {menuRendered && (
+            <SettingsMenu
+              colors={colors}
+              screenHeight={screenHeight}
+              menuAnimatedStyle={menuAnimatedStyle}
+              onHideMenu={hideMenu}
+              onOpenPersonalize={() => {
+                setPersonalizeVisible(true);
+                hideMenu();
+              }}
+              onOpenAbout={() => {
+                setAboutVisible(true);
+                hideMenu();
+              }}
+              onOpenParentDashboard={() => setParentDashboardVisible(true)}
+              onResetOnboarding={async () => {
+                await resetOnboarding();
+                setOnboardingVisible(true);
+              }}
+              onOpenBadges={() => setBadgesVisible(true)}
+              onOpenProfiles={() => {
+                setProfilePickerVisible(true);
+                hideMenu();
+              }}
+              onOpenLernreise={openLernreise}
+              onOpenTaskSettings={() => setTaskSettingsVisible(true)}
+              t={t}
+            />
+          )}
+
+          <GameCard
+            gameState={game.gameState}
+            colors={colors}
+            cardAnimatedStyle={cardAnimatedStyle}
+            operatorSymbol={game.operatorSymbol}
+            multipleChoices={game.multipleChoices}
+            numberSequence={game.numberSequence}
+            getCorrectAnswer={game.getCorrectAnswer}
+            onNumberClick={game.handleNumberClick}
+            onChoiceClick={game.handleChoiceClick}
+            onCheck={game.checkAnswer}
+            onNext={game.nextQuestion}
+            t={t}
+          />
+
+          <ResultModal
+            visible={game.gameState.showResult}
+            colors={colors}
+            difficultyMode={game.gameState.difficultyMode}
+            challengeState={game.gameState.challengeState}
+            score={game.gameState.score}
+            lernreiseResult={lernreiseResult}
+            onRestart={() => {
+              if (lernreiseResult) {
+                const row = lernreiseResult.row;
+                setLernreiseResult(null);
+                game.startLernreiseRound(row);
+              } else {
+                setLernreiseResult(null);
+                game.restartGame();
+              }
+            }}
+            onContinue={() => {
+              if (lernreiseResult) {
+                setLernreiseResult(null);
+                game.closeResult();
+                setLernreiseVisible(true);
+              } else {
+                setLernreiseResult(null);
+                game.continueGame();
+              }
+            }}
+            t={t}
+          />
+        </>
       )}
 
-      <GameCard
-        gameState={game.gameState}
-        colors={colors}
-        cardAnimatedStyle={cardAnimatedStyle}
-        operatorSymbol={game.operatorSymbol}
-        multipleChoices={game.multipleChoices}
-        numberSequence={game.numberSequence}
-        getCorrectAnswer={game.getCorrectAnswer}
-        onNumberClick={game.handleNumberClick}
-        onChoiceClick={game.handleChoiceClick}
-        onCheck={game.checkAnswer}
-        onNext={game.nextQuestion}
-        t={t}
-      />
-
-      <ResultModal
-        visible={game.gameState.showResult}
+      <TaskSettingsModal
+        visible={taskSettingsVisible}
+        onClose={() => setTaskSettingsVisible(false)}
         colors={colors}
         difficultyMode={game.gameState.difficultyMode}
-        challengeState={game.gameState.challengeState}
-        score={game.gameState.score}
-        lernreiseResult={lernreiseResult}
-        onRestart={() => {
-          if (lernreiseResult) {
-            const row = lernreiseResult.row;
-            setLernreiseResult(null);
-            game.startLernreiseRound(row);
-          } else {
-            setLernreiseResult(null);
-            game.restartGame();
-          }
-        }}
-        onContinue={() => {
-          if (lernreiseResult) {
-            setLernreiseResult(null);
-            game.closeResult();
-            setLernreiseVisible(true);
-          } else {
-            setLernreiseResult(null);
-            game.continueGame();
-          }
-        }}
+        selectedOperations={game.gameState.selectedOperations}
+        numberRange={preferences.numberRange}
+        weakTaskCount={weakTaskCount}
+        onToggleOperation={game.toggleOperation}
+        onChangeDifficultyMode={game.changeDifficultyMode}
+        onSetNumberRange={preferences.setNumberRange}
         t={t}
       />
 
