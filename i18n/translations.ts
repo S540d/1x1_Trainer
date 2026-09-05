@@ -198,6 +198,18 @@ export interface TranslationStrings {
   lernreiseIntroStart: string;
   // Splash Screen
   splashLoading: string;
+  // Task Settings sub-page
+  taskSettingsMenu: string;
+  taskSettingsTitle: string;
+  // Welcome Screen
+  welcomeTitle: string;
+  welcomeLernreiseTitle: string;
+  welcomeLernreiseBody: string;
+  welcomeRowPickTitle: string;
+  welcomeRowPickBody: string;
+  welcomeChallengeTitle: string;
+  welcomeChallengeBody: string;
+  welcomeSettingsHint: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -400,6 +412,19 @@ export const translations: Record<Language, TranslationStrings> = {
     profileActive: 'Active',
     // Splash Screen
     splashLoading: 'Loading...',
+    // Task Settings sub-page
+    taskSettingsMenu: 'Set Up Tasks',
+    taskSettingsTitle: 'Set Up Tasks',
+    // Welcome Screen
+    welcomeTitle: 'What would you like to do?',
+    welcomeLernreiseTitle: 'Learn Times Tables',
+    welcomeLernreiseBody: 'Master one times table after another on the Learning Journey.',
+    welcomeRowPickTitle: 'Practice a Times Table',
+    welcomeRowPickBody: 'Jump straight to picking the 1×, 2×, 3× ... table.',
+    welcomeChallengeTitle: 'Challenge Mode',
+    welcomeChallengeBody: 'Endless mode: answer until 3 mistakes, difficulty increases.',
+    welcomeSettingsHint:
+      'Tip: fine-tune the tasks (operation, difficulty, number range) under Settings → Set Up Tasks.',
   },
   de: {
     // Settings Menu
@@ -600,5 +625,18 @@ export const translations: Record<Language, TranslationStrings> = {
     profileActive: 'Aktiv',
     // Splash Screen
     splashLoading: 'Wird geladen …',
+    // Aufgaben-Einstellungen (Unterseite)
+    taskSettingsMenu: 'Aufgaben einstellen',
+    taskSettingsTitle: 'Aufgaben einstellen',
+    // Begrüßungsbildschirm
+    welcomeTitle: 'Was möchtest du machen?',
+    welcomeLernreiseTitle: 'Zahlenreihen lernen',
+    welcomeLernreiseBody: 'Meistere auf der Lernreise eine Malreihe nach der anderen.',
+    welcomeRowPickTitle: 'Bestimmte Malreihe üben',
+    welcomeRowPickBody: 'Direkt zur Auswahl der 1er-, 2er-, 3er- ... Reihe springen.',
+    welcomeChallengeTitle: 'Herausforderungsmodus',
+    welcomeChallengeBody: 'Endlos-Modus: antworte bis zu 3 Fehlern, die Schwierigkeit steigt.',
+    welcomeSettingsHint:
+      'Tipp: In den Einstellungen → Aufgaben einstellen kannst du Rechenart, Schwierigkeit und Zahlenbereich feiner einstellen.',
   },
 };
