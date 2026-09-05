@@ -349,6 +349,6 @@ export const DESIGN_TOKENS = {
   DOT_ACTIVE_COLOR: '#764ba2',
   DOT_INACTIVE_COLOR: '#CBD5E1',
 
-  FONT_UI: 'Nunito_700Bold',
-  FONT_NUMBER: 'Baloo2_700Bold',
+  FONT_UI: undefined,
+  FONT_NUMBER: undefined,
 } as const;
