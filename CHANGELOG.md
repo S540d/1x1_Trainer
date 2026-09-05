@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-09-05
+
+### Added
+
+- ✨ **Begrüßungsbildschirm**: Neuer Einstieg mit drei Kacheln (Lernreise, Übungsmodus, Herausforderungsmodus) statt direktem Spielstart (Issue #343)
+- ✨ **Animierter Splash Screen** statt statischem PNG
+
+### Changed
+
+- 🔧 **Einstellungsmenü vereinfacht**: Aufgaben-Einstellungen in eigene Unterseite (`TaskSettingsModal`) ausgelagert (Issue #343)
+- 🔧 Schriftart auf System-Font vereinfacht
+- 📦 Dependency-Updates: async-storage 2.2.0 → 3.1.1, Firebase app/crashlytics 24.1.0 → 26.3.2 (modulare v9-API)
+- 📉 **R8/ProGuard im Release-Build aktiviert** — spürbar kleinere Downloadgröße für Neuinstallationen im Play Store trotz größerem AAB (mehr Features gebündelt)
+
+### Fixed
+
+- 🐛 "Bestimmte Malreihe üben" führte versehentlich zur Lernreise statt zum adaptiven Übungsmodus — Kachel umbenannt in "Festige dein Können" und korrekt verdrahtet
+- 🐛 Play-Store-Footer entfernt
+- 🧹 Doppelten `intentFilter`-Eintrag in `app.json` entfernt (Issue #307)
+
+### Security
+
+- 🔒 Security-Scanning aktiviert (Dependabot + CodeQL, Issue #308)
+
+## [1.5.0] - 2026-08-08
+
+### Added
+
+- 🗺️ **Lernreise / Reihen-Meisterschaft**: Malreihen-Landkarte mit Bronze/Silber/Gold-Bewertung pro 1×1-Reihe (Issue #277 1a)
+- 📊 **Wochenrückblick im Eltern-Dashboard**: Trend, Übungszeit, Genauigkeit pro Malreihe, Übungsempfehlung + freundlicher Empty-State (Issue #277 1d/2d)
+- 🔗 Play-Store-Link + deutschsprachige SEO für die Web-Landingpage, inkl. UTM-Referrer-Attribution und In-App-Link im Einstellungsmenü (Issue #296)
+- 📱 `android:resizeableActivity="true"` für Large-Screen-/Foldable-Kompatibilität (Issue #275)
+
+### Changed
+
+- ⬆️ Expo SDK 55 → 57 (React Native 0.86, React 19.2.3)
+
 ## [1.3.8] - 2026-06-07
 
 ### Added
