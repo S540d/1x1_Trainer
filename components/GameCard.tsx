@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: 'bold',
     color: '#fff',
-    fontFamily: 'Baloo2_700Bold',
+    fontFamily: DESIGN_TOKENS.FONT_NUMBER,
   },
   answerBox: {
     width: 120,
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
-    fontFamily: 'Baloo2_700Bold',
+    fontFamily: DESIGN_TOKENS.FONT_NUMBER,
   },
   answerPlaceholder: {
     color: 'rgba(255,255,255,0.6)',
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    fontFamily: 'Baloo2_700Bold',
+    fontFamily: DESIGN_TOKENS.FONT_NUMBER,
   },
   choiceButtonTextSelected: {
     color: '#667eea',
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    fontFamily: 'Baloo2_700Bold',
+    fontFamily: DESIGN_TOKENS.FONT_NUMBER,
   },
   sequenceButtonTextSelected: {
     color: '#667eea',
