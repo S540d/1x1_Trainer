@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
 
 // Local imports
 import { translations } from './i18n/translations';
@@ -19,6 +20,7 @@ import { usePreferences } from './hooks/usePreferences';
 import { useGameLogic } from './hooks/useGameLogic';
 import { PersonalizeModal } from './components/PersonalizeModal';
 import { SkeletonLoader } from './components/SkeletonLoader';
+import { AppSplashScreen } from './components/SplashScreen';
 import { Header } from './components/Header';
 import { SettingsMenu } from './components/SettingsMenu';
 import { GameCard } from './components/GameCard';
@@ -72,7 +74,10 @@ import {
   prefersReducedMotion,
 } from './utils/animations';
 
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
 export default function App() {
+  const [splashFinished, setSplashFinished] = useState(false);
   const [menuRendered, setMenuRendered] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
   const [personalizeVisible, setPersonalizeVisible] = useState(false);
@@ -444,6 +449,19 @@ export default function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game.gameState.selectedOperations]);
+
+  if (!splashFinished) {
+    return (
+      <AppSplashScreen
+        colors={colors}
+        language={preferences.language}
+        onFinish={() => {
+          SplashScreen.hideAsync().catch(() => {});
+          setSplashFinished(true);
+        }}
+      />
+    );
+  }
 
   if (!preferences.isLoaded) {
     return <SkeletonLoader colors={colors} />;

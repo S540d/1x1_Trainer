@@ -197,6 +197,8 @@ export interface TranslationStrings {
   lernreiseIntroBody: string;
   lernreiseIntroPracticeHint: string;
   lernreiseIntroStart: string;
+  // Splash Screen
+  splashLoading: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -398,6 +400,8 @@ export const translations: Record<Language, TranslationStrings> = {
     deleteProfileConfirm: 'This will permanently delete all data for this profile.',
     maxProfilesReached: 'Maximum of 6 profiles reached',
     profileActive: 'Active',
+    // Splash Screen
+    splashLoading: 'Loading...',
   },
   de: {
     // Settings Menu
@@ -597,5 +601,7 @@ export const translations: Record<Language, TranslationStrings> = {
     deleteProfileConfirm: 'Damit werden alle Daten dieses Profils dauerhaft gelöscht.',
     maxProfilesReached: 'Maximal 6 Profile möglich',
     profileActive: 'Aktiv',
+    // Splash Screen
+    splashLoading: 'Wird geladen …',
   },
 };
