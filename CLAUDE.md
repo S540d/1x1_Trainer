@@ -85,18 +85,22 @@ npm run test:coverage # Coverage
 
 ## Aktueller Stand (2026-09-05)
 
-- Version: **1.5.2** / versionCode 34 (unverändert, kein Versionsbump in dieser Session)
-- Branches: `testing` vorn auf #345 (Einstellungsmenü-Umbau, inkl. #339 Play-Store-Footer-Entfernung, #340 System-Font, #344 animierter Splash Screen, #336 Dependabot-Target-Branch-Fix); `main` unverändert auf `ed24492` (#320, inkl. #330 Release-Sync v1.5.2 testing → main) — noch kein neuer Sync `testing` → `main` seitdem
+- Version: **1.6.0** / versionCode 35 — als AAB gebaut und im Play Store hochgeladen (2026-09-05)
+- Branches: `testing` vorn auf `cfd96cc` (Versionsbump 1.6.0, inkl. #347 Welcome-Screen-Fix, #348 doppelter intentFilter); `main` per PR #349 (Squash) auf denselben Inhaltsstand synchronisiert (`7e9c49b`)
 - Offene PRs: keine
 - Offene Issues: #256 (Streak-Push-Notification, Retention-Hebel Nr. 1), #276 (npm-audit-Vulnerabilities — SDK-Upgrade-Teilaufgabe erledigt, Rest bleibt offen), #277 (Wachstumsplan — 1a/1d/2d erledigt, siehe unten), #292 (Play-Store-Listing um Lernreise ergänzen), #294 (Android-15-Edge-to-Edge-APIs prüfen), #295 (App-Icon überarbeiten, Ausgliederung aus #277 2c), #296 (Auffindbarkeit außerhalb des Play Stores — Play-Store-Link/SEO in #297/#298 sowie In-App-Link/statischer SEO-Text in #303 umgesetzt; QR-Code fürs Print-Material + GitHub-Repo-Beschreibung/Topics bleiben offen, Repo-Settings ohne Tool-Zugriff), #325 (TypeScript 7.0.2 Dependabot-Bump — Lint-Fail, große Major-Migration, bewusst zurückgestellt)
 - v1.5.0 im Play Store veröffentlicht (Issue #275 geschlossen)
-- **Issue-Aufräumaktion (2026-09-05):** #337 (Schriftart → System-Font, PR #340), #338 (Play-Store-Footer entfernt, PR #339), #342 (Splashscreen-Platzhalter — im aktuellen `testing`-Stand nicht reproduzierbar, zusätzlich durch #344 obsolet) kommentiert und geschlossen; #343 (Einstellungsmenü zu komplex) mit PR #345 umgesetzt und geschlossen
-- **Offener Klärungsbedarf aus #343 (siehe PR #345):** Der neue Begrüßungsbildschirm hat drei Kacheln (Lernreise-Übersicht / direkte Malreihen-Auswahl / Herausforderungsmodus). Kachel a) und b) führen aktuell beide in dieselbe `LernreiseModal`-Landkarte, da die bestehende Lernreise bereits die Reihenauswahl ist. Falls sich a) und b) fachlich unterscheiden sollen (z. B. a) = Gesamtübersicht mit Fortschritt, b) = Schnellstart ohne Landkarte), braucht das ein eigenes Folge-Issue mit genauerer Spezifikation.
+- **Issue-Aufräumaktion (2026-09-05):** #337 (Schriftart → System-Font, PR #340), #338 (Play-Store-Footer entfernt, PR #339), #342 (Splashscreen-Platzhalter — im aktuellen `testing`-Stand nicht reproduzierbar, zusätzlich durch #344 obsolet) kommentiert und geschlossen; #343 (Einstellungsmenü zu komplex) mit PR #345 umgesetzt und geschlossen; #307 (doppelter intentFilter) mit PR #348 behoben und geschlossen
+- **Welcome-Screen-Klärung aus #343 gelöst (PR #347):** Die Kachel „Bestimmte Malreihe üben" führte durch einen Verdrahtungsfehler zur selben `LernreiseModal`-Landkarte wie „Zahlenreise lernen" statt zum eigentlich vorgesehenen `DifficultyMode.PRACTICE`. Umbenannt in „Festige dein Können" und korrekt auf `game.changeDifficultyMode(DifficultyMode.PRACTICE)` verdrahtet — startet jetzt den bestehenden adaptiven Übungsmodus (75 % Chance auf schwache Aufgabe).
+- **R8/ProGuard-Effekt bestätigt (v1.6.0-Build):** Play-Store-Downloadgröße für Neuinstallationen sank um 6.64 MB ggü. v1.5.2, obwohl das AAB selbst größer wurde (56 MB vs. 52 MB, mehr Features). R8/Shrink-Resources (seit #314/#315 aktiv) greift spürbar beim Split-APK-Schritt, den Play daraus generiert.
 
 ### Zuletzt gemergt / gepusht
 
 | PR / Commit  | Was                                                                                                                                                                                                      |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #349 ✅      | Sync: testing → main (Release-Sync, ~20 Commits inkl. #347/#348/#345/#344/#333/#314)                                                                                                                     |
+| #348 ✅      | chore: doppelten intentFilter in app.json entfernen — Issue #307                                                                                                                                         |
+| #347 ✅      | fix: Welcome-Screen-Kachel führt in echten Übungsmodus statt zur Lernreise                                                                                                                               |
 | #345 ✅      | feat: Einstellungsmenü vereinfacht (zweispaltiges Top-Button-Grid, neue Unterseite „Aufgaben einstellen“) + neuer Begrüßungsbildschirm mit 3 Moduskacheln — Issue #343                                   |
 | #344 ✅      | feat: animierter Splash Screen statt statischem PNG — Issue #328                                                                                                                                         |
 | #340 ✅      | fix: Schriftart auf System-Font vereinfacht (kein Nunito/Baloo2 mehr) — Issue #337                                                                                                                       |
@@ -304,7 +308,6 @@ npm run test:coverage # Coverage
 - **Paketname für Firebase**: `com.sven4321.trainer1x1` (Play-Store-Paketname, nicht `com.devsven.x1x1trainer` aus app.json!)
 
 <!-- GLOBAL POLICY:START -->
-
 ## [GLOBAL POLICY]
 
 > Automatisch synchronisiert aus project-templates (Issue #7). Nicht manuell editieren –
@@ -317,6 +320,7 @@ npm run test:coverage # Coverage
 - `--no-verify` nur auf explizite Bitte
 - **Vor jedem Push: lokale Tests ausführen** (`npm test` bzw. projektspezifischer Test-Befehl) – kein Push ohne grüne lokale Tests
 - **Kein Merge bei CI-Fail** – Branch Protection erzwingt das technisch; nie mit `--admin` umgehen außer auf explizite Bitte
+- **Zugehöriges Issue beim Merge schließen** (Issue #111): `Closes #X` im PR-Body greift nur beim Merge in den Default-Branch (`main`) — bei PRs nach `testing` also **nie**. Das Issue nach dem Merge manuell schließen (`gh issue close <N> -c "Umgesetzt in #<PR>, gemergt nach \`testing\`."`), sonst bleiben erledigte Issues offen liegen. Ausnahme: Sammel-/Meta-Issues, die ein Teil-PR nur anteilig abarbeitet — die bleiben offen. `Closes #X` trotzdem im PR-Body lassen: es erzeugt die sichtbare Verknüpfung.
 
 ## [ANDROID BUILD – PFLICHTREGELN]
 
@@ -326,6 +330,10 @@ npm run test:coverage # Coverage
 - **JAVA_HOME** für EAS/Expo-Builds explizit auf Android Studio JBR setzen: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"`
 - **Gradle-Lock nach Absturz:** Bei "Cannot lock file hash cache"-Fehler Daemons stoppen: `pkill -f GradleDaemon`, dann Workingdir leeren und neu starten
 - **AAB-Archiv:** Gebaute Release-AABs in einem **gitignored** `aab-archive/`-Verzeichnis im Repo-Root ablegen (in `.gitignore` aufnehmen – AABs sind 3–110 MB und gehören nie in die Git-History). Benennung: `<Projekt>-vX.Y.Z-vc<versionCode>-YYYY-MM-DD.aab`. **Retention: max. 2 Dateien** (aktuelles Release + ein Vorgänger für schnelles Rollback); ältere AABs löschen. Der Git-Tag `vX.Y.Z` ist die eigentliche Release-Baseline – ältere AABs lassen sich daraus jederzeit neu bauen.
+
+## [CODE HEALTH AUDIT]
+
+- **Wiederkehrendes Code-Health-Audit** (Ballast/Architektur: God Components, Boilerplate-Duplikation, toter Code, Dependency-Bloat, Test-Integrität, Design-Konsistenz, Bundle-Größe) alle ~3 Monate oder ~15 gemergte Feature-PRs (je nachdem was zuerst eintritt). Checkliste + Ablauf: https://github.com/S540d/project-templates/blob/main/dev-standards/code-health-audit.md — Ergebnis ist immer ein Issue im jeweiligen Projekt-Repo, nie in project-templates.
 
 ## [CI – CACHE-CLEANUP]
 
