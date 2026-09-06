@@ -478,6 +478,30 @@ export function useGameLogic({
     }));
   };
 
+  // Shared round-change sequence used by restartGame, continueGame,
+  // changeGameMode, toggleOperation, changeAnswerMode and changeDifficultyMode:
+  // reset the Lernreise refs, apply the state overrides for the new round
+  // (always including a fresh answerHistory/session timer via beginNewRound()),
+  // and schedule the next generateQuestion() call. `update` receives the
+  // pre-update state and returns the overrides + generateQuestion args to
+  // apply, or null to bail out without changing state or generating a
+  // question (e.g. toggleOperation refusing to deselect the last operation).
+  const startNewRound = (
+    update: (
+      prev: GameState
+    ) => { overrides: Partial<GameState>; generateArgs: Parameters<typeof generateQuestion> } | null
+  ) => {
+    lernreiseRowRef.current = null;
+    lernreiseFactorsRef.current = [];
+
+    setGameState((prev) => {
+      const result = update(prev);
+      if (!result) return prev;
+      setTimeout(() => generateQuestion(...result.generateArgs), 0);
+      return { ...prev, ...result.overrides, answerHistory: beginNewRound() };
+    });
+  };
+
   // Adopt persisted operations when they arrive (async preference load or
   // profile switch). The useState initializer above only sees the pre-load
   // defaults, so without this the saved selection never reaches the game.
@@ -702,9 +726,6 @@ export function useGameLogic({
 
   // Restart game
   const restartGame = () => {
-    lernreiseRowRef.current = null;
-    lernreiseFactorsRef.current = [];
-
     if (gameState.difficultyMode === DifficultyMode.CHALLENGE) {
       // Restart challenge with fresh lives
       const newChallengeState: ChallengeState = {
@@ -714,43 +735,30 @@ export function useGameLogic({
         highScore: gameState.challengeState?.highScore ?? challengeHighScore,
         isNewHighScore: false,
       };
-
-      setGameState((prev) => ({
-        ...prev,
-        score: 0,
-        currentTask: 1,
-        showResult: false,
-        challengeState: newChallengeState,
-        answerHistory: beginNewRound(),
+      startNewRound(() => ({
+        overrides: {
+          score: 0,
+          currentTask: 1,
+          showResult: false,
+          challengeState: newChallengeState,
+        },
+        generateArgs: [GameMode.NORMAL, new Set([Operation.MULTIPLICATION]), 10],
       }));
-
-      const level1Ops = new Set([Operation.MULTIPLICATION]);
-      setTimeout(() => generateQuestion(GameMode.NORMAL, level1Ops, 10), 0);
       return;
     }
 
-    setGameState((prev) => ({
-      ...prev,
-      score: 0,
-      currentTask: 1,
-      showResult: false,
-      answerHistory: beginNewRound(),
+    startNewRound(() => ({
+      overrides: { score: 0, currentTask: 1, showResult: false },
+      generateArgs: [],
     }));
-    setTimeout(() => generateQuestion(), 0);
   };
 
   // Continue game (keep score, reset to task 1)
   const continueGame = () => {
-    lernreiseRowRef.current = null;
-    lernreiseFactorsRef.current = [];
-
-    setGameState((prev) => ({
-      ...prev,
-      currentTask: 1,
-      showResult: false,
-      answerHistory: beginNewRound(),
+    startNewRound(() => ({
+      overrides: { currentTask: 1, showResult: false },
+      generateArgs: [],
     }));
-    setTimeout(() => generateQuestion(), 0);
   };
 
   // Close the result modal without starting a new round — used when leaving
@@ -783,77 +791,56 @@ export function useGameLogic({
 
   // Change game mode
   const changeGameMode = (newMode: GameMode) => {
-    lernreiseRowRef.current = null;
-    lernreiseFactorsRef.current = [];
-
-    setGameState((prev) => ({
-      ...prev,
-      gameMode: newMode,
-      currentTask: 1,
-      score: 0,
-      showResult: false,
-      answerHistory: beginNewRound(),
+    startNewRound(() => ({
+      overrides: { gameMode: newMode, currentTask: 1, score: 0, showResult: false },
+      generateArgs: [newMode],
     }));
-    setTimeout(() => generateQuestion(newMode), 0);
   };
 
   // Toggle operation selection (allow multiple operations)
   const toggleOperation = (operation: Operation) => {
-    lernreiseRowRef.current = null;
-    lernreiseFactorsRef.current = [];
-
-    setGameState((prev) => {
+    startNewRound((prev) => {
       const newSelectedOperations = new Set(prev.selectedOperations);
 
       if (newSelectedOperations.has(operation)) {
         // Prevent deselecting the last operation
         if (newSelectedOperations.size === 1) {
-          return prev; // Don't allow deselecting the last operation
+          return null;
         }
         newSelectedOperations.delete(operation);
       } else {
         newSelectedOperations.add(operation);
       }
 
-      const newState = {
-        ...prev,
-        selectedOperations: newSelectedOperations,
-        currentTask: 1,
-        score: 0,
-        showResult: false,
-        answerHistory: beginNewRound(),
+      return {
+        overrides: {
+          selectedOperations: newSelectedOperations,
+          currentTask: 1,
+          score: 0,
+          showResult: false,
+        },
+        generateArgs: [prev.gameMode, newSelectedOperations],
       };
-
-      // Generate a new question with the updated operations
-      setTimeout(() => generateQuestion(prev.gameMode, newSelectedOperations), 0);
-
-      return newState;
     });
   };
 
   // Change answer mode
   const changeAnswerMode = (newMode: AnswerMode) => {
-    lernreiseRowRef.current = null;
-    lernreiseFactorsRef.current = [];
-
-    setGameState((prev) => ({
-      ...prev,
-      answerMode: newMode,
-      currentTask: 1,
-      score: 0,
-      showResult: false,
-      userAnswer: '',
-      selectedChoice: null,
-      answerHistory: beginNewRound(),
+    startNewRound(() => ({
+      overrides: {
+        answerMode: newMode,
+        currentTask: 1,
+        score: 0,
+        showResult: false,
+        userAnswer: '',
+        selectedChoice: null,
+      },
+      generateArgs: [],
     }));
-    setTimeout(() => generateQuestion(), 0);
   };
 
   // Change difficulty mode
   const changeDifficultyMode = (newMode: DifficultyMode) => {
-    lernreiseRowRef.current = null;
-    lernreiseFactorsRef.current = [];
-
     let newGameMode: GameMode;
     let newAnswerMode: AnswerMode;
 
@@ -870,23 +857,21 @@ export function useGameLogic({
         isNewHighScore: false,
       };
 
-      setGameState((prev) => ({
-        ...prev,
-        difficultyMode: newMode,
-        gameMode: newGameMode,
-        answerMode: newAnswerMode,
-        currentTask: 1,
-        score: 0,
-        showResult: false,
-        userAnswer: '',
-        selectedChoice: null,
-        challengeState: initialChallengeState,
-        answerHistory: beginNewRound(),
-      }));
-
       // Level 1 starts with multiplication only, range 10
-      const level1Ops = new Set([Operation.MULTIPLICATION]);
-      setTimeout(() => generateQuestion(newGameMode, level1Ops, 10), 0);
+      startNewRound(() => ({
+        overrides: {
+          difficultyMode: newMode,
+          gameMode: newGameMode,
+          answerMode: newAnswerMode,
+          currentTask: 1,
+          score: 0,
+          showResult: false,
+          userAnswer: '',
+          selectedChoice: null,
+          challengeState: initialChallengeState,
+        },
+        generateArgs: [newGameMode, new Set([Operation.MULTIPLICATION]), 10],
+      }));
       return;
     }
 
@@ -903,20 +888,20 @@ export function useGameLogic({
       newAnswerMode = answerModes[Math.floor(Math.random() * answerModes.length)];
     }
 
-    setGameState((prev) => ({
-      ...prev,
-      difficultyMode: newMode,
-      gameMode: newGameMode,
-      answerMode: newAnswerMode,
-      currentTask: 1,
-      score: 0,
-      showResult: false,
-      userAnswer: '',
-      selectedChoice: null,
-      challengeState: undefined,
-      answerHistory: beginNewRound(),
+    startNewRound(() => ({
+      overrides: {
+        difficultyMode: newMode,
+        gameMode: newGameMode,
+        answerMode: newAnswerMode,
+        currentTask: 1,
+        score: 0,
+        showResult: false,
+        userAnswer: '',
+        selectedChoice: null,
+        challengeState: undefined,
+      },
+      generateArgs: [newGameMode, undefined, undefined, newMode],
     }));
-    setTimeout(() => generateQuestion(newGameMode, undefined, undefined, newMode), 0);
   };
 
   // Generate multiple choice options
