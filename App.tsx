@@ -18,6 +18,7 @@ import { STORAGE_KEYS } from './utils/constants';
 import { useTheme } from './hooks/useTheme';
 import { usePreferences } from './hooks/usePreferences';
 import { useGameLogic } from './hooks/useGameLogic';
+import { useModals } from './hooks/useModals';
 import { PersonalizeModal } from './components/PersonalizeModal';
 import { SkeletonLoader } from './components/SkeletonLoader';
 import { AppSplashScreen } from './components/SplashScreen';
@@ -82,15 +83,8 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 export default function App() {
   const [splashFinished, setSplashFinished] = useState(false);
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
-  const [taskSettingsVisible, setTaskSettingsVisible] = useState(false);
   const [menuRendered, setMenuRendered] = useState(false);
-  const [aboutVisible, setAboutVisible] = useState(false);
-  const [personalizeVisible, setPersonalizeVisible] = useState(false);
-  const [parentDashboardVisible, setParentDashboardVisible] = useState(false);
-  const [badgesVisible, setBadgesVisible] = useState(false);
-  const [profilePickerVisible, setProfilePickerVisible] = useState(false);
-  const [lernreiseVisible, setLernreiseVisible] = useState(false);
-  const [lernreiseIntroVisible, setLernreiseIntroVisible] = useState(false);
+  const modals = useModals();
   const [lernreiseResult, setLernreiseResult] = useState<{
     row: number;
     status: RowMasteryStatus | null;
@@ -100,17 +94,12 @@ export default function App() {
     lastPlayedDate: '',
     longestStreak: 0,
   });
-  const [streakWarningVisible, setStreakWarningVisible] = useState(false);
-  const [onboardingVisible, setOnboardingVisible] = useState(false);
   const [taskStats, setTaskStats] = useState<TaskStat[]>([]);
   const [roundsToday, setRoundsToday] = useState(0);
 
   // Profile state
   const [activeProfile, setActiveProfile] = useState<ChildProfile | null>(null);
   const [profiles, setProfiles] = useState<ChildProfile[]>([]);
-  // Forces the "who is playing?" picker on every launch when >1 profile exists,
-  // instead of silently resuming the last active one.
-  const [forceProfileSelectVisible, setForceProfileSelectVisible] = useState(false);
   // Ref so callbacks always see the current profileId without stale closures
   const activeProfileIdRef = useRef<string | undefined>(undefined);
   activeProfileIdRef.current = activeProfile?.id;
@@ -129,7 +118,7 @@ export default function App() {
       setProfiles(allProfiles);
       setActiveProfile(defaultProfile);
       if (allProfiles.length > 1) {
-        setForceProfileSelectVisible(true);
+        modals.openProfilePickerForced();
       }
     });
   }, []);
@@ -209,19 +198,7 @@ export default function App() {
   });
 
   // Physical keyboard on web (#258) — inactive while any overlay is open
-  const overlayOpen =
-    menuRendered ||
-    aboutVisible ||
-    personalizeVisible ||
-    parentDashboardVisible ||
-    badgesVisible ||
-    profilePickerVisible ||
-    lernreiseVisible ||
-    lernreiseIntroVisible ||
-    streakWarningVisible ||
-    onboardingVisible ||
-    forceProfileSelectVisible ||
-    game.gameState.showResult;
+  const overlayOpen = menuRendered || modals.activeModal !== null || game.gameState.showResult;
   useKeyboardInput({
     enabled: !overlayOpen,
     onDigit: (digit) => {
@@ -350,7 +327,7 @@ export default function App() {
       const streakStillSavable =
         data.currentStreak > 0 && data.lastPlayedDate === getYesterdayDateString();
       if (isEvening && streakStillSavable) {
-        setStreakWarningVisible(true);
+        modals.open('streakWarning');
       }
     });
   }, [activeProfile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -410,14 +387,14 @@ export default function App() {
   // Waits for the forced profile picker to resolve first, so onboarding always
   // refers to the profile the user actually picked.
   useEffect(() => {
-    if (!preferences.isLoaded || forceProfileSelectVisible) return;
+    if (!preferences.isLoaded || modals.profilePickerForced) return;
     (async () => {
       const shown = await getOnboardingDone();
       if (shown) return;
       const rawValue = await getStorageItem(STORAGE_KEYS.ONBOARDING_DONE);
       if (rawValue === 'pending') {
         // Explicit reset → always show onboarding
-        setOnboardingVisible(true);
+        modals.open('onboarding');
         return;
       }
       // rawValue is null → first launch: migrate existing users silently
@@ -425,11 +402,11 @@ export default function App() {
       if (existingLanguage) {
         await setOnboardingDone();
       } else {
-        setOnboardingVisible(true);
+        modals.open('onboarding');
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preferences.isLoaded, forceProfileSelectVisible]);
+  }, [preferences.isLoaded, modals.profilePickerForced]);
 
   // Generate first question on mount
   useEffect(() => {
@@ -475,9 +452,9 @@ export default function App() {
   const openLernreise = async () => {
     const introDone = await getLernreiseIntroDone(activeProfileIdRef.current);
     if (introDone) {
-      setLernreiseVisible(true);
+      modals.open('lernreise');
     } else {
-      setLernreiseIntroVisible(true);
+      modals.open('lernreiseIntro');
     }
   };
 
@@ -523,25 +500,25 @@ export default function App() {
               menuAnimatedStyle={menuAnimatedStyle}
               onHideMenu={hideMenu}
               onOpenPersonalize={() => {
-                setPersonalizeVisible(true);
+                modals.open('personalize');
                 hideMenu();
               }}
               onOpenAbout={() => {
-                setAboutVisible(true);
+                modals.open('about');
                 hideMenu();
               }}
-              onOpenParentDashboard={() => setParentDashboardVisible(true)}
+              onOpenParentDashboard={() => modals.open('parentDashboard')}
               onResetOnboarding={async () => {
                 await resetOnboarding();
-                setOnboardingVisible(true);
+                modals.open('onboarding');
               }}
-              onOpenBadges={() => setBadgesVisible(true)}
+              onOpenBadges={() => modals.open('badges')}
               onOpenProfiles={() => {
-                setProfilePickerVisible(true);
+                modals.open('profilePicker');
                 hideMenu();
               }}
               onOpenLernreise={openLernreise}
-              onOpenTaskSettings={() => setTaskSettingsVisible(true)}
+              onOpenTaskSettings={() => modals.open('taskSettings')}
               t={t}
             />
           )}
@@ -582,7 +559,7 @@ export default function App() {
               if (lernreiseResult) {
                 setLernreiseResult(null);
                 game.closeResult();
-                setLernreiseVisible(true);
+                modals.open('lernreise');
               } else {
                 setLernreiseResult(null);
                 game.continueGame();
@@ -594,8 +571,8 @@ export default function App() {
       )}
 
       <TaskSettingsModal
-        visible={taskSettingsVisible}
-        onClose={() => setTaskSettingsVisible(false)}
+        visible={modals.isOpen('taskSettings')}
+        onClose={() => modals.close('taskSettings')}
         colors={colors}
         difficultyMode={game.gameState.difficultyMode}
         selectedOperations={game.gameState.selectedOperations}
@@ -608,8 +585,8 @@ export default function App() {
       />
 
       <PersonalizeModal
-        visible={personalizeVisible}
-        onClose={() => setPersonalizeVisible(false)}
+        visible={modals.isOpen('personalize')}
+        onClose={() => modals.close('personalize')}
         colors={colors}
         language={preferences.language}
         onLanguageChange={preferences.setLanguage}
@@ -624,31 +601,32 @@ export default function App() {
       />
 
       <AboutModal
-        visible={aboutVisible}
-        onClose={() => setAboutVisible(false)}
+        visible={modals.isOpen('about')}
+        onClose={() => modals.close('about')}
         colors={colors}
         t={t}
       />
 
       <ParentDashboard
-        visible={parentDashboardVisible}
-        onClose={() => setParentDashboardVisible(false)}
+        visible={modals.isOpen('parentDashboard')}
+        onClose={() => modals.close('parentDashboard')}
         colors={colors}
         profileId={activeProfile?.id}
         t={t}
       />
 
       <ProfilePickerModal
-        visible={profilePickerVisible || forceProfileSelectVisible}
-        dismissible={!forceProfileSelectVisible}
-        onClose={() => setProfilePickerVisible(false)}
+        visible={modals.isOpen('profilePicker')}
+        dismissible={!modals.profilePickerForced}
+        onClose={() => {
+          if (!modals.profilePickerForced) modals.close('profilePicker');
+        }}
         profiles={profiles}
         activeProfileId={activeProfile?.id}
         onSwitchProfile={async (profile) => {
           setActiveProfile(profile);
           await setActiveProfileId(profile.id);
-          setProfilePickerVisible(false);
-          setForceProfileSelectVisible(false);
+          modals.closeProfilePicker();
         }}
         onProfilesChange={(updated) => {
           setProfiles(updated);
@@ -665,10 +643,10 @@ export default function App() {
       />
 
       <Modal
-        visible={streakWarningVisible}
+        visible={modals.isOpen('streakWarning')}
         transparent
         animationType="fade"
-        onRequestClose={() => setStreakWarningVisible(false)}
+        onRequestClose={() => modals.close('streakWarning')}
       >
         <View style={styles.streakOverlay}>
           <View style={[styles.streakWarningCard, { backgroundColor: colors.settingsMenu }]}>
@@ -681,7 +659,7 @@ export default function App() {
             </Text>
             <TouchableOpacity
               style={styles.streakWarningButton}
-              onPress={() => setStreakWarningVisible(false)}
+              onPress={() => modals.close('streakWarning')}
             >
               <Text style={styles.streakWarningButtonText}>{t.streakWarningButton}</Text>
             </TouchableOpacity>
@@ -690,18 +668,18 @@ export default function App() {
       </Modal>
 
       <OnboardingModal
-        visible={onboardingVisible}
+        visible={modals.isOpen('onboarding')}
         onFinish={async () => {
           await setOnboardingDone();
-          setOnboardingVisible(false);
+          modals.close('onboarding');
         }}
         colors={colors}
         t={t}
       />
 
       <BadgesModal
-        visible={badgesVisible}
-        onClose={() => setBadgesVisible(false)}
+        visible={modals.isOpen('badges')}
+        onClose={() => modals.close('badges')}
         colors={colors}
         badges={badgeSystem.badges}
         language={preferences.language}
@@ -715,8 +693,8 @@ export default function App() {
       />
 
       <LernreiseModal
-        visible={lernreiseVisible}
-        onClose={() => setLernreiseVisible(false)}
+        visible={modals.isOpen('lernreise')}
+        onClose={() => modals.close('lernreise')}
         onSelectRow={(row) => game.startLernreiseRound(row)}
         colors={colors}
         profileId={activeProfile?.id}
@@ -724,11 +702,10 @@ export default function App() {
       />
 
       <LernreiseIntroModal
-        visible={lernreiseIntroVisible}
+        visible={modals.isOpen('lernreiseIntro')}
         onClose={async () => {
           await setLernreiseIntroDone(activeProfileIdRef.current);
-          setLernreiseIntroVisible(false);
-          setLernreiseVisible(true);
+          modals.open('lernreise');
         }}
         colors={colors}
         t={t}
