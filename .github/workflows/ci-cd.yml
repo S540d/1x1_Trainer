@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, testing]
   pull_request:
-    branches: [main]
+    branches: [main, testing]
 
 # Security: Explicitly set minimal permissions
 permissions:
