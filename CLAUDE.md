@@ -308,6 +308,7 @@ npm run test:coverage # Coverage
 - **Paketname für Firebase**: `com.sven4321.trainer1x1` (Play-Store-Paketname, nicht `com.devsven.x1x1trainer` aus app.json!)
 
 <!-- GLOBAL POLICY:START -->
+
 ## [GLOBAL POLICY]
 
 > Automatisch synchronisiert aus project-templates (Issue #7). Nicht manuell editieren –
@@ -338,4 +339,5 @@ npm run test:coverage # Coverage
 ## [CI – CACHE-CLEANUP]
 
 - **Cache-Cleanup-Workflow** (`.github/workflows/cache-cleanup.yml`) in jedem Repo mit GitHub-Actions-Caches: löscht wöchentlich (So 03:00 UTC) bzw. on-demand alle Action-Caches älter als der jeweils letzte Lauf. GitHub-Limit ist 10 GB pro Repo – ohne Cleanup laufen Build-Caches (node_modules, Gradle, Expo) voll und verdrängen frische Einträge. Vorlage: `cache-cleanup.yml` in project-templates.
+
 <!-- GLOBAL POLICY:END -->
