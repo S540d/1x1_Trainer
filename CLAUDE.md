@@ -83,13 +83,14 @@ npm run test:coverage # Coverage
 
 ---
 
-## Aktueller Stand (2026-09-06)
+## Aktueller Stand (2026-09-07)
 
 - Version: **1.6.0** / versionCode 35 — als AAB gebaut und im Play Store hochgeladen (2026-09-05)
-- Branches: `testing` vorn auf `aef3104` (CI-Trigger-Fix #356, siehe unten); `main` noch auf dem Stand von PR #349 (`7e9c49b`) — kein neuer Sync `testing` → `main` seitdem
+- Branches: `testing` vorn auf PR #366 (CLAUDE.md-Doku, siehe unten); `main` noch auf dem Stand von PR #349 (`7e9c49b`) — kein neuer Sync `testing` → `main` seitdem
 - Offene PRs: keine
 - Offene Issues: #256 (Streak-Push-Notification, Retention-Hebel Nr. 1), #276 (npm-audit-Vulnerabilities — SDK-Upgrade-Teilaufgabe erledigt, Rest bleibt offen), #277 (Wachstumsplan — 1a/1d/2d erledigt, siehe unten), #292 (Play-Store-Listing um Lernreise ergänzen), #294 (Android-15-Edge-to-Edge-APIs prüfen), #295 (App-Icon überarbeiten, Ausgliederung aus #277 2c), #296 (Auffindbarkeit außerhalb des Play Stores — Play-Store-Link/SEO in #297/#298 sowie In-App-Link/statischer SEO-Text in #303 umgesetzt; QR-Code fürs Print-Material + GitHub-Repo-Beschreibung/Topics bleiben offen, Repo-Settings ohne Tool-Zugriff), #325 (TypeScript 7.0.2 Dependabot-Bump — Lint-Fail, große Major-Migration, bewusst zurückgestellt), #357 (Code-Audit 2026-09: Architektur-Ballast abbauen — Punkte 2/3 erledigt, Punkt 1 Teilschritt 1 (useModals-Hook) erledigt, Rest von Punkt 1 + Punkt 4 offen; CI-Gate-Befund aus dem Nachfass-Kommentar durch #356 unabhängig behoben)
 - v1.5.0 im Play Store veröffentlicht (Issue #275 geschlossen)
+- **CI-Build auf `testing` repariert (PR #369, Issue #368, 2026-09-07):** Dependabot-PR #354 hatte `react-native` auf `0.87.1` gebumpt — das erfordert Node `>=22.13` (CI lief auf Node 20) _und_ passt nicht zur installierten `expo@57.0.19` (`bundledNativeModules.json` erwartet `react-native@0.86.3`). Ergebnis war `ERR_PACKAGE_PATH_NOT_EXPORTED` beim Web-Bundling — auch nach reinem Node-Bump, da die Versions-Inkompatibilität zusätzlich vorlag. Fix: `node-version` in `.github/workflows/ci-cd.yml` (4 Stellen) auf `'22'`, `engines.node` in `package.json` auf `>=22.13.0`, sowie `react`/`react-dom`/`react-native`/`react-native-safe-area-context` auf die von `expo@57.0.19` erwarteten Versionen (`19.2.3`/`19.2.3`/`0.86.3`/`~5.7.0`) zurückgesetzt.
 - **Code-Audit #357 (2026-09-06):**
   - Punkt 2 (PR #361): `saveOperation`/`getOperation` (toter Code) entfernt; generische `makeProfileScopedValue<T>`-Factory für 7 von ~15 Getter/Setter-Paaren in `utils/storage.ts` (Language, Theme, ThemeName, TotalTasks, ChallengeHighScore, SoundsEnabled, SoundsVolume). `Operations`/`NumberRange` behalten ihre eigene Implementierung (Alt-Format-Migration).
   - Punkt 3 (PR #363): `useGameLogic.ts` — die 6 Rundenwechsel-Funktionen (`restartGame`, `continueGame`, `changeGameMode`, `toggleOperation`, `changeAnswerMode`, `changeDifficultyMode`) auf eine gemeinsame `startNewRound(update)`-Hilfsfunktion umgestellt statt die Reset-Sequenz sechsmal zu wiederholen.
@@ -104,6 +105,8 @@ npm run test:coverage # Coverage
 
 | PR / Commit  | Was                                                                                                                                                                                                      |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #366 ✅      | docs: CLAUDE.md nach PR #362/#363/#364 aktualisiert                                                                                                                                                      |
+| #369 ✅      | fix: CI-Build auf `testing` repariert (Node 22 + `react-native`-Downgrade auf `0.86.3`) — Issue #368                                                                                                     |
 | #356 ✅      | fix: CI-Trigger läuft jetzt auch für PRs gegen `testing` (vorher nur `main`) — behebt den CI-Gate-Befund aus dem #357-Nachfass-Kommentar                                                                 |
 | #364 ✅      | refactor: `useModals()`-Hook konsolidiert 11 Modal-Booleans in `App.tsx` zu einem `activeModal`-Slot — Issue #357 Punkt 1 (Teilschritt 1)                                                                |
 | #363 ✅      | refactor: `startNewRound()`-Hilfsfunktion in `useGameLogic.ts` fasst die 6 Rundenwechsel-Funktionen zusammen — Issue #357 Punkt 3                                                                        |
