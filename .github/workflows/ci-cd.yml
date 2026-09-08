@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, testing]
   pull_request:
-    branches: [main]
+    branches: [main, testing]
 
 # Security: Explicitly set minimal permissions
 permissions:
@@ -14,6 +14,13 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
+  # ============================================================================
+  # JOB 0: Workflow-Linting (Issue #445)
+  # ============================================================================
+  actionlint:
+    name: ⚙️ Workflow Linting
+    uses: S540d/project-templates/.github/workflows/reusable-actionlint.yml@v2
+
   # ============================================================================
   # JOB 1: Code Quality & Linting
   # ============================================================================
@@ -27,7 +34,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -71,7 +78,7 @@ jobs:
           fi
 
       - name: TypeScript Type Check
-        run: npx tsc --noEmit || true
+        run: npx tsc --noEmit
 
   # ============================================================================
   # JOB 2: Jest Tests
@@ -87,7 +94,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -110,7 +117,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -128,7 +135,7 @@ jobs:
           fi
 
       - name: Upload Web artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: web-build
           path: dist/
@@ -212,7 +219,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Run npm audit
         run: npm audit --audit-level=moderate || true
