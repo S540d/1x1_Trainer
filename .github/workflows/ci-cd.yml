@@ -78,7 +78,7 @@ jobs:
           fi
 
       - name: TypeScript Type Check
-        run: npx tsc --noEmit || true
+        run: npx tsc --noEmit
 
   # ============================================================================
   # JOB 2: Jest Tests
