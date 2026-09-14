@@ -186,47 +186,51 @@ export const migrateToProfiles = async (): Promise<ChildProfile> => {
 
 const VALID_OPERATIONS = new Set<string>(Object.values(Operation));
 
-export const saveLanguage = async (language: Language): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.LANGUAGE, language);
-};
+// Generic factory for the common get/save pair: read/write a single scalar
+// value under a (optionally profile-suffixed) storage key, string-encoded,
+// validated on the way back out. Covers keys with no legacy-migration logic;
+// keys with migration fallbacks (Operations, NumberRange) keep their own
+// hand-written implementation below.
+function makeProfileScopedValue<T>(
+  key: string,
+  config: { serialize: (value: T) => string; deserialize: (raw: string) => T | null }
+) {
+  return {
+    save: async (value: T, profileId?: string): Promise<void> => {
+      await setStorageItem(resolveKey(key, profileId), config.serialize(value));
+    },
+    get: async (profileId?: string): Promise<T | null> => {
+      const value = await getStorageItem(resolveKey(key, profileId));
+      return value === null ? null : config.deserialize(value);
+    },
+  };
+}
 
-export const getLanguage = async (): Promise<Language | null> => {
-  const value = await getStorageItem(STORAGE_KEYS.LANGUAGE);
-  if (value === 'en' || value === 'de') {
-    return value;
-  }
-  return null;
-};
+const identitySerialize = (value: string): string => value;
 
-export const saveTheme = async (theme: ThemeMode): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.THEME, theme);
-};
+const languageValue = makeProfileScopedValue<Language>(STORAGE_KEYS.LANGUAGE, {
+  serialize: identitySerialize,
+  deserialize: (value) => (value === 'en' || value === 'de' ? value : null),
+});
+export const saveLanguage = languageValue.save;
+export const getLanguage = languageValue.get;
 
-export const getTheme = async (): Promise<ThemeMode | null> => {
-  const value = await getStorageItem(STORAGE_KEYS.THEME);
-  if (value === 'light' || value === 'dark' || value === 'system') {
-    return value;
-  }
-  return null;
-};
+const themeValue = makeProfileScopedValue<ThemeMode>(STORAGE_KEYS.THEME, {
+  serialize: identitySerialize,
+  deserialize: (value) =>
+    value === 'light' || value === 'dark' || value === 'system' ? value : null,
+});
+export const saveTheme = themeValue.save;
+export const getTheme = themeValue.get;
 
-export const saveThemeName = async (themeName: ThemeName): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.THEME_NAME, themeName);
-};
+const VALID_THEME_NAMES = new Set<string>(['sunset', 'ocean', 'space', 'forest', 'candy']);
 
-export const getThemeName = async (): Promise<ThemeName | null> => {
-  const value = await getStorageItem(STORAGE_KEYS.THEME_NAME);
-  if (
-    value === 'sunset' ||
-    value === 'ocean' ||
-    value === 'space' ||
-    value === 'forest' ||
-    value === 'candy'
-  ) {
-    return value;
-  }
-  return null;
-};
+const themeNameValue = makeProfileScopedValue<ThemeName>(STORAGE_KEYS.THEME_NAME, {
+  serialize: identitySerialize,
+  deserialize: (value) => (VALID_THEME_NAMES.has(value) ? (value as ThemeName) : null),
+});
+export const saveThemeName = themeNameValue.save;
+export const getThemeName = themeNameValue.get;
 
 export const saveOperations = async (
   operations: Operation[],
@@ -267,44 +271,25 @@ export const getOperations = async (profileId?: string): Promise<Operation[]> =>
   return [Operation.MULTIPLICATION];
 };
 
-// Legacy function for backward compatibility
-export const saveOperation = async (operation: Operation): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.OPERATION, operation);
+const deserializeInt = (value: string): number | null => {
+  const parsed = parseInt(value, 10);
+  return isNaN(parsed) ? null : parsed;
 };
 
-export const getOperation = async (): Promise<Operation | null> => {
-  const value = await getStorageItem(STORAGE_KEYS.OPERATION);
-  if (value !== null && VALID_OPERATIONS.has(value)) {
-    return value as Operation;
-  }
-  return null;
-};
+const totalTasksValue = makeProfileScopedValue<number>(STORAGE_KEYS.TOTAL_TASKS, {
+  serialize: (v) => v.toString(),
+  deserialize: deserializeInt,
+});
+export const saveTotalTasks = totalTasksValue.save;
+export const getTotalTasks = totalTasksValue.get;
 
-export const saveTotalTasks = async (total: number, profileId?: string): Promise<void> => {
-  await setStorageItem(resolveKey(STORAGE_KEYS.TOTAL_TASKS, profileId), total.toString());
-};
-
-export const getTotalTasks = async (profileId?: string): Promise<number | null> => {
-  const value = await getStorageItem(resolveKey(STORAGE_KEYS.TOTAL_TASKS, profileId));
-  if (value) {
-    const parsed = parseInt(value, 10);
-    return isNaN(parsed) ? null : parsed;
-  }
-  return null;
-};
-
-export const saveChallengeHighScore = async (score: number, profileId?: string): Promise<void> => {
-  await setStorageItem(resolveKey(STORAGE_KEYS.CHALLENGE_HIGHSCORE, profileId), score.toString());
-};
-
-export const getChallengeHighScore = async (profileId?: string): Promise<number> => {
-  const value = await getStorageItem(resolveKey(STORAGE_KEYS.CHALLENGE_HIGHSCORE, profileId));
-  if (value) {
-    const parsed = parseInt(value, 10);
-    return isNaN(parsed) ? 0 : parsed;
-  }
-  return 0;
-};
+const challengeHighScoreValue = makeProfileScopedValue<number>(STORAGE_KEYS.CHALLENGE_HIGHSCORE, {
+  serialize: (v) => v.toString(),
+  deserialize: deserializeInt,
+});
+export const saveChallengeHighScore = challengeHighScoreValue.save;
+export const getChallengeHighScore = async (profileId?: string): Promise<number> =>
+  (await challengeHighScoreValue.get(profileId)) ?? 0;
 
 export const FOUR_WEEKS_MS = 28 * 24 * 60 * 60 * 1000;
 
@@ -711,25 +696,19 @@ export const getNumberRange = async (profileId?: string): Promise<NumberRange> =
   return NumberRange.RANGE_100;
 };
 
-export const saveSoundsEnabled = async (enabled: boolean): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.SOUNDS_ENABLED, enabled ? 'true' : 'false');
-};
+const soundsEnabledValue = makeProfileScopedValue<boolean>(STORAGE_KEYS.SOUNDS_ENABLED, {
+  serialize: (v) => (v ? 'true' : 'false'),
+  deserialize: (value) => (value === 'true' ? true : value === 'false' ? false : null),
+});
+export const saveSoundsEnabled = soundsEnabledValue.save;
+export const getSoundsEnabled = soundsEnabledValue.get;
 
-export const getSoundsEnabled = async (): Promise<boolean | null> => {
-  const value = await getStorageItem(STORAGE_KEYS.SOUNDS_ENABLED);
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-  return null;
-};
-
-export const saveSoundsVolume = async (volume: number): Promise<void> => {
-  await setStorageItem(STORAGE_KEYS.SOUNDS_VOLUME, String(volume));
-};
-
-export const getSoundsVolume = async (): Promise<number | null> => {
-  const value = await getStorageItem(STORAGE_KEYS.SOUNDS_VOLUME);
-  if (value === null) return null;
-  const n = Number(value);
-  if (!Number.isNaN(n) && n >= 0 && n <= 100) return n;
-  return null;
-};
+const soundsVolumeValue = makeProfileScopedValue<number>(STORAGE_KEYS.SOUNDS_VOLUME, {
+  serialize: (v) => String(v),
+  deserialize: (value) => {
+    const n = Number(value);
+    return !Number.isNaN(n) && n >= 0 && n <= 100 ? n : null;
+  },
+});
+export const saveSoundsVolume = soundsVolumeValue.save;
+export const getSoundsVolume = soundsVolumeValue.get;

@@ -13,8 +13,6 @@ import {
   getTheme,
   saveOperations,
   getOperations,
-  saveOperation,
-  getOperation,
   saveTotalTasks,
   getTotalTasks,
   saveNumberRange,
@@ -311,31 +309,6 @@ describe('storage.ts - Typed Storage Helpers', () => {
       mockLocalStorage['app-operations'] = JSON.stringify(['INVALID_OP']);
       const operations = await getOperations();
       expect(operations).toEqual([Operation.MULTIPLICATION]);
-    });
-  });
-
-  describe('Legacy operation storage', () => {
-    it('should save single operation (legacy)', async () => {
-      await saveOperation(Operation.ADDITION);
-      const operation = await getOperation();
-      expect(operation).toBe(Operation.ADDITION);
-    });
-
-    it('should retrieve legacy operation', async () => {
-      mockLocalStorage['app-operation'] = Operation.SUBTRACTION;
-      const operation = await getOperation();
-      expect(operation).toBe(Operation.SUBTRACTION);
-    });
-
-    it('should retrieve legacy DIVISION operation', async () => {
-      mockLocalStorage['app-operation'] = Operation.DIVISION;
-      const operation = await getOperation();
-      expect(operation).toBe(Operation.DIVISION);
-    });
-
-    it('should return null if no legacy operation stored', async () => {
-      const operation = await getOperation();
-      expect(operation).toBeNull();
     });
   });
 

@@ -48,10 +48,10 @@ module.exports = {
   // Bei Verbesserungen nachziehen (Issue project-templates#113).
   coverageThreshold: {
     global: {
-      statements: 84,
-      branches: 79,
-      functions: 79,
-      lines: 85,
+      statements: 88,
+      branches: 83,
+      functions: 83,
+      lines: 89,
     },
   },
 };
