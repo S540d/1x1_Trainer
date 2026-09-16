@@ -8,6 +8,17 @@ export const APP_VERSION = '1.6.0';
 export const APP_NAME = '1×1 Trainer';
 export const CONTACT_EMAIL = 'devsven@posteo.de';
 
+/**
+ * Zentrales Impressum für alle Projekte unter s540d.github.io (nicht
+ * projektlokal) — siehe project-templates/dev-standards/about-section.md,
+ * Issue #150.
+ */
+export const IMPRESSUM_URL = 'https://s540d.github.io/impressum.html';
+export const PRIVACY_POLICY_URL = 'https://s540d.github.io/1x1_Trainer/privacy-policy.html';
+export const REPO_URL = 'https://github.com/S540d/1x1_Trainer';
+export const PLAY_STORE_URL =
+  'https://play.google.com/store/apps/details?id=com.sven4321.trainer1x1';
+
 // Game Configuration
 export const TOTAL_TASKS = 10;
 export const MAX_CHOICE_GENERATION_ATTEMPTS = 100;
