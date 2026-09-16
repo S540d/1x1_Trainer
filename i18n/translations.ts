@@ -114,6 +114,17 @@ export interface TranslationStrings {
   parentResetLernreise: string;
   parentResetLernreiseConfirm: string;
   parentResetLernreiseDone: string;
+  // Reminder Planner (calendar entry generator)
+  reminderTitle: string;
+  reminderSubtitle: string;
+  reminderTimeLabel: string;
+  reminderCadenceLabel: string;
+  reminderCadenceDaily: string;
+  reminderCadenceEveryTwoDays: string;
+  reminderCadenceWeekend: string;
+  reminderCreateButton: string;
+  reminderEventTitle: string;
+  reminderEventDescription: string;
   colorTheme: string;
   // Sounds
   sounds: string;
@@ -325,6 +336,16 @@ export const translations: Record<Language, TranslationStrings> = {
     parentResetLernreiseConfirm:
       'This will reset all earned Bronze/Silver/Gold badges and locked progress on the Learning Journey map.',
     parentResetLernreiseDone: 'Learning Journey has been reset.',
+    reminderTitle: 'PRACTICE REMINDER',
+    reminderSubtitle: 'Add a recurring calendar entry — no notifications, no permissions.',
+    reminderTimeLabel: 'Time',
+    reminderCadenceLabel: 'How often?',
+    reminderCadenceDaily: 'Daily',
+    reminderCadenceEveryTwoDays: 'Every 2 days',
+    reminderCadenceWeekend: 'Weekends only',
+    reminderCreateButton: 'Create calendar entry',
+    reminderEventTitle: 'Practice 1×1!',
+    reminderEventDescription: 'A quick round of 1×1 Trainer is enough.',
     colorTheme: 'COLOR THEME',
     sounds: 'SOUNDS',
     soundsOn: 'On',
@@ -538,6 +559,17 @@ export const translations: Record<Language, TranslationStrings> = {
     parentResetLernreiseConfirm:
       'Damit werden alle erreichten Bronze/Silber/Gold-Abzeichen und der Freischalt-Fortschritt der Lernreise-Landkarte zurückgesetzt.',
     parentResetLernreiseDone: 'Die Lernreise wurde zurückgesetzt.',
+    reminderTitle: 'ÜBUNGSERINNERUNG',
+    reminderSubtitle:
+      'Erstellt einen wiederkehrenden Kalendereintrag – keine Benachrichtigungen, keine Berechtigungen.',
+    reminderTimeLabel: 'Uhrzeit',
+    reminderCadenceLabel: 'Wie oft?',
+    reminderCadenceDaily: 'Täglich',
+    reminderCadenceEveryTwoDays: 'Alle 2 Tage',
+    reminderCadenceWeekend: 'Nur am Wochenende',
+    reminderCreateButton: 'Kalendereintrag erstellen',
+    reminderEventTitle: 'Übe dein 1×1!',
+    reminderEventDescription: 'Eine kurze Runde 1x1 Trainer genügt.',
     colorTheme: 'FARBTHEMA',
     sounds: 'TÖNE',
     soundsOn: 'An',

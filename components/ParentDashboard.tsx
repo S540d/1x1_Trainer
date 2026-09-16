@@ -27,6 +27,7 @@ import {
 } from '../utils/storage';
 import { DESIGN_TOKENS, LERNREISE_ROW_COUNT } from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
+import { ReminderPlannerCard } from './ReminderPlannerCard';
 
 const OP_SYMBOL: Record<Operation, string> = {
   [Operation.ADDITION]: '+',
@@ -40,6 +41,7 @@ interface ParentDashboardProps {
   onClose: () => void;
   colors: ThemeColors;
   profileId?: string;
+  profileCreatedAt?: string;
   t: {
     parentDashboard: string;
     parentDashboardSubtitle: string;
@@ -70,6 +72,16 @@ interface ParentDashboardProps {
     parentResetLernreise: string;
     parentResetLernreiseConfirm: string;
     parentResetLernreiseDone: string;
+    reminderTitle: string;
+    reminderSubtitle: string;
+    reminderTimeLabel: string;
+    reminderCadenceLabel: string;
+    reminderCadenceDaily: string;
+    reminderCadenceEveryTwoDays: string;
+    reminderCadenceWeekend: string;
+    reminderCreateButton: string;
+    reminderEventTitle: string;
+    reminderEventDescription: string;
     cancel: string;
     ok: string;
   };
@@ -298,7 +310,14 @@ function recommendWeakestRow(
   return rate > minErrorRate ? worst : null;
 }
 
-export function ParentDashboard({ visible, onClose, colors, profileId, t }: ParentDashboardProps) {
+export function ParentDashboard({
+  visible,
+  onClose,
+  colors,
+  profileId,
+  profileCreatedAt,
+  t,
+}: ParentDashboardProps) {
   const [records, setRecords] = useState<SessionRecord[]>([]);
   const [streak, setStreak] = useState<StreakData>({
     currentStreak: 0,
@@ -378,6 +397,8 @@ export function ParentDashboard({ visible, onClose, colors, profileId, t }: Pare
               <Text style={[styles.closeText, { color: colors.text }]}>✕</Text>
             </TouchableOpacity>
           </View>
+
+          <ReminderPlannerCard colors={colors} profileCreatedAt={profileCreatedAt} t={t} />
 
           {/* Summary bar */}
           {(records.length > 0 || streak.currentStreak > 0 || streak.longestStreak > 0) && (
