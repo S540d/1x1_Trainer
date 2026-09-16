@@ -27,6 +27,7 @@ import {
 } from '../utils/storage';
 import { DESIGN_TOKENS, LERNREISE_ROW_COUNT } from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
+import { ReminderPlannerCard } from './ReminderPlannerCard';
 
 const OP_SYMBOL: Record<Operation, string> = {
   [Operation.ADDITION]: '+',
@@ -70,6 +71,16 @@ interface ParentDashboardProps {
     parentResetLernreise: string;
     parentResetLernreiseConfirm: string;
     parentResetLernreiseDone: string;
+    reminderTitle: string;
+    reminderSubtitle: string;
+    reminderTimeLabel: string;
+    reminderCadenceLabel: string;
+    reminderCadenceDaily: string;
+    reminderCadenceEveryTwoDays: string;
+    reminderCadenceWeekend: string;
+    reminderCreateButton: string;
+    reminderEventTitle: string;
+    reminderEventDescription: string;
     cancel: string;
     ok: string;
   };
@@ -378,6 +389,8 @@ export function ParentDashboard({ visible, onClose, colors, profileId, t }: Pare
               <Text style={[styles.closeText, { color: colors.text }]}>✕</Text>
             </TouchableOpacity>
           </View>
+
+          <ReminderPlannerCard colors={colors} profileId={profileId} t={t} />
 
           {/* Summary bar */}
           {(records.length > 0 || streak.currentStreak > 0 || streak.longestStreak > 0) && (

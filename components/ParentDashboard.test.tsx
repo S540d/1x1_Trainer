@@ -49,6 +49,16 @@ const t = {
   parentResetLernreiseConfirm:
     'Damit werden alle erreichten Bronze/Silber/Gold-Abzeichen und der Freischalt-Fortschritt der Lernreise-Landkarte zurückgesetzt.',
   parentResetLernreiseDone: 'Die Lernreise wurde zurückgesetzt.',
+  reminderTitle: 'ÜBUNGSERINNERUNG',
+  reminderSubtitle: 'Erstellt einen wiederkehrenden Kalendereintrag.',
+  reminderTimeLabel: 'Uhrzeit',
+  reminderCadenceLabel: 'Wie oft?',
+  reminderCadenceDaily: 'Täglich',
+  reminderCadenceEveryTwoDays: 'Alle 2 Tage',
+  reminderCadenceWeekend: 'Nur am Wochenende',
+  reminderCreateButton: 'Kalendereintrag erstellen',
+  reminderEventTitle: 'Übe dein 1×1!',
+  reminderEventDescription: 'Eine kurze Runde 1x1 Trainer genügt.',
   cancel: 'Abbrechen',
   ok: 'OK',
 };
