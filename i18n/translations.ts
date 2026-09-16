@@ -42,6 +42,10 @@ export interface TranslationStrings {
   about: string;
   aboutDescription: string;
   version: string;
+  impressum: string;
+  privacyPolicy: string;
+  sourceCode: string;
+  playStoreLink: string;
   copyright: string;
   license: string;
   contact: string;
@@ -261,6 +265,10 @@ export const translations: Record<Language, TranslationStrings> = {
     about: 'ABOUT',
     aboutDescription: 'A math trainer for children with multiple game modes.',
     version: 'Version',
+    impressum: 'Impressum',
+    privacyPolicy: 'Privacy Policy',
+    sourceCode: 'Source Code (GitHub)',
+    playStoreLink: 'Play Store',
     copyright: '© 2025 S540d',
     license: 'License: MIT',
     contact: 'Contact: devsven@posteo.de',
@@ -484,6 +492,10 @@ export const translations: Record<Language, TranslationStrings> = {
     about: 'ÜBER',
     aboutDescription: 'Ein Rechentrainer für Kinder mit verschiedenen Spielmodi.',
     version: 'Version',
+    impressum: 'Impressum',
+    privacyPolicy: 'Datenschutz',
+    sourceCode: 'Quellcode (GitHub)',
+    playStoreLink: 'Play Store',
     copyright: '© 2025 S540d',
     license: 'Lizenz: MIT',
     contact: 'Kontakt: devsven@posteo.de',
