@@ -41,6 +41,7 @@ interface ParentDashboardProps {
   onClose: () => void;
   colors: ThemeColors;
   profileId?: string;
+  profileCreatedAt?: string;
   t: {
     parentDashboard: string;
     parentDashboardSubtitle: string;
@@ -309,7 +310,14 @@ function recommendWeakestRow(
   return rate > minErrorRate ? worst : null;
 }
 
-export function ParentDashboard({ visible, onClose, colors, profileId, t }: ParentDashboardProps) {
+export function ParentDashboard({
+  visible,
+  onClose,
+  colors,
+  profileId,
+  profileCreatedAt,
+  t,
+}: ParentDashboardProps) {
   const [records, setRecords] = useState<SessionRecord[]>([]);
   const [streak, setStreak] = useState<StreakData>({
     currentStreak: 0,
@@ -390,7 +398,7 @@ export function ParentDashboard({ visible, onClose, colors, profileId, t }: Pare
             </TouchableOpacity>
           </View>
 
-          <ReminderPlannerCard colors={colors} profileId={profileId} t={t} />
+          <ReminderPlannerCard colors={colors} profileCreatedAt={profileCreatedAt} t={t} />
 
           {/* Summary bar */}
           {(records.length > 0 || streak.currentStreak > 0 || streak.longestStreak > 0) && (

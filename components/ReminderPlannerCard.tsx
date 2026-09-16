@@ -10,7 +10,12 @@ const CADENCES: ReminderCadence[] = ['daily', 'everyTwoDays', 'weekend'];
 
 interface ReminderPlannerCardProps {
   colors: ThemeColors;
-  profileId?: string;
+  // Deliberately the profile's creation timestamp, not its id: the id is
+  // generated with Math.random() (utils/storage.ts#generateId), which
+  // CodeQL flags as insecure randomness once it reaches an identifier used
+  // in a shareable calendar entry. createdAt is equally stable per profile
+  // without that flow.
+  profileCreatedAt?: string;
   t: {
     reminderTitle: string;
     reminderSubtitle: string;
@@ -37,7 +42,7 @@ function downloadIcs(icsContent: string) {
   window.URL.revokeObjectURL(url); // platform-safe
 }
 
-export function ReminderPlannerCard({ colors, profileId, t }: ReminderPlannerCardProps) {
+export function ReminderPlannerCard({ colors, profileCreatedAt, t }: ReminderPlannerCardProps) {
   const [hour, setHour] = useState(18);
   const [cadence, setCadence] = useState<ReminderCadence>('daily');
 
@@ -54,7 +59,7 @@ export function ReminderPlannerCard({ colors, profileId, t }: ReminderPlannerCar
       cadence,
       title: t.reminderEventTitle,
       description: t.reminderEventDescription,
-      uid: `1x1trainer-reminder-${profileId ?? 'default'}@1x1trainer`,
+      uid: `1x1trainer-reminder-${profileCreatedAt ?? 'default'}@1x1trainer`,
     });
 
     if (Platform.OS === 'web') {

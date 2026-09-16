@@ -26,7 +26,7 @@ describe('ReminderPlannerCard', () => {
   it('renders time presets and cadence options', () => {
     const colors = getThemeColors(false);
     const { getByText } = render(
-      <ReminderPlannerCard colors={colors} profileId="profile-1" t={t} />
+      <ReminderPlannerCard colors={colors} profileCreatedAt="2026-01-01T00:00:00.000Z" t={t} />
     );
 
     expect(getByText('18:00')).toBeTruthy();
@@ -39,7 +39,7 @@ describe('ReminderPlannerCard', () => {
   it('lets a parent pick a different time and cadence before creating the entry', () => {
     const colors = getThemeColors(false);
     const { getByText } = render(
-      <ReminderPlannerCard colors={colors} profileId="profile-1" t={t} />
+      <ReminderPlannerCard colors={colors} profileCreatedAt="2026-01-01T00:00:00.000Z" t={t} />
     );
 
     fireEvent.click(getByText('20:00'));
