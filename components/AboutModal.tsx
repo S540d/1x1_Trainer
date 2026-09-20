@@ -57,17 +57,13 @@ export function AboutModal({ visible, onClose, colors, t }: AboutModalProps) {
             <Text style={[styles.aboutModalInfoText, { color: linkColor }]}>{t.impressum}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => Linking.openURL(PRIVACY_POLICY_URL).catch(() => {})}>
-            <Text style={[styles.aboutModalInfoText, { color: linkColor }]}>
-              {t.privacyPolicy}
-            </Text>
+            <Text style={[styles.aboutModalInfoText, { color: linkColor }]}>{t.privacyPolicy}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => Linking.openURL(REPO_URL).catch(() => {})}>
             <Text style={[styles.aboutModalInfoText, { color: linkColor }]}>{t.sourceCode}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => Linking.openURL(PLAY_STORE_URL).catch(() => {})}>
-            <Text style={[styles.aboutModalInfoText, { color: linkColor }]}>
-              {t.playStoreLink}
-            </Text>
+            <Text style={[styles.aboutModalInfoText, { color: linkColor }]}>{t.playStoreLink}</Text>
           </TouchableOpacity>
           <View style={styles.aboutModalDivider} />
           <Text style={[styles.aboutModalInfoText, { color: colors.textSecondary }]}>
