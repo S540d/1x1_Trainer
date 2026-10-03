@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
     padding: 4,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     borderWidth: 2,
     borderColor: 'transparent',
   },

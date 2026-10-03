@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   demoCard: {
     paddingVertical: 16,
     paddingHorizontal: 32,
-    borderRadius: 16,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     alignItems: 'center',
     elevation: 2,
     shadowColor: '#000',
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   choiceButton: {
     width: 64,
     height: 56,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   menuHint: {
     width: 48,
     height: 48,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,

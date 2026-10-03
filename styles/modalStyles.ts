@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { DESIGN_TOKENS } from '../utils/constants';
 
 export const modalStyles = StyleSheet.create({
   overlay: {
@@ -9,7 +10,7 @@ export const modalStyles = StyleSheet.create({
   },
   content: {
     backgroundColor: '#fff',
-    borderRadius: 24,
+    borderRadius: DESIGN_TOKENS.RADIUS_XL,
     padding: 24,
     alignItems: 'center',
     width: '85%',

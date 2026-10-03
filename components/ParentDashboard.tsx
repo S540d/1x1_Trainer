@@ -693,7 +693,7 @@ export function ParentDashboard({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 24,
+    borderRadius: DESIGN_TOKENS.RADIUS_XL,
     padding: 20,
     width: '90%',
     maxWidth: 420,
@@ -733,7 +733,7 @@ const styles = StyleSheet.create({
   summaryBar: {
     flexDirection: 'row',
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     marginBottom: 14,
     overflow: 'hidden',
   },
@@ -783,7 +783,7 @@ const styles = StyleSheet.create({
   },
   weeklySection: {
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     padding: 12,
     marginBottom: 12,
     gap: 4,
@@ -828,7 +828,7 @@ const styles = StyleSheet.create({
   rowChip: {
     width: 28,
     height: 28,
-    borderRadius: 8,
+    borderRadius: DESIGN_TOKENS.RADIUS_SM,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -838,7 +838,7 @@ const styles = StyleSheet.create({
   },
   chartsSection: {
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     padding: 12,
     marginBottom: 12,
   },
@@ -854,7 +854,7 @@ const styles = StyleSheet.create({
   },
   weakSection: {
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     padding: 10,
     marginBottom: 12,
   },
@@ -923,7 +923,7 @@ const styles = StyleSheet.create({
   errorBadge: {
     paddingHorizontal: 7,
     paddingVertical: 3,
-    borderRadius: 8,
+    borderRadius: DESIGN_TOKENS.RADIUS_SM,
     minWidth: 42,
     alignItems: 'center',
   },

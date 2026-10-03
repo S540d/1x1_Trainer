@@ -105,7 +105,7 @@ export function LernreiseModal({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 24,
+    borderRadius: DESIGN_TOKENS.RADIUS_XL,
     padding: 20,
     width: '90%',
     maxWidth: 420,

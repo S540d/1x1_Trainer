@@ -199,7 +199,7 @@ export function BadgesModal({ visible, onClose, colors, badges, language, t }: B
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 24,
+    borderRadius: DESIGN_TOKENS.RADIUS_XL,
     padding: 20,
     width: '92%',
     maxWidth: 440,

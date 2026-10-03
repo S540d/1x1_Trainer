@@ -337,6 +337,11 @@ export const THEMES: Record<ThemeName, { label: string; LIGHT: ThemeVariant; DAR
   };
 
 export const DESIGN_TOKENS = {
+  RADIUS_SM: 8,
+  RADIUS_MD: 12,
+  RADIUS_LG: 16,
+  RADIUS_XL: 24,
+
   GRADIENT_PRIMARY: ['#667eea', '#764ba2'] as const,
   GRADIENT_CORRECT: ['#43e97b', '#38f9d7'] as const,
   GRADIENT_INCORRECT: ['#f857a6', '#ff5858'] as const,
