@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     borderWidth: 1.5,
-    borderRadius: 14,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     paddingVertical: 11,
     paddingHorizontal: 28,
   },

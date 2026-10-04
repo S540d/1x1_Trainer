@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 import { ThemeColors, DifficultyMode, ChallengeState } from '../types/game';
-import { CHALLENGE_MAX_LIVES } from '../utils/constants';
+import { CHALLENGE_MAX_LIVES, DESIGN_TOKENS } from '../utils/constants';
 import { Badge } from './Badge';
 import { ProgressBar } from './ProgressBar';
 
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     minWidth: 28,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 14,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     alignItems: 'center',
     justifyContent: 'center',
   },
