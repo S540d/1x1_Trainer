@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   badgeCard: {
     width: '48%',
     borderWidth: 1.5,
-    borderRadius: 14,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     padding: 10,
     alignItems: 'center',
     opacity: 0.5,

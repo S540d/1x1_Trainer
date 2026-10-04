@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   hintCard: {
-    borderRadius: 14,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     padding: 14,
     width: '100%',
   },

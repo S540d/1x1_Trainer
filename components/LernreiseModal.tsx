@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   rowNode: {
     width: '31%',
     borderWidth: 1.5,
-    borderRadius: 14,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     paddingVertical: 14,
     alignItems: 'center',
     gap: 4,
