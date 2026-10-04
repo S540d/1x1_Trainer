@@ -151,23 +151,23 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: DESIGN_TOKENS.NUMPAD_CARD_BG,
     borderRadius: DESIGN_TOKENS.NUMPAD_BORDER_RADIUS,
-    padding: 12,
+    padding: DESIGN_TOKENS.SPACING_MD,
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   numpad: {
     width: '100%',
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   numpadRow: {
     flexDirection: 'row',
     alignItems: 'stretch',
     height: 60,
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   numpadButton: {
     flex: 1,

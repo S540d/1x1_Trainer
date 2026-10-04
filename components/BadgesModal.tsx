@@ -200,7 +200,7 @@ export function BadgesModal({ visible, onClose, colors, badges, language, t }: B
 const styles = StyleSheet.create({
   container: {
     borderRadius: DESIGN_TOKENS.RADIUS_XL,
-    padding: 20,
+    padding: DESIGN_TOKENS.SPACING_XL,
     width: '92%',
     maxWidth: 440,
     maxHeight: '88%',
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
   },
   title: {
     fontSize: 18,
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   },
   scroll: {
     maxHeight: 440,
-    marginBottom: 12,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
   },
   categorySection: {
     marginBottom: 14,
@@ -247,13 +247,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: DESIGN_TOKENS.FONT_UI,
     letterSpacing: 0.8,
-    marginBottom: 8,
+    marginBottom: DESIGN_TOKENS.SPACING_SM,
     marginLeft: 2,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   badgeCard: {
     width: '48%',
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   },
   badgeIcon: {
     fontSize: 28,
-    marginBottom: 4,
+    marginBottom: DESIGN_TOKENS.SPACING_XS,
   },
   badgeIconLocked: {
     opacity: 0.4,
@@ -288,12 +288,12 @@ const styles = StyleSheet.create({
   unlockedDate: {
     fontSize: 9,
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    marginTop: 4,
+    marginTop: DESIGN_TOKENS.SPACING_XS,
     textAlign: 'center',
   },
   closeBtn: {
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
-    paddingVertical: 12,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
     alignItems: 'center',
   },
   closeBtnText: {

@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XL,
     paddingVertical: 14,
   },
   settingsMenuTitle: {
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   settingsMenuCloseButton: {
-    padding: 8,
+    padding: DESIGN_TOKENS.SPACING_SM,
     alignItems: 'flex-end',
   },
   settingsMenuCloseButtonText: {
@@ -247,19 +247,19 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   settingsSection: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
   },
   settingsSectionTitle: {
     fontSize: 11,
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    marginBottom: 8,
+    marginBottom: DESIGN_TOKENS.SPACING_SM,
     textTransform: 'uppercase',
     letterSpacing: 0.08,
   },
   chipRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   settingsDivider: {
     height: 1,
@@ -272,8 +272,8 @@ const styles = StyleSheet.create({
   },
   themeSwatchWrapper: {
     alignItems: 'center',
-    gap: 4,
-    padding: 4,
+    gap: DESIGN_TOKENS.SPACING_XS,
+    padding: DESIGN_TOKENS.SPACING_XS,
     borderRadius: DESIGN_TOKENS.RADIUS_MD,
     borderWidth: 2,
     borderColor: 'transparent',

@@ -62,24 +62,24 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 48,
-    marginBottom: 12,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: DESIGN_TOKENS.SPACING_SM,
   },
   message: {
     fontSize: 14,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: DESIGN_TOKENS.SPACING_XL,
     lineHeight: 20,
   },
   button: {
     backgroundColor: '#F59E0B',
     borderRadius: DESIGN_TOKENS.RADIUS_LG,
-    paddingVertical: 12,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
     paddingHorizontal: 32,
   },
   buttonText: {

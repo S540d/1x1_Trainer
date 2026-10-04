@@ -253,15 +253,15 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '80%',
-    paddingBottom: 24,
+    paddingBottom: DESIGN_TOKENS.SPACING_XXL,
     overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XL,
+    paddingVertical: DESIGN_TOKENS.SPACING_LG,
   },
   headerTitle: {
     color: '#fff',
@@ -285,24 +285,24 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: 'center',
     marginVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XL,
   },
   list: {
     flexGrow: 0,
     maxHeight: 320,
-    paddingHorizontal: 16,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
   },
   profileRow: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    paddingVertical: 12,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
   },
   profileInfo: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: DESIGN_TOKENS.SPACING_MD,
   },
   avatar: {
     width: 44,
@@ -328,16 +328,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   deleteButton: {
-    padding: 8,
+    padding: DESIGN_TOKENS.SPACING_SM,
   },
   deleteButtonText: {
     fontSize: 18,
   },
   createForm: {
     borderTopWidth: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    gap: 12,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
+    paddingTop: DESIGN_TOKENS.SPACING_LG,
+    gap: DESIGN_TOKENS.SPACING_MD,
   },
   createTitle: {
     fontSize: 15,
@@ -396,8 +396,8 @@ const styles = StyleSheet.create({
   },
   addButtonWrapper: {
     borderTopWidth: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
+    paddingTop: DESIGN_TOKENS.SPACING_LG,
     alignItems: 'center',
   },
   addButton: {
