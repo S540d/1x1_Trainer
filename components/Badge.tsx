@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Text, StyleSheet, Animated } from 'react-native';
 import { prefersReducedMotion } from '../utils/animations';
+import { DESIGN_TOKENS } from '../utils/constants';
 
 type BadgeVariant = 'default' | 'success' | 'warning' | 'error';
 
@@ -51,7 +52,7 @@ export function Badge({ value, variant = 'default', animated = false }: BadgePro
 
 const styles = StyleSheet.create({
   badge: {
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     paddingHorizontal: 10,
     paddingVertical: 4,
     alignSelf: 'center',

@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     left: 24,
     right: 24,
     backgroundColor: DESIGN_TOKENS.GRADIENT_PRIMARY[1],
-    borderRadius: 16,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     paddingVertical: 12,
     paddingHorizontal: 20,
     flexDirection: 'row',

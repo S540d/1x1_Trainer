@@ -117,7 +117,7 @@ export function ReminderPlannerCard({ colors, profileCreatedAt, t }: ReminderPla
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     padding: 12,
     marginBottom: 12,
     gap: 4,

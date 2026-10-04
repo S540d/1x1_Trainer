@@ -8,6 +8,7 @@ import React from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ThemeColors } from '../types/game';
 import { TranslationStrings } from '../i18n/translations';
+import { DESIGN_TOKENS } from '../utils/constants';
 
 interface StreakWarningModalProps {
   visible: boolean;
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    borderRadius: 24,
+    borderRadius: DESIGN_TOKENS.RADIUS_XL,
     padding: 28,
     width: '80%',
     maxWidth: 340,
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#F59E0B',
-    borderRadius: 16,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     paddingVertical: 12,
     paddingHorizontal: 32,
   },

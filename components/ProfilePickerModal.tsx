@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChildProfile, ThemeColors } from '../types/game';
-import { AVATAR_COLORS } from '../utils/constants';
+import { AVATAR_COLORS, DESIGN_TOKENS } from '../utils/constants';
 import { createProfile, deleteProfileData, saveProfiles, getProfiles } from '../utils/storage';
 
 const MAX_PROFILES = 6;
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   closeButton: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     backgroundColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   },
   nameInput: {
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 15,
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   formButton: {
     flex: 1,
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     paddingVertical: 11,
     alignItems: 'center',
   },
