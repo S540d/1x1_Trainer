@@ -87,7 +87,7 @@ npm run test:coverage # Coverage
 
 ## Aktueller Stand (2026-09-27)
 
-- Version: **1.6.0** / versionCode 35 (Play Store, Stand 2026-09-05)
+- Version: **1.7.0** / versionCode 36 (noch nicht im Play Store; zuletzt veröffentlicht: 1.6.0 / 35, Stand 2026-09-05)
 - Release-Historie: `CHANGELOG.md`; Merge-Historie: `git log`
 - Offene Issues (Details in GitHub): #276 (Rest), #277 (Rest), #292, #294, #295, #296 (Rest), #325
 - Diagnostizierte, bereits gelöste Vorfälle (Kalendereintrags-Generator #382, WelcomeScreen-Redesign #380, CI-Break #368/#369, Code-Audit #357, R8/ProGuard-Bestätigung u. a.): `docs/private/INCIDENTS.md`
