@@ -190,14 +190,14 @@ vollständig in `docs/ARCHITECTURE.md#feature-notes` (ausgelagert, Issue
 - Größere Dependency-Updates verschoben: react-native 0.84, react 19.2.4, async-storage 3.x
 - Reanimated wurde durch `Animated` core ersetzt (Web-Kompatibilität) — Issue #131
 
-## Sound-Effekte / Mehrere Kinderprofile / Firebase Crashlytics
+## Sound-Effekte / Mehrere Kinderprofile
 
 Detaildokumentation vollständig in `docs/ARCHITECTURE.md#feature-notes`
 (ausgelagert, Issue #160). Storage-Keys als Schnellreferenz:
 
 - Sounds: `app-sounds-enabled` / `app-sounds-volume`; native via `expo-audio`, Web via `AudioContext`
 - Profile: `app-profiles` / `app-active-profile-id`; Suffix-Pattern `{key}-{profileId}` für alle per-Profil-Daten, max. 6 Profile
-- Firebase Crashlytics: nur nativ (Android); Paketname für Firebase ist `com.sven4321.trainer1x1`, nicht der `app.json`-Default
+- Kein Firebase/Crashlytics mehr (entfernt 2026-10-04) — Absturzdaten liefert Android Vitals in der Play Console; Datenschutzerklärung sagt „keine Crash-Reports, kein Firebase“, nicht wieder einführen ohne sie anzupassen
 
 <!-- GLOBAL POLICY:START -->
 

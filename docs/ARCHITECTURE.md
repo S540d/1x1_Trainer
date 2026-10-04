@@ -85,10 +85,10 @@ instead of scattering `Platform.OS` checks. Web builds go through
 assets Expo does not emit (manifest, service worker, icons, `assetlinks.json`
 for the TWA link).
 
-### Crashlytics is native-only
+### No crash reporting SDK
 
-`@react-native-firebase/crashlytics` is wired for the Android build; the web
-build has no crash reporting.
+Firebase Crashlytics was removed on 2026-10-04. Crash data for the Android app
+comes from Android Vitals in the Play Console; the web build has none.
 
 ## Data Flow
 
@@ -122,8 +122,7 @@ writes `CHALLENGE_HIGHSCORE` if beaten.
 
 Es gibt zwei Android-Paketnamen, und das ist Absicht:
 
-- `com.sven4321.trainer1x1` — der **Play-Store-Paketname**. Darauf ist auch
-  `google-services.json` (Firebase/Crashlytics) registriert und darauf zeigt
+- `com.sven4321.trainer1x1` — der **Play-Store-Paketname**. Darauf zeigt
   `assetlinks.json` für die Deep Links.
 - `com.devsven.x1x1trainer` — der Default in `app.json`, nur für Dev-Builds.
 
@@ -134,8 +133,7 @@ package: process.env.APP_PACKAGE || base.expo.android.package,
 ```
 
 Store-Builds müssen die Variable also setzen — sonst entsteht ein AAB mit dem
-Dev-Paketnamen, das der Play Store ablehnt und dem Firebase keine Daten
-zuordnet:
+Dev-Paketnamen, das der Play Store ablehnt:
 
 ```
 APP_PACKAGE=com.sven4321.trainer1x1 npx expo prebuild --platform android --clean
@@ -169,7 +167,7 @@ Nach jedem Schritt `npx expo config --type public` gegen Warnungen prüfen.
 installierten SDK-Version — Root-Ursache ist `uuid <11.1.1` als transitive
 Build-Time-Dependency von `xcode` → `@expo/config-plugins`. Betrifft nur
 Prebuild/Config-Plugins, nicht den ausgelieferten App-Code; Fix liegt
-upstream bei Expo/Firebase. Volle Diagnose: `docs/private/INCIDENTS.md`.
+upstream bei Expo. Volle Diagnose: `docs/private/INCIDENTS.md`.
 
 ## Android Config Plugins
 
@@ -181,10 +179,7 @@ werden, sondern brauchen ein Expo-Config-Plugin
 `expo/config-plugins`, in `app.config.js` an die Plugin-Liste angehängt).
 Verifizieren mit `npx expo prebuild --platform android --clean` + `grep` im
 generierten `AndroidManifest.xml`; danach `android/` wieder löschen
-(gitignored). Für den lokalen Test wird zusätzlich eine (gitignorete)
-Platzhalter-`google-services.json` benötigt, sonst bricht der
-Firebase-Copy-Schritt des Prebuilds unabhängig von der eigentlichen
-Änderung ab.
+(gitignored).
 
 ## Feature Notes
 
@@ -299,10 +294,3 @@ Detaildokumentation zu einzelnen Features — ausgelagert aus `CLAUDE.md`
 - **SettingsMenu:** "Profile"-Button öffnet `ProfilePickerModal` via `onOpenProfiles`-Prop
 - `usePreferences` setzt `isLoaded = false` bei Profilwechsel → verhindert Auto-Save-Race zwischen altem und neuem Profil
 - Aufgabenstatistiken, Streak, Badges, HighScore, Operations, NumberRange, SessionRecords — alle per Profil getrennt
-
-### Firebase Crashlytics
-
-- Initialisierung in `index.ts` via dynamischem Import (Web-Bundle bleibt sauber)
-- `setCrashlyticsCollectionEnabled(!__DEV__)` — kein Dev-Traffic in Firebase Console
-- `google-services.json` liegt im Projekt-Root, ist gitignored — muss nach `prebuild --clean` nicht neu abgelegt werden (kein Expo-Native-Ordner)
-- **Paketname für Firebase**: `com.sven4321.trainer1x1` (Play-Store-Paketname, nicht `com.devsven.x1x1trainer` aus app.json!)
