@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 import { ThemeColors, DifficultyMode, ChallengeState } from '../types/game';
-import { CHALLENGE_MAX_LIVES } from '../utils/constants';
+import { CHALLENGE_MAX_LIVES, DESIGN_TOKENS } from '../utils/constants';
 import { Badge } from './Badge';
 import { ProgressBar } from './ProgressBar';
 
@@ -78,15 +78,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   headerScore: {
     fontSize: 18,
   },
   settingsButton: {
-    padding: 8,
+    padding: DESIGN_TOKENS.SPACING_SM,
     minWidth: 44,
     minHeight: 44,
     justifyContent: 'center',
@@ -98,9 +98,9 @@ const styles = StyleSheet.create({
   },
   roundsBadge: {
     minWidth: 28,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 14,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_SM,
+    paddingVertical: DESIGN_TOKENS.SPACING_XS,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     alignItems: 'center',
     justifyContent: 'center',
   },

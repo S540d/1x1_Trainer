@@ -103,6 +103,7 @@ export const ModalHost: React.FC<ModalHostProps> = ({
       onClose={() => modals.close('parentDashboard')}
       colors={colors}
       profileId={activeProfile?.id}
+      profileCreatedAt={activeProfile?.createdAt}
       t={t}
     />
 

@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { DESIGN_TOKENS } from '../utils/constants';
 
 export const modalStyles = StyleSheet.create({
   overlay: {
@@ -9,8 +10,8 @@ export const modalStyles = StyleSheet.create({
   },
   content: {
     backgroundColor: '#fff',
-    borderRadius: 24,
-    padding: 24,
+    borderRadius: DESIGN_TOKENS.RADIUS_XL,
+    padding: DESIGN_TOKENS.SPACING_XXL,
     alignItems: 'center',
     width: '85%',
     maxWidth: 400,
@@ -23,17 +24,17 @@ export const modalStyles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: DESIGN_TOKENS.SPACING_LG,
   },
   text: {
     fontSize: 18,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: DESIGN_TOKENS.SPACING_XXL,
   },
   primaryButton: {
     backgroundColor: '#4F46E5',
     paddingHorizontal: 32,
-    paddingVertical: 16,
+    paddingVertical: DESIGN_TOKENS.SPACING_LG,
     borderRadius: 28,
   },
   primaryButtonText: {

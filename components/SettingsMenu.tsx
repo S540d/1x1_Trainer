@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XL,
     paddingVertical: 14,
   },
   settingsMenuTitle: {
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   settingsMenuCloseButton: {
-    padding: 8,
+    padding: DESIGN_TOKENS.SPACING_SM,
     alignItems: 'flex-end',
   },
   settingsMenuCloseButtonText: {
@@ -251,8 +251,8 @@ const styles = StyleSheet.create({
   },
   settingsMenuLinkFlex: {
     flex: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 16,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_SM,
+    paddingVertical: DESIGN_TOKENS.SPACING_LG,
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: 'rgba(102,126,234,0.12)',
@@ -264,13 +264,13 @@ const styles = StyleSheet.create({
   topButtonsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   topButton: {
     flex: 1,
     minWidth: '45%',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: DESIGN_TOKENS.SPACING_SM,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_MD,
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
     borderWidth: 2,
     alignItems: 'center',
@@ -283,8 +283,8 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   settingsSection: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
   },
   settingsSectionRow: {
     flexDirection: 'row',
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   },
   resetOnboardingButton: {
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
     borderTopWidth: 1,
     borderTopColor: 'rgba(102,126,234,0.1)',
   },

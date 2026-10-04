@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Removed
+
+- 🔥 **Firebase Crashlytics** vollständig entfernt (`@react-native-firebase/*`, `google-services.json`, CI-Secret-Schritt). Absturzdaten liefert weiterhin Android Vitals in der Play Console; die Datenschutzerklärung („keine Crash-Reports, kein Firebase“) stimmt damit wieder.
+
+## [1.7.0] - 2026-10-04
+
+### Added
+
+- ✨ **Kalendereintrags-Generator** im Eltern-Dashboard: Übungserinnerung als ICS-Download (Web) bzw. Google-Calendar-Link (nativ) (Issue #381)
+- ✨ **Impressum, Datenschutz, Quellcode und Play-Store-Link** im „Über"-Dialog sowie Datenschutzerklärung als statische Seite (Issue #384)
+
+### Changed
+
+- 🎨 Begrüßungsbildschirm und SEO-Landingpage kindgerechter gestaltet (#380)
+- 🔧 Design-Tokens für Radius (`RADIUS_SM/MD/LG/XL`) und Spacing (`SPACING_XS`–`SPACING_XXL`) statt hartkodierter Werte; Radius 14 auf 16 angeglichen (leicht rundere Ecken bei einzelnen Karten/Buttons) (Issues #357, #394)
+- 🧹 `App.tsx` in `GameScreen`, `ModalHost` und Feature-Hooks aufgeteilt, `useModals()`-Hook, gemeinsame `startNewRound()`-Logik und Storage-Factory — kein Verhaltensunterschied (Issue #357)
+- 📝 README auf Nutzer ausgerichtet, Dokumentation nach `docs/ARCHITECTURE.md` ausgelagert
+
+### Fixed
+
+- 🐛 Splash-Screen-Animation lief immer im Reduced-Motion-Fallback (#378)
+- 🐛 CI-Build repariert (Node 22, `react-native`-Version passend zu Expo SDK 57) (Issue #368)
+
 ## [1.6.0] - 2026-09-05
 
 ### Added
