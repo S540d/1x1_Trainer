@@ -219,7 +219,7 @@ export function TaskSettingsModal({
 const styles = StyleSheet.create({
   container: {
     borderRadius: DESIGN_TOKENS.RADIUS_XL,
-    padding: 20,
+    padding: DESIGN_TOKENS.SPACING_XL,
     width: '92%',
     maxWidth: 440,
     maxHeight: '88%',
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
   },
   title: {
     fontSize: 18,
@@ -254,19 +254,19 @@ const styles = StyleSheet.create({
     maxHeight: 440,
   },
   section: {
-    paddingVertical: 8,
+    paddingVertical: DESIGN_TOKENS.SPACING_SM,
   },
   sectionTitle: {
     fontSize: 11,
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    marginBottom: 8,
+    marginBottom: DESIGN_TOKENS.SPACING_SM,
     textTransform: 'uppercase',
     letterSpacing: 0.08,
   },
   modeInfo: {
     fontSize: 11,
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    marginTop: 8,
+    marginTop: DESIGN_TOKENS.SPACING_SM,
     fontStyle: 'italic',
   },
   divider: {
@@ -277,13 +277,13 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   gridButton: {
     flex: 1,
     minWidth: '45%',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: DESIGN_TOKENS.SPACING_SM,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_MD,
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
     borderWidth: 2,
     alignItems: 'center',

@@ -3,7 +3,7 @@ import { Animated, Image, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors, Language } from '../types/game';
 import { translations } from '../i18n/translations';
-import { APP_NAME, APP_VERSION } from '../utils/constants';
+import { APP_NAME, APP_VERSION, DESIGN_TOKENS } from '../utils/constants';
 import { ANIMATION_DURATIONS, prefersReducedMotion } from '../utils/animations';
 
 interface SplashScreenProps {
@@ -173,13 +173,13 @@ const styles = StyleSheet.create({
     borderRadius: 28,
   },
   title: {
-    marginTop: 20,
+    marginTop: DESIGN_TOKENS.SPACING_XL,
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
   },
   loading: {
-    marginTop: 8,
+    marginTop: DESIGN_TOKENS.SPACING_SM,
     fontSize: 14,
     color: 'rgba(255,255,255,0.85)',
   },

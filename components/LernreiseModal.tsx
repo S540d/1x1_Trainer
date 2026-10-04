@@ -106,7 +106,7 @@ export function LernreiseModal({
 const styles = StyleSheet.create({
   container: {
     borderRadius: DESIGN_TOKENS.RADIUS_XL,
-    padding: 20,
+    padding: DESIGN_TOKENS.SPACING_XL,
     width: '90%',
     maxWidth: 420,
     maxHeight: '88%',
@@ -144,12 +144,12 @@ const styles = StyleSheet.create({
   },
   mapScroll: {
     maxHeight: 440,
-    marginBottom: 12,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
   },
   mapGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   rowNode: {
     width: '31%',
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     borderRadius: DESIGN_TOKENS.RADIUS_LG,
     paddingVertical: 14,
     alignItems: 'center',
-    gap: 4,
+    gap: DESIGN_TOKENS.SPACING_XS,
   },
   rowNodeLocked: {
     opacity: 0.5,
@@ -171,9 +171,9 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
-    paddingVertical: 12,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: DESIGN_TOKENS.SPACING_XS,
   },
   closeBtnText: {
     color: '#fff',

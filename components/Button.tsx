@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   button: {
     borderRadius: DESIGN_TOKENS.RADIUS_LG,
     paddingVertical: 14,
-    paddingHorizontal: 24,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XXL,
     alignItems: 'center',
     justifyContent: 'center',
   },

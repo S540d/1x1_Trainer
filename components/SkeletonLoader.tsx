@@ -87,8 +87,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
+    paddingVertical: DESIGN_TOKENS.SPACING_LG,
     borderBottomWidth: 1,
   },
   headerChip: {
@@ -103,19 +103,19 @@ const styles = StyleSheet.create({
   },
   contentArea: {
     flex: 1,
-    padding: 16,
+    padding: DESIGN_TOKENS.SPACING_LG,
   },
   questionCard: {
     borderRadius: DESIGN_TOKENS.RADIUS_LG,
     height: 180,
-    marginBottom: 16,
+    marginBottom: DESIGN_TOKENS.SPACING_LG,
   },
   numpad: {
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   numpadRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   numpadButton: {
     flex: 1,

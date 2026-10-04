@@ -89,7 +89,7 @@ npm run test:coverage # Coverage
 
 - Version: **1.6.0** / versionCode 35 (Play Store, Stand 2026-09-05)
 - Release-Historie: `CHANGELOG.md`; Merge-Historie: `git log`
-- Offene Issues (Details in GitHub): #276 (Rest), #277 (Rest), #292, #294, #295, #296 (Rest), #325, #394 (Spacing-Tokens)
+- Offene Issues (Details in GitHub): #276 (Rest), #277 (Rest), #292, #294, #295, #296 (Rest), #325
 - Diagnostizierte, bereits gelöste Vorfälle (Kalendereintrags-Generator #382, WelcomeScreen-Redesign #380, CI-Break #368/#369, Code-Audit #357, R8/ProGuard-Bestätigung u. a.): `docs/private/INCIDENTS.md`
 
 ---
@@ -98,7 +98,7 @@ npm run test:coverage # Coverage
 
 | Datei                                | Inhalt                                                                                                                                                                                                                                                                                                |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `utils/constants.ts`                 | THEME_COLORS, DESIGN_TOKENS (inkl. `RADIUS_SM/MD/LG/XL` = 8/12/16/24 — für `borderRadius` statt Literale verwenden), STORAGE_KEYS, CHALLENGE_LEVELS, `THEMES` (alle 5 Farbthemes mit LIGHT/DARK-Varianten)                                                                                            |
+| `utils/constants.ts`                 | THEME_COLORS, DESIGN_TOKENS (inkl. `RADIUS_SM/MD/LG/XL` = 8/12/16/24 für `borderRadius`, `SPACING_XS/SM/MD/LG/XL/XXL` = 4/8/12/16/20/24 für `padding`/`margin`/`gap` — statt Literale verwenden), STORAGE_KEYS, CHALLENGE_LEVELS, `THEMES` (alle 5 Farbthemes mit LIGHT/DARK-Varianten)               |
 | `utils/theme.ts`                     | `getThemeColors(isDarkMode, themeName?)` — themeName optional, Default `'sunset'`                                                                                                                                                                                                                     |
 | `utils/storage.ts`                   | Storage-Helfer + Profile-Management (`migrateToProfiles`, `createProfile`, `deleteProfileData`, `getProfiles`/`saveProfiles`, `setActiveProfileId`). Alle per-Profil-Funktionen haben optionalen `profileId?`-Parameter (Suffix-Pattern `{key}-{profileId}`). `profileKey()` / `resolveKey()` intern. |
 | `utils/animations.ts`                | `prefersReducedMotion()` — liest Accessibility-Einstellung                                                                                                                                                                                                                                            |

@@ -85,20 +85,20 @@ export function WelcomeScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XL,
+    paddingTop: DESIGN_TOKENS.SPACING_XXL,
     alignItems: 'center',
   },
   wave: {
     fontSize: 40,
-    marginBottom: 4,
+    marginBottom: DESIGN_TOKENS.SPACING_XS,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     fontFamily: DESIGN_TOKENS.FONT_UI,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: DESIGN_TOKENS.SPACING_XXL,
   },
   tilesColumn: {
     width: '100%',
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   tile: {
     borderRadius: 32,
     paddingVertical: 22,
-    paddingHorizontal: 16,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
     alignItems: 'center',
     elevation: 4,
     shadowColor: '#000',
@@ -118,13 +118,13 @@ const styles = StyleSheet.create({
   },
   tileEmoji: {
     fontSize: 44,
-    marginBottom: 8,
+    marginBottom: DESIGN_TOKENS.SPACING_SM,
   },
   tileTitle: {
     fontSize: 19,
     fontWeight: 'bold',
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    marginBottom: 4,
+    marginBottom: DESIGN_TOKENS.SPACING_XS,
     textAlign: 'center',
     color: '#ffffff',
   },
@@ -139,11 +139,11 @@ const styles = StyleSheet.create({
   settingsHint: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
     borderRadius: 20,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginTop: 24,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
+    marginTop: DESIGN_TOKENS.SPACING_XXL,
     maxWidth: 420,
   },
   settingsHintEmoji: {

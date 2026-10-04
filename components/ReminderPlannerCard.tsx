@@ -118,9 +118,9 @@ const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
     borderRadius: DESIGN_TOKENS.RADIUS_MD,
-    padding: 12,
-    marginBottom: 12,
-    gap: 4,
+    padding: DESIGN_TOKENS.SPACING_MD,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
+    gap: DESIGN_TOKENS.SPACING_XS,
   },
   title: {
     fontSize: 10,
@@ -139,17 +139,17 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   labelSpaced: {
-    marginTop: 8,
+    marginTop: DESIGN_TOKENS.SPACING_SM,
   },
   row: {
     flexDirection: 'row',
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   createButton: {
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
     paddingVertical: 10,
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: DESIGN_TOKENS.SPACING_MD,
   },
   createButtonText: {
     color: '#fff',

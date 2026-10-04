@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   badge: {
     borderRadius: DESIGN_TOKENS.RADIUS_MD,
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: DESIGN_TOKENS.SPACING_XS,
     alignSelf: 'center',
   },
   text: {
