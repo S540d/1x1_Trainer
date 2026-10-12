@@ -2,7 +2,7 @@
   "expo": {
     "name": "1x1 Trainer",
     "slug": "1x1-trainer",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,9 +15,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 35,
+      "versionCode": 36,
       "jsEngine": "hermes",
-      "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "intentFilters": [
@@ -58,15 +57,13 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "@react-native-firebase/app",
-      "@react-native-firebase/crashlytics",
       [
         "expo-build-properties",
         {
           "android": {
             "enableProguardInReleaseBuilds": true,
             "enableShrinkResourcesInReleaseBuilds": true,
-            "extraProguardRules": "-keep class expo.modules.** { *; }\n-keepattributes SourceFile,LineNumberTable\n-keep class com.google.firebase.** { *; }\n-keep class com.crashlytics.** { *; }\n-keepattributes *Annotation*\n-dontwarn com.google.firebase.**"
+            "extraProguardRules": "-keep class expo.modules.** { *; }\n-keepattributes SourceFile,LineNumberTable\n-keepattributes *Annotation*"
           }
         }
       ]

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChildProfile, ThemeColors } from '../types/game';
-import { AVATAR_COLORS } from '../utils/constants';
+import { AVATAR_COLORS, DESIGN_TOKENS } from '../utils/constants';
 import { createProfile, deleteProfileData, saveProfiles, getProfiles } from '../utils/storage';
 
 const MAX_PROFILES = 6;
@@ -253,15 +253,15 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '80%',
-    paddingBottom: 24,
+    paddingBottom: DESIGN_TOKENS.SPACING_XXL,
     overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XL,
+    paddingVertical: DESIGN_TOKENS.SPACING_LG,
   },
   headerTitle: {
     color: '#fff',
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   closeButton: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     backgroundColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -285,24 +285,24 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: 'center',
     marginVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XL,
   },
   list: {
     flexGrow: 0,
     maxHeight: 320,
-    paddingHorizontal: 16,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
   },
   profileRow: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    paddingVertical: 12,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
   },
   profileInfo: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: DESIGN_TOKENS.SPACING_MD,
   },
   avatar: {
     width: 44,
@@ -328,16 +328,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   deleteButton: {
-    padding: 8,
+    padding: DESIGN_TOKENS.SPACING_SM,
   },
   deleteButtonText: {
     fontSize: 18,
   },
   createForm: {
     borderTopWidth: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    gap: 12,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
+    paddingTop: DESIGN_TOKENS.SPACING_LG,
+    gap: DESIGN_TOKENS.SPACING_MD,
   },
   createTitle: {
     fontSize: 15,
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   },
   nameInput: {
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 15,
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   formButton: {
     flex: 1,
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     paddingVertical: 11,
     alignItems: 'center',
   },
@@ -396,13 +396,13 @@ const styles = StyleSheet.create({
   },
   addButtonWrapper: {
     borderTopWidth: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
+    paddingTop: DESIGN_TOKENS.SPACING_LG,
     alignItems: 'center',
   },
   addButton: {
     borderWidth: 1.5,
-    borderRadius: 14,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     paddingVertical: 11,
     paddingHorizontal: 28,
   },

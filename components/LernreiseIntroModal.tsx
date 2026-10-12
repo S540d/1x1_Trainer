@@ -47,11 +47,11 @@ const styles = StyleSheet.create({
   container: {
     width: '88%',
     maxWidth: 420,
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 20,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XXL,
+    paddingTop: DESIGN_TOKENS.SPACING_XXL,
+    paddingBottom: DESIGN_TOKENS.SPACING_XL,
     alignItems: 'center',
-    gap: 12,
+    gap: DESIGN_TOKENS.SPACING_MD,
   },
   emoji: {
     fontSize: 48,
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   hintCard: {
-    borderRadius: 14,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     padding: 14,
     width: '100%',
   },
@@ -80,10 +80,10 @@ const styles = StyleSheet.create({
   },
   startButton: {
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
-    paddingVertical: 12,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
     paddingHorizontal: 32,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: DESIGN_TOKENS.SPACING_XS,
     width: '100%',
   },
   startButtonText: {

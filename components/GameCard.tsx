@@ -237,12 +237,12 @@ function GradientCheckButton({
 const styles = StyleSheet.create({
   contentArea: {
     flex: 1,
-    padding: 16,
-    gap: 4,
+    padding: DESIGN_TOKENS.SPACING_LG,
+    gap: DESIGN_TOKENS.SPACING_XS,
   },
   cardWrapper: {
     flex: 1,
-    borderRadius: 24,
+    borderRadius: DESIGN_TOKENS.RADIUS_XL,
     overflow: 'hidden',
     elevation: 8,
     shadowColor: '#000',
@@ -253,11 +253,11 @@ const styles = StyleSheet.create({
   questionCard: {
     flex: 1,
     width: '100%',
-    borderRadius: 24,
-    padding: 24,
+    borderRadius: DESIGN_TOKENS.RADIUS_XL,
+    padding: DESIGN_TOKENS.SPACING_XXL,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 16,
+    gap: DESIGN_TOKENS.SPACING_LG,
   },
   questionRow: {
     flexDirection: 'row',
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 60,
     backgroundColor: 'rgba(255,255,255,0.3)',
-    borderRadius: 16,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -298,16 +298,16 @@ const styles = StyleSheet.create({
   },
   choicesScroll: {
     flex: 1,
-    marginBottom: 12,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
   },
   choiceButton: {
     width: '100%',
     height: 60,
     backgroundColor: DESIGN_TOKENS.CHOICE_BUTTON_BG,
-    borderRadius: 16,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: DESIGN_TOKENS.SPACING_SM,
   },
   choiceButtonSelected: {
     backgroundColor: DESIGN_TOKENS.CHOICE_SELECTED_BG,
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     borderRadius: DESIGN_TOKENS.NUMPAD_BORDER_RADIUS,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: DESIGN_TOKENS.SPACING_SM,
     flexShrink: 0,
   },
   checkButtonDisabled: {
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
   },
   sequenceScroll: {
     flex: 1,
-    marginBottom: 12,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
   },
   sequenceGrid: {
     flexDirection: 'row',
@@ -368,10 +368,10 @@ const styles = StyleSheet.create({
     width: '48%',
     height: 48,
     backgroundColor: DESIGN_TOKENS.CHOICE_BUTTON_BG,
-    borderRadius: 16,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: DESIGN_TOKENS.SPACING_SM,
   },
   sequenceButtonSelected: {
     backgroundColor: DESIGN_TOKENS.CHOICE_SELECTED_BG,

@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeColors } from '../types/game';
 import { DESIGN_TOKENS } from '../utils/constants';
 
@@ -27,48 +28,56 @@ export function WelcomeScreen({
   onSelectChallenge,
   t,
 }: WelcomeScreenProps) {
-  const activeColor = colors.gradientPrimary[0];
-
   const tiles = [
     {
       emoji: '🗺️',
       title: t.welcomeLernreiseTitle,
       body: t.welcomeLernreiseBody,
       onPress: onSelectLernreise,
+      gradient: DESIGN_TOKENS.GRADIENT_PRIMARY,
     },
     {
       emoji: '💪',
       title: t.welcomeRowPickTitle,
       body: t.welcomeRowPickBody,
       onPress: onSelectRowPick,
+      gradient: DESIGN_TOKENS.GRADIENT_CORRECT,
     },
     {
       emoji: '🏆',
       title: t.welcomeChallengeTitle,
       body: t.welcomeChallengeBody,
       onPress: onSelectChallenge,
+      gradient: DESIGN_TOKENS.GRADIENT_GOLD,
     },
   ];
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={styles.wave}>👋</Text>
       <Text style={[styles.title, { color: colors.text }]}>{t.welcomeTitle}</Text>
       <View style={styles.tilesColumn}>
         {tiles.map((tile) => (
-          <TouchableOpacity
-            key={tile.title}
-            style={[styles.tile, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={tile.onPress}
-          >
-            <Text style={styles.tileEmoji}>{tile.emoji}</Text>
-            <Text style={[styles.tileTitle, { color: activeColor }]}>{tile.title}</Text>
-            <Text style={[styles.tileBody, { color: colors.textSecondary }]}>{tile.body}</Text>
+          <TouchableOpacity key={tile.title} onPress={tile.onPress} activeOpacity={0.85}>
+            <LinearGradient
+              colors={tile.gradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.tile}
+            >
+              <Text style={styles.tileEmoji}>{tile.emoji}</Text>
+              <Text style={styles.tileTitle}>{tile.title}</Text>
+              <Text style={styles.tileBody}>{tile.body}</Text>
+            </LinearGradient>
           </TouchableOpacity>
         ))}
       </View>
-      <Text style={[styles.settingsHint, { color: colors.textSecondary }]}>
-        {t.welcomeSettingsHint}
-      </Text>
+      <View style={[styles.settingsHint, { backgroundColor: colors.card }]}>
+        <Text style={styles.settingsHintEmoji}>💡</Text>
+        <Text style={[styles.settingsHintText, { color: colors.textSecondary }]}>
+          {t.welcomeSettingsHint}
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
@@ -76,55 +85,74 @@ export function WelcomeScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 32,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XL,
+    paddingTop: DESIGN_TOKENS.SPACING_XXL,
     alignItems: 'center',
   },
+  wave: {
+    fontSize: 40,
+    marginBottom: DESIGN_TOKENS.SPACING_XS,
+  },
   title: {
-    fontSize: 22,
+    fontSize: 24,
+    fontWeight: 'bold',
     fontFamily: DESIGN_TOKENS.FONT_UI,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: DESIGN_TOKENS.SPACING_XXL,
   },
   tilesColumn: {
     width: '100%',
     maxWidth: 420,
-    gap: 16,
+    gap: 18,
   },
   tile: {
-    borderRadius: DESIGN_TOKENS.NUMPAD_BORDER_RADIUS,
-    borderWidth: 2,
-    paddingVertical: 20,
-    paddingHorizontal: 16,
+    borderRadius: 32,
+    paddingVertical: 22,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
     alignItems: 'center',
-    elevation: 2,
+    elevation: 4,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
   },
   tileEmoji: {
-    fontSize: 36,
-    marginBottom: 8,
+    fontSize: 44,
+    marginBottom: DESIGN_TOKENS.SPACING_SM,
   },
   tileTitle: {
-    fontSize: 16,
+    fontSize: 19,
+    fontWeight: 'bold',
     fontFamily: DESIGN_TOKENS.FONT_UI,
-    marginBottom: 4,
+    marginBottom: DESIGN_TOKENS.SPACING_XS,
     textAlign: 'center',
+    color: '#ffffff',
   },
   tileBody: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: DESIGN_TOKENS.FONT_UI,
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: 19,
+    color: '#ffffff',
+    opacity: 0.92,
   },
   settingsHint: {
-    fontSize: 12,
-    fontFamily: DESIGN_TOKENS.FONT_UI,
-    textAlign: 'center',
-    marginTop: 24,
-    fontStyle: 'italic',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: DESIGN_TOKENS.SPACING_SM,
+    borderRadius: 20,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
+    marginTop: DESIGN_TOKENS.SPACING_XXL,
     maxWidth: 420,
+  },
+  settingsHintEmoji: {
+    fontSize: 18,
+  },
+  settingsHintText: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: DESIGN_TOKENS.FONT_UI,
+    lineHeight: 18,
   },
 });
