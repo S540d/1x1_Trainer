@@ -61,9 +61,9 @@
         "expo-build-properties",
         {
           "android": {
-            "enableProguardInReleaseBuilds": true,
+            "enableMinifyInReleaseBuilds": true,
             "enableShrinkResourcesInReleaseBuilds": true,
-            "extraProguardRules": "-keep class expo.modules.** { *; }\n-keepattributes SourceFile,LineNumberTable\n-keepattributes *Annotation*"
+            "extraProguardRules": "-keepattributes SourceFile,LineNumberTable\n-keepattributes *Annotation*"
           }
         }
       ]
