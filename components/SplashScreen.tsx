@@ -127,7 +127,7 @@ export function AppSplashScreen({ onFinish, colors, language }: SplashScreenProp
       <View style={styles.content}>
         <Animated.View style={{ opacity: iconOpacity, transform: [{ scale: iconScale }] }}>
           <Image
-            source={require('../assets/splash-icon.png')}
+            source={require('../assets/splash-logo.png')}
             style={styles.icon}
             accessibilityIgnoresInvertColors
           />
