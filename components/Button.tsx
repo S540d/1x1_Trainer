@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Text, StyleSheet, Pressable, Animated } from 'react-native';
 import { ThemeColors } from '../types/game';
 import { prefersReducedMotion } from '../utils/animations';
+import { DESIGN_TOKENS } from '../utils/constants';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger';
 
@@ -83,9 +84,9 @@ export function Button({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 16,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     paddingVertical: 14,
-    paddingHorizontal: 24,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XXL,
     alignItems: 'center',
     justifyContent: 'center',
   },

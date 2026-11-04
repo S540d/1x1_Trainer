@@ -27,6 +27,7 @@ import {
 } from '../utils/storage';
 import { DESIGN_TOKENS, LERNREISE_ROW_COUNT } from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
+import { ReminderPlannerCard } from './ReminderPlannerCard';
 
 const OP_SYMBOL: Record<Operation, string> = {
   [Operation.ADDITION]: '+',
@@ -40,6 +41,7 @@ interface ParentDashboardProps {
   onClose: () => void;
   colors: ThemeColors;
   profileId?: string;
+  profileCreatedAt?: string;
   t: {
     parentDashboard: string;
     parentDashboardSubtitle: string;
@@ -70,6 +72,16 @@ interface ParentDashboardProps {
     parentResetLernreise: string;
     parentResetLernreiseConfirm: string;
     parentResetLernreiseDone: string;
+    reminderTitle: string;
+    reminderSubtitle: string;
+    reminderTimeLabel: string;
+    reminderCadenceLabel: string;
+    reminderCadenceDaily: string;
+    reminderCadenceEveryTwoDays: string;
+    reminderCadenceWeekend: string;
+    reminderCreateButton: string;
+    reminderEventTitle: string;
+    reminderEventDescription: string;
     cancel: string;
     ok: string;
   };
@@ -298,7 +310,14 @@ function recommendWeakestRow(
   return rate > minErrorRate ? worst : null;
 }
 
-export function ParentDashboard({ visible, onClose, colors, profileId, t }: ParentDashboardProps) {
+export function ParentDashboard({
+  visible,
+  onClose,
+  colors,
+  profileId,
+  profileCreatedAt,
+  t,
+}: ParentDashboardProps) {
   const [records, setRecords] = useState<SessionRecord[]>([]);
   const [streak, setStreak] = useState<StreakData>({
     currentStreak: 0,
@@ -378,6 +397,8 @@ export function ParentDashboard({ visible, onClose, colors, profileId, t }: Pare
               <Text style={[styles.closeText, { color: colors.text }]}>✕</Text>
             </TouchableOpacity>
           </View>
+
+          <ReminderPlannerCard colors={colors} profileCreatedAt={profileCreatedAt} t={t} />
 
           {/* Summary bar */}
           {(records.length > 0 || streak.currentStreak > 0 || streak.longestStreak > 0) && (
@@ -672,8 +693,8 @@ export function ParentDashboard({ visible, onClose, colors, profileId, t }: Pare
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 24,
-    padding: 20,
+    borderRadius: DESIGN_TOKENS.RADIUS_XL,
+    padding: DESIGN_TOKENS.SPACING_XL,
     width: '90%',
     maxWidth: 420,
     maxHeight: '88%',
@@ -712,7 +733,7 @@ const styles = StyleSheet.create({
   summaryBar: {
     flexDirection: 'row',
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     marginBottom: 14,
     overflow: 'hidden',
   },
@@ -744,7 +765,7 @@ const styles = StyleSheet.create({
   },
   emptyEmoji: {
     fontSize: 40,
-    marginBottom: 4,
+    marginBottom: DESIGN_TOKENS.SPACING_XS,
   },
   emptyTitle: {
     fontSize: 16,
@@ -758,21 +779,21 @@ const styles = StyleSheet.create({
   },
   list: {
     flex: 1,
-    marginBottom: 12,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
   },
   weeklySection: {
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-    gap: 4,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
+    padding: DESIGN_TOKENS.SPACING_MD,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
+    gap: DESIGN_TOKENS.SPACING_XS,
   },
   weeklyTitle: {
     fontSize: 10,
     fontFamily: DESIGN_TOKENS.FONT_UI,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginBottom: 4,
+    marginBottom: DESIGN_TOKENS.SPACING_XS,
   },
   weeklyRow: {
     flexDirection: 'row',
@@ -796,18 +817,18 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   weeklySubtitleSpaced: {
-    marginTop: 8,
+    marginTop: DESIGN_TOKENS.SPACING_SM,
   },
   rowAccuracyRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
-    marginTop: 4,
+    marginTop: DESIGN_TOKENS.SPACING_XS,
   },
   rowChip: {
     width: 28,
     height: 28,
-    borderRadius: 8,
+    borderRadius: DESIGN_TOKENS.RADIUS_SM,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -817,9 +838,9 @@ const styles = StyleSheet.create({
   },
   chartsSection: {
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
+    padding: DESIGN_TOKENS.SPACING_MD,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
   },
   chartTitle: {
     fontSize: 10,
@@ -833,9 +854,9 @@ const styles = StyleSheet.create({
   },
   weakSection: {
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     padding: 10,
-    marginBottom: 12,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
   },
   weakTitle: {
     fontSize: 10,
@@ -852,8 +873,8 @@ const styles = StyleSheet.create({
   weakRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 4,
-    gap: 8,
+    paddingVertical: DESIGN_TOKENS.SPACING_XS,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   weakTask: {
     fontSize: 14,
@@ -872,15 +893,15 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginTop: 10,
-    marginBottom: 4,
+    marginBottom: DESIGN_TOKENS.SPACING_XS,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+    paddingVertical: DESIGN_TOKENS.SPACING_SM,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XS,
     borderBottomWidth: 1,
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   rowTime: {
     fontSize: 12,
@@ -902,7 +923,7 @@ const styles = StyleSheet.create({
   errorBadge: {
     paddingHorizontal: 7,
     paddingVertical: 3,
-    borderRadius: 8,
+    borderRadius: DESIGN_TOKENS.RADIUS_SM,
     minWidth: 42,
     alignItems: 'center',
   },
@@ -915,9 +936,9 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
-    paddingVertical: 12,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: DESIGN_TOKENS.SPACING_XS,
   },
   closeBtnText: {
     color: '#fff',
@@ -929,7 +950,7 @@ const styles = StyleSheet.create({
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
     paddingVertical: 10,
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: DESIGN_TOKENS.SPACING_MD,
   },
   resetBtnText: {
     fontSize: 13,

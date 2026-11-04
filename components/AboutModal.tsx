@@ -1,7 +1,16 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Modal, Linking } from 'react-native';
 import { ThemeColors } from '../types/game';
-import { APP_VERSION, APP_NAME, CONTACT_EMAIL } from '../utils/constants';
+import {
+  APP_VERSION,
+  APP_NAME,
+  CONTACT_EMAIL,
+  IMPRESSUM_URL,
+  PRIVACY_POLICY_URL,
+  REPO_URL,
+  PLAY_STORE_URL,
+  DESIGN_TOKENS,
+} from '../utils/constants';
 import { modalStyles } from '../styles/modalStyles';
 import { Button } from './Button';
 
@@ -13,6 +22,10 @@ interface AboutModalProps {
     about: string;
     version: string;
     aboutDescription: string;
+    impressum: string;
+    privacyPolicy: string;
+    sourceCode: string;
+    playStoreLink: string;
     copyright: string;
     license: string;
     contact: string;
@@ -21,6 +34,8 @@ interface AboutModalProps {
 }
 
 export function AboutModal({ visible, onClose, colors, t }: AboutModalProps) {
+  const linkColor = colors.gradientPrimary?.[0] ?? '#4F46E5';
+
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={modalStyles.overlay}>
@@ -39,6 +54,19 @@ export function AboutModal({ visible, onClose, colors, t }: AboutModalProps) {
             {t.aboutDescription}
           </Text>
           <View style={styles.aboutModalDivider} />
+          <TouchableOpacity onPress={() => Linking.openURL(IMPRESSUM_URL).catch(() => {})}>
+            <Text style={[styles.aboutModalInfoText, { color: linkColor }]}>{t.impressum}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => Linking.openURL(PRIVACY_POLICY_URL).catch(() => {})}>
+            <Text style={[styles.aboutModalInfoText, { color: linkColor }]}>{t.privacyPolicy}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => Linking.openURL(REPO_URL).catch(() => {})}>
+            <Text style={[styles.aboutModalInfoText, { color: linkColor }]}>{t.sourceCode}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => Linking.openURL(PLAY_STORE_URL).catch(() => {})}>
+            <Text style={[styles.aboutModalInfoText, { color: linkColor }]}>{t.playStoreLink}</Text>
+          </TouchableOpacity>
+          <View style={styles.aboutModalDivider} />
           <Text style={[styles.aboutModalInfoText, { color: colors.textSecondary }]}>
             {t.copyright}
           </Text>
@@ -48,7 +76,7 @@ export function AboutModal({ visible, onClose, colors, t }: AboutModalProps) {
           <TouchableOpacity
             onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}`).catch(() => {})}
           >
-            <Text style={[styles.aboutModalInfoText, { color: '#4F46E5' }]}>{t.contact}</Text>
+            <Text style={[styles.aboutModalInfoText, { color: linkColor }]}>{t.contact}</Text>
           </TouchableOpacity>
           <Button label={t.ok} onPress={onClose} variant="primary" fullWidth colors={colors} />
         </View>
@@ -62,10 +90,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: DESIGN_TOKENS.SPACING_LG,
   },
   aboutModalCloseButton: {
-    padding: 8,
+    padding: DESIGN_TOKENS.SPACING_SM,
     minWidth: 44,
     minHeight: 44,
     justifyContent: 'center',
@@ -78,19 +106,19 @@ const styles = StyleSheet.create({
   aboutModalAppName: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: DESIGN_TOKENS.SPACING_XS,
   },
   aboutModalInfoText: {
     fontSize: 14,
     fontWeight: '400',
-    marginTop: 4,
-    marginBottom: 8,
+    marginTop: DESIGN_TOKENS.SPACING_XS,
+    marginBottom: DESIGN_TOKENS.SPACING_SM,
     lineHeight: 20,
   },
   aboutModalDivider: {
     height: 1,
     backgroundColor: 'rgba(0,0,0,0.1)',
     width: '100%',
-    marginVertical: 8,
+    marginVertical: DESIGN_TOKENS.SPACING_SM,
   },
 });

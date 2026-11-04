@@ -36,6 +36,12 @@ import { initReducedMotionListener } from './utils/animations';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
+// Started at module load, not inside an effect: child components (e.g. the
+// splash screen) mount and check prefersReducedMotion() before a same-named
+// effect in App itself would run, so starting this any later means the splash
+// always sees the safe "true" default regardless of the real device setting.
+const reducedMotionCleanup = initReducedMotionListener();
+
 export default function App() {
   const [splashFinished, setSplashFinished] = useState(false);
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
@@ -50,9 +56,10 @@ export default function App() {
 
   const weakTaskCount = useMemo(() => getWeakTasks(taskStats, 3, 0.3).length, [taskStats]);
 
-  // Reduced motion preference — centralized in utils/animations.ts
+  // Reduced motion preference — listener started at module load (see above),
+  // cleaned up here on unmount.
   useEffect(() => {
-    return initReducedMotionListener();
+    return reducedMotionCleanup;
   }, []);
 
   // Use custom hooks

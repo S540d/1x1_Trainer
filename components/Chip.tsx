@@ -43,7 +43,7 @@ export function Chip({ label, active, onPress, colors, disabled = false, size = 
 const styles = StyleSheet.create({
   chip: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: DESIGN_TOKENS.SPACING_SM,
     paddingHorizontal: 10,
     borderRadius: DESIGN_TOKENS.NUMPAD_BUTTON_RADIUS,
     borderWidth: 2,
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   chipSm: {
     paddingVertical: 6,
-    paddingHorizontal: 8,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_SM,
   },
   chipText: {
     fontSize: 14,

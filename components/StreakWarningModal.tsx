@@ -8,6 +8,7 @@ import React from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ThemeColors } from '../types/game';
 import { TranslationStrings } from '../i18n/translations';
+import { DESIGN_TOKENS } from '../utils/constants';
 
 interface StreakWarningModalProps {
   visible: boolean;
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    borderRadius: 24,
+    borderRadius: DESIGN_TOKENS.RADIUS_XL,
     padding: 28,
     width: '80%',
     maxWidth: 340,
@@ -61,24 +62,24 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 48,
-    marginBottom: 12,
+    marginBottom: DESIGN_TOKENS.SPACING_MD,
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: DESIGN_TOKENS.SPACING_SM,
   },
   message: {
     fontSize: 14,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: DESIGN_TOKENS.SPACING_XL,
     lineHeight: 20,
   },
   button: {
     backgroundColor: '#F59E0B',
-    borderRadius: 16,
-    paddingVertical: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
     paddingHorizontal: 32,
   },
   buttonText: {

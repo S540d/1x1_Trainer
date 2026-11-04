@@ -235,15 +235,15 @@ export function OnboardingModal({ visible, onFinish, colors, t }: OnboardingModa
 const styles = StyleSheet.create({
   container: {
     width: '88%',
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_XXL,
+    paddingTop: DESIGN_TOKENS.SPACING_XL,
+    paddingBottom: DESIGN_TOKENS.SPACING_XL,
   },
   dotsRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: DESIGN_TOKENS.SPACING_XL,
   },
   dot: {
     width: 8,
@@ -257,12 +257,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: 200,
     justifyContent: 'center',
-    gap: 12,
+    gap: DESIGN_TOKENS.SPACING_MD,
     width: '100%',
   },
   emoji: {
     fontSize: 48,
-    marginBottom: 4,
+    marginBottom: DESIGN_TOKENS.SPACING_XS,
   },
   title: {
     fontSize: 20,
@@ -281,9 +281,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   demoCard: {
-    paddingVertical: 16,
+    paddingVertical: DESIGN_TOKENS.SPACING_LG,
     paddingHorizontal: 32,
-    borderRadius: 16,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     alignItems: 'center',
     elevation: 2,
     shadowColor: '#000',
@@ -296,13 +296,13 @@ const styles = StyleSheet.create({
   },
   choicesRow: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 4,
+    gap: DESIGN_TOKENS.SPACING_MD,
+    marginTop: DESIGN_TOKENS.SPACING_XS,
   },
   choiceButton: {
     width: 64,
     height: 56,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
@@ -317,10 +317,10 @@ const styles = StyleSheet.create({
   menuHint: {
     width: 48,
     height: 48,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
+    marginTop: DESIGN_TOKENS.SPACING_SM,
   },
   menuHintText: {
     fontSize: 20,
@@ -331,11 +331,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 24,
-    gap: 12,
+    marginTop: DESIGN_TOKENS.SPACING_XXL,
+    gap: DESIGN_TOKENS.SPACING_MD,
   },
   skipButton: {
-    paddingHorizontal: 12,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_MD,
     paddingVertical: 10,
   },
   skipText: {
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   nextButtonGradient: {
-    paddingVertical: 12,
+    paddingVertical: DESIGN_TOKENS.SPACING_MD,
     alignItems: 'center',
   },
   nextButtonText: {

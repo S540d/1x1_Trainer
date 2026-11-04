@@ -64,99 +64,30 @@ export function generateNumberSequenceForState(
   operation: Operation,
   maxNumber: number = 10
 ): number[] {
-  const sequence: number[] = [];
+  const multiples = (base: number) => Array.from({ length: 10 }, (_, i) => base * (i + 1));
+  const aroundAnswer = (answer: number) => {
+    const startValue = Math.max(1, answer - 4);
+    return Array.from({ length: 10 }, (_, i) => startValue + i);
+  };
+  // Asking for an operand/factor: simple sequence 1 to min(10, maxNumber)
+  const simple = () => Array.from({ length: Math.min(10, maxNumber) }, (_, i) => i + 1);
 
-  // Determine which number is being asked for and generate appropriate sequence
-  // For multiplication/division: we need the multiplication table of the known factor
-  // For addition/subtraction: we need a range around the known value
-
-  if (operation === Operation.MULTIPLICATION) {
-    // For multiplication, the sequence depends on what we're asking for:
-    // - If asking for a FACTOR (questionPart 0 or 1): show simple sequence 1-10
-    // - If asking for RESULT (questionPart 2): show multiples of one factor
-
-    if (questionPart === 2) {
-      // Asking for result: num1 × num2 = ?
-      // Show multiples of num1: num1×1, num1×2, ..., num1×10
-      const base = num1;
-      for (let i = 1; i <= 10; i++) {
-        sequence.push(base * i);
-      }
-    } else {
-      // Asking for a factor: ? × num2 = result OR num1 × ? = result
-      // Show simple sequence: 1 to min(10, maxNumber)
-      const limit = Math.min(10, maxNumber);
-      for (let i = 1; i <= limit; i++) {
-        sequence.push(i);
-      }
-    }
-  } else if (operation === Operation.ADDITION) {
-    // For addition:
-    // - If asking for ADDEND (questionPart 0 or 1): show simple sequence 1-10
-    // - If asking for SUM (questionPart 2): show range around the CORRECT ANSWER
-
-    if (questionPart === 2) {
-      // Asking for sum: num1 + num2 = ?
-      // Show range around correct answer: (result-4) to (result+5)
-      const correctAnswer = num1 + num2;
-      const startValue = Math.max(1, correctAnswer - 4);
-
-      for (let i = 0; i < 10; i++) {
-        sequence.push(startValue + i);
-      }
-    } else {
-      // Asking for an addend: ? + num2 = result OR num1 + ? = result
-      // Show simple sequence: 1 to min(10, maxNumber)
-      const limit = Math.min(10, maxNumber);
-      for (let i = 1; i <= limit; i++) {
-        sequence.push(i);
-      }
-    }
-  } else if (operation === Operation.SUBTRACTION) {
-    // For subtraction:
-    // - If asking for MINUEND or SUBTRAHEND (questionPart 0 or 1): show simple sequence 1-10
-    // - If asking for DIFFERENCE (questionPart 2): show range around the CORRECT ANSWER
-
-    if (questionPart === 2) {
-      // Asking for difference: num1 - num2 = ?
-      // Show range around correct answer: (result-4) to (result+5)
-      const correctAnswer = num1 - num2;
-      const startValue = Math.max(1, correctAnswer - 4);
-
-      for (let i = 0; i < 10; i++) {
-        sequence.push(startValue + i);
-      }
-    } else {
-      // Asking for minuend or subtrahend: ? - num2 = result OR num1 - ? = result
-      // Show simple sequence: 1 to min(10, maxNumber)
-      const limit = Math.min(10, maxNumber);
-      for (let i = 1; i <= limit; i++) {
-        sequence.push(i);
-      }
-    }
-  } else if (operation === Operation.DIVISION) {
-    // For division, all question types should show simple sequence 1-10
-    // since we're always looking for a factor or quotient (both in range 1-10)
-
-    if (questionPart === 0) {
-      // Asking for dividend: ? ÷ num2 = result
-      // The dividend = divisor × quotient, so show multiples of num2
-      const base = num2;
-      for (let i = 1; i <= 10; i++) {
-        sequence.push(base * i);
-      }
-    } else {
-      // Asking for divisor OR quotient: num1 ÷ ? = result OR num1 ÷ num2 = ?
-      // Both divisor and quotient are in range 1 to min(10, maxNumber)
-      // Show simple sequence
-      const limit = Math.min(10, maxNumber);
-      for (let i = 1; i <= limit; i++) {
-        sequence.push(i);
-      }
-    }
+  switch (operation) {
+    case Operation.MULTIPLICATION:
+      // Result asked: multiples of num1 (num1×1 … num1×10)
+      return questionPart === 2 ? multiples(num1) : simple();
+    case Operation.ADDITION:
+      // Sum asked: range around the correct answer (result-4 … result+5)
+      return questionPart === 2 ? aroundAnswer(num1 + num2) : simple();
+    case Operation.SUBTRACTION:
+      // Difference asked: range around the correct answer
+      return questionPart === 2 ? aroundAnswer(num1 - num2) : simple();
+    case Operation.DIVISION:
+      // Dividend asked (dividend = divisor × quotient): multiples of num2
+      return questionPart === 0 ? multiples(num2) : simple();
+    default:
+      return [];
   }
-
-  return sequence;
 }
 
 export function useGameLogic({

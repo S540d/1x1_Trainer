@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import { ThemeColors } from '../types/game';
+import { DESIGN_TOKENS } from '../utils/constants';
 
 interface SkeletonLoaderProps {
   colors: ThemeColors;
@@ -86,8 +87,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: DESIGN_TOKENS.SPACING_LG,
+    paddingVertical: DESIGN_TOKENS.SPACING_LG,
     borderBottomWidth: 1,
   },
   headerChip: {
@@ -98,30 +99,30 @@ const styles = StyleSheet.create({
   headerIcon: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
   },
   contentArea: {
     flex: 1,
-    padding: 16,
+    padding: DESIGN_TOKENS.SPACING_LG,
   },
   questionCard: {
-    borderRadius: 16,
+    borderRadius: DESIGN_TOKENS.RADIUS_LG,
     height: 180,
-    marginBottom: 16,
+    marginBottom: DESIGN_TOKENS.SPACING_LG,
   },
   numpad: {
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   numpadRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: DESIGN_TOKENS.SPACING_SM,
   },
   numpadButton: {
     flex: 1,
     height: 56,
-    borderRadius: 12,
+    borderRadius: DESIGN_TOKENS.RADIUS_MD,
   },
   block: {
-    borderRadius: 8,
+    borderRadius: DESIGN_TOKENS.RADIUS_SM,
   },
 });

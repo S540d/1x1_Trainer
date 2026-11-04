@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Modal } from 'react-native';
 import { ThemeColors, DifficultyMode, ChallengeState, RowMasteryStatus } from '../types/game';
 import { modalStyles } from '../styles/modalStyles';
 import { Button } from './Button';
+import { DESIGN_TOKENS } from '../utils/constants';
 
 const STATUS_EMOJI: Record<RowMasteryStatus, string> = {
   bronze: '🥉',
@@ -157,7 +158,7 @@ export function ResultModal({
 const styles = StyleSheet.create({
   modalButtonRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: DESIGN_TOKENS.SPACING_MD,
     width: '100%',
   },
   modalButtonWrap: {
@@ -166,15 +167,15 @@ const styles = StyleSheet.create({
   newHighScoreText: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: DESIGN_TOKENS.SPACING_SM,
   },
   highScoreText: {
     fontSize: 14,
-    marginBottom: 16,
+    marginBottom: DESIGN_TOKENS.SPACING_LG,
   },
   lernreiseEmoji: {
     fontSize: 48,
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: DESIGN_TOKENS.SPACING_XS,
   },
 });
