@@ -21,20 +21,11 @@ feature/issue-XXX → testing → main
 | `feature/issue-XXX` | Kurzlebige Feature-Branches      |
 
 - PRs immer gegen `testing` öffnen, nicht `main`
-- `gh pr merge <nr> --squash --delete-branch` für Feature→testing PRs
-- `gh pr merge <nr> --squash` für testing→main (kein `--delete-branch`!)
+- `gh pr merge <nr> --merge --delete-branch` für Feature→testing PRs
+- `gh pr merge <nr> --merge` für testing→main (kein `--delete-branch`!)
+- **Squash-Merges sind in den Repo-Settings deaktiviert** (API antwortet mit `405 Squash merges are not allowed`, festgestellt 2026-11-04 bei #398). Für testing→main ist der Merge-Commit ohnehin richtig: `main` bleibt Vorfahre von `testing`, ein Rück-Sync main→testing (wie früher #400) entfällt.
 - **Vor Push:** lokale Tests ausführen (`npm test`)
 - **Kein Merge bei CI-Fail**
-
-## Merge-Workflow (PR → staging → main)
-
-```bash
-gh pr merge <nr> --squash --delete-branch
-git checkout main && git merge staging && git push origin main
-git checkout staging && git merge main && git push origin staging
-git checkout testing && git merge main && git push origin testing
-git checkout main
-```
 
 ---
 
