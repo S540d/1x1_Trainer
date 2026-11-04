@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View, Modal } from 'react-native';
+import { StyleSheet, Text, View, Modal, TouchableOpacity } from 'react-native';
 import { ThemeColors, DifficultyMode, ChallengeState, RowMasteryStatus } from '../types/game';
 import { modalStyles } from '../styles/modalStyles';
 import { Button } from './Button';
+import { HomeIcon } from './HomeIcon';
 import { DESIGN_TOKENS } from '../utils/constants';
 
 const STATUS_EMOJI: Record<RowMasteryStatus, string> = {
@@ -25,6 +26,7 @@ interface ResultModalProps {
   lernreiseResult?: LernreiseResult | null;
   onRestart: () => void;
   onContinue: () => void;
+  onGoHome: () => void;
   t: {
     challengeOver: string;
     newHighScore: string;
@@ -45,6 +47,7 @@ interface ResultModalProps {
     lernreiseResultBronze: string;
     lernreiseResultRetry: string;
     lernreiseBackToMap: string;
+    backToHome: string;
   };
 }
 
@@ -57,6 +60,7 @@ export function ResultModal({
   lernreiseResult,
   onRestart,
   onContinue,
+  onGoHome,
   t,
 }: ResultModalProps) {
   return (
@@ -149,6 +153,12 @@ export function ResultModal({
               </View>
             </>
           )}
+          <TouchableOpacity onPress={onGoHome} style={styles.homeLink} accessibilityRole="button">
+            <HomeIcon color={colors.textSecondary} size={18} />
+            <Text style={[styles.homeLinkText, { color: colors.textSecondary }]}>
+              {t.backToHome}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -172,6 +182,20 @@ const styles = StyleSheet.create({
   highScoreText: {
     fontSize: 14,
     marginBottom: DESIGN_TOKENS.SPACING_LG,
+  },
+  homeLink: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    alignItems: 'flex-end',
+    gap: DESIGN_TOKENS.SPACING_SM,
+    marginTop: DESIGN_TOKENS.SPACING_MD,
+    paddingVertical: DESIGN_TOKENS.SPACING_SM,
+  },
+  homeLinkText: {
+    fontSize: 15,
+    lineHeight: 20,
+    marginBottom: -2,
+    textDecorationLine: 'underline',
   },
   lernreiseEmoji: {
     fontSize: 48,

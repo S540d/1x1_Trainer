@@ -23,6 +23,8 @@ describe('WelcomeScreen', () => {
         onSelectLernreise={jest.fn()}
         onSelectRowPick={jest.fn()}
         onSelectChallenge={jest.fn()}
+        onOpenTaskSettings={jest.fn()}
+        onShowMenu={jest.fn()}
         t={t}
       />
     );
@@ -45,6 +47,8 @@ describe('WelcomeScreen', () => {
         onSelectLernreise={onSelectLernreise}
         onSelectRowPick={onSelectRowPick}
         onSelectChallenge={onSelectChallenge}
+        onOpenTaskSettings={jest.fn()}
+        onShowMenu={jest.fn()}
         t={t}
       />
     );
@@ -53,5 +57,43 @@ describe('WelcomeScreen', () => {
     expect(onSelectRowPick).toHaveBeenCalledTimes(1);
     expect(onSelectLernreise).not.toHaveBeenCalled();
     expect(onSelectChallenge).not.toHaveBeenCalled();
+  });
+
+  it('opens the task settings when the hint is pressed', () => {
+    const colors = getThemeColors(false);
+    const onOpenTaskSettings = jest.fn();
+    const { getByText } = render(
+      <WelcomeScreen
+        colors={colors}
+        onSelectLernreise={jest.fn()}
+        onSelectRowPick={jest.fn()}
+        onSelectChallenge={jest.fn()}
+        onOpenTaskSettings={onOpenTaskSettings}
+        onShowMenu={jest.fn()}
+        t={t}
+      />
+    );
+
+    fireEvent.click(getByText(t.welcomeSettingsHint));
+    expect(onOpenTaskSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens the settings menu from the ⋮ button', () => {
+    const colors = getThemeColors(false);
+    const onShowMenu = jest.fn();
+    const { getByLabelText } = render(
+      <WelcomeScreen
+        colors={colors}
+        onSelectLernreise={jest.fn()}
+        onSelectRowPick={jest.fn()}
+        onSelectChallenge={jest.fn()}
+        onOpenTaskSettings={jest.fn()}
+        onShowMenu={onShowMenu}
+        t={t}
+      />
+    );
+
+    fireEvent.click(getByLabelText('Settings'));
+    expect(onShowMenu).toHaveBeenCalledTimes(1);
   });
 });

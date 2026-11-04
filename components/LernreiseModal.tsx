@@ -8,6 +8,8 @@ import { modalStyles } from '../styles/modalStyles';
 interface LernreiseModalProps {
   visible: boolean;
   onClose: () => void;
+  /** ✕ / OK without picking a row; falls back to onClose */
+  onDismiss?: () => void;
   onSelectRow: (row: number) => void;
   colors: ThemeColors;
   profileId?: string;
@@ -28,6 +30,7 @@ const STATUS_EMOJI: Record<RowMasteryStatus, string> = {
 export function LernreiseModal({
   visible,
   onClose,
+  onDismiss,
   onSelectRow,
   colors,
   profileId,
@@ -52,7 +55,7 @@ export function LernreiseModal({
                 {t.lernreiseSubtitle}
               </Text>
             </View>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <TouchableOpacity style={styles.closeButton} onPress={onDismiss ?? onClose}>
               <Text style={[styles.closeText, { color: colors.text }]}>✕</Text>
             </TouchableOpacity>
           </View>
@@ -93,7 +96,7 @@ export function LernreiseModal({
 
           <TouchableOpacity
             style={[styles.closeBtn, { backgroundColor: colors.gradientPrimary[0] }]}
-            onPress={onClose}
+            onPress={onDismiss ?? onClose}
           >
             <Text style={styles.closeBtnText}>{t.ok}</Text>
           </TouchableOpacity>

@@ -330,16 +330,18 @@ export function ParentDashboard({
   useEffect(() => {
     if (visible) {
       setLoading(true);
-      Promise.all([getSessionRecords(), getStreakData(), getTaskStats()]).then(
-        ([data, streakData, stats]) => {
-          setRecords(data);
-          setStreak(streakData);
-          setTaskStats(stats);
-          setLoading(false);
-        }
-      );
+      Promise.all([
+        getSessionRecords(profileId),
+        getStreakData(profileId),
+        getTaskStats(profileId),
+      ]).then(([data, streakData, stats]) => {
+        setRecords(data);
+        setStreak(streakData);
+        setTaskStats(stats);
+        setLoading(false);
+      });
     }
-  }, [visible]);
+  }, [visible, profileId]);
 
   const weakTasks = useMemo(() => getWeakTasks(taskStats).slice(0, 5), [taskStats]);
 
