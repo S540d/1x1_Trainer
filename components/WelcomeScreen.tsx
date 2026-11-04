@@ -64,7 +64,6 @@ export function WelcomeScreen({
         <Text style={[styles.menuButtonText, { color: colors.text }]}>⋮</Text>
       </TouchableOpacity>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.wave}>👋</Text>
         <Text style={[styles.title, { color: colors.text }]}>{t.welcomeTitle}</Text>
         <View style={styles.tilesColumn}>
           {tiles.map((tile) => (
@@ -121,12 +120,10 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: DESIGN_TOKENS.SPACING_XL,
-    paddingVertical: DESIGN_TOKENS.SPACING_XL,
+    // clears the absolutely positioned ⋮ button (top + 44 min height)
+    paddingTop: DESIGN_TOKENS.SPACING_MD + 44 + DESIGN_TOKENS.SPACING_SM,
+    paddingBottom: DESIGN_TOKENS.SPACING_XL,
     alignItems: 'center',
-  },
-  wave: {
-    fontSize: 36,
-    marginBottom: DESIGN_TOKENS.SPACING_XS,
   },
   title: {
     fontSize: 24,
