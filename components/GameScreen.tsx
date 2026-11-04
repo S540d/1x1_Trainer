@@ -44,6 +44,7 @@ interface GameScreenProps {
   };
   onShowMenu: () => void;
   onHideMenu: () => void;
+  onGoHome: () => void;
   menuActions: SettingsMenuActions;
   lernreiseResult: { row: number; status: RowMasteryStatus | null } | null;
   onResultRestart: () => void;
@@ -61,6 +62,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   menuAnimatedStyle,
   onShowMenu,
   onHideMenu,
+  onGoHome,
   menuActions,
   lernreiseResult,
   onResultRestart,
@@ -75,6 +77,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       answerHistory={game.gameState.answerHistory}
       roundsToday={roundsToday}
       onShowMenu={onShowMenu}
+      onGoHome={onGoHome}
       t={t}
     />
 
@@ -113,6 +116,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       lernreiseResult={lernreiseResult}
       onRestart={onResultRestart}
       onContinue={onResultContinue}
+      onGoHome={onGoHome}
       t={t}
     />
   </>

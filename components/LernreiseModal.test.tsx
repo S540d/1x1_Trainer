@@ -118,4 +118,34 @@ describe('LernreiseModal', () => {
     );
     await waitFor(() => expect(mockGetRowMastery).toHaveBeenCalledWith('abc'));
   });
+
+  it('dismissing via ✕ or OK calls onDismiss instead of onClose', async () => {
+    const onClose = jest.fn();
+    const onDismiss = jest.fn();
+    const { getByText } = render(
+      <LernreiseModal
+        visible
+        onClose={onClose}
+        onDismiss={onDismiss}
+        onSelectRow={jest.fn()}
+        colors={colors}
+        t={t}
+      />
+    );
+    await waitFor(() => expect(getByText('1er-Reihe')).toBeTruthy());
+    fireEvent.click(getByText('✕'));
+    fireEvent.click(getByText(t.ok));
+    expect(onDismiss).toHaveBeenCalledTimes(2);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('dismissing falls back to onClose without onDismiss', async () => {
+    const onClose = jest.fn();
+    const { getByText } = render(
+      <LernreiseModal visible onClose={onClose} onSelectRow={jest.fn()} colors={colors} t={t} />
+    );
+    await waitFor(() => expect(getByText('1er-Reihe')).toBeTruthy());
+    fireEvent.click(getByText('✕'));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });

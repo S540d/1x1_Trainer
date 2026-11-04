@@ -225,6 +225,7 @@ export interface TranslationStrings {
   welcomeChallengeTitle: string;
   welcomeChallengeBody: string;
   welcomeSettingsHint: string;
+  backToHome: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -452,8 +453,8 @@ export const translations: Record<Language, TranslationStrings> = {
     welcomeRowPickBody: 'Practice harder problems more often than easy ones.',
     welcomeChallengeTitle: 'Challenge Mode',
     welcomeChallengeBody: 'Endless mode: answer until 3 mistakes, difficulty increases.',
-    welcomeSettingsHint:
-      'Tip: fine-tune the tasks (operation, difficulty, number range) under Settings → Set Up Tasks.',
+    welcomeSettingsHint: 'Tip: tap here to fine-tune operation, difficulty and number range.',
+    backToHome: 'Back to Start',
   },
   de: {
     // Settings Menu
@@ -681,6 +682,7 @@ export const translations: Record<Language, TranslationStrings> = {
     welcomeChallengeTitle: 'Herausforderungsmodus',
     welcomeChallengeBody: 'Endlos-Modus: antworte bis zu 3 Fehlern, die Schwierigkeit steigt.',
     welcomeSettingsHint:
-      'Tipp: In den Einstellungen → Aufgaben einstellen kannst du Rechenart, Schwierigkeit und Zahlenbereich feiner einstellen.',
+      'Tipp: Tippe hier, um Rechenart, Schwierigkeit und Zahlenbereich feiner einzustellen.',
+    backToHome: 'Zur Startseite',
   },
 };

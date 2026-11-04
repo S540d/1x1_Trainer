@@ -98,6 +98,14 @@ describe('ParentDashboard', () => {
     });
   });
 
+  it('loads the data of the given profile', async () => {
+    render(<ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} profileId="kid-1" />);
+    await waitFor(() => {
+      expect(mockGetSessionRecords).toHaveBeenCalledWith('kid-1');
+      expect(mockGetTaskStats).toHaveBeenCalledWith('kid-1');
+    });
+  });
+
   it('shows title', async () => {
     const { getByText } = render(
       <ParentDashboard visible onClose={jest.fn()} colors={colors} t={t} />

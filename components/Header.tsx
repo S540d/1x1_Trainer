@@ -13,12 +13,14 @@ interface HeaderProps {
   answerHistory: (boolean | null)[];
   roundsToday?: number;
   onShowMenu: () => void;
+  onGoHome: () => void;
   t: {
     level: string;
     task: string;
     points: string;
     roundsInfoTitle: string;
     roundsInfoBody: string;
+    backToHome: string;
   };
 }
 
@@ -30,6 +32,7 @@ export function Header({
   answerHistory,
   roundsToday,
   onShowMenu,
+  onGoHome,
   t,
 }: HeaderProps) {
   return (
@@ -66,6 +69,14 @@ export function Header({
             </Text>
           </TouchableOpacity>
         )}
+      <TouchableOpacity
+        onPress={onGoHome}
+        style={styles.settingsButton}
+        accessibilityRole="button"
+        accessibilityLabel={t.backToHome}
+      >
+        <Text style={styles.homeButtonText}>🏠</Text>
+      </TouchableOpacity>
       <TouchableOpacity onPress={onShowMenu} style={styles.settingsButton} aria-label="Settings">
         <Text style={[styles.settingsButtonText, { color: colors.text }]}>⋮</Text>
       </TouchableOpacity>
@@ -95,6 +106,9 @@ const styles = StyleSheet.create({
   settingsButtonText: {
     fontSize: 24,
     fontWeight: 'normal',
+  },
+  homeButtonText: {
+    fontSize: 20,
   },
   roundsBadge: {
     minWidth: 28,

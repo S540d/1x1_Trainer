@@ -41,6 +41,7 @@ interface ModalHostProps {
   onProfilesChange: (profiles: ChildProfile[]) => void;
   onOnboardingFinish: () => void;
   onLernreiseIntroClose: () => void;
+  onLernreiseDismiss: () => void;
 }
 
 export const ModalHost: React.FC<ModalHostProps> = ({
@@ -59,6 +60,7 @@ export const ModalHost: React.FC<ModalHostProps> = ({
   onProfilesChange,
   onOnboardingFinish,
   onLernreiseIntroClose,
+  onLernreiseDismiss,
 }) => (
   <>
     <TaskSettingsModal
@@ -154,6 +156,10 @@ export const ModalHost: React.FC<ModalHostProps> = ({
     <LernreiseModal
       visible={modals.isOpen('lernreise')}
       onClose={() => modals.close('lernreise')}
+      onDismiss={() => {
+        modals.close('lernreise');
+        onLernreiseDismiss();
+      }}
       onSelectRow={(row) => game.startLernreiseRound(row)}
       colors={colors}
       profileId={activeProfile?.id}

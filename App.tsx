@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { StyleSheet, SafeAreaView, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -45,6 +45,10 @@ const reducedMotionCleanup = initReducedMotionListener();
 export default function App() {
   const [splashFinished, setSplashFinished] = useState(false);
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
+  // Dismissing the Lernreise map returns to the welcome screen when the map
+  // was opened from there or from a finished round — otherwise the finished
+  // round would reappear and loop (Issue #428).
+  const lernreiseExitsHomeRef = useRef(false);
 
   const modals = useModals();
   const menu = useSlideMenu();
@@ -167,7 +171,15 @@ export default function App() {
     return <SkeletonLoader colors={colors} />;
   }
 
-  const openLernreise = async () => {
+  const goHome = () => {
+    setLernreiseResult(null);
+    game.closeResult();
+    menu.hide();
+    setShowWelcomeScreen(true);
+  };
+
+  const openLernreise = async (exitsHome = false) => {
+    lernreiseExitsHomeRef.current = exitsHome;
     const introDone = await getLernreiseIntroDone(activeProfileIdRef.current);
     modals.open(introDone ? 'lernreise' : 'lernreiseIntro');
   };
@@ -182,7 +194,7 @@ export default function App() {
           colors={colors}
           onSelectLernreise={() => {
             setShowWelcomeScreen(false);
-            openLernreise();
+            openLernreise(true);
           }}
           onSelectRowPick={() => {
             setShowWelcomeScreen(false);
@@ -192,6 +204,7 @@ export default function App() {
             setShowWelcomeScreen(false);
             game.changeDifficultyMode(DifficultyMode.CHALLENGE);
           }}
+          onOpenTaskSettings={() => modals.open('taskSettings')}
           t={t}
         />
       ) : (
@@ -206,6 +219,7 @@ export default function App() {
           menuAnimatedStyle={menu.animatedStyle}
           onShowMenu={menu.show}
           onHideMenu={menu.hide}
+          onGoHome={goHome}
           menuActions={{
             onOpenPersonalize: () => {
               modals.open('personalize');
@@ -225,7 +239,7 @@ export default function App() {
               modals.open('profilePicker');
               menu.hide();
             },
-            onOpenLernreise: openLernreise,
+            onOpenLernreise: () => openLernreise(),
             onOpenTaskSettings: () => modals.open('taskSettings'),
           }}
           lernreiseResult={lernreiseResult}
@@ -243,6 +257,7 @@ export default function App() {
             if (lernreiseResult) {
               setLernreiseResult(null);
               game.closeResult();
+              lernreiseExitsHomeRef.current = true;
               modals.open('lernreise');
             } else {
               setLernreiseResult(null);
@@ -276,6 +291,9 @@ export default function App() {
         onLernreiseIntroClose={async () => {
           await setLernreiseIntroDone(activeProfileIdRef.current);
           modals.open('lernreise');
+        }}
+        onLernreiseDismiss={() => {
+          if (lernreiseExitsHomeRef.current) goHome();
         }}
       />
     </SafeAreaView>
