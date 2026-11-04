@@ -7,11 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Removed
-
-- 🔥 **Firebase Crashlytics** vollständig entfernt (`@react-native-firebase/*`, `google-services.json`, CI-Secret-Schritt). Absturzdaten liefert weiterhin Android Vitals in der Play Console; die Datenschutzerklärung („keine Crash-Reports, kein Firebase“) stimmt damit wieder.
-
-## [1.7.0] - 2026-10-04
+## [1.7.0] - 2026-11-04
 
 ### Added
 
@@ -24,11 +20,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🔧 Design-Tokens für Radius (`RADIUS_SM/MD/LG/XL`) und Spacing (`SPACING_XS`–`SPACING_XXL`) statt hartkodierter Werte; Radius 14 auf 16 angeglichen (leicht rundere Ecken bei einzelnen Karten/Buttons) (Issues #357, #394)
 - 🧹 `App.tsx` in `GameScreen`, `ModalHost` und Feature-Hooks aufgeteilt, `useModals()`-Hook, gemeinsame `startNewRound()`-Logik und Storage-Factory — kein Verhaltensunterschied (Issue #357)
 - 📝 README auf Nutzer ausgerichtet, Dokumentation nach `docs/ARCHITECTURE.md` ausgelagert
+- 🎨 Startseite kompakter (Emoji neben dem Text, scrollbar), mit eigenem Einstellungsmenü (⋮); der Tipp öffnet „Aufgaben einstellen“ direkt (Issue #428)
+- 🏠 Lernreise und Herausforderungsmodus lassen sich jederzeit über das Haus-Symbol im Header bzw. „Zur Startseite“ im Ergebnis verlassen (Issue #428)
+- ⚡ R8-Optimierung im Release-Build freigeschaltet (`proguard-android-optimize.txt`) und Splash-Logo als verkleinerte Bitmap — Hinweise aus Android Vitals (Issue #417)
 
 ### Fixed
 
 - 🐛 Splash-Screen-Animation lief immer im Reduced-Motion-Fallback (#378)
 - 🐛 CI-Build repariert (Node 22, `react-native`-Version passend zu Expo SDK 57) (Issue #368)
+- 🐛 Eltern-Dashboard zeigte keine neuen Runden: es las die globalen statt der profilbezogenen Daten (Issue #428)
+- 🐛 Nach einer Lernreise-Runde führte „Zurück zur Lernreise“ und Schließen der Karte in eine Schleife aus Ergebnis-Dialogen (Issue #428)
+
+### Removed
+
+- 🔥 **Firebase Crashlytics** vollständig entfernt (`@react-native-firebase/*`, `google-services.json`, CI-Secret-Schritt). Absturzdaten liefert weiterhin Android Vitals in der Play Console; die Datenschutzerklärung („keine Crash-Reports, kein Firebase“) stimmt damit wieder.
 
 ## [1.6.0] - 2026-09-05
 
