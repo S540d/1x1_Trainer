@@ -10,6 +10,7 @@ interface WelcomeScreenProps {
   onSelectRowPick: () => void;
   onSelectChallenge: () => void;
   onOpenTaskSettings: () => void;
+  onShowMenu: () => void;
   t: {
     welcomeTitle: string;
     welcomeLernreiseTitle: string;
@@ -28,6 +29,7 @@ export function WelcomeScreen({
   onSelectRowPick,
   onSelectChallenge,
   onOpenTaskSettings,
+  onShowMenu,
   t,
 }: WelcomeScreenProps) {
   const tiles = [
@@ -58,6 +60,9 @@ export function WelcomeScreen({
   // hint below the tiles stays reachable on small phones (Issue #428).
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <TouchableOpacity onPress={onShowMenu} style={styles.menuButton} aria-label="Settings">
+        <Text style={[styles.menuButtonText, { color: colors.text }]}>⋮</Text>
+      </TouchableOpacity>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.wave}>👋</Text>
         <Text style={[styles.title, { color: colors.text }]}>{t.welcomeTitle}</Text>
@@ -98,6 +103,21 @@ export function WelcomeScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  menuButton: {
+    position: 'absolute',
+    top: DESIGN_TOKENS.SPACING_MD,
+    right: DESIGN_TOKENS.SPACING_LG,
+    padding: DESIGN_TOKENS.SPACING_SM,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  menuButtonText: {
+    fontSize: 24,
+    fontWeight: 'normal',
   },
   content: {
     paddingHorizontal: DESIGN_TOKENS.SPACING_XL,

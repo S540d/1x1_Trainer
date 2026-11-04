@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 import { ThemeColors, DifficultyMode, ChallengeState } from '../types/game';
 import { CHALLENGE_MAX_LIVES, DESIGN_TOKENS } from '../utils/constants';
 import { Badge } from './Badge';
+import { HomeIcon } from './HomeIcon';
 import { ProgressBar } from './ProgressBar';
 
 interface HeaderProps {
@@ -75,7 +76,7 @@ export function Header({
         accessibilityRole="button"
         accessibilityLabel={t.backToHome}
       >
-        <Text style={styles.homeButtonText}>🏠</Text>
+        <HomeIcon color={colors.textSecondary} />
       </TouchableOpacity>
       <TouchableOpacity onPress={onShowMenu} style={styles.settingsButton} aria-label="Settings">
         <Text style={[styles.settingsButtonText, { color: colors.text }]}>⋮</Text>
@@ -106,9 +107,6 @@ const styles = StyleSheet.create({
   settingsButtonText: {
     fontSize: 24,
     fontWeight: 'normal',
-  },
-  homeButtonText: {
-    fontSize: 20,
   },
   roundsBadge: {
     minWidth: 28,

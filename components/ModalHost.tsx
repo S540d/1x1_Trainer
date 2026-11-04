@@ -41,6 +41,7 @@ interface ModalHostProps {
   onProfilesChange: (profiles: ChildProfile[]) => void;
   onOnboardingFinish: () => void;
   onLernreiseIntroClose: () => void;
+  onSelectLernreiseRow: (row: number) => void;
   onLernreiseDismiss: () => void;
 }
 
@@ -60,6 +61,7 @@ export const ModalHost: React.FC<ModalHostProps> = ({
   onProfilesChange,
   onOnboardingFinish,
   onLernreiseIntroClose,
+  onSelectLernreiseRow,
   onLernreiseDismiss,
 }) => (
   <>
@@ -160,7 +162,7 @@ export const ModalHost: React.FC<ModalHostProps> = ({
         modals.close('lernreise');
         onLernreiseDismiss();
       }}
-      onSelectRow={(row) => game.startLernreiseRound(row)}
+      onSelectRow={onSelectLernreiseRow}
       colors={colors}
       profileId={activeProfile?.id}
       t={t}

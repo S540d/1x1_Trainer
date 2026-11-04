@@ -19,6 +19,7 @@ import { FloatingStars } from './components/FloatingStars';
 import { GameScreen } from './components/GameScreen';
 import { ModalHost } from './components/ModalHost';
 import { WelcomeScreen } from './components/WelcomeScreen';
+import { SettingsMenu } from './components/SettingsMenu';
 import {
   getWeakTasks,
   getOnboardingDone,
@@ -192,10 +193,7 @@ export default function App() {
       {showWelcomeScreen ? (
         <WelcomeScreen
           colors={colors}
-          onSelectLernreise={() => {
-            setShowWelcomeScreen(false);
-            openLernreise(true);
-          }}
+          onSelectLernreise={() => openLernreise(true)}
           onSelectRowPick={() => {
             setShowWelcomeScreen(false);
             game.changeDifficultyMode(DifficultyMode.PRACTICE);
@@ -205,6 +203,7 @@ export default function App() {
             game.changeDifficultyMode(DifficultyMode.CHALLENGE);
           }}
           onOpenTaskSettings={() => modals.open('taskSettings')}
+          onShowMenu={menu.show}
           t={t}
         />
       ) : (
@@ -213,35 +212,9 @@ export default function App() {
           t={t}
           game={game}
           roundsToday={profileData.roundsToday}
-          screenHeight={screenHeight}
           cardAnimatedStyle={cardAnimatedStyle}
-          menuRendered={menu.rendered}
-          menuAnimatedStyle={menu.animatedStyle}
           onShowMenu={menu.show}
-          onHideMenu={menu.hide}
           onGoHome={goHome}
-          menuActions={{
-            onOpenPersonalize: () => {
-              modals.open('personalize');
-              menu.hide();
-            },
-            onOpenAbout: () => {
-              modals.open('about');
-              menu.hide();
-            },
-            onOpenParentDashboard: () => modals.open('parentDashboard'),
-            onResetOnboarding: async () => {
-              await resetOnboarding();
-              modals.open('onboarding');
-            },
-            onOpenBadges: () => modals.open('badges'),
-            onOpenProfiles: () => {
-              modals.open('profilePicker');
-              menu.hide();
-            },
-            onOpenLernreise: () => openLernreise(),
-            onOpenTaskSettings: () => modals.open('taskSettings'),
-          }}
           lernreiseResult={lernreiseResult}
           onResultRestart={() => {
             if (lernreiseResult) {
@@ -264,6 +237,36 @@ export default function App() {
               game.continueGame();
             }
           }}
+        />
+      )}
+
+      {menu.rendered && (
+        <SettingsMenu
+          colors={colors}
+          screenHeight={screenHeight}
+          menuAnimatedStyle={menu.animatedStyle}
+          onHideMenu={menu.hide}
+          onOpenPersonalize={() => {
+            modals.open('personalize');
+            menu.hide();
+          }}
+          onOpenAbout={() => {
+            modals.open('about');
+            menu.hide();
+          }}
+          onOpenParentDashboard={() => modals.open('parentDashboard')}
+          onResetOnboarding={async () => {
+            await resetOnboarding();
+            modals.open('onboarding');
+          }}
+          onOpenBadges={() => modals.open('badges')}
+          onOpenProfiles={() => {
+            modals.open('profilePicker');
+            menu.hide();
+          }}
+          onOpenLernreise={() => openLernreise(showWelcomeScreen)}
+          onOpenTaskSettings={() => modals.open('taskSettings')}
+          t={t}
         />
       )}
 
@@ -291,6 +294,10 @@ export default function App() {
         onLernreiseIntroClose={async () => {
           await setLernreiseIntroDone(activeProfileIdRef.current);
           modals.open('lernreise');
+        }}
+        onSelectLernreiseRow={(row) => {
+          setShowWelcomeScreen(false);
+          game.startLernreiseRound(row);
         }}
         onLernreiseDismiss={() => {
           if (lernreiseExitsHomeRef.current) goHome();

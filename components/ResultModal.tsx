@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Modal, TouchableOpacity } from 'react-native';
 import { ThemeColors, DifficultyMode, ChallengeState, RowMasteryStatus } from '../types/game';
 import { modalStyles } from '../styles/modalStyles';
 import { Button } from './Button';
+import { HomeIcon } from './HomeIcon';
 import { DESIGN_TOKENS } from '../utils/constants';
 
 const STATUS_EMOJI: Record<RowMasteryStatus, string> = {
@@ -153,8 +154,9 @@ export function ResultModal({
             </>
           )}
           <TouchableOpacity onPress={onGoHome} style={styles.homeLink} accessibilityRole="button">
+            <HomeIcon color={colors.textSecondary} size={18} />
             <Text style={[styles.homeLinkText, { color: colors.textSecondary }]}>
-              🏠 {t.backToHome}
+              {t.backToHome}
             </Text>
           </TouchableOpacity>
         </View>
@@ -182,12 +184,17 @@ const styles = StyleSheet.create({
     marginBottom: DESIGN_TOKENS.SPACING_LG,
   },
   homeLink: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    alignItems: 'flex-end',
+    gap: DESIGN_TOKENS.SPACING_SM,
     marginTop: DESIGN_TOKENS.SPACING_MD,
     paddingVertical: DESIGN_TOKENS.SPACING_SM,
-    alignItems: 'center',
   },
   homeLinkText: {
     fontSize: 15,
+    lineHeight: 20,
+    marginBottom: -2,
     textDecorationLine: 'underline',
   },
   lernreiseEmoji: {

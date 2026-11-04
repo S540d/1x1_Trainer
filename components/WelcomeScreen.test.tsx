@@ -24,6 +24,7 @@ describe('WelcomeScreen', () => {
         onSelectRowPick={jest.fn()}
         onSelectChallenge={jest.fn()}
         onOpenTaskSettings={jest.fn()}
+        onShowMenu={jest.fn()}
         t={t}
       />
     );
@@ -47,6 +48,7 @@ describe('WelcomeScreen', () => {
         onSelectRowPick={onSelectRowPick}
         onSelectChallenge={onSelectChallenge}
         onOpenTaskSettings={jest.fn()}
+        onShowMenu={jest.fn()}
         t={t}
       />
     );
@@ -67,11 +69,31 @@ describe('WelcomeScreen', () => {
         onSelectRowPick={jest.fn()}
         onSelectChallenge={jest.fn()}
         onOpenTaskSettings={onOpenTaskSettings}
+        onShowMenu={jest.fn()}
         t={t}
       />
     );
 
     fireEvent.click(getByText(t.welcomeSettingsHint));
     expect(onOpenTaskSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens the settings menu from the ⋮ button', () => {
+    const colors = getThemeColors(false);
+    const onShowMenu = jest.fn();
+    const { getByLabelText } = render(
+      <WelcomeScreen
+        colors={colors}
+        onSelectLernreise={jest.fn()}
+        onSelectRowPick={jest.fn()}
+        onSelectChallenge={jest.fn()}
+        onOpenTaskSettings={jest.fn()}
+        onShowMenu={onShowMenu}
+        t={t}
+      />
+    );
+
+    fireEvent.click(getByLabelText('Settings'));
+    expect(onShowMenu).toHaveBeenCalledTimes(1);
   });
 });
