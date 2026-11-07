@@ -83,6 +83,25 @@ jobs:
 
           echo "✅ Testing environment prepared"
 
+      - name: Guard – keine sensiblen Dateien im Deploy-Verzeichnis
+        # Ersetzt den früheren Schritt "Cleanup sensitive files from gh-pages".
+        # Der hat gh-pages im Build-Workspace ausgecheckt und per `git add -A`
+        # gitignorierte Build-Reste (.expo/, dist/, *-deploy/) erst eingecheckt
+        # (S540d/S540d.github.io#28). Geprüft wird jetzt VOR dem Upload genau das,
+        # was hochgeladen wird.
+        run: |
+          DIR=./testing-deploy
+          BAD=$( { find "$DIR" -maxdepth 1 \( -name node_modules -o -name .expo -o -name .git \) ; \
+                  find "$DIR" \( -name '.env' -o -name '.env.*' -o -name '*.jks' -o -name '*.keystore' \
+                    -o -name '*.p12' -o -name credentials.json -o -name google-services.json \
+                    -o -name GoogleService-Info.plist -o -name local.properties \) ; } | head -20)
+          if [ -n "$BAD" ]; then
+            echo "::error::Sensible Dateien im Deploy-Verzeichnis $DIR:"
+            echo "$BAD"
+            exit 1
+          fi
+          echo "✅ Deploy-Verzeichnis $DIR sauber"
+
       - name: Upload to gh-pages (testing subdirectory)
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -93,63 +112,9 @@ jobs:
           keep_files: true
           allow_empty_commit: true
 
-      - name: Cleanup sensitive files from gh-pages
-        run: |
-          echo "🧹 Cleaning up sensitive files from gh-pages branch..."
-
-          # Save current working directory state
-          git stash --include-untracked || true
-
-          # Checkout gh-pages branch
-          git fetch origin gh-pages
-          git checkout gh-pages
-
-          # List of files/directories to remove
-          FILES_TO_REMOVE=(
-            "credentials.json"
-            "Keystore/"
-            ".vscode/"
-            ".husky/"
-            "node_modules/"
-            ".templates/"
-            ".venv/"
-            "Android_old/"
-            "Playstore_apps/"
-            "coverage/"
-            ".env"
-            ".env.local"
-            "*.log"
-          )
-
-          # Remove files if they exist
-          REMOVED=0
-          for item in "${FILES_TO_REMOVE[@]}"; do
-            if [ -e "$item" ] || [ -d "$item" ]; then
-              echo "  Removing: $item"
-              rm -rf "$item"
-              REMOVED=1
-            fi
-          done
-
-          # Commit and push if changes were made
-          if [ $REMOVED -eq 1 ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add -A
-            git commit -m "🧹 Auto-cleanup: Remove sensitive files from gh-pages" || true
-            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
-            echo "✅ Cleanup completed and pushed"
-          else
-            echo "✅ No cleanup needed - gh-pages is already clean"
-          fi
-
-          # Switch back to original branch
-          git checkout -
-
       - name: Deployment Summary
         run: |
           echo "🧪 Testing deployment successful!"
           echo "Testing URL: https://s540d.github.io/1x1_Trainer/testing/"
           echo "Branch: gh-pages (subdirectory: /testing/)"
           echo "Note: GitHub Pages will auto-rebuild from branch (1-2 minutes)"
-          echo "🧹 Auto-cleanup: Sensitive files removed from gh-pages"
