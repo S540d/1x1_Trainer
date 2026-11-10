@@ -1,0 +1,11 @@
+{
+  "_comment": "Befristete Ausnahmen für scripts/audit-gate.mjs (Vorlage: DrawFromMemory, project-templates#171). Nur Findings ohne kurzfristigen Fix aufnehmen, jeweils mit Begründung und Ablaufdatum. Nach Ablauf schlägt das Gate fehl -> neu bewerten.",
+  "advisories": [
+    {
+      "id": "GHSA-mrhx-c7xc-m3w5",
+      "package": "zod",
+      "reason": "Speicher-DoS bei übergroßen Collections. Nur zod@3.25.76 via expo -> @expo/cli (Build-Tooling, nicht im App-Bundle); kein gepatchter 3.x-Release. Löst sich mit dem Expo-SDK-58-Upgrade (#423).",
+      "expires": "2026-12-31"
+    }
+  ]
+}
