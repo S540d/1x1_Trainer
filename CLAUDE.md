@@ -46,11 +46,10 @@ Beim Erhöhen der Version IMMER alle drei Stellen aktualisieren:
 
 ## Build-Workflow (Übersicht)
 
-- **APK (Test):** Lokaler Build wieder lauffähig seit expo-audio-Migration (Issue #214, PR #215). **Wichtig: JDK 17 verwenden** (`export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home`) — Default-Java ist 21/25 und bricht den Gradle-Build. Alternativ per GitHub Actions: `gh workflow run build-android.yml --ref testing -f profile=preview -f bump=none`
+- **APK (Test):** Lokaler Build wieder lauffähig seit expo-audio-Migration (Issue #214, PR #215). **Wichtig: JDK 17 verwenden** (`export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home`) — Default-Java ist 21/25 und bricht den Gradle-Build.
 - **Lokaler AAB mit Store-Paketname:** `APP_PACKAGE=com.sven4321.trainer1x1 npx expo prebuild --platform android --clean && cd android && ./gradlew bundleRelease` — `app.config.js` injiziert den Paketnamen automatisch (Issue #233, PR #244 ✅)
-- **AAB (Play Store):** `./scripts/build-android-local.sh` (PR #409) — fragt das Keystore-Passwort ab, prüft Paketname/versionCode/Upload-Key und legt AAB + `mapping.txt` in `aab-archive/` ab. Die Mapping-Datei steckt zusätzlich im AAB (`BUNDLE-METADATA/.../proguard.map`) und wird von der Play Console automatisch übernommen — kein manueller Upload nötig. Der CI-Workflow `build-android.yml` ist Altlast.
+- **AAB (Play Store):** `./scripts/build-android-local.sh` (PR #409) — fragt das Keystore-Passwort ab, prüft Paketname/versionCode/Upload-Key und legt AAB + `mapping.txt` in `aab-archive/` ab. Die Mapping-Datei steckt zusätzlich im AAB (`BUNDLE-METADATA/.../proguard.map`) und wird von der Play Console automatisch übernommen — kein manueller Upload nötig. Android-Builds laufen ausschließlich lokal auf dem Mac (CI-Workflow `build-android.yml` entfernt).
 - **Gerätetest-APK neben der Store-App:** `npx expo prebuild --platform android --clean` **ohne** `APP_PACKAGE` + `cd android && ./gradlew assembleRelease` → Dev-Paket `com.devsven.x1x1trainer`, Debug-Key, R8 aktiv. Installiert sich parallel zur Store-App (kein Deinstallieren, keine Datenverluste). Auf dem Nexus 6 hängt `adb install` an der Play-Protect-Prüfung → `adb push` nach `/data/local/tmp` + `adb shell pm install -r`, ggf. einige Minuten warten.
-- Workflow: `.github/workflows/build-android.yml`
 
 ---
 
