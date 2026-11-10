@@ -140,9 +140,9 @@ APP_PACKAGE=com.sven4321.trainer1x1 npx expo prebuild --platform android --clean
 cd android && ./gradlew bundleRelease
 ```
 
-In CI kommt `APP_PACKAGE` aus den Repo-Secrets (`build-android.yml`).
-`npm run build:android` ruft `eas build` auf; die Store-AABs entstehen aktuell
-lokal über den Weg oben. Hintergrund: Issue #233 / PR #244.
+`./scripts/build-android-local.sh` setzt die Variable selbst. Einen CI-Build gibt
+es nicht mehr (`build-android.yml` entfernt); `npm run build:android` ruft
+`eas build` auf, die Store-AABs entstehen aber lokal über den Weg oben. Hintergrund: Issue #233 / PR #244.
 
 ## Testing
 
