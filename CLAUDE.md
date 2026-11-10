@@ -81,6 +81,7 @@ npm run test:coverage # Coverage
 
 - Version: **1.7.0** / versionCode 36 — Play-Store-Rollout gestartet 2026-11-04 (30 %), Tag `v1.7.0`
 - Release-Historie: `CHANGELOG.md`; Merge-Historie: `git log`
+- **Nächstes Release 1.8.0 = Expo SDK 58 (#423)** — erst starten, wenn der 1.7.0-Rollout bei 100 % ist und Android Vitals unauffällig sind (neues Release bricht Teil-Rollout ab). Voraussetzung Node 22 in allen Workflows: #436
 - Offene Issues (Details in GitHub): #276, #277, #294, #295, #416, #419, #423 (SDK 58), #426 (Coverage)
 - Diagnostizierte, bereits gelöste Vorfälle (Kalendereintrags-Generator #382, WelcomeScreen-Redesign #380, CI-Break #368/#369, Code-Audit #357, R8/ProGuard-Bestätigung u. a.): `docs/private/INCIDENTS.md`
 
@@ -146,6 +147,7 @@ npm run test:coverage # Coverage
 - **Merge-Konflikt staging→main:** temporäre Workflow-Dateien können kollidieren → staging-Version bevorzugen
 - **Expo-Pakete in Jest:** Neue Pakete immer in `transformIgnorePatterns` **und** `moduleNameMapper` eintragen
 - **expo-audio statt expo-av** (Issue #214 / PR #215): expo-av brach auf SDK 55. **JDK 17 zwingend** für `./gradlew assembleRelease`. Diagnose: `docs/private/INCIDENTS.md`
+- **Node-Version:** alle Workflows auf Node 22 (= `engines.node`); ab SDK 58/RN 0.88 ist Node 20 nicht mehr unterstützt. Bei SDK-Upgrades `engines` von `react-native`/`expo` gegen alle `node-version`-Stellen prüfen, nicht nur `ci-cd.yml`
 - **Expo-SDK-Upgrades:** immer in Einzelschritten fahren, nicht `expo install --fix` verlassen (Proxy blockiert `exp.host`). Details: `docs/ARCHITECTURE.md#dependency-upgrades`
 - **npm-audit zeigt dauerhaft moderate Findings** (`uuid` transitiv über `@expo/config-plugins`, Issue #276) — kein App-Code betroffen. Diagnose: `docs/private/INCIDENTS.md`
 - **`android/` ist nicht versioniert** — Manifest-Änderungen nur über Expo-Config-Plugins (`plugins/withResizeableActivity.js`). Details: `docs/ARCHITECTURE.md#android-config-plugins`
