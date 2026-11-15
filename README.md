@@ -18,4 +18,4 @@ Practice the multiplication tables (1×1 to 12×12) — a simple trainer for chi
 
 ## License
 
-MIT
+PolyForm Noncommercial 1.0.0 (non-commercial use) — see [LICENSE](LICENSE).
