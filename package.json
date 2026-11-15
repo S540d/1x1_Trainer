@@ -14,7 +14,7 @@
   "bugs": {
     "url": "https://github.com/S540d/1x1_Trainer/issues"
   },
-  "license": "MIT",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "author": "S540d",
   "scripts": {
     "start": "expo start",
