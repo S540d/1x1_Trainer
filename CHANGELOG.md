@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- 🔒 `uuid` für `xcode` per `overrides` auf `^11.1.1` gepinnt (Build-Tooling, Dependabot medium). `node-forge` steht auf `testing` bereits auf 1.4.3 und schließt die node-forge-Alerts mit dem nächsten Release nach `main`
+
 ## [1.7.0] - 2026-11-04
 
 ### Added
